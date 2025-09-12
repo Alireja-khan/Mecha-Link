@@ -19,7 +19,7 @@ export default function Home() {
           <button className=" border-2 py-3 px-5">Click Me</button>
 
           <button>Click me!</button>
- main
+          <p>This change is from faruk</p>
       </main>
     </div>
   ); 
