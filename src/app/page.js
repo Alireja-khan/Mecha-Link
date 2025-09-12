@@ -20,7 +20,7 @@ export default function Home() {
           <button onClick={alert("besi jore chap diye felechen")} className=" border-2 py-3 px-5">Jore click kore den</button>
 
           <button>Click me!</button>
- main
+          <p>This change is from faruk</p>
       </main>
     </div>
   ); 
