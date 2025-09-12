@@ -20,6 +20,7 @@ export default function Home() {
 
           <button>Click me!</button>
           <p>This change is from faruk</p>
+          <h6>This change is from faruk 2</h6>
       </main>
     </div>
   ); 
