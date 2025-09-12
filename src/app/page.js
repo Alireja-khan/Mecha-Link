@@ -8,8 +8,8 @@ export default function Home() {
         <p>👉 You only run create-react-app (or npm create vite@latest, npx next, etc.) if you are starting a brand new project.
           So for cloning and running an existing repo → just clone, install, and run.
           Do you want me to also show you what to do if the cloned repo uses Vite or Next.js instead of CRA?</p>
-          <button className="px-4 py-2 border rounded-lg">click me</button>
+          <button>Click me!</button>
       </main>
     </div>
-  );
+  ); 
 }
