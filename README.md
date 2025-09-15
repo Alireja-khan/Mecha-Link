@@ -1,36 +1,91 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# 🚗 MechaLink
 
-## Getting Started
+**Slogan:** _MechaLink – Connect with Trusted Mechanics_
 
-First, run the development server:
+---
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## 📖 Overview
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+**MechaLink** is a minimalist social network and online marketplace designed to bridge the gap between **car owners/drivers** and **mechanic shop owners**.  
+Finding reliable and efficient repair or maintenance services can be a challenge — MechaLink solves this by offering a platform where car owners connect directly with certified mechanics.
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+Our goal is to make **vehicle servicing simple, transparent, and trustworthy**.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+---
 
-## Learn More
+## ✨ Key Features
 
-To learn more about Next.js, take a look at the following resources:
+1. **🔎 Mechanic Discovery & Search**  
+   Easily search and filter mechanics by service type, location, or rating.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+2. **👨‍🔧 Mechanic Profile & Shop Details**  
+   View detailed profiles including expertise, shop information, and service offerings.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+3. **📩 Service Request System**  
+   Car owners can send direct service requests to mechanics with problem details.
 
-## Deploy on Vercel
+4. **🛠️ Multi-Category Services**  
+   Supports various categories such as general maintenance, electronics, tire service, bodywork, and more.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+5. **📅 Booking & Scheduling System**  
+   Seamless appointment booking with available time slots and instant confirmations.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+6. **📊 Request Status Tracking**  
+   Real-time updates on service requests — from pending to accepted, ongoing, or completed.
+
+7. **⭐ Ratings & Reviews**  
+   Build trust with authentic reviews and star ratings for mechanics and shops.
+
+8. **💬 Real-Time Chat / Messaging**  
+   Secure and instant communication between car owners and mechanics.
+
+9. **🗺️ Map Integration**  
+   Integrated maps to locate nearby mechanics and get directions quickly.
+
+10. **📂 Dashboard**  
+    Personalized dashboard for car owners, mechanics, and admins to manage bookings, chats, and history.
+
+---
+
+## 👥 User Personas
+
+- **Car Owner / Driver** – Finds, books, and reviews mechanic services.
+- **Mechanic Shop Owner** – Showcases shop details, receives bookings, and manages service requests.
+- **Website Handler (Admin Team)** – Monitors system activity, ensures transparency, and manages users.
+
+---
+
+## 🌍 Target Sector
+
+MechaLink mainly serves the **automobile and electronics sector**, benefiting:
+
+- Car owners & riders seeking trusted mechanics
+- Local mechanics and repair shops wanting visibility
+- Communities looking for a seamless repair/maintenance booking system
+
+In short: _a minimalist social platform connecting users and mechanics with discovery, communication, and service booking._
+
+---
+
+## 🛠️ Tech Stack
+
+- **Frontend:** React, Next.js, Tailwind CSS
+- **Backend/Database:** MongoDB
+- **Authentication:** NextAuth.js
+
+---
+
+## 🚀 Future Enhancements
+
+- **Emergency Roadside Assistance** – One-click request for urgent help
+- **Loyalty & Rewards System** – Incentives for frequent users
+- **Advanced Analytics** – Service history, spending insights, and performance tracking
+- **Mobile App Version** – Extend reach with native iOS and Android apps
+
+---
+
+## 📌 Project Type
+
+**Minimalist Social Network** – focused on building meaningful connections between car owners and mechanics with an intuitive, clutter-free user experience.
+
+---
