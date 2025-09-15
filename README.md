@@ -6,10 +6,10 @@
 
 ## 📖 Overview
 
-**MechaLink** is a minimalist social network and online marketplace designed to bridge the gap between **car owners/drivers** and **mechanic shop owners**.  
+**MechaLink** is a minimalist social network and online marketplace designed to bridge the gap between **all electronics user/ vehicle owners/drivers** and **mechanic shop owners**.  
 Finding reliable and efficient repair or maintenance services can be a challenge — MechaLink solves this by offering a platform where car owners connect directly with certified mechanics.
 
-Our goal is to make **vehicle servicing simple, transparent, and trustworthy**.
+Our goal is to make **electronics and vehicle servicing simple, transparent, and trustworthy**.
 
 ---
 
@@ -22,10 +22,10 @@ Our goal is to make **vehicle servicing simple, transparent, and trustworthy**.
    View detailed profiles including expertise, shop information, and service offerings.
 
 3. **📩 Service Request System**  
-   Car owners can send direct service requests to mechanics with problem details.
+   User / Car owners can send direct service requests to mechanics with problem details.
 
 4. **🛠️ Multi-Category Services**  
-   Supports various categories such as general maintenance, electronics, tire service, bodywork, and more.
+   Supports various categories such as general maintenance, electronics, A/C, refrigerator  and more.
 
 5. **📅 Booking & Scheduling System**  
    Seamless appointment booking with available time slots and instant confirmations.
@@ -37,19 +37,19 @@ Our goal is to make **vehicle servicing simple, transparent, and trustworthy**.
    Build trust with authentic reviews and star ratings for mechanics and shops.
 
 8. **💬 Real-Time Chat / Messaging**  
-   Secure and instant communication between car owners and mechanics.
+   Secure and instant communication between users / vehicle owners and mechanics.
 
 9. **🗺️ Map Integration**  
    Integrated maps to locate nearby mechanics and get directions quickly.
 
 10. **📂 Dashboard**  
-    Personalized dashboard for car owners, mechanics, and admins to manage bookings, chats, and history.
+    Personalized dashboard for all users, mechanics, and admins to manage bookings, chats, and history.
 
 ---
 
 ## 👥 User Personas
 
-- **Car Owner / Driver** – Finds, books, and reviews mechanic services.
+- **Users/ vehicle Owner / Driver** – Finds, books, and reviews mechanic services.
 - **Mechanic Shop Owner** – Showcases shop details, receives bookings, and manages service requests.
 - **Website Handler (Admin Team)** – Monitors system activity, ensures transparency, and manages users.
 
@@ -60,7 +60,8 @@ Our goal is to make **vehicle servicing simple, transparent, and trustworthy**.
 MechaLink mainly serves the **automobile and electronics sector**, benefiting:
 
 - Car owners & riders seeking trusted mechanics
-- Local mechanics and repair shops wanting visibility
+- Users can seek experienced mechanics for household electronics. 
+- Local mechanics and repair shops want visibility
 - Communities looking for a seamless repair/maintenance booking system
 
 In short: _a minimalist social platform connecting users and mechanics with discovery, communication, and service booking._
