@@ -12,11 +12,11 @@ export default function Newsletter() {
   };
 
   return (
-    <div className="w-9/12 mx-auto bg-[#cdd6e0] p-12 rounded-lg">
-      <div className="relative w-full rounded-lg bg-[#1f2430] shadow-lg p-6 text-center">
+    <div className="container mx-auto font-roboto  bg-[#ede1fc] p-12 rounded-lg">
+      <div className="relative w-full rounded-lg  shadow-2xl border border-gray-300 p-6 text-center bg-primary">
         {/* Icon */}
         <div className="absolute -top-8 left-1/2 transform -translate-x-1/2">
-          <div className="flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-r from-blue-400 to-purple-500 shadow-md">
+          <div className="flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-r from-purple-400 to-purple-950 shadow-md">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               className="h-8 w-8 text-white"
@@ -40,15 +40,15 @@ export default function Newsletter() {
         </button> */}
 
         {/* Content */}
-        <h2 className="mt-10 text-2xl font-semibold text-blue-400">Newsletter</h2>
-        <p className="mt-2 text-sm text-gray-300">
+        <h2 className="mt-10 text-4xl md:text-5xl font-bold text-white font-caveat">Newsletter</h2>
+        <p className="mt-3 text-base text-gray-300">
           Stay up to date with our latest news and products.
         </p>
 
         {/* Form */}
         <form
           onSubmit={handleSubmit}
-          className="mt-6 flex items-center rounded-lg bg-white overflow-hidden"
+          className="mt-6 flex items-center rounded-lg bg-white overflow-hidden border border-gray-300"
         >
           <input
             type="email"
@@ -60,14 +60,14 @@ export default function Newsletter() {
           />
           <button
             type="submit"
-            className="bg-blue-500 px-5 py-2 text-white font-medium hover:bg-blue-600 cursor-pointer"
+            className="bg-primary px-5 py-2 text-white font-medium cursor-pointer"
           >
             SUBSCRIBE
           </button>
         </form>
 
         {/* Privacy Note */}
-        <p className="mt-4 text-xs text-gray-400">
+        <p className="mt-4 text-sm text-gray-300">
           Your email is safe with us, we don’t spam.
         </p>
       </div>
