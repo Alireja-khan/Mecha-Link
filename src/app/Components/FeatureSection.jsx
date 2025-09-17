@@ -54,7 +54,7 @@ export default function FeaturesSection() {
   ];
 
   return (
-    <section className="bg-primary/20 py-16">
+    <section className="py-16">
       <div className="container mx-auto text-center px-4">
         {/* Heading */}
         <h2 className="text-4xl md:text-5xl font-bold mb-6">
