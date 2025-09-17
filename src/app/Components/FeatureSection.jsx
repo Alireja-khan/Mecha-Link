@@ -58,10 +58,10 @@ export default function FeaturesSection() {
       <div className="container mx-auto text-center px-4">
         {/* Heading */}
         <h2 className="text-4xl md:text-5xl font-bold mb-6">
-          Our <span className="font-caveat text-primary ">Features</span>
+          Our <span className="font-caveat text-purple ">Features</span>
         </h2>
 
-        <p className="text-xl text-gray-600 max-w-2xl mx-auto font-nunito-sans mb-16">
+        <p className="text-xl text-dark-purple/70 max-w-2xl mx-auto font-nunito-sans mb-16">
           Everything you need to keep your vehicle running smoothly
         </p>
 
@@ -70,10 +70,10 @@ export default function FeaturesSection() {
           {features.map((feature, index) => (
             <div
               key={index}
-              className="relative bg-white p-6 rounded-lg shadow-2xl"
+              className="relative bg-white p-6 rounded-lg  shadow-md hover:shadow-xl transition-shadow duration-300"
             >
               {/* Circle with Icon */}
-              <div className="absolute -top-5 left-6 h-12 w-12 rounded-full bg-primary flex items-center justify-center shadow">
+              <div className="absolute -top-6 left-6 h-12 w-12 rounded-full bg-purple flex items-center justify-center shadow">
                 {feature.icon}
               </div>
 
@@ -84,7 +84,7 @@ export default function FeaturesSection() {
               <p className="mt-2 text-sm text-gray-600">{feature.desc}</p>
               <a
                 href="#"
-                className="mt-4 inline-block text-sm font-medium text-primary underline"
+                className="mt-4 inline-block text-sm font-medium text-primary underline text-purple"
               >
                 See More
               </a>
