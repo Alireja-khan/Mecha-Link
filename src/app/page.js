@@ -1,3 +1,4 @@
+"use client"
 import Image from "next/image";
 
 export default function Home() {
@@ -17,7 +18,7 @@ export default function Home() {
 
           <button>Don't Click</button>
           <button className=" border-2 py-3 px-5">Click Me</button>
-          <button onClick={alert("besi jore chap diye felechen")} className=" border-2 py-3 px-5">Jore click korun</button>
+          <button onClick={()=>alert("besi jore chap diye felechen")} className=" border-2 py-3 px-5">Jore click korun</button>
 
           <button>Click me!</button>
           <p>This change is from faruk</p>
