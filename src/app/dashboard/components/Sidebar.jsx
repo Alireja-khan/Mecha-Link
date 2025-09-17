@@ -26,14 +26,14 @@ const Sidebar = ({ role = "user" }) => {
 
   // Common menu
   const commonMenu = [
-    { name: "Overview", icon: <Home size={20} />, href: "/dashboard" },
-    { name: "Profile", icon: <User size={20} />, href: "/dashboard/user/profile" },
-    //   { name: "Payments", icon: <CreditCard size={20} />, href: "/dashboard/user/payments" },
-    { name: "Settings", icon: <Settings size={20} />, href: "/dashboard/user/settings" },
-    { name: "Bookings", icon: <Calendar size={20} />, href: "/dashboard/user/bookings" },
-    { name: "Reviews", icon: <Star size={20} />, href: "/dashboard/user/reviews" },
-    { name: "Messages", icon: <MessageSquare size={20} />, href: "/dashboard/user/messages" },
-  ];
+  { name: "Overview", icon: <Home size={20} />, href: "/dashboard" },
+  { name: "Profile", icon: <User size={20} />, href: "/dashboard/user/profile" },
+//   { name: "Payments", icon: <CreditCard size={20} />, href: "/dashboard/user/payments" },
+  { name: "Settings", icon: <Settings size={20} />, href: "/dashboard/user/settings" },
+  { name: "Bookings", icon: <Calendar size={20} />, href: "/dashboard/user/bookings" },
+  { name: "Reviews", icon: <Star size={20} />, href: "/dashboard/user/reviews" },
+  { name: "Messages", icon: <MessageSquare size={20} />, href: "/dashboard/user/messages" },
+];
 
 
   // Role-based
@@ -57,6 +57,7 @@ const Sidebar = ({ role = "user" }) => {
         ${collapsed ? "w-20" : "w-64"}`}
     >
       {/* Logo */}
+<<<<<<< HEAD
       <div className={`p-6 text-xl font-bold border-b border-gray-200 flex ${collapsed ? "justify-center" : ""}`}>
         {collapsed ? <Link href={"/"}>ML</Link> : <><Link href={"/"}>
         <Image
@@ -65,10 +66,14 @@ const Sidebar = ({ role = "user" }) => {
         alt="MechaLink logo"
         src={"/logo.png"}/>
         </Link></>}
+=======
+      <div className="p-6 text-xl font-bold border-b border-gray-200">
+        {collapsed ? "ML" : "MechaLink"}
+>>>>>>> fd59b4f720550790c80880719b9ec3a05758555d
       </div>
 
       {/* Menu */}
-      <nav className={`flex flex-col flex-1 p-4 space-y-2 ${collapsed ? "items-center" : ""}`}>
+      <nav className="flex-1 p-4 space-y-2">
         {[...commonMenu, ...roleMenu[role]].map((item) => (
           <Link
             key={item.name}
@@ -82,7 +87,7 @@ const Sidebar = ({ role = "user" }) => {
       </nav>
 
       {/* Collapse button + Logout */}
-      <div className={`border-t border-gray-200 p-4 flex flex-col gap-2 ${collapsed ? "items-center" : ""}`}>
+      <div className="border-t border-gray-200 p-4 flex flex-col gap-2">
         <button
           onClick={() => setCollapsed(!collapsed)}
           className="flex items-center gap-2 p-2 rounded-lg hover:bg-gray-100 transition"
@@ -91,7 +96,7 @@ const Sidebar = ({ role = "user" }) => {
           {!collapsed && <span>Collapse</span>}
         </button>
 
-        <button className={`flex items-center gap-3 w-full p-2 rounded-lg hover:bg-red-600 hover:text-white transition ${collapsed ? "justify-center" : ""}`}>
+        <button className="flex items-center gap-3 w-full p-2 rounded-lg hover:bg-red-600 hover:text-white transition">
           <LogOut size={20} />
           {!collapsed && <span>Logout</span>}
         </button>

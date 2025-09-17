@@ -2,13 +2,12 @@ import React from "react";
 import { Facebook, Twitter, Instagram, Linkedin } from "lucide-react";
 import Image from "next/image";
 
-const footer = () => {
+const Footer = () => {
   return (
     <div className="bg-gray-900 text-gray-300">
       <div className="container mx-auto py-12 grid grid-cols-1 md:grid-cols-4 gap-8">
         {/* Brand */}
         <div>
-          {/* <h2 className="text-2xl font-bold text-white">MechaLink</h2> */}
           <Image src="/logo.png" alt="MechaLink Logo" width={120} height={50} />
           <p className="mt-4 text-sm text-gray-400">
             Connecting you with trusted garages, mechanics, and seamless vehicle
@@ -68,7 +67,7 @@ const footer = () => {
             />
             <button
               type="submit"
-              className="bg-primary px-4 py-2 text-white text-sm font-medium hover:bg-primary/90 transition"
+              className="bg-primary px-4 py-2 text-white text-sm font-medium hover:bg-primary/90 transition cursor-pointer"
             >
               Subscribe
             </button>
@@ -102,4 +101,4 @@ const footer = () => {
   );
 };
 
-export default footer;
+export default Footer;

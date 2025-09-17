@@ -12,7 +12,7 @@ export default function Newsletter() {
   };
 
   return (
-    <div className="container mx-auto font-roboto  bg-[#ede1fc] p-12 rounded-lg">
+    <div className="container mx-auto font-roboto  bg-[#ede1fc] p-16 rounded-lg">
       <div className="relative w-full rounded-lg  shadow-2xl border border-gray-300 p-6 text-center bg-primary">
         {/* Icon */}
         <div className="absolute -top-8 left-1/2 transform -translate-x-1/2">
