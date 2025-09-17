@@ -12,8 +12,8 @@ export default function Newsletter() {
   };
 
   return (
-    <div className="container mx-auto font-roboto  bg-[#ede1fc] p-16 rounded-lg">
-      <div className="relative w-full rounded-lg  shadow-2xl border border-gray-300 p-6 text-center bg-primary">
+    <div className="container mx-auto font-roboto p-16 rounded-lg">
+      <div className="relative w-full rounded-xl  shadow-2xl border border-gray-300 p-6 text-center bg-purple">
         {/* Icon */}
         <div className="absolute -top-8 left-1/2 transform -translate-x-1/2">
           <div className="flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-r from-purple-400 to-purple-950 shadow-md">
@@ -48,7 +48,7 @@ export default function Newsletter() {
         {/* Form */}
         <form
           onSubmit={handleSubmit}
-          className="mt-6 flex items-center rounded-lg bg-white overflow-hidden border border-gray-300"
+          className="mt-6 flex items-center rounded-lg bg-white overflow-hidden border border-gray-300 max-w-4xl mx-auto"
         >
           <input
             type="email"
@@ -60,7 +60,7 @@ export default function Newsletter() {
           />
           <button
             type="submit"
-            className="bg-primary px-5 py-2 text-white font-medium cursor-pointer"
+            className="bg-purple px-5 py-2 text-white font-bold cursor-pointer"
           >
             SUBSCRIBE
           </button>

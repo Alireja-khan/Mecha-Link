@@ -6,7 +6,6 @@ import WhyChooseUs from "./Components/WhyChooseUs";
 
 
 export default function Home() {
-
     return (
         <div className="">
             <WhyChooseUs />
@@ -16,5 +15,4 @@ export default function Home() {
             <FeatureSection/>
         </div>
     );
-
 }
