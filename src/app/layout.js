@@ -25,9 +25,9 @@ export default function RootLayout({ children }) {
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <div className="flex flex-col min-h-screen justify-between">
-          <ConditionalHeader /> {/* Header will handle path logic */}
+          <ConditionalHeader /> 
           {children}
-          <ConditionalFooter /> {/* Footer will handle path logic */}
+          <ConditionalFooter />
         </div>
       </body>
     </html>
