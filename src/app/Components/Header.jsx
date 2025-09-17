@@ -67,7 +67,7 @@ function Header() {
                 ))}
                 <Link href={"/contact"} className="my-button px-2 py-1 my-1 md:hidden">Let's talk</Link>
               </nav>
-              <div>
+              <div className="hidden md:flex">
                 <Image
                 src={"/MechaLink-logo.png"}
                 width={100}
