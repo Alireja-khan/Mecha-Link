@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Newsletter from "./components/Home/Newsletter";
 
 export default function Home() {
   return (
@@ -16,9 +17,11 @@ export default function Home() {
 
           <button>Don't Click</button>
           <button className=" border-2 py-3 px-5">Click Me</button>
-          {/* <button onClick={() =>alert("besi jore chap diye felechen")} className=" border-2 py-3 px-5">Jore click kore den</button> */}
+          
 
+          {/* Newsletter */}
+          <Newsletter></Newsletter>
       </main>
     </div>
-  );
+  ); 
 }
