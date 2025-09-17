@@ -31,7 +31,7 @@ export default function ServiceDetailsPage() {
         <div className="absolute bottom-6 left-6 text-white">
                 
           <div className="bg-primary w-50 text-white px-3 py-1 rounded-full text-sm mb-2">
-            General Maintenance
+            General Maintenance eee
           </div>
           <h1 className="text-4xl font-bold mb-2">
             Complete Vehicle Maintenance Service
