@@ -10,6 +10,7 @@ export default function Home() {
     return (
         <div className="">
             <WhyChooseUs />
+            <p>This is so complex</p>
             <HowItWork />
             <BlogSection />
             <Newsletter/>
