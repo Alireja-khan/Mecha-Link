@@ -57,7 +57,6 @@ const Sidebar = ({ role = "user" }) => {
         ${collapsed ? "w-20" : "w-64"}`}
     >
       {/* Logo */}
-<<<<<<< HEAD
       <div className={`p-6 text-xl font-bold border-b border-gray-200 flex ${collapsed ? "justify-center" : ""}`}>
         {collapsed ? <Link href={"/"}>ML</Link> : <><Link href={"/"}>
         <Image
@@ -66,10 +65,9 @@ const Sidebar = ({ role = "user" }) => {
         alt="MechaLink logo"
         src={"/logo.png"}/>
         </Link></>}
-=======
       <div className="p-6 text-xl font-bold border-b border-gray-200">
         {collapsed ? "ML" : "MechaLink"}
->>>>>>> fd59b4f720550790c80880719b9ec3a05758555d
+      </div>
       </div>
 
       {/* Menu */}
