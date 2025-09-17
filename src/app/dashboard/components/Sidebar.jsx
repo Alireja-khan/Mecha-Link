@@ -26,15 +26,13 @@ const Sidebar = ({ role = "user" }) => {
 
   // Common menu
   const commonMenu = [
-  { name: "Overview", icon: <Home size={20} />, href: "/dashboard" },
-  { name: "Profile", icon: <User size={20} />, href: "/dashboard/user/profile" },
-//   { name: "Payments", icon: <CreditCard size={20} />, href: "/dashboard/user/payments" },
-  { name: "Settings", icon: <Settings size={20} />, href: "/dashboard/user/settings" },
-  { name: "Bookings", icon: <Calendar size={20} />, href: "/dashboard/user/bookings" },
-  { name: "Reviews", icon: <Star size={20} />, href: "/dashboard/user/reviews" },
-  { name: "Messages", icon: <MessageSquare size={20} />, href: "/dashboard/user/messages" },
-];
-
+    { name: "Overview", icon: <Home size={20} />, href: "/dashboard" },
+    { name: "Profile", icon: <User size={20} />, href: "/dashboard/user/profile" },
+    { name: "Settings", icon: <Settings size={20} />, href: "/dashboard/user/settings" },
+    { name: "Bookings", icon: <Calendar size={20} />, href: "/dashboard/user/bookings" },
+    { name: "Reviews", icon: <Star size={20} />, href: "/dashboard/user/reviews" },
+    { name: "Messages", icon: <MessageSquare size={20} />, href: "/dashboard/user/messages" },
+  ];
 
   // Role-based
   const roleMenu = {
@@ -57,19 +55,19 @@ const Sidebar = ({ role = "user" }) => {
         ${collapsed ? "w-20" : "w-64"}`}
     >
       {/* Logo */}
-<<<<<<< HEAD
-      <div className={`p-6 text-xl font-bold border-b border-gray-200 flex ${collapsed ? "justify-center" : ""}`}>
-        {collapsed ? <Link href={"/"}>ML</Link> : <><Link href={"/"}>
-        <Image
-        width={95}
-        height={95}
-        alt="MechaLink logo"
-        src={"/logo.png"}/>
-        </Link></>}
-=======
-      <div className="p-6 text-xl font-bold border-b border-gray-200">
-        {collapsed ? "ML" : "MechaLink"}
->>>>>>> fd59b4f720550790c80880719b9ec3a05758555d
+      <div
+        className={`p-6 border-b border-gray-200 flex items-center ${
+          collapsed ? "justify-center" : "gap-2"
+        }`}
+      >
+        <Link href={"/"}>
+          {collapsed ? (
+            <span className="text-xl font-bold">ML</span>
+          ) : (
+            <Image width={120} height={40} alt="MechaLink logo" src={"/logo.png"} />
+          )}
+        </Link>
+        {!collapsed && <span className="text-xl font-bold">MechaLink</span>}
       </div>
 
       {/* Menu */}
