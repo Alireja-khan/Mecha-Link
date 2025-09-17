@@ -1,5 +1,5 @@
 import BlogSection from "./Components/Blog";
-import FeaturesSection from "./components/FeatureSection";
+import FeatureSection from "./Components/FeatureSection";
 import HowItWork from "./Components/HowToWork";
 import Newsletter from "./components/Newsletter";
 import WhyChooseUs from "./Components/WhyChooseUs";
@@ -12,7 +12,7 @@ export default function Home() {
             <HowItWork />
             <BlogSection />
             <Newsletter/>
-            <FeaturesSection/>
+            <FeatureSection/>
         </div>
     );
 }
