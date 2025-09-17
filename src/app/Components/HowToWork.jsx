@@ -1,27 +1,31 @@
 import { CheckCircle, ArrowRight } from "lucide-react";
 
-const HowItWork = () => {
+const HowToWork = () => {
     const steps = [
         {
             title: "Sign Up",
-            description: "Create your account quickly and securely to get started. Make sure to verify your email to unlock all features.",
-            icon: <CheckCircle className="w-10 h-10 text-primary" />
+            description:
+                "Create an account quickly and securely to get started with our platform.",
+            icon: <CheckCircle className="w-10 h-10 text-purple" />,
         },
         {
-            title: "Select Service",
-            description: "Browse through our wide range of services and choose the one that best fits your needs and goals for maximum efficiency.",
-            icon: <CheckCircle className="w-10 h-10 text-primary" />
+            title: "Choose a Service",
+            description:
+                "Browse through our services and select the one that fits your needs best.",
+            icon: <CheckCircle className="w-10 h-10 text-purple" />,
         },
         {
             title: "Start Working",
-            description: "Follow simple, guided steps to start your tasks, track your progress, and stay organized with helpful reminders.",
-            icon: <CheckCircle className="w-10 h-10 text-primary" />
+            description:
+                "Follow simple steps to start your tasks and track your progress easily.",
+            icon: <CheckCircle className="w-10 h-10 text-purple" />,
         },
         {
             title: "Get Results",
-            description: "Measure your outcomes with detailed insights, make improvements over time, and achieve your goals more effectively.",
-            icon: <CheckCircle className="w-10 h-10 text-primary" />
-        }
+            description:
+                "See measurable outcomes and improve continuously with our analytics.",
+            icon: <CheckCircle className="w-10 h-10 text-purple" />,
+        },
     ];
 
     return (
@@ -30,9 +34,10 @@ const HowItWork = () => {
                 {/* Section Header */}
                 <div className="text-center mb-12">
                     <h2 className="text-4xl md:text-5xl font-bold mb-4 font-roboto-con">
-                        How To <span className="text-primary font-caveat">Work</span>
+                        How It{" "}
+                        <span className="text-purple font-caveat inline-block">Works</span>
                     </h2>
-                    <p className="text-xl text-gray-600 max-w-2xl mx-auto font-nunito-sans">
+                    <p className="text-xl text-dark-purple/70 max-w-2xl mx-auto font-nunito-sans">
                         Follow these simple steps to get started and achieve results quickly.
                     </p>
                 </div>
@@ -42,12 +47,14 @@ const HowItWork = () => {
                     {steps.map((step, index) => (
                         <div
                             key={index}
-                            className="bg-white border border-gray-300 rounded-lg p-6 flex flex-col items-start hover:shadow-lg transition-shadow duration-300"
+                            className="bg-white border border-gray/50 rounded-2xl p-6 flex flex-col items-start hover:shadow-lg transition-all duration-300"
                         >
                             <div className="mb-4">{step.icon}</div>
                             <h3 className="text-xl font-semibold mb-2">{step.title}</h3>
-                            <p className="text-gray-600 text-sm">{step.description}</p>
-                            <ArrowRight className="w-5 h-5 text-primary mt-4 self-end" />
+                            <p className="text-dark-purple/70 text-sm">{step.description}</p>
+                            <div className="mt-auto">
+                                <ArrowRight className="w-5 h-5 text-purple mt-4" />
+                            </div>
                         </div>
                     ))}
                 </div>
@@ -56,4 +63,4 @@ const HowItWork = () => {
     );
 };
 
-export default HowItWork;
+export default HowToWork;
