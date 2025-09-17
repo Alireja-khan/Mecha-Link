@@ -47,7 +47,7 @@ const HowToWork = () => {
                     {steps.map((step, index) => (
                         <div
                             key={index}
-                            className="bg-white border border-gray/50 rounded-2xl p-6 flex flex-col items-start hover:shadow-lg transition-all duration-300"
+                            className="bg-white border border-gray-200 rounded-2xl p-6 flex flex-col items-start hover:shadow-lg transition-all duration-300"
                         >
                             <div className="mb-4">{step.icon}</div>
                             <h3 className="text-xl font-semibold mb-2">{step.title}</h3>

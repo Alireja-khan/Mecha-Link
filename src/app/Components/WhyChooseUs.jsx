@@ -13,27 +13,27 @@ const reasons = [
         description:
             "Our skilled professionals ensure your projects are handled with expertise and care.",
         icon: <Users className="w-8 h-8" />,
-        color: "purple",
+        color: "red",
     },
     {
         title: "Fast & Efficient",
         description:
             "We deliver solutions quickly without compromising on quality or performance.",
         icon: <Zap className="w-8 h-8" />,
-        color: "purple",
+        color: "yellow",
     },
     {
         title: "Secure & Protected",
         description:
             "Your data and projects are safe with our top-notch security standards.",
         icon: <Shield className="w-8 h-8" />,
-        color: "purple",
+        color: "dark-purple",
     },
 ];
 
 const WhyChooseUs = () => {
     return (
-        <section className="py-20 font-roboto">
+        <section className="py-20 font-robot">
             <div className="container mx-auto px-4">
                 {/* Section Header */}
                 <div className="text-center mb-16">
