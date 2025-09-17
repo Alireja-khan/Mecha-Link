@@ -25,7 +25,7 @@ const HowItWork = () => {
     ];
 
     return (
-        <section className="py-16 font-roboto">
+        <section className="py-16 bg-gray-50 font-roboto">
             <div className="container mx-auto px-4">
                 {/* Section Header */}
                 <div className="text-center mb-12">
