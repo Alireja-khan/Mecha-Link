@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@plugin "daisyui";
 
 
 :root {
@@ -10,6 +11,7 @@
   --color-dark-purple: #37215A;
   --color-border: #f5f5f5;
 }
+
 
 @theme {
 
@@ -37,7 +39,7 @@
 }
 
 .bg-accent {
-  background-color: var(--color-yellow);
+  background-color: var(--color-blue);
 }
 
 .bg-muted {
@@ -88,13 +90,6 @@
   font-family: var(--font-roboto-con);
 }
 
-.font-caveat {
-  font-family: var(--font-caveat);
-}
-
-.font-nunito-sans {
-  font-family: var(--font-nunito-sans);
-}
 
 .container {
   @apply px-5 mx-auto w-full sm:max-w-xl md:max-w-[45rem] lg:max-w-[62rem] xl:max-w-[77rem] 2xl:max-w-[93rem];
