@@ -19,6 +19,7 @@ import {
   Star,
   MessageSquare,
 } from "lucide-react";
+import Image from "next/image";
 
 const Sidebar = ({ role = "user" }) => {
   const [collapsed, setCollapsed] = useState(false);
@@ -57,7 +58,13 @@ const Sidebar = ({ role = "user" }) => {
     >
       {/* Logo */}
       <div className={`p-6 text-xl font-bold border-b border-gray-200 flex ${collapsed ? "justify-center" : ""}`}>
-        {collapsed ? "ML" : "MechaLink"}
+        {collapsed ? <Link href={"/"}>ML</Link> : <><Link href={"/"}>
+        <Image
+        width={95}
+        height={95}
+        alt="MechaLink logo"
+        src={"/logo.png"}/>
+        </Link></>}
       </div>
 
       {/* Menu */}
