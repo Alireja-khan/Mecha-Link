@@ -6,6 +6,7 @@ import WhyChooseUs from "./Components/WhyChooseUs";
 import './globals.css'
 
 export default function Home() {
+
     return (
         <div className="">
             <WhyChooseUs />
@@ -15,4 +16,5 @@ export default function Home() {
             <FeaturesSection/>
         </div>
     );
+
 }
