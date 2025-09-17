@@ -19,7 +19,7 @@ export default function ServiceDetailsPage() {
   const position = [23.8041, 90.4152];
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen container bg-white">
       <div className="relative h-80 bg-gray-100">
         <Image
           src="https://cdn.biswasautomobilesbd.com/article_images/655b1cbf475703d5024fb9fd.webp"
@@ -30,8 +30,8 @@ export default function ServiceDetailsPage() {
         <div className="absolute inset-0 bg-black/40" />
         <div className="absolute bottom-6 left-6 text-white">
                 
-          <div className="bg-primary w-50 text-white px-3 py-1 rounded-full text-sm mb-2">
-            General Maintenance eee
+          <div className="bg-secondary w-50 text-white px-3 py-1 rounded-full text-sm mb-2">
+            General Maintenance eeeasfasfdsafdsa
           </div>
           <h1 className="text-4xl font-bold mb-2">
             Complete Vehicle Maintenance Service
