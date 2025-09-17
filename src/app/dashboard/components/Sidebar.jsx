@@ -27,7 +27,7 @@ const Sidebar = ({ role = "user" }) => {
   const commonMenu = [
   { name: "Overview", icon: <Home size={20} />, href: "/dashboard" },
   { name: "Profile", icon: <User size={20} />, href: "/dashboard/user/profile" },
-  { name: "Payments", icon: <CreditCard size={20} />, href: "/dashboard/user/payments" },
+//   { name: "Payments", icon: <CreditCard size={20} />, href: "/dashboard/user/payments" },
   { name: "Settings", icon: <Settings size={20} />, href: "/dashboard/user/settings" },
   { name: "Bookings", icon: <Calendar size={20} />, href: "/dashboard/user/bookings" },
   { name: "Reviews", icon: <Star size={20} />, href: "/dashboard/user/reviews" },
