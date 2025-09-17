@@ -9,8 +9,7 @@ export default function DashboardLayout({ children }) {
 
             <div className="flex-1 flex flex-col">
                 <Topbar></Topbar>
-                <div className="ml-10 mt-10">
-                    <h2>Dashboard Layout</h2>
+                <div className="">
                     <main>{children}</main>
                 </div>
             </div>

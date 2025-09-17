@@ -1,11 +1,14 @@
-import React from 'react';
+import React from "react";
+import ProfileCard from "../../components/ProfileCard";
 
-const page = () => {
-    return (
-        <div>
-            <h1>Hello Profile</h1>
-        </div>
-    );
+const userProfile = {
+    name: "Abby Cooper",
+    email: "abby.cooper@example.com",
+    phone: "+123456789",
+    joined: "July 25, 2018",
+    additionalInfo: "Lives in Portland, Oregon",
 };
 
-export default page;
+export default function UserProfile() {
+    return <ProfileCard role="User" profileData={userProfile} />;
+}
