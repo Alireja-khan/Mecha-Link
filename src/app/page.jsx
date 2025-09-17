@@ -10,7 +10,7 @@ export default function Home() {
     return (
         <div className="">
             <WhyChooseUs />
-            <p>This is so complex</p>
+            <p>This is super dupper complex</p>
             <HowItWork />
             <BlogSection />
             <Newsletter/>
