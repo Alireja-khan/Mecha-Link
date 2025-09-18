@@ -25,3 +25,6 @@ export default function Home() {
     );
 
 }
+
+
+// bg-[#2A2D38]

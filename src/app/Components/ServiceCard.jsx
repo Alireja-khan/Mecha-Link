@@ -40,10 +40,10 @@ export default function ServiceCard({ service }) {
 
         {/* Buttons */}
         <div className="flex justify-between gap-2 border-t border-gray-100 p-3 w-full mt-auto">
-          <button className="w-1/2  py-3 bg-primary border border-primary hover:bg-secondary hover:border-secondary text-white font-bold text-xl capitalize leading-none font-urbanist rounded-md transition duration-400 cursor-pointer">
+          <button className="w-1/2  py-3 bg-orange-500  hover:bg-white border hover:border-orange-500  text-white hover:text-orange-500 font-bold text-xl capitalize leading-none font-urbanist rounded-md transition duration-400 cursor-pointer">
             Contact
           </button>
-          <button className="w-1/2 py-3 border border-primary hover:bg-primary hover:text-white text-primary font-bold text-xl capitalize leading-none font-urbanist rounded-md transition duration-400 cursor-pointer">
+          <button className="w-1/2 py-3 border hover:border-orange-500 bg-[#2A2D38] hover:bg-white hover:text-orange-500 text-white  font-bold text-xl capitalize leading-none font-urbanist rounded-md transition duration-400 cursor-pointer">
             service Details
           </button>
         </div>

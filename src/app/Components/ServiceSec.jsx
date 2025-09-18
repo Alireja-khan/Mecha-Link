@@ -70,7 +70,7 @@ export default function ServiceSec() {
         <div className="container">
           <div className="text-center mb-10">
             <h2 className="text-4xl font-bold text-center">
-              Trusted <span className="text-primary">Mechanics</span> Near You
+              Trusted <span className="text-orange-500">Mechanics</span> Near You
             </h2>
             <p className="text-lg">
               Connect with skilled professionals mechanics to solve you issue
