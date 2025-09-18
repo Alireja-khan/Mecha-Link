@@ -12,7 +12,7 @@ export default function Services() {
       workingHour: "9:00 AM - 8:00 PM",
       weekend: "Friday",
       rating: 4,
-      image: "https://placehold.co/600x400?text=AutoFix%20Garage",
+      image: "https://i.ibb.co.com/twWwK13q/pexels-olly-3817756.jpg",
     },
     {
       id: 2,
@@ -22,7 +22,7 @@ export default function Services() {
       workingHour: "10:00 AM - 9:00 PM",
       weekend: "Sunday",
       rating: 3,
-      image: "https://placehold.co/600x400?text=Home%20Essentials",
+      image: "https://i.ibb.co.com/j96BjHkM/pexels-olly-3846508.jpg",
     },
     {
       id: 3,
@@ -32,7 +32,7 @@ export default function Services() {
       workingHour: "8:00 AM - 7:00 PM",
       weekend: "Friday",
       rating: 5,
-      image: "https://placehold.co/600x400?text=Speedy%20Motors",
+      image: "https://i.ibb.co.com/d0xkrYqh/pexels-gustavo-fring-6870320.jpg",
     },
     {
       id: 4,
@@ -42,7 +42,7 @@ export default function Services() {
       workingHour: "9:30 AM - 8:30 PM",
       weekend: "Saturday",
       rating: 2,
-      image: "https://placehold.co/600x400?text=Daily%20Needs%20Store",
+      image: "https://i.ibb.co.com/ds3m107k/pexels-centre-for-ageing-better-55954677-7849743.jpg",
     },
     {
       id: 5,
@@ -52,7 +52,7 @@ export default function Services() {
       workingHour: "9:00 AM - 6:00 PM",
       weekend: "Friday",
       rating: 4,
-      image: "https://placehold.co/600x400?text=Elite%20Auto%20Care",
+      image: "https://i.ibb.co.com/1G6K3BDg/pexels-gustavo-fring-4173282.jpg",
     },
     {
       id: 6,
@@ -62,7 +62,7 @@ export default function Services() {
       workingHour: "10:00 AM - 9:00 PM",
       weekend: "Sunday",
       rating: 3,
-      image: "https://placehold.co/600x400?text=City%20Home%20Mart",
+      image: "https://i.ibb.co.com/279cNcqV/pexels-cottonbro-4489732.jpg",
     },
     {
       id: 7,
@@ -72,7 +72,7 @@ export default function Services() {
       workingHour: "9:00 AM - 8:00 PM",
       weekend: "Friday",
       rating: 5,
-      image: "https://placehold.co/600x400?text=Prime%20Car%20Service",
+      image: "https://i.ibb.co.com/0pFykFJ7/pexels-sergey-sergeev-2153675005-32845697.jpg",
     },
     {
       id: 8,
@@ -82,7 +82,7 @@ export default function Services() {
       workingHour: "10:00 AM - 8:00 PM",
       weekend: "Saturday",
       rating: 2,
-      image: "https://placehold.co/600x400?text=Family%20Needs",
+      image: "https://i.ibb.co.com/CsMCdKgP/pexels-cottonbro-4489748.jpg",
     },
     {
       id: 9,
@@ -92,7 +92,7 @@ export default function Services() {
       workingHour: "8:00 AM - 7:00 PM",
       weekend: "Friday",
       rating: 4,
-      image: "https://placehold.co/600x400?text=Super%20Auto%20Hub",
+      image: "https://i.ibb.co.com/N6kYLt4S/pexels-olly-3822843.jpg",
     },
     {
       id: 10,
@@ -102,7 +102,7 @@ export default function Services() {
       workingHour: "9:00 AM - 8:30 PM",
       weekend: "Sunday",
       rating: 3,
-      image: "https://placehold.co/600x400?text=Happy%20Home%20Store",
+      image: "https://i.ibb.co.com/JFqMFR8y/pexels-olly-3807120.jpg",
     },
     {
       id: 11,
@@ -112,7 +112,7 @@ export default function Services() {
       workingHour: "9:00 AM - 7:00 PM",
       weekend: "Friday",
       rating: 5,
-      image: "https://placehold.co/600x400?text=Metro%20Car%20Clinic",
+      image: "https://i.ibb.co.com/4Rvr6PFS/pexels-pixabay-279949.jpg",
     },
     {
       id: 12,
@@ -122,9 +122,11 @@ export default function Services() {
       workingHour: "10:00 AM - 9:00 PM",
       weekend: "Saturday",
       rating: 2,
-      image: "https://placehold.co/600x400?text=Smart%20Living",
+      image: "https://i.ibb.co.com/zTn519zm/kato-blackmore-qc-F-19-Bv-Vi-E-unsplash.jpg",
     },
   ];
+
+
 
   return (
     <>

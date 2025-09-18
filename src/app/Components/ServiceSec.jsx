@@ -1,5 +1,6 @@
 import React from "react";
 import ServiceCard from "./ServiceCard";
+import Link from "next/link";
 
 export default function ServiceSec() {
   const services = [
@@ -11,7 +12,7 @@ export default function ServiceSec() {
       workingHour: "9:00 AM - 8:00 PM",
       weekend: "Friday",
       rating: 4,
-      image: "https://placehold.co/600x400?text=AutoFix%20Garage",
+      image: "https://i.ibb.co.com/twWwK13q/pexels-olly-3817756.jpg",
     },
     {
       id: 2,
@@ -21,7 +22,7 @@ export default function ServiceSec() {
       workingHour: "10:00 AM - 9:00 PM",
       weekend: "Sunday",
       rating: 3,
-      image: "https://placehold.co/600x400?text=Home%20Essentials",
+      image: "https://i.ibb.co.com/j96BjHkM/pexels-olly-3846508.jpg",
     },
     {
       id: 3,
@@ -31,7 +32,7 @@ export default function ServiceSec() {
       workingHour: "8:00 AM - 7:00 PM",
       weekend: "Friday",
       rating: 5,
-      image: "https://placehold.co/600x400?text=Speedy%20Motors",
+      image: "https://i.ibb.co.com/d0xkrYqh/pexels-gustavo-fring-6870320.jpg",
     },
     {
       id: 4,
@@ -41,7 +42,7 @@ export default function ServiceSec() {
       workingHour: "9:30 AM - 8:30 PM",
       weekend: "Saturday",
       rating: 2,
-      image: "https://placehold.co/600x400?text=Daily%20Needs%20Store",
+      image: "https://i.ibb.co.com/ds3m107k/pexels-centre-for-ageing-better-55954677-7849743.jpg",
     },
     {
       id: 5,
@@ -51,7 +52,7 @@ export default function ServiceSec() {
       workingHour: "9:00 AM - 6:00 PM",
       weekend: "Friday",
       rating: 4,
-      image: "https://placehold.co/600x400?text=Elite%20Auto%20Care",
+      image: "https://i.ibb.co.com/1G6K3BDg/pexels-gustavo-fring-4173282.jpg",
     },
     {
       id: 6,
@@ -60,9 +61,9 @@ export default function ServiceSec() {
       location: "Barisal, Bangladesh",
       workingHour: "10:00 AM - 9:00 PM",
       weekend: "Sunday",
-      rating: 4,
-      image: "https://placehold.co/600x400?text=City%20Home%20Mart",
-    }
+      rating: 3,
+      image: "https://i.ibb.co.com/279cNcqV/pexels-cottonbro-4489732.jpg",
+    },
   ];
   return (
     <>
@@ -83,9 +84,11 @@ export default function ServiceSec() {
             ))}
           </div>
           <div className="text-center mt-10">
-            <button className="px-16  py-3 bg-primary border border-primary hover:bg-secondary hover:border-secondary text-white font-bold text-xl capitalize leading-none font-urbanist rounded-md transition duration-400 cursor-pointer">
-              See All Mechanics
-            </button>
+            <Link href='/services'>
+              <button className="px-16  py-3 bg-white border border-orange-500 hover:bg-orange-500  text-orange-500 hover:text-white font-bold text-xl capitalize leading-none font-urbanist rounded-md transition duration-400 cursor-pointer">
+                See All Mechanics
+              </button>
+            </Link>
           </div>
         </div>
       </section>

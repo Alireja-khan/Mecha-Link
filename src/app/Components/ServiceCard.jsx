@@ -23,7 +23,7 @@ export default function ServiceCard({ service }) {
           <div className="flex justify-between">
             <h2 className="text-3xl font-bold">{service.name}</h2>
             <p className="w-14 shrink-0 text-right flex items-center gap-2">
-              <Star strokeWidth={1.25} className="w-6 text-primary" />{" "}
+              <Star strokeWidth={1.25} className="w-6 text-orange-500" />{" "}
               {service.rating}/5
             </p>
           </div>
@@ -33,9 +33,9 @@ export default function ServiceCard({ service }) {
               {service.category}
             </Link>
           </p>
-          <p className="text-base mt-3 flex gap-2 items-center"><MapPinPlus strokeWidth={1.25} className="w-6 h-6 text-2xl text-primary"/> Location: {service.location}</p>
-            <p className="text-base flex gap-2 items-center mt-3"><Clock strokeWidth={1.25} className="w-6 h-6 text-2xl text-primary"/> Working Hour: {service.workingHour}</p>
-            <p className="text-base flex gap-2 items-center mt-3"><CalendarHeart strokeWidth={1.25} className="w-6 h-6 text-2xl text-primary"/> Weekend: {service.weekend}</p>
+          <p className="text-base mt-3 flex gap-2 items-center"><MapPinPlus strokeWidth={1.25} className="w-6 h-6 text-2xl text-orange-500"/> Location: {service.location}</p>
+            <p className="text-base flex gap-2 items-center mt-3"><Clock strokeWidth={1.25} className="w-6 h-6 text-2xl text-orange-500"/> Working Hour: {service.workingHour}</p>
+            <p className="text-base flex gap-2 items-center mt-3"><CalendarHeart strokeWidth={1.25} className="w-6 h-6 text-2xl text-orange-500"/> Weekend: {service.weekend}</p>
         </div>
 
         {/* Buttons */}
@@ -43,7 +43,7 @@ export default function ServiceCard({ service }) {
           <button className="w-1/2  py-3 bg-orange-500  hover:bg-white border hover:border-orange-500  text-white hover:text-orange-500 font-bold text-xl capitalize leading-none font-urbanist rounded-md transition duration-400 cursor-pointer">
             Contact
           </button>
-          <button className="w-1/2 py-3 border hover:border-orange-500 bg-[#2A2D38] hover:bg-white hover:text-orange-500 text-white  font-bold text-xl capitalize leading-none font-urbanist rounded-md transition duration-400 cursor-pointer">
+          <button className="w-1/2 py-3 border border-orange-500 hover:bg-orange-100 bg-white text-orange-500 font-bold text-xl capitalize leading-none font-urbanist rounded-md transition duration-400 cursor-pointer">
             service Details
           </button>
         </div>
