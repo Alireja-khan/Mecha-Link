@@ -95,7 +95,7 @@ const BlogSection = () => {
                 </div>
 
                 {/* Main Layout */}
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <div className="space-y-8">
                     {/* Blog Posts */}
                     <div className="lg:col-span-2 space-y-8">
                         {blogPosts.map((post, index) => (
