@@ -60,7 +60,7 @@ export default function ServiceSec() {
       location: "Barisal, Bangladesh",
       workingHour: "10:00 AM - 9:00 PM",
       weekend: "Sunday",
-      rating: 3,
+      rating: 4,
       image: "https://placehold.co/600x400?text=City%20Home%20Mart",
     }
   ];
