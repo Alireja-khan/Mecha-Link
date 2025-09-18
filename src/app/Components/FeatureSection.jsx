@@ -54,53 +54,45 @@ export default function FeaturesSection() {
   ];
 
   return (
-    <section className="py-16">
+    <section className="py-20 bg-white">
       <div className="container mx-auto text-center px-4">
-        {/* Heading */}
-        <h2 className="text-4xl md:text-5xl font-bold mb-6">
-          Our <span className="font-caveat text-purple ">Features</span>
+        {/* Heading and Description */}
+        <h2 className="text-4xl md:text-5xl font-extrabold mb-4 font-urbanist">
+          Our <span className="text-primary">Features</span>
         </h2>
-
-        <p className="text-xl text-dark-purple/70 max-w-2xl mx-auto font-nunito-sans mb-16">
+        <p className="text-lg text-gray-600 max-w-2xl mx-auto font-poppins mb-16">
           Everything you need to keep your vehicle running smoothly
         </p>
 
-        {/* Cards */}
+        {/* Feature Cards Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
           {features.map((feature, index) => {
             const Icon = feature.icon;
             return (
               <div
                 key={index}
-                className="relative bg-white p-6 rounded-lg shadow-2xl"
+                className="bg-white p-8 rounded-lg shadow-lg border border-gray-100 transform transition-all duration-300 hover:scale-105 hover:shadow-2xl"
               >
-                {/* Circle with Icon */}
-                <div className="absolute -top-5 left-6 h-12 w-12 rounded-full bg-purple flex items-center justify-center shadow">
-                  <Icon className="h-6 w-6 text-white" />
+                {/* Icon Container */}
+                <div className="mx-auto w-16 h-16 flex items-center justify-center rounded-full bg-primary/10 text-primary mb-6 transition-colors duration-300 group-hover:bg-primary group-hover:text-white">
+                  <Icon className="h-8 w-8 text-primary" />
                 </div>
 
                 {/* Card Content */}
-                <h3 className="mt-6 text-lg font-bold text-primary">
+                <h3 className="mt-4 text-xl font-bold font-urbanist">
                   {feature.title}
                 </h3>
-                <p className="mt-2 text-sm text-gray-600">{feature.desc}</p>
-                <a
-                  href="#"
-                  className="mt-4 inline-block text-sm font-medium text-primary underline"
-                >
-                  See More
-                </a>
+                <p className="mt-2 text-sm text-gray-600 font-poppins">{feature.desc}</p>
               </div>
             );
           })}
         </div>
 
         {/* Explore button */}
-        <button className="mt-10 px-6 py-2 bg-primary text-white rounded cursor-pointer">
+        <button className="mt-16 px-8 py-3 bg-primary text-white rounded-full font-poppins font-medium cursor-pointer transition-colors duration-300 hover:bg-secondary hover:shadow-lg">
           Explore more features
         </button>
-    </div>
-      
+      </div>
     </section>
   );
 }
