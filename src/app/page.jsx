@@ -12,7 +12,7 @@ export default function Home() {
 
     return (
         <div className="">
-
+<p>Hello World</p>
             <HeroSection />
             <ServiceSec />
             <FeatureSection />
