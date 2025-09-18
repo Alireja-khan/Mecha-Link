@@ -6,7 +6,7 @@ export default function ServiceBanner() {
   return (
     <>
       <section
-        className="bg-cover bg-center relative after:absolute after:top-0 after:left-0 after:w-full after:h-full after:bg-black/70"
+        className="bg-cover bg-center relative after:absolute after:top-0 after:left-0 after:w-full after:h-full after:bg-black/80"
         style={{ backgroundImage: `url(${serviceBanner.src})` }}
       >
         <div className="container">
