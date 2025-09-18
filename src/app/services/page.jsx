@@ -178,20 +178,20 @@ export default function Services() {
                 </select>
               </div>
             </div>
-            <div class="flex justify-center space-x-2">
-              <button class="px-3 py-1 border rounded-md ">
+            <div className="flex justify-center space-x-2">
+              <button className="px-3 py-1 border rounded-md ">
                 Prev
               </button>
-              <button class="px-3 py-1 border rounded-md  ">
+              <button className="px-3 py-1 border rounded-md  ">
                 1
               </button>
-              <button class="px-3 py-1 border rounded-md">
+              <button className="px-3 py-1 border rounded-md">
                 2
               </button>
-              <button class="px-3 py-1 border rounded-md">
+              <button className="px-3 py-1 border rounded-md">
                 3
               </button>
-              <button class="px-3 py-1 border rounded-md">
+              <button className="px-3 py-1 border rounded-md">
                 Next
               </button>
             </div>
