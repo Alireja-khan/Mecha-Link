@@ -67,7 +67,7 @@ const Footer = () => {
             />
             <button
               type="submit"
-              className="bg-purple px-4 py-2 text-white text-sm font-medium hover:bg-primary/90 transition cursor-pointer"
+              className="bg-primary px-4 py-2 text-white text-sm font-medium hover:bg-primary/70 transition cursor-pointer"
             >
               Subscribe
             </button>
@@ -82,16 +82,16 @@ const Footer = () => {
             © {new Date().getFullYear()} MechaLink. All rights reserved.
           </p>
           <div className="flex space-x-4">
-            <a href="#" className="hover:text-purple transition">
+            <a href="#" className="hover:text-primary transition">
               <Facebook className="h-5 w-5" />
             </a>
-            <a href="#" className="hover:text-purple transition">
+            <a href="#" className="hover:text-primary transition">
               <Twitter className="h-5 w-5" />
             </a>
-            <a href="#" className="hover:text-purple transition">
+            <a href="#" className="hover:text-primary transition">
               <Instagram className="h-5 w-5" />
             </a>
-            <a href="#" className="hover:text-purple transition">
+            <a href="#" className="hover:text-primary transition">
               <Linkedin className="h-5 w-5" />
             </a>
           </div>
