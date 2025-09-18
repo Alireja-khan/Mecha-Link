@@ -131,6 +131,12 @@ export default function Services() {
       <ServiceBanner></ServiceBanner>
       <section className="py-20">
         <div className="container">
+          <div className="text-center mb-10">
+            <h2 className="text-4xl font-bold text-center">
+              Service <span className="text-primary">Directory</span>
+            </h2>
+            <p className="text-lg">Browse through our wide range of professional services.</p>
+          </div>
           <div className="flex justify-between">
             <div className="w-1/2">
               <div className="flex items-center gap-3">
@@ -179,21 +185,15 @@ export default function Services() {
               </div>
             </div>
             <div className="flex justify-center space-x-2">
-              <button className="px-3 py-1 border rounded-md ">
-                Prev
-              </button>
-              <button className="px-3 py-1 border rounded-md  ">
-                1
-              </button>
-              <button className="px-3 py-1 border rounded-md">
-                2
-              </button>
-              <button className="px-3 py-1 border rounded-md">
-                3
-              </button>
-              <button className="px-3 py-1 border rounded-md">
-                Next
-              </button>
+              <button className="px-5 shrink-0 py-1 leading-none border border-primary rounded-md hover:bg-primary hover:text-white transition duration-400 cursor-pointer">Prev</button>
+
+              <button className="px-5 shrink-0 py-1 leading-none border border-primary rounded-md hover:bg-primary hover:text-white transition duration-400 cursor-pointer">1</button>
+
+              <button className="px-5 shrink-0 py-1 leading-none border border-primary rounded-md hover:bg-primary hover:text-white transition duration-400 cursor-pointer">2</button>
+
+              <button className="px-5 shrink-0 py-1 leading-none border border-primary rounded-md hover:bg-primary hover:text-white transition duration-400 cursor-pointer">3</button>
+
+              <button className="px-5 shrink-0 py-1 leading-none border border-primary rounded-md hover:bg-primary hover:text-white transition duration-400 cursor-pointer">Next</button>
             </div>
           </div>
         </div>
