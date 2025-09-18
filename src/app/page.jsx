@@ -14,8 +14,8 @@ export default function Home() {
         <div className="">
 
             <HeroSection />
-            <FeatureSection />
             <ServiceSec />
+            <FeatureSection />
             <WhyChooseUs />
             <HowItWork />
             <WhyChooseUs />
