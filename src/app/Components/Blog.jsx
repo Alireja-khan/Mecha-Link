@@ -117,7 +117,7 @@ const BlogSection = () => {
                                 </div>
                                 <div className="mt-6 flex items-center text-sm md:text-base text-text/70">
                                     <div className="w-10 h-10 rounded-full flex items-center justify-center mr-3 bg-secondary/20 text-secondary overflow-hidden">
-                                        <Image src={post.userImage} width={50} height={50}></Image>
+                                        <Image src={post.userImage} alt="user" width={50} height={50}></Image>
                                     </div>
                                     <div className="flex-1">
                                         <p className="font-medium font-urbanist">{post.author}</p>
