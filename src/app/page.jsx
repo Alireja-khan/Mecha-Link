@@ -13,7 +13,6 @@ export default function Home() {
         <div className="">
             <HeroSection />
             <FeatureSection />
-            <p>This is super dupper complex</p>
             <HowItWork />
             <WhyChooseUs />
             <ReviewSection />
