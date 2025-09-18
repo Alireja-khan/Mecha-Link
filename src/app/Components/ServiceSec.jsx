@@ -69,15 +69,16 @@ export default function ServiceSec() {
     <>
       <section className="py-20">
         <div className="container">
-          <div className="text-center mb-10">
-            <h2 className="text-4xl font-bold text-center">
+          <div className="text-center mb-10 max-w-2xl mx-auto">
+            <h2 className="text-5xl font-bold text-center">
               Trusted <span className="text-orange-500">Mechanics</span> Near You
             </h2>
-            <p className="text-lg">
-              Connect with skilled professionals mechanics to solve you issue
-              faster.
+            <p className="text-lg text-gray-600 mt-4">
+              MechaLink connects you with verified mechanics nearby – making vehicle
+              repairs and services faster, easier, and more reliable.
             </p>
           </div>
+
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-10">
             {services.map((service) => (
               <ServiceCard key={service.id} service={service}></ServiceCard>
