@@ -1,6 +1,6 @@
 import BlogSection from "./Components/Blog";
 import FeatureSection from "./Components/FeatureSection";
-import HowItWork from "./Components/HowToWork";
+import HowItWork from "./Components/HowItWork";
 import Newsletter from "./Components/Newsletter";
 import WhyChooseUs from "./Components/WhyChooseUs";
 

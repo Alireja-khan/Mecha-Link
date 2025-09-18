@@ -6,25 +6,25 @@ const HowToWork = () => {
             title: "Sign Up",
             description:
                 "Create an account quickly and securely to get started with our platform.",
-            icon: <CheckCircle className="w-10 h-10 text-purple" />,
+            icon: <CheckCircle className="w-10 h-10 text-primary" />,
         },
         {
             title: "Choose a Service",
             description:
                 "Browse through our services and select the one that fits your needs best.",
-            icon: <CheckCircle className="w-10 h-10 text-purple" />,
+            icon: <CheckCircle className="w-10 h-10 text-primary" />,
         },
         {
             title: "Start Working",
             description:
                 "Follow simple steps to start your tasks and track your progress easily.",
-            icon: <CheckCircle className="w-10 h-10 text-purple" />,
+            icon: <CheckCircle className="w-10 h-10 text-primary" />,
         },
         {
             title: "Get Results",
             description:
                 "See measurable outcomes and improve continuously with our analytics.",
-            icon: <CheckCircle className="w-10 h-10 text-purple" />,
+            icon: <CheckCircle className="w-10 h-10 text-primary" />,
         },
     ];
 
@@ -35,9 +35,9 @@ const HowToWork = () => {
                 <div className="text-center mb-12">
                     <h2 className="text-4xl md:text-5xl font-bold mb-4 font-roboto-con">
                         How It{" "}
-                        <span className="text-purple font-caveat inline-block">Works</span>
+                        <span className="text-primary font-caveat inline-block">Works</span>
                     </h2>
-                    <p className="text-xl text-dark-purple/70 max-w-2xl mx-auto font-nunito-sans">
+                    <p className="text-xl text-gray-600 max-w-2xl mx-auto font-nunito-sans">
                         Follow these simple steps to get started and achieve results quickly.
                     </p>
                 </div>
@@ -51,9 +51,9 @@ const HowToWork = () => {
                         >
                             <div className="mb-4">{step.icon}</div>
                             <h3 className="text-xl font-semibold mb-2">{step.title}</h3>
-                            <p className="text-dark-purple/70 text-sm">{step.description}</p>
+                            <p className="text-gray-600 text-sm">{step.description}</p>
                             <div className="mt-auto">
-                                <ArrowRight className="w-5 h-5 text-purple mt-4" />
+                                <ArrowRight className="w-5 h-5 text-primary mt-4" />
                             </div>
                         </div>
                     ))}

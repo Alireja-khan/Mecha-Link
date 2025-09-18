@@ -19,14 +19,13 @@ function Header() {
 
   const links = [
     { href: "/", label: "Home" },
+    { href: "/services", label: "Services" },
     {href: "/dashboard", label: "Dashboard"}
     
   ];
   return (
     <div
-      className={`font-roboto fixed w-full top-0 left-0 z-50 transition-all duration-300 ${
-        scrolled ? "bg-black/1 backdrop-blur-md" : "bg-transparent"
-      }`}
+      className="font-roboto w-full sticky inset-0 top-0 z-50 transition-all duration-300 bg-black/1 backdrop-blur-md"
     >
       <div className="navbar container mx-auto">
         <div className="navbar-start">
