@@ -123,9 +123,8 @@ const ReviewSection = () => {
 
                                     return (
                                         <div
-                                            className={`group flex flex-col bg-white rounded-xl shadow-md hover:shadow-xl transition-transform duration-300 p-6 ${index === activeIndex ? "scale-95 -translate-y-2" : "scale-95 translate-y-1"
-                                                }`}
-                                            style={{ minHeight: "320px" }} // Fixed height for all cards
+                                            className={`group flex flex-col bg-white rounded-xl shadow-md hover:shadow-xl transition-transform duration-300 p-6 scale-95`}
+                                            style={{ maxHeight: "320px" }} // Fixed height for all cards
                                         >
                                             {/* User Profile */}
                                             <div className="flex items-center mb-4">
