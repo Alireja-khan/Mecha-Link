@@ -17,7 +17,6 @@ export default function Home() {
             <FeatureSection />
             <WhyChooseUs />
             <HowItWork />
-            <WhyChooseUs />
             <ReviewSection />
             <BlogSection />
             <Newsletter />
