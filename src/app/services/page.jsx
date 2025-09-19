@@ -1,4 +1,6 @@
-import React from "react";
+"use client";
+
+import React, { useState } from "react";
 import ServiceBanner from "./ServiceBanner";
 import ServiceCard from "../Components/ServiceCard";
 
@@ -12,7 +14,7 @@ export default function Services() {
       workingHour: "9:00 AM - 8:00 PM",
       weekend: "Friday",
       rating: 4,
-      image: "https://i.ibb.co.com/twWwK13q/pexels-olly-3817756.jpg",
+      image: "https://i.ibb.co/twWwK13q/pexels-olly-3817756.jpg",
     },
     {
       id: 2,
@@ -22,7 +24,7 @@ export default function Services() {
       workingHour: "10:00 AM - 9:00 PM",
       weekend: "Sunday",
       rating: 3,
-      image: "https://i.ibb.co.com/j96BjHkM/pexels-olly-3846508.jpg",
+      image: "https://i.ibb.co/j96BjHkM/pexels-olly-3846508.jpg",
     },
     {
       id: 3,
@@ -32,7 +34,7 @@ export default function Services() {
       workingHour: "8:00 AM - 7:00 PM",
       weekend: "Friday",
       rating: 5,
-      image: "https://i.ibb.co.com/d0xkrYqh/pexels-gustavo-fring-6870320.jpg",
+      image: "https://i.ibb.co/d0xkrYqh/pexels-gustavo-fring-6870320.jpg",
     },
     {
       id: 4,
@@ -126,58 +128,120 @@ export default function Services() {
     },
   ];
 
+  // ===== State =====
+  const [searchTerm, setSearchTerm] = useState("");
+  const [sortOrder, setSortOrder] = useState("htl"); // htl = High to Low
+  const [itemsPerPage, setItemsPerPage] = useState(12);
+  const [currentPage, setCurrentPage] = useState(1);
 
+  // ===== Filter & Sort =====
+  const filteredServices = services
+    .filter((service) =>
+      service.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      service.location.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      service.category.toLowerCase().includes(searchTerm.toLowerCase())
+    )
+    .sort((a, b) =>
+      sortOrder === "htl" ? b.rating - a.rating : a.rating - b.rating
+    );
+
+  // ===== Pagination =====
+  const totalPages = Math.ceil(filteredServices.length / itemsPerPage);
+  const displayedServices = filteredServices.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
+
+  // ===== Handlers =====
+  const handleSearch = (e) => {
+    setSearchTerm(e.target.value);
+    setCurrentPage(1); // Reset to first page on search
+  };
+
+  const handleSort = (e) => {
+    setSortOrder(e.target.value);
+  };
+
+  const handleItemsPerPage = (e) => {
+    setItemsPerPage(parseInt(e.target.value));
+    setCurrentPage(1);
+  };
+
+  const handlePageChange = (page) => {
+    setCurrentPage(page);
+  };
 
   return (
     <>
-      <ServiceBanner></ServiceBanner>
+      <ServiceBanner />
       <section className="py-20">
         <div className="container">
-          <div className="text-center mb-10">
-            <h2 className="text-4xl font-bold text-center">
-              Service <span className="text-primary">Directory</span>
+          {/* Title */}
+          <div className="text-center mb-12">
+            <h2 className="text-4xl md:text-5xl font-extrabold text-center">
+              Explore <span className="text-orange-500">MechaLink Services</span>
             </h2>
-            <p className="text-lg">Browse through our wide range of professional services.</p>
+            <p className="text-md max-w-2xl mx-auto md:text-xl mt-3">
+              Discover professional services for all your needs and manage bookings effortlessly with MechaLink.
+            </p>
           </div>
-          <div className="flex justify-between">
-            <div className="w-1/2">
-              <div className="flex items-center gap-3">
-                <label htmlFor="search">Search</label>
+
+          {/* Search & Sort */}
+          <div className="flex flex-col md:flex-row justify-between items-center gap-4 mb-6">
+            {/* Search */}
+            <div className="flex-1">
+              <div className="flex items-center gap-3 bg-orange-500 rounded-lg px-4 py-1 shadow-sm">
+                <label htmlFor="search" className="text-white font-medium">
+                  Search
+                </label>
                 <input
                   type="search"
-                  placeholder="Search with shop name, mechanic name, location"
-                  className="px-3 py-2 border-1 rounded-lg border-gray-300 w-3/4 focus:outline-none"
+                  id="search"
+                  placeholder="Shop, mechanic, or location"
+                  value={searchTerm}
+                  onChange={handleSearch}
+                  className="flex-1 bg-white text-gray-900 placeholder-gray-800 px-3 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
                 />
               </div>
             </div>
-            <div className="w-1/2 flex justify-end">
-              <div className="flex items-center gap-3">
-                <label htmlFor="sort">Sort by Rating</label>
-                <select
-                  name="sort"
-                  id="sort"
-                  className="px-3 py-2 border-1 rounded-lg border-gray-300 focus:outline-none"
-                >
-                  <option value="htl">High to Low</option>
-                  <option value="lth">Low to High</option>
-                </select>
-              </div>
+
+            {/* Sort */}
+            <div className="flex items-center gap-3">
+              <label htmlFor="sort" className="font-medium">
+                Sort by
+              </label>
+              <select
+                name="sort"
+                id="sort"
+                value={sortOrder}
+                onChange={handleSort}
+                className="px-3 py-2 bg-white rounded-md border-2 border-orange-500 focus:outline-none focus:ring-2 focus:ring-orange-500"
+              >
+                <option value="htl">Rating: High to Low</option>
+                <option value="lth">Rating: Low to High</option>
+              </select>
             </div>
           </div>
 
+          {/* Services Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-10">
-            {services.map((service) => (
-              <ServiceCard key={service.id} service={service}></ServiceCard>
+            {displayedServices.map((service) => (
+              <ServiceCard key={service.id} service={service} />
             ))}
           </div>
-          <div className="flex justify-between mt-8">
+
+          {/* Pagination & Items per page */}
+          <div className="flex justify-between mt-8 items-center">
+            {/* Items per page */}
             <div>
               <div className="flex items-center gap-3">
-                <label htmlFor="sort">Show on page</label>
+                <label htmlFor="itemsPerPage">Show on page</label>
                 <select
-                  name="sort"
-                  id="sort"
-                  className="px-3 py-2 border-1 rounded-lg border-gray-300 focus:outline-none"
+                  name="itemsPerPage"
+                  id="itemsPerPage"
+                  value={itemsPerPage}
+                  onChange={handleItemsPerPage}
+                  className="px-3 py-2 border-2 rounded-lg border-orange-500 focus:outline-none"
                 >
                   <option value="12">12</option>
                   <option value="24">24</option>
@@ -186,16 +250,38 @@ export default function Services() {
                 </select>
               </div>
             </div>
+
+            {/* Page buttons */}
             <div className="flex justify-center space-x-2">
-              <button className="px-5 shrink-0 py-1 leading-none border border-primary rounded-md hover:bg-primary hover:text-white transition duration-400 cursor-pointer">Prev</button>
+              <button
+                className="px-5 py-1 border border-orange-500 rounded-md hover:bg-orange-500 hover:text-white transition duration-400 cursor-pointer"
+                disabled={currentPage === 1}
+                onClick={() => handlePageChange(currentPage - 1)}
+              >
+                Prev
+              </button>
 
-              <button className="px-5 shrink-0 py-1 leading-none border border-primary rounded-md hover:bg-primary hover:text-white transition duration-400 cursor-pointer">1</button>
+              {Array.from({ length: totalPages }, (_, i) => (
+                <button
+                  key={i}
+                  className={`px-5 py-1 border rounded-md transition duration-400 cursor-pointer ${
+                    currentPage === i + 1
+                      ? "bg-orange-500 text-white border-orange-500"
+                      : "border-orange-500 hover:bg-orange-500 hover:text-white"
+                  }`}
+                  onClick={() => handlePageChange(i + 1)}
+                >
+                  {i + 1}
+                </button>
+              ))}
 
-              <button className="px-5 shrink-0 py-1 leading-none border border-primary rounded-md hover:bg-primary hover:text-white transition duration-400 cursor-pointer">2</button>
-
-              <button className="px-5 shrink-0 py-1 leading-none border border-primary rounded-md hover:bg-primary hover:text-white transition duration-400 cursor-pointer">3</button>
-
-              <button className="px-5 shrink-0 py-1 leading-none border border-primary rounded-md hover:bg-primary hover:text-white transition duration-400 cursor-pointer">Next</button>
+              <button
+                className="px-5 py-1 border border-orange-500 rounded-md hover:bg-orange-500 hover:text-white transition duration-400 cursor-pointer"
+                disabled={currentPage === totalPages}
+                onClick={() => handlePageChange(currentPage + 1)}
+              >
+                Next
+              </button>
             </div>
           </div>
         </div>
