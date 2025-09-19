@@ -1,3 +1,5 @@
+"use client"; // <--- must be at very top
+
 import {
   CalendarCheck,
   Clock,
@@ -8,6 +10,11 @@ import {
   Bell,
   Headphones,
 } from "lucide-react";
+
+import { Swiper, SwiperSlide } from "swiper/react";
+import { Autoplay, Navigation } from "swiper/modules";
+import "swiper/css";
+import "swiper/css/navigation";
 
 export default function FeaturesSection() {
   const features = [
@@ -53,46 +60,99 @@ export default function FeaturesSection() {
     },
   ];
 
+  const stats = [
+    { value: "50K+", label: "Happy Customers" },
+    { value: "10K+", label: "Services Booked" },
+    { value: "2K+", label: "Partner Garages" },
+    { value: "24/7", label: "Customer Support" },
+  ];
+
   return (
-    <section className="py-20 bg-white">
-      <div className="container mx-auto text-center px-4">
-        {/* Heading and Description */}
-        <h2 className="text-4xl md:text-5xl font-extrabold mb-4 font-urbanist">
-          Our <span className="text-primary">Features</span>
+    <section className="relative bg-white text-gray-900">
+      {/* Title + Description outside background image */}
+      <div className="container mx-auto px-6 text-center mb-10">
+        <h2 className="text-4xl md:text-5xl font-extrabold font-urbanist">
+          Our <span className="text-orange-500">Features</span>
         </h2>
-        <p className="text-lg text-gray-600 max-w-2xl mx-auto font-poppins mb-16">
-          Everything you need to keep your vehicle running smoothly
+        <p className="text-lg mt-2 text-gray-600 max-w-2xl mx-auto font-poppins">
+          Find trusted mechanics and book car services online—fast, easy, and reliable.
         </p>
+      </div>
 
-        {/* Feature Cards Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-          {features.map((feature, index) => {
-            const Icon = feature.icon;
-            return (
-              <div
-                key={index}
-                className="bg-white p-8 rounded-lg shadow-lg border border-gray-100 transform transition-all duration-300 hover:scale-105 hover:shadow-2xl"
+      {/* Background image section */}
+      <div
+        className="relative py-24 bg-cover bg-center bg-fixed text-white"
+        style={{
+          backgroundImage:
+            "url('https://i.ibb.co.com/nMqyZrF5/anton-savinov-OTM6-L4-U-n-Ts-unsplash.jpg')",
+        }}
+      >
+        {/* Glass / overlay effect */}
+        <div className="absolute inset-0 bg-black/60 "></div>
+
+        <div className="relative container mx-auto px-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            {/* Left: Feature Slider */}
+            <div className="relative">
+              <Swiper
+                spaceBetween={20}
+                slidesPerView={1}
+                autoplay={{ delay: 3000, disableOnInteraction: false }}
+                navigation={{ nextEl: ".swiper-next", prevEl: ".swiper-prev" }}
+                breakpoints={{
+                  640: { slidesPerView: 1 },
+                  768: { slidesPerView: 2 },
+                }}
+                modules={[Autoplay, Navigation]}
               >
-                {/* Icon Container */}
-                <div className="mx-auto w-16 h-16 flex items-center justify-center rounded-full bg-primary/10 text-primary mb-6 transition-colors duration-300 group-hover:bg-primary group-hover:text-white">
-                  <Icon className="h-8 w-8 text-primary" />
-                </div>
+                {features.map((feature, index) => {
+                  const Icon = feature.icon;
+                  return (
+                    <SwiperSlide key={index}>
+                      <div className="bg-white text-gray-800 p-6 rounded-xl shadow-lg border border-orange-500 h-[230px] flex flex-col justify-between">
+                        <div className="flex flex-col items-center">
+                          <div className="w-14 h-14 flex items-center justify-center rounded-full bg-orange-500/10 text-orange-500 mb-4">
+                            <Icon className="h-7 w-7" />
+                          </div>
+                          <h3 className="text-lg font-bold text-orange-500 font-urbanist text-center">
+                            {feature.title}
+                          </h3>
+                          <p className="mt-2 text-sm text-gray-600 font-poppins text-center">
+                            {feature.desc}
+                          </p>
+                        </div>
+                      </div>
+                    </SwiperSlide>
+                  );
+                })}
+              </Swiper>
 
-                {/* Card Content */}
-                <h3 className="mt-4 text-xl font-bold font-urbanist">
-                  {feature.title}
-                </h3>
-                <p className="mt-2 text-sm text-gray-600 font-poppins">{feature.desc}</p>
+              {/* Arrow Buttons */}
+              <div className="absolute -bottom-14 left-1/2 -translate-x-1/2 flex gap-4">
+                <button className="swiper-prev w-10 h-10 rounded-full bg-white text-orange-500 shadow hover:bg-orange-500 hover:text-white transition">
+                  ‹
+                </button>
+                <button className="swiper-next w-10 h-10 rounded-full bg-white text-orange-500 shadow hover:bg-orange-500 hover:text-white transition">
+                  ›
+                </button>
               </div>
-            );
-          })}
-        </div>
+            </div>
 
-        {/* Explore button */}
-        <button className="mt-16 px-8 py-3 bg-primary text-white rounded-full font-poppins font-medium cursor-pointer transition-colors duration-300 hover:bg-secondary hover:shadow-lg">
-          Explore more features
-        </button>
+            {/* Right: Stats */}
+            <div className="grid grid-cols-2 gap-8 m-20  text-center lg:text-left">
+              {stats.map((stat, idx) => (
+                <div key={idx} className="flex flex-col items-center lg:items-start">
+                  <h3 className="text-4xl md:text-5xl font-extrabold text-orange-500">
+                    {stat.value}
+                  </h3>
+                  <p className="text-gray-200 text-lg font-poppins">{stat.label}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
       </div>
     </section>
+
   );
 }

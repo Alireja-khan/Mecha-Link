@@ -17,7 +17,6 @@ export default function Home() {
             <FeatureSection />
             <WhyChooseUs />
             <HowItWork />
-            <WhyChooseUs />
             <ReviewSection />
             <BlogSection />
             <Newsletter />
@@ -25,3 +24,6 @@ export default function Home() {
     );
 
 }
+
+
+// bg-[#2A2D38]
