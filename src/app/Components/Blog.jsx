@@ -1,74 +1,81 @@
-import { Calendar, User, Clock } from "lucide-react";
+import { Calendar, Clock } from "lucide-react";
 import Image from "next/image";
 
 const blogPosts = [
     {
-        title: "The Future of Web Development: Trends to Watch in 2024",
+        title: "Top 5 Car Maintenance Tips Every Driver Should Know",
         excerpt:
-            "Explore the latest trends shaping the web development landscape, from AI integration to progressive web apps and beyond.",
-        author: "Sarah Chen",
-        date: "Mar 15, 2024",
+            "Keep your vehicle in top shape with these essential maintenance tips to improve safety and extend your car’s lifespan.",
+        author: "Alex Johnson",
+        date: "Sep 10, 2024",
+        readTime: "4 min read",
+        category: "Maintenance",
+        image: "https://i.ibb.co.com/B7gB3mt/pexels-lumierestudiomx-4116224.jpg",
+        userImage: "https://i.pravatar.cc/150?img=11",
+    },
+    {
+        title: "Why Regular Oil Changes are Crucial for Your Engine",
+        excerpt:
+            "Learn how timely oil changes keep your engine healthy, prevent breakdowns, and save money on costly repairs.",
+        author: "Sophia Lee",
+        date: "Sep 5, 2024",
         readTime: "5 min read",
-        category: "Technology",
-        image: "https://images.unsplash.com/photo-1542831371-29b0f74f9713?ixlib=rb-4.0.3&q=80&w=2940&auto=format&fit=crop",
-        userImage: "https://i.pravatar.cc/150?img=1",
+        category: "Engine Care",
+        image: "https://i.ibb.co.com/YTJ22bVk/pexels-19x14-8478268.jpg",
+        userImage: "https://i.pravatar.cc/150?img=12",
     },
     {
-        title: "Building Scalable React Applications with Modern Architecture",
+        title: "How to Detect Common Brake Issues Early",
         excerpt:
-            "Learn how to structure React applications for maximum scalability and maintainability using the latest architectural patterns.",
-        author: "Mike Rodriguez",
-        date: "Mar 12, 2024",
-        readTime: "8 min read",
-        category: "Development",
-        image: "https://images.unsplash.com/photo-1593720216508-3075c3f912a7?ixlib=rb-4.0.3&q=80&w=2940&auto=format&fit=crop",
-        userImage: "https://i.pravatar.cc/150?img=2",
-    },
-    {
-        title: "Mastering CSS Grid: A Complete Guide for Modern Layouts",
-        excerpt:
-            "Discover the power of CSS Grid and how it revolutionizes the way we create complex, responsive web layouts.",
-        author: "Emma Thompson",
-        date: "Mar 10, 2024",
+            "Brakes are vital for your safety. Here’s how to identify warning signs of brake problems before they get worse.",
+        author: "Michael Brown",
+        date: "Aug 28, 2024",
         readTime: "6 min read",
-        category: "CSS",
-        image: "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?ixlib=rb-4.0.3&q=80&w=2940&auto=format&fit=crop",
-        userImage: "https://i.pravatar.cc/150?img=3",
+        category: "Safety",
+        image: "https://i.ibb.co.com/r2WjqH8T/pexels-cottonbro-4489794-1.jpg",
+        userImage: "https://i.pravatar.cc/150?img=13",
     },
     {
-        title: "Performance Optimization Strategies for Web Applications",
+        title: "Benefits of Choosing Certified Mechanics for Your Car",
         excerpt:
-            "Comprehensive guide to optimizing your web applications for speed, covering everything from bundling to caching strategies.",
-        author: "David Kim",
-        date: "Mar 8, 2024",
+            "Understand why certified mechanics provide reliable services, better diagnosis, and long-term vehicle performance.",
+        author: "Emma Wilson",
+        date: "Aug 20, 2024",
         readTime: "7 min read",
-        category: "Performance",
-        image: "https://images.unsplash.com/photo-1579403159955-442b0059b56f?ixlib=rb-4.0.3&q=80&w=2940&auto=format&fit=crop",
-        userImage: "https://i.pravatar.cc/150?img=4",
+        category: "Expert Tips",
+        image: "https://i.ibb.co.com/q3cwLVgR/pexels-gustavo-fring-6870300.jpg",
+        userImage: "https://i.pravatar.cc/150?img=14",
     },
     {
-        title: "Introduction to TypeScript: Strongly Typed JavaScript",
+        title: "How Smart Tools are Changing Vehicle Diagnostics",
         excerpt:
-            "Learn how TypeScript can help you write more maintainable and error-free JavaScript applications with ease.",
-        author: "Linda Park",
-        date: "Mar 5, 2024",
+            "Explore how AI-powered tools and smart diagnostics are transforming the auto repair industry for better accuracy.",
+        author: "Daniel Green",
+        date: "Aug 15, 2024",
         readTime: "6 min read",
-        category: "TypeScript",
-        image: "https://images.unsplash.com/photo-1627398242436-d748ad0a72c1?ixlib=rb-4.0.3&q=80&w=2940&auto=format&fit=crop",
-        userImage: "https://i.pravatar.cc/150?img=5",
+        category: "Technology",
+        image: "https://i.ibb.co.com/QjXqMhQ4/pexels-daniel-andraski-197681005-13065690.jpg",
+        userImage: "https://i.pravatar.cc/150?img=15",
     },
     {
-        title: "Accessibility in Web Design: Best Practices",
+        title: "When Should You Replace Your Car Battery?",
         excerpt:
-            "Understand the key principles of accessible web design and how to make your websites usable for everyone.",
-        author: "James Wilson",
-        date: "Mar 2, 2024",
+            "Learn the signs of a weak battery and when it’s the right time to replace it to avoid unexpected breakdowns.",
+        author: "Olivia Martinez",
+        date: "Aug 5, 2024",
         readTime: "5 min read",
-        category: "Design",
-        image: "https://images.unsplash.com/photo-1559128010-7c1ad6e6bdf8?ixlib=rb-4.0.3&q=80&w=2942&auto=format&fit=crop",
-        userImage: "https://i.pravatar.cc/150?img=6",
+        category: "Battery Care",
+        image: "https://i.ibb.co.com/1tgq5y0c/pexels-maltelu-2244746-1.jpg",
+        userImage: "https://i.pravatar.cc/150?img=16",
     },
 ];
+
+
+
+
+
+
+
 
 const BlogSection = () => {
     return (
@@ -77,10 +84,10 @@ const BlogSection = () => {
                 {/* Section Header */}
                 <div className="text-center mb-12">
                     <h2 className="text-4xl md:text-5xl font-bold mb-4 font-urbanist">
-                        Latest <span className="text-primary inline-block">Articles</span>
+                        MechaLink <span className="text-orange-500 inline-block">Insights</span>
                     </h2>
                     <p className="text-xl text-text/70 max-w-2xl mx-auto font-poppins">
-                        Explore our latest insights, tutorials, and deep dives into web development.
+                        Explore expert advice, tips, and the latest updates to keep your vehicle running smoothly.
                     </p>
                 </div>
 
@@ -103,14 +110,14 @@ const BlogSection = () => {
                             <div className="p-6 flex flex-col justify-between flex-grow">
                                 <div>
                                     <div className="flex items-center justify-between mb-3">
-                                        <span className="text-xs font-semibold uppercase px-3 py-1 rounded-full bg-primary text-white">
+                                        <span className="text-xs font-semibold uppercase px-3 py-1 rounded-full bg-orange-500 text-white">
                                             {post.category}
                                         </span>
                                         <div className="flex items-center text-text/70 text-sm">
                                             <Clock className="w-4 h-4 mr-1" /> {post.readTime}
                                         </div>
                                     </div>
-                                    <h3 className="text-2xl font-bold font-urbanist group-hover:text-primary transition-colors duration-300">
+                                    <h3 className="text-2xl font-bold font-urbanist group-hover:text-orange-500 transition-colors duration-300">
                                         {post.title}
                                     </h3>
                                     <p className="text-sm text-text/70 mt-3">{post.excerpt}</p>
