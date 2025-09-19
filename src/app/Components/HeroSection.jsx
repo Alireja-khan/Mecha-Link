@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 
 export default function HeroModern() {
     return (
@@ -17,9 +18,11 @@ export default function HeroModern() {
 
                     {/* Buttons */}
                     <div className="mt-10 flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
-                        <button className="bg-orange-500 text-white px-8 py-4 rounded-xl hover:bg-orange-600 transition-all duration-300 w-full sm:w-auto font-medium shadow-lg hover:shadow-xl transform hover:-translate-y-1">
-                            Find a Mechanic
-                        </button>
+                        <Link href="/services">
+                            <button className="bg-orange-500 text-white px-8 py-4 rounded-xl hover:bg-orange-600 transition-all duration-300 w-full sm:w-auto font-medium shadow-lg hover:shadow-xl transform hover:-translate-y-1">
+                                Find a Mechanic
+                            </button>
+                        </Link>
                         <button className="border-2 border-orange-500 text-orange-500 hover:bg-orange-100 px-8 py-4 rounded-xl hover:border-orange-500 hover:text-orange-500 transition-all duration-300 w-full sm:w-auto font-medium shadow-sm hover:shadow-md">
                             Become a Partner
                         </button>
