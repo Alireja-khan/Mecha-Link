@@ -14,7 +14,7 @@ const AboutPage = () => {
                         alt="Modern automotive service background"
                         className="w-full h-full object-cover"
                     />
-                    <div className="absolute inset-0 bg-gray-900/70"></div>
+                    <div className="absolute inset-0 bg-gray-900/50"></div>
                 </div>
 
                 <div className="relative max-w-6xl mx-auto px-6">
@@ -353,11 +353,11 @@ const AboutPage = () => {
                                 image: "https://i.ibb.co.com/BK7jhQh5/Gemini-Generated-Image-ddddlp1lddlp1lddlp.png",
                                 featured: true
                             },
-                            { name: "Omar Faruk", role: "Full Stack Developer", image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=687&q=80" },
+                            { name: "Omar Faruk", role: "Full Stack Developer", image: "https://i.ibb.co.com/ym8mNNbg/Gemini-Generated-Image-i0r1rti0r1rti0r1.png" },
                             { name: "Abrar Karim Rupu", role: "Fronted Developer", image: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80" },
-                            { name: "MD. Rahimul Haq", role: "Backend Engineer", image: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=687&q=80" },
-                            { name: "Raheel Arfeen Rahat", role: "Frontend Developer", image: "https://images.unsplash.com/photo-1531427186611-ecfd6d936c79?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=687&q=80" },
-                            { name: "MD. Shahan Al Munim", role: "Backend Engineer", image: "https://images.unsplash.com/photo-1560250097-0b93528c311a?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=687&q=80" },
+                            { name: "MD. Rahimul Haq", role: "Backend Engineer", image: "https://i.ibb.co.com/Cs6LrB64/Gemini-Generated-Image-ynkbetynkbetynkb.png" },
+                            { name: "Raheel Arfeen Rahat", role: "Frontend Developer", image: "https://i.ibb.co.com/5X6mGPm2/550733568-1845540119507626-4770195972697828670-n.png" },
+                            { name: "MD. Shahan Al Munim", role: "Backend Engineer", image: "https://i.ibb.co.com/v4cTbvVf/Gemini-Generated-Image-89jk6b89jk6b89jk.png" },
                         ].map((person, i) => (
                             <div
                                 key={i}
