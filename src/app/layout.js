@@ -1,8 +1,9 @@
 // app/layout.js
-import { Geist, Geist_Mono, Urbanist,Poppins } from "next/font/google";
+import { Geist, Geist_Mono, Urbanist, Poppins } from "next/font/google";
 import "./globals.css";
 import ConditionalHeader from "./ConditionalHeader";
 import ConditionalFooter from "./ConditionalFooter";
+import UserProvider from "./UserContext";
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -20,8 +21,8 @@ const urbanist = Urbanist({
 const poppins = Poppins({
   variable: "--font-poppins",
   subsets: ["latin"],
-   weight: ["300", "400", "500", "600", "700"],
-   fallback: ["sans-serif"]
+  weight: ["300", "400", "500", "600", "700"],
+  fallback: ["sans-serif"]
 });
 export const metadata = {
   title: "MechaLink",
@@ -34,11 +35,13 @@ export default function RootLayout({ children }) {
       <body
         className={`${geistSans.variable} ${geistMono.variable} ${urbanist.variable} ${poppins.variable} antialiased`}
       >
-        <div className="flex flex-col min-h-screen justify-between">
-          <ConditionalHeader /> 
-          {children}
-          <ConditionalFooter />
-        </div>
+        <UserProvider>
+          <div className="flex flex-col min-h-screen justify-between pt-18">
+            <ConditionalHeader />
+            {children}
+            <ConditionalFooter />
+          </div>
+        </UserProvider>
       </body>
     </html>
   );

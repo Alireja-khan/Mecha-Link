@@ -1,41 +1,49 @@
 import React from "react";
 import { Facebook, Twitter, Instagram, Linkedin } from "lucide-react";
-import Image from "next/image";
+import { FaGear } from "react-icons/fa6";
+import Link from "next/link";
 
 const Footer = () => {
   return (
     <div className="bg-gray-900 text-gray-300">
       <div className="container mx-auto py-12 grid grid-cols-1 md:grid-cols-4 gap-8">
         {/* Brand */}
-        <div>
-          <Image src="/logo.png" alt="MechaLink Logo" width={120} height={50} />
-          <p className="mt-4 text-sm text-gray-400">
-            Connecting you with trusted garages, mechanics, and seamless vehicle
-            servicing.
+        <div className="flex flex-col items-start gap-3 max-w-xs">
+          <div className="flex items-center gap-3">
+            <Link href="/">
+              <FaGear className="h-12 w-12 text-orange-500" />
+            </Link>
+            <h1 className="text-4xl font-bold text-white">
+              MechaLink
+            </h1>
+          </div>
+          <p className="text-gray-300 text-sm font-poppins leading-relaxed">
+            Connecting drivers with trusted mechanics and auto services.
           </p>
         </div>
+
 
         {/* Quick Links */}
         <div>
           <h3 className="text-lg font-semibold text-white mb-4">Quick Links</h3>
           <ul className="space-y-2 text-sm">
             <li>
-              <a href="#" className="hover:text-primary transition">
+              <a href="#" className="hover:text-orange-500 transition">
                 Home
               </a>
             </li>
             <li>
-              <a href="#" className="hover:text-primary transition">
+              <a href="#" className="hover:text-orange-500 transition">
                 About Us
               </a>
             </li>
             <li>
-              <a href="#" className="hover:text-primary transition">
+              <a href="#" className="hover:text-orange-500 transition">
                 Services
               </a>
             </li>
             <li>
-              <a href="#" className="hover:text-primary transition">
+              <a href="#" className="hover:text-orange-500 transition">
                 Contact
               </a>
             </li>
@@ -67,7 +75,7 @@ const Footer = () => {
             />
             <button
               type="submit"
-              className="bg-purple px-4 py-2 text-white text-sm font-medium hover:bg-primary/90 transition cursor-pointer"
+              className="bg-orange-500 px-4 py-2 text-white text-sm font-medium hover:bg-orange-500/70 transition cursor-pointer"
             >
               Subscribe
             </button>
@@ -82,16 +90,16 @@ const Footer = () => {
             © {new Date().getFullYear()} MechaLink. All rights reserved.
           </p>
           <div className="flex space-x-4">
-            <a href="#" className="hover:text-purple transition">
+            <a href="#" className="hover:text-orange-500 transition">
               <Facebook className="h-5 w-5" />
             </a>
-            <a href="#" className="hover:text-purple transition">
+            <a href="#" className="hover:text-orange-500 transition">
               <Twitter className="h-5 w-5" />
             </a>
-            <a href="#" className="hover:text-purple transition">
+            <a href="#" className="hover:text-orange-500 transition">
               <Instagram className="h-5 w-5" />
             </a>
-            <a href="#" className="hover:text-purple transition">
+            <a href="#" className="hover:text-orange-500 transition">
               <Linkedin className="h-5 w-5" />
             </a>
           </div>
