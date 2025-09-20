@@ -2,7 +2,8 @@
 
 import React, { useState } from "react";
 import ServiceBanner from "./ServiceBanner";
-import ServiceCard from "../Components/ServiceCard";
+import ServiceCard from "@/app/Components/ServiceCard";
+// import ServiceCard from "../../Components/ServiceCard";
 
 export default function Services() {
   const services = [
