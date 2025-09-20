@@ -1,8 +1,8 @@
 // app/layout.js
 import { Geist, Geist_Mono, Urbanist, Poppins } from "next/font/google";
 import "./globals.css";
-import ConditionalHeader from "./ConditionalHeader";
-import ConditionalFooter from "./ConditionalFooter";
+// import ConditionalHeader from "./ConditionalHeader";
+// import ConditionalFooter from "./ConditionalFooter";
 import UserProvider from "./UserContext";
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -37,9 +37,9 @@ export default function RootLayout({ children }) {
       >
         <UserProvider>
           <div className="flex flex-col min-h-screen justify-between pt-18">
-            <ConditionalHeader />
+            {/* <ConditionalHeader /> */}
             {children}
-            <ConditionalFooter />
+            {/* <ConditionalFooter /> */}
           </div>
         </UserProvider>
       </body>
