@@ -1,4 +1,5 @@
 import { CalendarHeart, Clock, MapPinPlus, Star } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
 import React from "react";
 
@@ -10,12 +11,12 @@ export default function ServiceCard({ service }) {
         className="border border-gray-300 rounded-xl overflow-hidden shadow-md h-full flex flex-col group"
       >
         {/* service Image */}
-        <div className="h-60 w-full overflow-hidden">
-          <img
+        <div className="h-60 w-full overflow-hidden relative">
+          <Image
+            fill
             src={service.image}
-            alt={service.name}
-            className="h-full w-full object-cover group-hover:scale-120 duration-500"
-          />
+            className="object-cover group-hover:scale-120 duration-500 object-top"
+            alt={service.name}/>
         </div>
 
         {/* service Info */}

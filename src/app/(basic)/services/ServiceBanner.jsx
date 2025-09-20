@@ -1,6 +1,5 @@
-import Image from "next/image";
-import serviceBanner from "../../assets/images/service-banner.jpg";
-import tools from "../../assets/images/tools-f.png";
+
+import serviceBanner from "../../../assets/images/service-banner.jpg";
 
 export default function ServiceBanner() {
   return (
