@@ -21,7 +21,7 @@ import CountUp from "react-countup";
 
 const AboutPage = () => {
   return (
-    <div className="bg-gray-50 text-gray-800">
+    <div className="">
       {/* Enhanced Hero Section */}
       <section className="relative bg-gray-900 text-white py-24 text-center overflow-hidden">
         {/* Background image with overlay */}
@@ -61,35 +61,35 @@ const AboutPage = () => {
       </section>
 
       {/* Stats Section */}
-      <section className="py-16 bg-white">
+      <section className="py-16 ">
         <div className="max-w-6xl mx-auto px-6">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
             <div className="p-6">
               <div className="text-4xl font-bold text-orange-500 mb-2">
                 <CountUp end={500} suffix="+" duration={10} enableScrollSpy />
               </div>
-              <p className="text-gray-600">Verified Mechanics</p>
+              <p className="text-gray-400">Verified Mechanics</p>
             </div>
 
             <div className="p-6">
               <div className="text-4xl font-bold text-orange-500 mb-2">
                 <CountUp end={10000} suffix="+" duration={10} enableScrollSpy />
               </div>
-              <p className="text-gray-600">Happy Customers</p>
+              <p className="text-gray-400">Happy Customers</p>
             </div>
 
             <div className="p-6">
               <div className="text-4xl font-bold text-orange-500 mb-2">
                 <CountUp end={15000} suffix="+" duration={10} enableScrollSpy />
               </div>
-              <p className="text-gray-600">Services Completed</p>
+              <p className="text-gray-400">Services Completed</p>
             </div>
 
             <div className="p-6">
               <div className="text-4xl font-bold text-orange-500 mb-2">
                 <CountUp end={95} suffix="%" duration={10} enableScrollSpy />
               </div>
-              <p className="text-gray-600">Satisfaction Rate</p>
+              <p className="text-gray-400">Satisfaction Rate</p>
             </div>
           </div>
         </div>
@@ -100,7 +100,7 @@ const AboutPage = () => {
         <div className="text-center mb-16">
           <h2 className="text-4xl font-bold mb-4">Our Story</h2>
           <div className="w-20 h-1 bg-orange-500 mx-auto"></div>
-          <p className="max-w-2xl mx-auto mt-4 text-gray-600">
+          <p className="max-w-2xl mx-auto mt-4 text-gray-400">
             How a simple idea transformed into a revolutionary platform for
             automotive services
           </p>
@@ -131,7 +131,7 @@ const AboutPage = () => {
               intuitive booking systems to secure payment processing, we've
               built every component with both mechanics and customers in mind.
             </p>
-            <div className="bg-gray-100 p-6 rounded-xl border-l-4 border-orange-500">
+            <div className="p-6 rounded-xl border-l-4 border-orange-500 shadow-2xl">
               <p className="font-medium">
                 "Our mission is to empower mechanics with better tools and
                 provide customers with transparency, quality service, and peace
@@ -143,7 +143,7 @@ const AboutPage = () => {
       </section>
 
       {/* Mission & Vision */}
-      <section className="py-20 bg-gray-100">
+      <section className="py-20">
         <div className="max-w-6xl mx-auto px-6">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold mb-4">Our Core Philosophy</h2>
@@ -151,12 +151,12 @@ const AboutPage = () => {
           </div>
 
           <div className="grid md:grid-cols-2 gap-10">
-            <div className="bg-white p-8 rounded-2xl shadow-md hover:shadow-lg transition">
+            <div className="p-8 rounded-2xl shadow-lg hover:shadow-xl transition">
               <div className="inline-flex items-center justify-center w-16 h-16 bg-orange-100 rounded-2xl mb-6">
                 <Target className="w-8 h-8 text-orange-600" />
               </div>
               <h3 className="text-2xl font-semibold mb-4">Our Mission</h3>
-              <p className="text-gray-700">
+              <p className="">
                 To create a reliable bridge between mechanics and customers by
                 offering transparency, trust, and convenience in every service.
                 We're committed to elevating the standard of automotive repairs
@@ -164,12 +164,12 @@ const AboutPage = () => {
               </p>
             </div>
 
-            <div className="bg-white p-8 rounded-2xl shadow-md hover:shadow-lg transition">
+            <div className="p-8 rounded-2xl shadow-lg hover:shadow-xl transition">
               <div className="inline-flex items-center justify-center w-16 h-16 bg-orange-100 rounded-2xl mb-6">
                 <Rocket className="w-8 h-8 text-orange-600" />
               </div>
               <h3 className="text-2xl font-semibold mb-4">Our Vision</h3>
-              <p className="text-gray-700">
+              <p className="">
                 To become the global leader in automotive service technology,
                 redefining customer experience with innovation and care. We
                 envision a world where finding quality automotive service is as
@@ -181,12 +181,12 @@ const AboutPage = () => {
       </section>
 
       {/* Key Features */}
-      <section className="py-20 bg-white">
+      <section className="py-20">
         <div className="max-w-6xl mx-auto px-6">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold mb-4">Why Choose MechaLink?</h2>
             <div className="w-20 h-1 bg-orange-500 mx-auto"></div>
-            <p className="max-w-2xl mx-auto mt-4 text-gray-600">
+            <p className="max-w-2xl mx-auto mt-4 text-gray-400">
               Our platform offers unique advantages for both mechanics and
               customers
             </p>
@@ -197,7 +197,7 @@ const AboutPage = () => {
               <div className="inline-flex items-center justify-center w-12 h-12 bg-orange-100 rounded-xl mb-4">
                 <Shield className="w-6 h-6 text-orange-600" />
               </div>
-              <h3 className="text-xl font-semibold mb-2">
+              <h3 className="text-xl font-semibold mb-2 text-black">
                 Verified Professionals
               </h3>
               <p className="text-gray-600">
@@ -210,7 +210,7 @@ const AboutPage = () => {
               <div className="inline-flex items-center justify-center w-12 h-12 bg-orange-100 rounded-xl mb-4">
                 <MapPin className="w-6 h-6 text-orange-600" />
               </div>
-              <h3 className="text-xl font-semibold mb-2">
+              <h3 className="text-xl font-semibold mb-2 text-black">
                 Location-Based Search
               </h3>
               <p className="text-gray-600">
@@ -223,7 +223,7 @@ const AboutPage = () => {
               <div className="inline-flex items-center justify-center w-12 h-12 bg-orange-100 rounded-xl mb-4">
                 <CreditCard className="w-6 h-6 text-orange-600" />
               </div>
-              <h3 className="text-xl font-semibold mb-2">Secure Payments</h3>
+              <h3 className="text-xl font-semibold mb-2 text-black">Secure Payments</h3>
               <p className="text-gray-600">
                 Enjoy hassle-free transactions with multiple payment options and
                 protection policies.
@@ -234,7 +234,7 @@ const AboutPage = () => {
               <div className="inline-flex items-center justify-center w-12 h-12 bg-orange-100 rounded-xl mb-4">
                 <MessageCircle className="w-6 h-6 text-orange-600" />
               </div>
-              <h3 className="text-xl font-semibold mb-2">
+              <h3 className="text-xl font-semibold mb-2 text-black">
                 Real-Time Communication
               </h3>
               <p className="text-gray-600">
@@ -247,7 +247,7 @@ const AboutPage = () => {
               <div className="inline-flex items-center justify-center w-12 h-12 bg-orange-100 rounded-xl mb-4">
                 <Clock className="w-6 h-6 text-orange-600" />
               </div>
-              <h3 className="text-xl font-semibold mb-2">Service Tracking</h3>
+              <h3 className="text-xl font-semibold mb-2 text-black">Service Tracking</h3>
               <p className="text-gray-600">
                 Monitor your service request status from booking to completion
                 in real-time.
@@ -258,7 +258,7 @@ const AboutPage = () => {
               <div className="inline-flex items-center justify-center w-12 h-12 bg-orange-100 rounded-xl mb-4">
                 <TrendingUp className="w-6 h-6 text-orange-600" />
               </div>
-              <h3 className="text-xl font-semibold mb-2">Business Growth</h3>
+              <h3 className="text-xl font-semibold mb-2 text-black">Business Growth</h3>
               <p className="text-gray-600">
                 Mechanics can grow their business with our marketing tools and
                 customer reach.
@@ -339,12 +339,12 @@ const AboutPage = () => {
       </section>
 
       {/* Founder Section */}
-      <section className="py-20 bg-white">
+      <section className="py-20">
         <div className="max-w-6xl mx-auto px-6">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold mb-4">Leadership Team</h2>
             <div className="w-20 h-1 bg-orange-500 mx-auto"></div>
-            <p className="max-w-2xl mx-auto mt-4 text-gray-600">
+            <p className="max-w-2xl mx-auto mt-4 text-gray-400">
               Passionate individuals driving innovation in the automotive
               service industry
             </p>
@@ -359,7 +359,7 @@ const AboutPage = () => {
                   className="w-20 h-20 rounded-full object-cover mr-6 border-4 border-white shadow"
                 />
                 <div>
-                  <h3 className="text-2xl font-semibold">Jhankar Mahbub</h3>
+                  <h3 className="text-2xl font-semibold text-black">Jhankar Mahbub</h3>
                   <p className="text-orange-600">Founder & Lead Developer</p>
                   <div className="flex mt-2">
                     {[1, 2, 3, 4, 5].map((star) => (
@@ -432,21 +432,21 @@ const AboutPage = () => {
               <h3 className="text-2xl font-semibold mb-6">
                 From Vision to Reality
               </h3>
-              <p className="text-lg text-gray-700 mb-6">
+              <p className="text-lg text-gray-400 mb-6">
                 Jhankar assembled a team of passionate developers and industry
                 experts to bring MechaLink to life. His leadership has fostered
                 a culture of innovation and excellence that continues to drive
                 the platform forward.
               </p>
-              <div className="flex items-center text-gray-600">
+              <div className="flex items-center text-gray-400">
                 <Award className="w-5 h-5 text-orange-500 mr-2" />
-                <span>5+ Years in Software Development</span>
+                <span>10+ Years in Software Development</span>
               </div>
-              <div className="flex items-center text-gray-600 mt-2">
+              <div className="flex items-center text-gray-400 mt-2">
                 <Zap className="w-5 h-5 text-orange-500 mr-2" />
                 <span>Expert in React & Next.js Ecosystems</span>
               </div>
-              <div className="flex items-center text-gray-600 mt-2">
+              <div className="flex items-center text-gray-400 mt-2">
                 <Calendar className="w-5 h-5 text-orange-500 mr-2" />
                 <span>Founded MechaLink in 2023</span>
               </div>
@@ -456,12 +456,12 @@ const AboutPage = () => {
       </section>
 
       {/* Team Section */}
-      <section className="py-20 bg-gray-100">
+      <section className="py-20">
         <div className="max-w-6xl mx-auto px-6">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold mb-4">Our Team</h2>
             <div className="w-20 h-1 bg-orange-500 mx-auto"></div>
-            <p className="max-w-2xl mx-auto mt-4 text-gray-600">
+            <p className="max-w-2xl mx-auto mt-4 text-gray-400">
               Talented individuals working together to revolutionize automotive
               services
             </p>
@@ -509,7 +509,7 @@ const AboutPage = () => {
             ].map((person, i) => (
               <div
                 key={i}
-                className={`bg-white rounded-2xl overflow-hidden shadow-md hover:shadow-lg transition transform hover:-translate-y-2 ${
+                className={`rounded-2xl overflow-hidden shadow-md hover:shadow-lg transition transform hover:-translate-y-2 ${
                   person.featured
                     ? "md:order-first border-2 border-orange-500"
                     : "border-2 border-orange-500"
@@ -529,7 +529,7 @@ const AboutPage = () => {
                 </div>
                 <div className="p-6 text-center">
                   <h3 className="text-xl font-semibold mb-1">{person.name}</h3>
-                  <p className="text-gray-600 mb-4">{person.role}</p>
+                  <p className="text-gray-400 mb-4">{person.role}</p>
                   <div className="flex justify-center items-center space-x-3">
                     <a href="#" className=" hover:text-orange-500 transition">
                       <svg

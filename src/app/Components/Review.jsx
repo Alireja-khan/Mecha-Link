@@ -100,7 +100,7 @@ const ReviewSection = () => {
         <h2 className="text-4xl md:text-5xl font-bold mb-4 font-urbanist">
           What Our <span className="text-primary inline-block">Users Say</span>
         </h2>
-        <p className="text-lg text-gray-700 max-w-2xl mx-auto font-poppins">
+        <p className="text-lg max-w-2xl mx-auto font-poppins">
           Real stories from car owners, drivers, and businesses who trust MechaLink
           for reliable auto services.
         </p>
@@ -156,7 +156,7 @@ const ReviewSection = () => {
                       alt={review.name}
                       className="w-12 h-12 rounded-full border border-primary mr-4 object-cover"
                     />
-                    <div>
+                    <div className="text-black">
                       <p className="font-medium font-urbanist">{review.name}</p>
                       <p className="text-sm ">{review.role}</p>
                     </div>
@@ -196,7 +196,7 @@ const ReviewSection = () => {
           <div className="flex items-center mt-8 w-fit mx-auto space-x-4">
             <button
               ref={prevRef}
-              className="bg-white p-2 rounded-full shadow-lg hover:shadow-xl  hover:text-primary focus:outline-none focus:ring-2 focus:ring-primary"
+              className="bg-white p-2 rounded-full shadow-lg hover:shadow-xl  hover:text-primary focus:outline-none focus:ring-2 focus:ring-primary text-black"
             >
               <ChevronLeft className="h-6 w-6" />
             </button>
@@ -205,7 +205,7 @@ const ReviewSection = () => {
 
             <button
               ref={nextRef}
-              className="bg-white p-2 rounded-full shadow-lg hover:shadow-xl  hover:text-primary focus:outline-none focus:ring-2 focus:ring-primary"
+              className="bg-white p-2 rounded-full shadow-lg hover:shadow-xl  hover:text-primary focus:outline-none focus:ring-2 focus:ring-primary text-black"
             >
               <ChevronRight className="h-6 w-6" />
             </button>
