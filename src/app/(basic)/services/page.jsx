@@ -201,7 +201,7 @@ export default function Services() {
                   placeholder="Shop, mechanic, or location"
                   value={searchTerm}
                   onChange={handleSearch}
-                  className="flex-1 bg-white text-gray-900 placeholder-gray-800 px-3 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
+                  className="flex-1 bg-white  placeholder-gray-800 px-3 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
                 />
               </div>
             </div>

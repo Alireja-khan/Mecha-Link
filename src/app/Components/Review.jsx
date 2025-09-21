@@ -158,7 +158,7 @@ const ReviewSection = () => {
                     />
                     <div>
                       <p className="font-medium font-urbanist">{review.name}</p>
-                      <p className="text-sm text-gray-500">{review.role}</p>
+                      <p className="text-sm ">{review.role}</p>
                     </div>
                   </div>
 
@@ -196,7 +196,7 @@ const ReviewSection = () => {
           <div className="flex items-center mt-8 w-fit mx-auto space-x-4">
             <button
               ref={prevRef}
-              className="bg-white p-2 rounded-full shadow-lg hover:shadow-xl text-gray-600 hover:text-primary focus:outline-none focus:ring-2 focus:ring-primary"
+              className="bg-white p-2 rounded-full shadow-lg hover:shadow-xl  hover:text-primary focus:outline-none focus:ring-2 focus:ring-primary"
             >
               <ChevronLeft className="h-6 w-6" />
             </button>
@@ -205,7 +205,7 @@ const ReviewSection = () => {
 
             <button
               ref={nextRef}
-              className="bg-white p-2 rounded-full shadow-lg hover:shadow-xl text-gray-600 hover:text-primary focus:outline-none focus:ring-2 focus:ring-primary"
+              className="bg-white p-2 rounded-full shadow-lg hover:shadow-xl  hover:text-primary focus:outline-none focus:ring-2 focus:ring-primary"
             >
               <ChevronRight className="h-6 w-6" />
             </button>

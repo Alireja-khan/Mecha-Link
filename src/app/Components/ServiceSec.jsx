@@ -73,7 +73,7 @@ export default function ServiceSec() {
             <h2 className="text-5xl font-bold text-center">
               Trusted <span className="text-primary">Mechanics</span> Near You
             </h2>
-            <p className="text-lg text-gray-600 mt-4">
+            <p className="text-lg  mt-4">
               MechaLink connects you with verified mechanics nearby – making vehicle
               repairs and services faster, easier, and more reliable.
             </p>

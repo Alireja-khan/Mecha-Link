@@ -68,13 +68,13 @@ export default function FeaturesSection() {
   ];
 
   return (
-    <section className="relative text-gray-900">
+    <section className="relative ">
       {/* Title + Description outside background image */}
       <div className="container mx-auto px-6 text-center mb-10">
         <h2 className="text-4xl md:text-5xl font-extrabold font-urbanist">
           Our <span className="text-primary">Features</span>
         </h2>
-        <p className="text-lg mt-2 text-gray-600 max-w-2xl mx-auto font-poppins">
+        <p className="text-lg mt-2  max-w-2xl mx-auto font-poppins">
           Find trusted mechanics and book car services online—fast, easy, and reliable.
         </p>
       </div>
@@ -117,7 +117,7 @@ export default function FeaturesSection() {
                           <h3 className="text-lg font-bold text-primary font-urbanist text-center">
                             {feature.title}
                           </h3>
-                          <p className="mt-2 text-sm text-gray-600 font-poppins text-center">
+                          <p className="mt-2 text-sm  font-poppins text-center">
                             {feature.desc}
                           </p>
                         </div>
