@@ -46,7 +46,7 @@ export default function ServiceDetailsPage() {
               />
             </div>
             <div>
-              <p className="font-semibold">AutoFix Garage</p>
+              <p className="font-semibold">AutoFix Garage.</p>
               <p className="text-sm">4.9 (127 reviews)</p>
             </div>
           </div>
