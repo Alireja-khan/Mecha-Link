@@ -2,6 +2,7 @@
 
 import { useState, useContext } from "react";
 import { useRouter } from "next/navigation";
+import { UserContext } from "@/app/UserContext";
 // import { UserContext } from "../UserContext";
 
 export default function RegisterPage() {

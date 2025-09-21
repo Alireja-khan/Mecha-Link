@@ -1,12 +1,12 @@
 "use client";
 
 import Lottie from "lottie-react";
-import loginIllustration from "../../../public/assets/login/login.json"; 
+import loginIllustration from "../../../../public/assets/login/login.json"; 
 import LoginForm from "./components/LoginForm";
 
 export default function LoginPage() {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-black text-white">
+    <div className="min-h-screen flex items-center justify-center">
       <div className="flex max-w-5xl w-full">
         {/* Left Side Illustration */}
         <div className="hidden md:flex w-1/2 items-center justify-center p-6">

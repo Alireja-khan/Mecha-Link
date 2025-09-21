@@ -218,8 +218,8 @@ export default function Services() {
                 onChange={handleSort}
                 className="px-3 py-2  rounded-md border-2 border-primary focus:outline-none focus:ring-2 focus:ring-primary"
               >
-                <option value="htl">Rating: High to Low</option>
-                <option value="lth">Rating: Low to High</option>
+                <option className="text-black" value="htl">Rating: High to Low</option>
+                <option className="text-black" value="lth">Rating: Low to High</option>
               </select>
             </div>
           </div>

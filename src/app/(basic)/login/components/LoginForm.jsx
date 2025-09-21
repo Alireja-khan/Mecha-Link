@@ -3,7 +3,7 @@ import React from "react";
 // import { signIn, signOut } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
-// import SocialLogin from "./SocialLogin";
+import SocialLogin from "./SocialLogin";
 
 export default function LoginForm() {
   const router = useRouter();
@@ -63,7 +63,7 @@ export default function LoginForm() {
 
       {/* Social Login */}
       <p className="text-center">Or Sign In With</p>
-      {/* <SocialLogin></SocialLogin> */}
+      <SocialLogin></SocialLogin>
 
       {/* Sign Up Link */}
       <p className="text-center text-sm mt-6">

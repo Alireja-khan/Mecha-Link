@@ -1,10 +1,9 @@
 // app/layout.js
 import { Geist, Geist_Mono, Urbanist, Poppins } from "next/font/google";
 import "../globals.css";
-// import UserProvider from "../UserContext";
-import Header from "../Components/Header";
-import Footer from "../Components/Footer";
-import NextAuthProvider from "@/Providers/NextAuthProvider";
+import UserProvider from "../UserContext";
+import Header from "../components/Header";
+import Footer from "../components/Footer";
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -36,15 +35,13 @@ export default function RootLayout({ children }) {
       <body
         className={`${geistSans.variable} ${geistMono.variable} ${urbanist.variable} ${poppins.variable} antialiased`}
       >
-        <NextAuthProvider>
-          {/* <UserProvider> */}
+        <UserProvider>
           <div className="flex flex-col min-h-screen justify-between pt-18">
             <Header />
             {children}
             <Footer />
           </div>
-          {/* </UserProvider> */}
-        </NextAuthProvider>
+        </UserProvider>
       </body>
     </html>
   );
