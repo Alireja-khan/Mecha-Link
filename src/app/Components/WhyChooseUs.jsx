@@ -62,7 +62,7 @@ const WhyChooseUs = () => {
                         Why Choose{" "}
                         <span className="text-primary">MechaLink</span>
                     </h2>
-                    <p className="text-lg md:text-xl text-gray-600 mt-4">
+                    <p className="text-lg md:text-xl  mt-4">
                         A smarter, faster, and safer way to connect with trusted mechanics
                         near you.
                     </p>

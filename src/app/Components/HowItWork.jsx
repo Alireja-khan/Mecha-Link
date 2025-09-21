@@ -85,7 +85,7 @@ const HowToWork = () => {
                     <h2 className="text-4xl md:text-5xl font-bold mb-4 font-roboto-con">
                         How <span className="text-primary font-caveat inline-block">MechaLink Works</span>
                     </h2>
-                    <p className="text-xl text-gray-600 max-w-2xl mx-auto font-nunito-sans">
+                    <p className="text-xl  max-w-2xl mx-auto font-nunito-sans">
                         Follow these steps to understand the complete workflow and get connected with trusted mechanics efficiently.
                     </p>
                 </div>
@@ -108,7 +108,7 @@ const HowToWork = () => {
                                     <div className={`w-10 h-10 rounded-full flex items-center justify-center z-10 relative ${
                                         activeStep === index 
                                             ? "bg-primary scale-110 ring-4 ring-orange-200" 
-                                            : "bg-white border-2 border-orange-400"
+                                            : " border-2 border-orange-400"
                                     } transition-all duration-300`}>
                                         <div className={`${activeStep === index ? "text-white" : "text-primary"}`}>
                                             {step.icon}
@@ -120,7 +120,7 @@ const HowToWork = () => {
                                 </div>
                                 
                                 {/* Content card with dynamic animation */}
-                                <div className={`flex-1 bg-white rounded-2xl p-6 transform transition-all duration-300 ${
+                                <div className={`flex-1  rounded-2xl p-6 transform transition-all duration-300 ${
                                     activeStep === index 
                                         ? "shadow-xl -translate-y-1 border-l-4 border-primary" 
                                         : "shadow-md"
@@ -131,7 +131,7 @@ const HowToWork = () => {
                                                 Step {index + 1}
                                             </span>
                                             <h3 className="text-xl font-semibold mb-2">{step.title}</h3>
-                                            <p className="text-gray-600 text-sm">{step.description}</p>
+                                            <p className=" text-sm">{step.description}</p>
                                         </div>
                                         <ArrowRight className={`w-5 h-5 text-primary transition-transform duration-300 ${
                                             activeStep === index ? "translate-x-1" : ""

@@ -11,7 +11,7 @@ export default function HeroModern() {
                     <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold leading-tight">
                         Connect with <span className="text-primary">Trusted Mechanics</span> <br className="hidden sm:block" /> Anytime, Anywhere
                     </h1>
-                    <p className="mt-6 text-lg sm:text-xl text-gray-600 max-w-2xl mx-auto lg:mx-0">
+                    <p className="mt-6 text-lg sm:text-xl  max-w-2xl mx-auto lg:mx-0">
                         MechaLink helps vehicle owners find verified mechanics, book services instantly,
                         and track repairs—all in one platform. Reliable. Fast. Hassle-free.
                     </p>
@@ -29,7 +29,7 @@ export default function HeroModern() {
                     </div>
 
                     {/* Trust Indicators */}
-                    <div className="mt-10 flex flex-wrap items-center justify-center lg:justify-start gap-6 text-gray-500 text-sm">
+                    <div className="mt-10 flex flex-wrap items-center justify-center lg:justify-start gap-6  text-sm">
                         <div className="flex items-center">
                             <div className="flex -space-x-3 mr-2">
                                 {[
@@ -77,7 +77,7 @@ export default function HeroModern() {
                             </div>
                             <div>
                                 <h4 className="font-semibold text-gray-800">Live Booking</h4>
-                                <p className="text-gray-600 text-sm">Instant mechanic availability</p>
+                                <p className=" text-sm">Instant mechanic availability</p>
                             </div>
                         </div>
                     </div>

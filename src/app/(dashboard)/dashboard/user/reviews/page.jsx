@@ -218,8 +218,8 @@ const ReviewsComponent = () => {
       <div className="max-w-6xl mx-auto">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-2xl font-bold text-gray-900">My Reviews</h1>
-          <p className="text-gray-600">View and manage your service reviews</p>
+          <h1 className="text-2xl font-bold ">My Reviews</h1>
+          <p className="">View and manage your service reviews</p>
         </div>
 
         {/* Stats and Action Card */}
@@ -227,22 +227,22 @@ const ReviewsComponent = () => {
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center">
             <div className="flex items-center mb-4 md:mb-0">
               <div className="mr-6">
-                <div className="text-4xl font-bold text-gray-900">{averageRating}</div>
+                <div className="text-4xl font-bold ">{averageRating}</div>
                 <div className="flex mt-1">{renderStars(Number(averageRating))}</div>
-                <div className="text-sm text-gray-600 mt-1">{reviews.length} reviews</div>
+                <div className="text-sm  mt-1">{reviews.length} reviews</div>
               </div>
               
               <div className="space-y-1">
                 {[5, 4, 3, 2, 1].map(rating => (
                   <div key={rating} className="flex items-center">
-                    <div className="w-8 text-sm text-gray-600">{rating} star</div>
+                    <div className="w-8 text-sm ">{rating} star</div>
                     <div className="w-32 h-2 bg-gray-200 rounded-full mx-2">
                       <div 
                         className="h-2 bg-yellow-400 rounded-full" 
                         style={{ width: `${(ratingCounts[rating] / reviews.length) * 100}%` }}
                       ></div>
                     </div>
-                    <div className="w-8 text-sm text-gray-600">{ratingCounts[rating]}</div>
+                    <div className="w-8 text-sm ">{ratingCounts[rating]}</div>
                   </div>
                 ))}
               </div>
@@ -281,7 +281,7 @@ const ReviewsComponent = () => {
           </div>
           
           <div className="flex items-center">
-            <label className="text-sm text-gray-600 mr-2">Sort by:</label>
+            <label className="text-sm  mr-2">Sort by:</label>
             <select
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value)}
@@ -310,7 +310,7 @@ const ReviewsComponent = () => {
                       />
                       <div className="ml-3">
                         <h3 className="font-medium">{review.mechanic.name}</h3>
-                        <p className="text-sm text-gray-600">{review.mechanic.specialty}</p>
+                        <p className="text-sm ">{review.mechanic.specialty}</p>
                       </div>
                     </div>
                   </div>
@@ -320,10 +320,10 @@ const ReviewsComponent = () => {
                       <div>
                         <div className="flex items-center">
                           {renderStars(review.rating)}
-                          <span className="ml-2 text-sm text-gray-600">{review.date}</span>
+                          <span className="ml-2 text-sm ">{review.date}</span>
                         </div>
                         <h4 className="font-medium mt-2">{review.service}</h4>
-                        <p className="text-sm text-gray-600">{review.vehicle}</p>
+                        <p className="text-sm ">{review.vehicle}</p>
                       </div>
                       
                       <div className="flex items-center mt-3 sm:mt-0">
@@ -334,7 +334,7 @@ const ReviewsComponent = () => {
                         )}
                         <button
                           onClick={() => handleHelpful(review.id)}
-                          className="text-sm text-gray-500 hover:text-indigo-600 flex items-center"
+                          className="text-sm  hover:text-indigo-600 flex items-center"
                         >
                           <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905a3.61 3.61 0 01-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.5"></path>
@@ -352,7 +352,7 @@ const ReviewsComponent = () => {
                         alt={review.user}
                         className="w-6 h-6 rounded-full object-cover"
                       />
-                      <span className="ml-2 text-sm text-gray-600">{review.user}</span>
+                      <span className="ml-2 text-sm ">{review.user}</span>
                     </div>
                   </div>
                 </div>
@@ -361,8 +361,8 @@ const ReviewsComponent = () => {
           ) : (
             <div className="bg-white rounded-2xl shadow-sm p-8 text-center">
               <div className="text-gray-400 mb-4">🌟</div>
-              <h3 className="font-medium text-gray-900 mb-2">No reviews yet</h3>
-              <p className="text-gray-600 mb-4">You haven't written any reviews for your services.</p>
+              <h3 className="font-medium  mb-2">No reviews yet</h3>
+              <p className=" mb-4">You haven't written any reviews for your services.</p>
               <button
                 onClick={() => setIsWritingReview(true)}
                 className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition"
@@ -382,7 +382,7 @@ const ReviewsComponent = () => {
                   <h2 className="text-xl font-semibold">Write a Review</h2>
                   <button
                     onClick={() => setIsWritingReview(false)}
-                    className="text-gray-400 hover:text-gray-600"
+                    className="text-gray-400 hover:"
                   >
                     <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path>

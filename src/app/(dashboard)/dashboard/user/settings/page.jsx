@@ -111,7 +111,7 @@ const SettingsComponent = () => {
               />
               <div>
                 <h3 className="text-lg font-medium">{userData.name}</h3>
-                <p className="text-gray-600">{userData.role}</p>
+                <p className="">{userData.role}</p>
                 <button className="mt-2 text-sm text-indigo-600 hover:underline">
                   Change Avatar
                 </button>
@@ -198,13 +198,13 @@ const SettingsComponent = () => {
         return (
           <div className="space-y-6">
             <h3 className="text-lg font-medium">Notification Preferences</h3>
-            <p className="text-gray-600">Manage how you receive notifications from MechaLink</p>
+            <p className="">Manage how you receive notifications from MechaLink</p>
             
             <div className="space-y-4">
               <div className="flex items-center justify-between p-4 border rounded-lg">
                 <div>
                   <h4 className="font-medium">Email Notifications</h4>
-                  <p className="text-sm text-gray-600">Receive important updates via email</p>
+                  <p className="text-sm ">Receive important updates via email</p>
                 </div>
                 <label className="relative inline-flex items-center cursor-pointer">
                   <input
@@ -220,7 +220,7 @@ const SettingsComponent = () => {
               <div className="flex items-center justify-between p-4 border rounded-lg">
                 <div>
                   <h4 className="font-medium">SMS Notifications</h4>
-                  <p className="text-sm text-gray-600">Receive text messages for urgent updates</p>
+                  <p className="text-sm ">Receive text messages for urgent updates</p>
                 </div>
                 <label className="relative inline-flex items-center cursor-pointer">
                   <input
@@ -236,7 +236,7 @@ const SettingsComponent = () => {
               <div className="flex items-center justify-between p-4 border rounded-lg">
                 <div>
                   <h4 className="font-medium">Push Notifications</h4>
-                  <p className="text-sm text-gray-600">Get alerts on your device</p>
+                  <p className="text-sm ">Get alerts on your device</p>
                 </div>
                 <label className="relative inline-flex items-center cursor-pointer">
                   <input
@@ -252,7 +252,7 @@ const SettingsComponent = () => {
               <div className="flex items-center justify-between p-4 border rounded-lg">
                 <div>
                   <h4 className="font-medium">Service Reminders</h4>
-                  <p className="text-sm text-gray-600">Get reminders for upcoming vehicle services</p>
+                  <p className="text-sm ">Get reminders for upcoming vehicle services</p>
                 </div>
                 <label className="relative inline-flex items-center cursor-pointer">
                   <input
@@ -272,12 +272,12 @@ const SettingsComponent = () => {
         return (
           <div className="space-y-6">
             <h3 className="text-lg font-medium">Privacy Settings</h3>
-            <p className="text-gray-600">Control your privacy and data sharing preferences</p>
+            <p className="">Control your privacy and data sharing preferences</p>
             
             <div className="space-y-4">
               <div className="p-4 border rounded-lg">
                 <h4 className="font-medium mb-2">Profile Visibility</h4>
-                <p className="text-sm text-gray-600 mb-3">Who can see your profile information</p>
+                <p className="text-sm  mb-3">Who can see your profile information</p>
                 <div className="flex flex-wrap gap-3">
                   {['public', 'connections', 'private'].map(option => (
                     <label key={option} className="flex items-center space-x-2">
@@ -297,7 +297,7 @@ const SettingsComponent = () => {
               <div className="flex items-center justify-between p-4 border rounded-lg">
                 <div>
                   <h4 className="font-medium">Show Email Address</h4>
-                  <p className="text-sm text-gray-600">Allow others to see your email address</p>
+                  <p className="text-sm ">Allow others to see your email address</p>
                 </div>
                 <label className="relative inline-flex items-center cursor-pointer">
                   <input
@@ -313,7 +313,7 @@ const SettingsComponent = () => {
               <div className="flex items-center justify-between p-4 border rounded-lg">
                 <div>
                   <h4 className="font-medium">Show Phone Number</h4>
-                  <p className="text-sm text-gray-600">Allow others to see your phone number</p>
+                  <p className="text-sm ">Allow others to see your phone number</p>
                 </div>
                 <label className="relative inline-flex items-center cursor-pointer">
                   <input
@@ -329,7 +329,7 @@ const SettingsComponent = () => {
               <div className="flex items-center justify-between p-4 border rounded-lg">
                 <div>
                   <h4 className="font-medium">Data Sharing for Improvement</h4>
-                  <p className="text-sm text-gray-600">Help us improve our services by sharing anonymous usage data</p>
+                  <p className="text-sm ">Help us improve our services by sharing anonymous usage data</p>
                 </div>
                 <label className="relative inline-flex items-center cursor-pointer">
                   <input
@@ -349,13 +349,13 @@ const SettingsComponent = () => {
         return (
           <div className="space-y-6">
             <h3 className="text-lg font-medium">Security Settings</h3>
-            <p className="text-gray-600">Manage your account security and access</p>
+            <p className="">Manage your account security and access</p>
             
             <div className="space-y-4">
               <div className="flex items-center justify-between p-4 border rounded-lg">
                 <div>
                   <h4 className="font-medium">Two-Factor Authentication</h4>
-                  <p className="text-sm text-gray-600">Add an extra layer of security to your account</p>
+                  <p className="text-sm ">Add an extra layer of security to your account</p>
                 </div>
                 <label className="relative inline-flex items-center cursor-pointer">
                   <input
@@ -371,7 +371,7 @@ const SettingsComponent = () => {
               <div className="flex items-center justify-between p-4 border rounded-lg">
                 <div>
                   <h4 className="font-medium">Login Alerts</h4>
-                  <p className="text-sm text-gray-600">Get notified when someone logs into your account</p>
+                  <p className="text-sm ">Get notified when someone logs into your account</p>
                 </div>
                 <label className="relative inline-flex items-center cursor-pointer">
                   <input
@@ -386,7 +386,7 @@ const SettingsComponent = () => {
               
               <div className="p-4 border rounded-lg">
                 <h4 className="font-medium mb-2">Change Password</h4>
-                <p className="text-sm text-gray-600 mb-3">Update your password regularly to keep your account secure</p>
+                <p className="text-sm  mb-3">Update your password regularly to keep your account secure</p>
                 <button className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 text-sm">
                   Change Password
                 </button>
@@ -394,7 +394,7 @@ const SettingsComponent = () => {
               
               <div className="p-4 border rounded-lg">
                 <h4 className="font-medium mb-2">Active Sessions</h4>
-                <p className="text-sm text-gray-600 mb-3">Manage devices that are logged into your account</p>
+                <p className="text-sm  mb-3">Manage devices that are logged into your account</p>
                 <button className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 text-sm">
                   View Active Sessions
                 </button>
@@ -407,7 +407,7 @@ const SettingsComponent = () => {
         return (
           <div className="space-y-6">
             <h3 className="text-lg font-medium">App Preferences</h3>
-            <p className="text-gray-600">Customize your MechaLink experience</p>
+            <p className="">Customize your MechaLink experience</p>
             
             <div className="space-y-4">
               <div className="p-4 border rounded-lg">
@@ -500,8 +500,8 @@ const SettingsComponent = () => {
     <div className="min-h-screen bg-gray-50 p-6">
       <div className="max-w-6xl mx-auto">
         <div className="mb-6">
-          <h1 className="text-2xl font-bold text-gray-900">Settings</h1>
-          <p className="text-gray-600">Manage your account settings and preferences</p>
+          <h1 className="text-2xl font-bold ">Settings</h1>
+          <p className="">Manage your account settings and preferences</p>
         </div>
 
         {saveMessage.text && (
@@ -517,7 +517,7 @@ const SettingsComponent = () => {
             {/* Sidebar Navigation */}
             <div className="md:w-64 border-r border-r-gray-200 bg-gray-50">
               <div className="p-4">
-                <h3 className="text-sm font-medium text-gray-500 uppercase tracking-wider mb-3">Settings</h3>
+                <h3 className="text-sm font-medium  uppercase tracking-wider mb-3">Settings</h3>
                 <nav className="space-y-1">
                   {tabs.map(tab => (
                     <button
@@ -526,7 +526,7 @@ const SettingsComponent = () => {
                       className={`w-full flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors ${
                         activeTab === tab.id
                           ? 'bg-indigo-50 text-indigo-700'
-                          : 'text-gray-600 hover:bg-gray-100'
+                          : ' hover:bg-gray-100'
                       }`}
                     >
                       <span className="mr-3">{tab.icon}</span>
