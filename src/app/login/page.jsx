@@ -1,60 +1,24 @@
 "use client";
 
-import { useState, useContext } from "react";
-import { useRouter } from "next/navigation";
-import { UserContext } from "../UserContext";
+import Lottie from "lottie-react";
+import loginIllustration from "../../../public/assets/login/login.json"; 
+import LoginForm from "./components/LoginForm";
 
 export default function LoginPage() {
-  const { setUser } = useContext(UserContext);
-  const [formData, setFormData] = useState({ name: "", email: "" });
-  const router = useRouter();
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-
-    setUser({
-      name: formData.name,
-      email: formData.email,
-      avatar: "/default-avatar.png", // fallback avatar
-    });
-
-    alert("User Logged In!");
-    router.push("/"); // redirect home
-  };
-
   return (
-    <div className="flex justify-center items-center min-h-[70vh]">
-      <form
-        onSubmit={handleSubmit}
-        className="bg-white p-6 rounded shadow-md w-80"
-      >
-        <h2 className="text-xl font-bold mb-4">Login</h2>
+    <div className="min-h-screen flex items-center justify-center bg-black text-white">
+      <div className="flex max-w-5xl w-full">
+        {/* Left Side Illustration */}
+        <div className="hidden md:flex w-1/2 items-center justify-center p-6">
+          <Lottie animationData={loginIllustration} loop={true} className="w-full h-full max-w-md" />
+        </div>
 
-        <input
-          type="text"
-          placeholder="Name"
-          value={formData.name}
-          onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-          className="w-full border p-2 mb-3 rounded"
-          required
-        />
-
-        <input
-          type="email"
-          placeholder="Email"
-          value={formData.email}
-          onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-          className="w-full border p-2 mb-3 rounded"
-          required
-        />
-
-        <button
-          type="submit"
-          className="w-full bg-green-600 text-white py-2 rounded hover:bg-green-700"
-        >
-          Login
-        </button>
-      </form>
+        {/* Right Side Form */}
+        <div className="w-full md:w-1/2 p-10 flex flex-col justify-center">
+          <h2 className="text-2xl font-semibold mb-6 text-center">Login</h2>
+            <LoginForm></LoginForm>
+        </div>
+      </div>
     </div>
   );
 }

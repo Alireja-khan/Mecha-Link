@@ -1,4 +1,4 @@
-"use client"; // <--- must be at very top
+"use client";
 
 import {
   CalendarCheck,
@@ -15,6 +15,7 @@ import { Swiper, SwiperSlide } from "swiper/react";
 import { Autoplay, Navigation } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/navigation";
+import CountUp from "react-countup";
 
 export default function FeaturesSection() {
   const features = [
@@ -61,10 +62,10 @@ export default function FeaturesSection() {
   ];
 
   const stats = [
-    { value: "50K+", label: "Happy Customers" },
-    { value: "10K+", label: "Services Booked" },
-    { value: "2K+", label: "Partner Garages" },
-    { value: "24/7", label: "Customer Support" },
+    { value: 50000, suffix: "+", label: "Happy Customers" },
+    { value: 10000, suffix: "+", label: "Services Booked" },
+    { value: 2000, suffix: "+", label: "Partner Garages" },
+    { value: 24, suffix: "/7", label: "Customer Support" },
   ];
 
   return (
@@ -129,10 +130,10 @@ export default function FeaturesSection() {
 
               {/* Arrow Buttons */}
               <div className="absolute -bottom-14 left-1/2 -translate-x-1/2 flex gap-4">
-                <button className="swiper-prev w-10 h-10 rounded-full bg-white text-primary shadow hover:bg-primary hover:text-white transition">
+                <button className="swiper-prev w-10 h-10 rounded-full bg-white text-primary shadow hover:bg-primary hover:text-white transition text-2xl">
                   ‹
                 </button>
-                <button className="swiper-next w-10 h-10 rounded-full bg-white text-primary shadow hover:bg-primary hover:text-white transition">
+                <button className="swiper-next w-10 h-10 rounded-full bg-white text-primary shadow hover:bg-primary hover:text-white transition text-2xl">
                   ›
                 </button>
               </div>
@@ -143,7 +144,7 @@ export default function FeaturesSection() {
               {stats.map((stat, idx) => (
                 <div key={idx} className="flex flex-col items-center lg:items-start">
                   <h3 className="text-4xl md:text-5xl font-extrabold text-primary">
-                    {stat.value}
+                    <CountUp end={stat.value} duration={10} suffix={stat.suffix} />
                   </h3>
                   <p className="text-gray-200 text-lg font-poppins">{stat.label}</p>
                 </div>
@@ -153,6 +154,5 @@ export default function FeaturesSection() {
         </div>
       </div>
     </section>
-
   );
 }
