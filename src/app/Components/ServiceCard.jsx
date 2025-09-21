@@ -62,12 +62,12 @@ export default function ServiceCard({service}) {
         <div className="flex justify-between gap-2 border-t border-gray-100 p-3 w-full mt-auto">
           <Link
             href={`/services/${service.id}`}
-            className="w-1/2  py-3 bg-primary  hover:bg-white border hover:border-primary  text-white hover:text-primary font-bold text-xl capitalize leading-none font-urbanist rounded-md transition duration-400 cursor-pointer text-center "
+            className="w-1/2  py-3 bg-primary  hover:bg-white hover:border hover:border-primary  text-white hover:text-primary font-bold text-xl capitalize leading-none font-urbanist rounded-md transition duration-400 cursor-pointer text-center "
           >
             Contact
           </Link>
           <Link
-            className="w-1/2 py-3 border border-primary hover:bg-accent bg-white text-primary font-bold text-xl capitalize leading-none font-urbanist rounded-md transition duration-400 cursor-pointer text-center hover:border-transparent"
+            className="w-1/2 py-3 border hover:border border-primary hover-border-primary hover:bg-accent text-primary font-bold text-xl capitalize leading-none font-urbanist rounded-md transition duration-400 cursor-pointer text-center"
             href={`/services/${service.id}`}
           >
             Service Details
