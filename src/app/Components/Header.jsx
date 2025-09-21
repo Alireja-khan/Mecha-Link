@@ -1,14 +1,14 @@
 "use client";
 
 import { useContext, useState, useEffect } from "react";
-import { UserContext } from "../UserContext";
+// import { UserContext } from "../UserContext";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { UserIcon } from "lucide-react";
 import { FaGear } from "react-icons/fa6";
 
 export default function Header() {
-  const { user, setUser } = useContext(UserContext);
+  // const { user, setUser } = useContext(UserContext);
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
@@ -142,7 +142,7 @@ export default function Header() {
           </label>
 
 
-          {!user ? (
+          {/* {!user ? ( */}
             <>
               <Link
                 href="/login"
@@ -157,7 +157,7 @@ export default function Header() {
                 Sign up
               </Link>
             </>
-          ) : (
+          {/* ) : (
             <div className="relative">
               <button
                 className="flex items-center space-x-2 focus:outline-none"
@@ -193,7 +193,7 @@ export default function Header() {
               </button>
 
               {/* User Dropdown */}
-              {userMenuOpen && (
+              {/* {userMenuOpen && (
                 <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50 border border-gray-100">
                   <div className="px-4 py-2 border-b border-gray-100">
                     <p className="text-sm font-medium ">{user.name}</p>
@@ -217,8 +217,7 @@ export default function Header() {
                   </button>
                 </div>
               )}
-            </div>
-          )}
+            </div> */}
         </div>
       </div>
     </header>

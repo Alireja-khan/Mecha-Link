@@ -1,9 +1,10 @@
 // app/layout.js
 import { Geist, Geist_Mono, Urbanist, Poppins } from "next/font/google";
 import "../globals.css";
-import UserProvider from "../UserContext";
+// import UserProvider from "../UserContext";
 import Header from "../Components/Header";
 import Footer from "../Components/Footer";
+import NextAuthProvider from "@/Providers/NextAuthProvider";
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -22,7 +23,7 @@ const poppins = Poppins({
   variable: "--font-poppins",
   subsets: ["latin"],
   weight: ["300", "400", "500", "600", "700"],
-  fallback: ["sans-serif"]
+  fallback: ["sans-serif"],
 });
 export const metadata = {
   title: "MechaLink",
@@ -35,13 +36,15 @@ export default function RootLayout({ children }) {
       <body
         className={`${geistSans.variable} ${geistMono.variable} ${urbanist.variable} ${poppins.variable} antialiased`}
       >
-        <UserProvider>
+        <NextAuthProvider>
+          {/* <UserProvider> */}
           <div className="flex flex-col min-h-screen justify-between pt-18">
             <Header />
             {children}
             <Footer />
           </div>
-        </UserProvider>
+          {/* </UserProvider> */}
+        </NextAuthProvider>
       </body>
     </html>
   );

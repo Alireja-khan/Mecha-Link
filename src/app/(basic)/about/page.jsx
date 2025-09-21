@@ -66,28 +66,28 @@ const AboutPage = () => {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
             <div className="p-6">
               <div className="text-4xl font-bold text-orange-500 mb-2">
-                <CountUp end={500} suffix="+" duration={3} enableScrollSpy />
+                <CountUp end={500} suffix="+" duration={10} enableScrollSpy />
               </div>
               <p className="text-gray-600">Verified Mechanics</p>
             </div>
 
             <div className="p-6">
               <div className="text-4xl font-bold text-orange-500 mb-2">
-                <CountUp end={10000} suffix="+" duration={3} enableScrollSpy />
+                <CountUp end={10000} suffix="+" duration={10} enableScrollSpy />
               </div>
               <p className="text-gray-600">Happy Customers</p>
             </div>
 
             <div className="p-6">
               <div className="text-4xl font-bold text-orange-500 mb-2">
-                <CountUp end={15000} suffix="+" duration={3} enableScrollSpy />
+                <CountUp end={15000} suffix="+" duration={10} enableScrollSpy />
               </div>
               <p className="text-gray-600">Services Completed</p>
             </div>
 
             <div className="p-6">
               <div className="text-4xl font-bold text-orange-500 mb-2">
-                <CountUp end={95} suffix="%" duration={3} enableScrollSpy />
+                <CountUp end={95} suffix="%" duration={10} enableScrollSpy />
               </div>
               <p className="text-gray-600">Satisfaction Rate</p>
             </div>
