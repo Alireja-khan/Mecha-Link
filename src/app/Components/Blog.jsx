@@ -79,12 +79,12 @@ const blogPosts = [
 
 const BlogSection = () => {
     return (
-        <section className="py-16 bg-background text-text">
+        <section className="py-16  text-text">
             <div className="container mx-auto px-4">
                 {/* Section Header */}
                 <div className="text-center mb-12">
                     <h2 className="text-4xl md:text-5xl font-bold mb-4 font-urbanist">
-                        MechaLink <span className="text-orange-500 inline-block">Insights</span>
+                        MechaLink <span className="text-primary inline-block">Insights</span>
                     </h2>
                     <p className="text-xl text-text/70 max-w-2xl mx-auto font-poppins">
                         Explore expert advice, tips, and the latest updates to keep your vehicle running smoothly.
@@ -110,14 +110,14 @@ const BlogSection = () => {
                             <div className="p-6 flex flex-col justify-between flex-grow">
                                 <div>
                                     <div className="flex items-center justify-between mb-3">
-                                        <span className="text-xs font-semibold uppercase px-3 py-1 rounded-full bg-orange-500 text-white">
+                                        <span className="text-xs font-semibold uppercase px-3 py-1 rounded-full bg-primary text-white">
                                             {post.category}
                                         </span>
                                         <div className="flex items-center text-text/70 text-sm">
                                             <Clock className="w-4 h-4 mr-1" /> {post.readTime}
                                         </div>
                                     </div>
-                                    <h3 className="text-2xl font-bold font-urbanist group-hover:text-orange-500 transition-colors duration-300">
+                                    <h3 className="text-2xl font-bold font-urbanist group-hover:text-primary transition-colors duration-300">
                                         {post.title}
                                     </h3>
                                     <p className="text-sm text-text/70 mt-3">{post.excerpt}</p>

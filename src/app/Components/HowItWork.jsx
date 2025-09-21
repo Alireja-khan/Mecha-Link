@@ -76,14 +76,14 @@ const HowToWork = () => {
     return (
         <section className="py-16 font-roboto relative overflow-hidden">
             {/* Decorative elements */}
-            {/* <div className="absolute top-0 left-0 w-72 h-72 bg-orange-100 rounded-full -translate-x-1/2 -translate-y-1/2 opacity-50"></div>
+            {/* <div className="absolute top-0 left-0 w-72 h-72 bg-accent rounded-full -translate-x-1/2 -translate-y-1/2 opacity-50"></div>
             <div className="absolute bottom-0 right-0 w-96 h-96 bg-blue-100 rounded-full translate-x-1/3 translate-y-1/3 opacity-40"></div> */}
             
             <div className="container mx-auto px-4 relative z-10">
                 {/* Section Header */}
                 <div className="text-center mb-16">
                     <h2 className="text-4xl md:text-5xl font-bold mb-4 font-roboto-con">
-                        How <span className="text-orange-500 font-caveat inline-block">MechaLink Works</span>
+                        How <span className="text-primary font-caveat inline-block">MechaLink Works</span>
                     </h2>
                     <p className="text-xl text-gray-600 max-w-2xl mx-auto font-nunito-sans">
                         Follow these steps to understand the complete workflow and get connected with trusted mechanics efficiently.
@@ -107,10 +107,10 @@ const HowToWork = () => {
                                 <div className="flex flex-col items-center mr-6">
                                     <div className={`w-10 h-10 rounded-full flex items-center justify-center z-10 relative ${
                                         activeStep === index 
-                                            ? "bg-orange-500 scale-110 ring-4 ring-orange-200" 
+                                            ? "bg-primary scale-110 ring-4 ring-orange-200" 
                                             : "bg-white border-2 border-orange-400"
                                     } transition-all duration-300`}>
-                                        <div className={`${activeStep === index ? "text-white" : "text-orange-500"}`}>
+                                        <div className={`${activeStep === index ? "text-white" : "text-primary"}`}>
                                             {step.icon}
                                         </div>
                                     </div>
@@ -122,18 +122,18 @@ const HowToWork = () => {
                                 {/* Content card with dynamic animation */}
                                 <div className={`flex-1 bg-white rounded-2xl p-6 transform transition-all duration-300 ${
                                     activeStep === index 
-                                        ? "shadow-xl -translate-y-1 border-l-4 border-orange-500" 
+                                        ? "shadow-xl -translate-y-1 border-l-4 border-primary" 
                                         : "shadow-md"
                                 }`}>
                                     <div className="flex items-start justify-between">
                                         <div>
-                                            <span className="text-sm font-semibold text-orange-500 mb-1 block">
+                                            <span className="text-sm font-semibold text-primary mb-1 block">
                                                 Step {index + 1}
                                             </span>
                                             <h3 className="text-xl font-semibold mb-2">{step.title}</h3>
                                             <p className="text-gray-600 text-sm">{step.description}</p>
                                         </div>
-                                        <ArrowRight className={`w-5 h-5 text-orange-500 transition-transform duration-300 ${
+                                        <ArrowRight className={`w-5 h-5 text-primary transition-transform duration-300 ${
                                             activeStep === index ? "translate-x-1" : ""
                                         }`} />
                                     </div>

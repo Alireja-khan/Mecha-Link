@@ -98,7 +98,7 @@ const ReviewSection = () => {
       {/* Title + Description OUTSIDE background image */}
       <div className="container mx-auto px-4 text-center mb-10">
         <h2 className="text-4xl md:text-5xl font-bold mb-4 font-urbanist">
-          What Our <span className="text-orange-500 inline-block">Users Say</span>
+          What Our <span className="text-primary inline-block">Users Say</span>
         </h2>
         <p className="text-lg text-gray-700 max-w-2xl mx-auto font-poppins">
           Real stories from car owners, drivers, and businesses who trust MechaLink
@@ -136,7 +136,7 @@ const ReviewSection = () => {
               el: paginationRef.current,
               bulletClass:
                 "swiper-pagination-bullet w-3 h-3 rounded-full bg-orange-400 transition-colors duration-200 mx-1 cursor-pointer",
-              bulletActiveClass: "swiper-pagination-bullet-active bg-orange-500",
+              bulletActiveClass: "swiper-pagination-bullet-active bg-primary",
             }}
             onSwiper={setSwiperInstance}
             breakpoints={{
@@ -148,13 +148,13 @@ const ReviewSection = () => {
           >
             {reviews.map((review, index) => (
               <SwiperSlide key={index}>
-                <div className="group flex border border-orange-500 flex-col bg-white rounded-xl shadow-md hover:shadow-xl transition-transform duration-300 p-6 scale-80 h-full">
+                <div className="group flex border border-primary flex-col bg-white rounded-xl shadow-md hover:shadow-xl transition-transform duration-300 p-6 scale-80 h-full">
                   {/* User Profile */}
                   <div className="flex items-center mb-4">
                     <img
                       src={review.avatar}
                       alt={review.name}
-                      className="w-12 h-12 rounded-full border border-orange-500 mr-4 object-cover"
+                      className="w-12 h-12 rounded-full border border-primary mr-4 object-cover"
                     />
                     <div>
                       <p className="font-medium font-urbanist">{review.name}</p>
@@ -168,7 +168,7 @@ const ReviewSection = () => {
                       <Star
                         key={i}
                         className={`w-5 h-5 mr-1 ${
-                          i < review.rating ? "text-orange-500" : "text-gray-300"
+                          i < review.rating ? "text-primary" : "text-gray-300"
                         }`}
                       />
                     ))}
@@ -185,7 +185,7 @@ const ReviewSection = () => {
 
                   {/* Double Quote Icon */}
                   <div className="flex justify-end mt-auto">
-                    <Quote className="w-10 h-10 text-orange-500" />
+                    <Quote className="w-10 h-10 text-primary" />
                   </div>
                 </div>
               </SwiperSlide>
@@ -196,7 +196,7 @@ const ReviewSection = () => {
           <div className="flex items-center mt-8 w-fit mx-auto space-x-4">
             <button
               ref={prevRef}
-              className="bg-white p-2 rounded-full shadow-lg hover:shadow-xl text-gray-600 hover:text-orange-500 focus:outline-none focus:ring-2 focus:ring-orange-500"
+              className="bg-white p-2 rounded-full shadow-lg hover:shadow-xl text-gray-600 hover:text-primary focus:outline-none focus:ring-2 focus:ring-primary"
             >
               <ChevronLeft className="h-6 w-6" />
             </button>
@@ -205,7 +205,7 @@ const ReviewSection = () => {
 
             <button
               ref={nextRef}
-              className="bg-white p-2 rounded-full shadow-lg hover:shadow-xl text-gray-600 hover:text-orange-500 focus:outline-none focus:ring-2 focus:ring-orange-500"
+              className="bg-white p-2 rounded-full shadow-lg hover:shadow-xl text-gray-600 hover:text-primary focus:outline-none focus:ring-2 focus:ring-primary"
             >
               <ChevronRight className="h-6 w-6" />
             </button>
