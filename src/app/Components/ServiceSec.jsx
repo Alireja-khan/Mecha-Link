@@ -86,7 +86,7 @@ export default function ServiceSec() {
           </div>
           <div className="text-center mt-10">
             <Link href='/services'>
-              <button className="px-16  py-3 bg-white border border-primary hover:bg-primary  text-primary hover:text-white font-bold text-xl capitalize leading-none font-urbanist rounded-md transition duration-400 cursor-pointer">
+              <button className="px-16  py-3 border border-primary hover:bg-primary  text-primary hover:text-white font-bold text-xl capitalize leading-none font-urbanist rounded-md transition duration-400 cursor-pointer">
                 See All Mechanics
               </button>
             </Link>

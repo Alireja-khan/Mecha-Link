@@ -216,7 +216,7 @@ export default function Services() {
                 id="sort"
                 value={sortOrder}
                 onChange={handleSort}
-                className="px-3 py-2 bg-white rounded-md border-2 border-primary focus:outline-none focus:ring-2 focus:ring-primary"
+                className="px-3 py-2  rounded-md border-2 border-primary focus:outline-none focus:ring-2 focus:ring-primary"
               >
                 <option value="htl">Rating: High to Low</option>
                 <option value="lth">Rating: Low to High</option>
