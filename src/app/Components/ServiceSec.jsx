@@ -71,9 +71,9 @@ export default function ServiceSec() {
         <div className="container">
           <div className="text-center mb-10 max-w-2xl mx-auto">
             <h2 className="text-5xl font-bold text-center">
-              Trusted <span className="text-orange-500">Mechanics</span> Near You
+              Trusted <span className="text-primary">Mechanics</span> Near You
             </h2>
-            <p className="text-lg text-gray-600 mt-4">
+            <p className="text-lg  mt-4">
               MechaLink connects you with verified mechanics nearby – making vehicle
               repairs and services faster, easier, and more reliable.
             </p>
@@ -86,7 +86,7 @@ export default function ServiceSec() {
           </div>
           <div className="text-center mt-10">
             <Link href='/services'>
-              <button className="px-16  py-3 bg-white border border-orange-500 hover:bg-orange-500  text-orange-500 hover:text-white font-bold text-xl capitalize leading-none font-urbanist rounded-md transition duration-400 cursor-pointer">
+              <button className="px-16  py-3 bg-white border border-primary hover:bg-primary  text-primary hover:text-white font-bold text-xl capitalize leading-none font-urbanist rounded-md transition duration-400 cursor-pointer">
                 See All Mechanics
               </button>
             </Link>

@@ -68,8 +68,8 @@ const DashboardOverview = () => {
                 className="p-4 border rounded-xl hover:bg-gray-50 transition"
               >
                 <p className="font-medium">{c.name}</p>
-                <p className="text-sm text-gray-500">Role: {c.role}</p>
-                <p className="text-sm text-gray-500">Specialty: {c.specialty}</p>
+                <p className="text-sm ">Role: {c.role}</p>
+                <p className="text-sm ">Specialty: {c.specialty}</p>
               </div>
             ))}
           </div>
@@ -82,7 +82,7 @@ const DashboardOverview = () => {
         <div className="bg-white rounded-2xl shadow-sm p-5">
           <h2 className="text-lg font-semibold mb-4">Service Requests</h2>
           <table className="w-full text-sm text-left">
-            <thead className="border-b text-gray-600">
+            <thead className="border-b ">
               <tr>
                 <th className="py-2">Date</th>
                 <th className="py-2">Mechanic</th>
@@ -115,7 +115,7 @@ const DashboardOverview = () => {
             </button>
           </div>
           <table className="w-full text-sm text-left">
-            <thead className="border-b text-gray-600">
+            <thead className="border-b ">
               <tr>
                 <th className="py-2">Title</th>
                 <th className="py-2">Date</th>

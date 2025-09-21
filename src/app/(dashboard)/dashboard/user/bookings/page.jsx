@@ -141,7 +141,7 @@ const BookingComponent = ({ onBookingComplete }) => {
                   onClick={() => handleServiceSelect(service)}
                 >
                   <h4 className="font-medium">{service.name}</h4>
-                  <p className="text-sm text-gray-600">${service.basePrice} • {service.duration} mins</p>
+                  <p className="text-sm ">${service.basePrice} • {service.duration} mins</p>
                 </div>
               ))}
             </div>
@@ -164,7 +164,7 @@ const BookingComponent = ({ onBookingComplete }) => {
                   onClick={() => handleVehicleSelect(vehicle)}
                 >
                   <h4 className="font-medium">{vehicle.make} {vehicle.model} ({vehicle.year})</h4>
-                  <p className="text-sm text-gray-600">Plate: {vehicle.plate}</p>
+                  <p className="text-sm ">Plate: {vehicle.plate}</p>
                 </div>
               ))}
               <div 
@@ -182,7 +182,7 @@ const BookingComponent = ({ onBookingComplete }) => {
         return (
           <div className="space-y-6">
             <h3 className="text-lg font-medium">Choose a Mechanic</h3>
-            <p className="text-sm text-gray-600">Recommended mechanics for {selectedService.name}</p>
+            <p className="text-sm ">Recommended mechanics for {selectedService.name}</p>
             
             <div className="grid grid-cols-1 gap-4">
               {availableMechanics
@@ -200,18 +200,18 @@ const BookingComponent = ({ onBookingComplete }) => {
                     <div className="flex items-center justify-between">
                       <div>
                         <h4 className="font-medium">{mechanic.name}</h4>
-                        <p className="text-sm text-gray-600">Specialty: {mechanic.specialty}</p>
+                        <p className="text-sm ">Specialty: {mechanic.specialty}</p>
                         <div className="flex items-center mt-1">
                           <span className="text-yellow-500">★</span>
                           <span className="text-sm ml-1">{mechanic.rating}</span>
-                          <span className="text-sm text-gray-600 ml-2">${mechanic.hourlyRate}/hr</span>
+                          <span className="text-sm  ml-2">${mechanic.hourlyRate}/hr</span>
                         </div>
                       </div>
                       <div className="text-right">
                         <div className="text-sm font-medium">
                           ${(selectedService.basePrice + (mechanic.hourlyRate * (selectedService.duration / 60))).toFixed(2)}
                         </div>
-                        <div className="text-xs text-gray-600">Total estimate</div>
+                        <div className="text-xs ">Total estimate</div>
                       </div>
                     </div>
                   </div>
@@ -291,21 +291,21 @@ const BookingComponent = ({ onBookingComplete }) => {
               <h4 className="font-medium mb-3">Service Details</h4>
               <div className="grid grid-cols-2 gap-4 text-sm">
                 <div>
-                  <p className="text-gray-600">Service</p>
+                  <p className="">Service</p>
                   <p className="font-medium">{selectedService.name}</p>
                 </div>
                 <div>
-                  <p className="text-gray-600">Vehicle</p>
+                  <p className="">Vehicle</p>
                   <p className="font-medium">
                     {selectedVehicle.make} {selectedVehicle.model} ({selectedVehicle.year})
                   </p>
                 </div>
                 <div>
-                  <p className="text-gray-600">Mechanic</p>
+                  <p className="">Mechanic</p>
                   <p className="font-medium">{selectedMechanic.name}</p>
                 </div>
                 <div>
-                  <p className="text-gray-600">Scheduled</p>
+                  <p className="">Scheduled</p>
                   <p className="font-medium">
                     {formatDate(selectedDate)} at {selectedTime}
                   </p>
@@ -375,12 +375,12 @@ const BookingComponent = ({ onBookingComplete }) => {
               </svg>
             </div>
             <h3 className="text-2xl font-medium mb-2">Booking Confirmed!</h3>
-            <p className="text-gray-600 mb-6">
+            <p className=" mb-6">
               Your {selectedService.name} for your {selectedVehicle.make} {selectedVehicle.model} has been scheduled with {selectedMechanic.name}.
             </p>
             <div className="bg-gray-50 p-4 rounded-lg max-w-md mx-auto mb-6">
               <p className="font-medium">Booking Reference: #{Math.floor(Math.random() * 10000)}</p>
-              <p className="text-sm text-gray-600">
+              <p className="text-sm ">
                 {formatDate(selectedDate)} at {selectedTime}
               </p>
             </div>
@@ -416,7 +416,7 @@ const BookingComponent = ({ onBookingComplete }) => {
               <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs ${
                 index <= currentStep 
                 ? "bg-indigo-600 text-white" 
-                : "bg-gray-200 text-gray-500"
+                : "bg-gray-200 "
               }`}>
                 {index < currentStep ? (
                   <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -426,7 +426,7 @@ const BookingComponent = ({ onBookingComplete }) => {
                   index + 1
                 )}
               </div>
-              <div className={`text-xs mt-2 ${index <= currentStep ? "text-indigo-600 font-medium" : "text-gray-500"}`}>
+              <div className={`text-xs mt-2 ${index <= currentStep ? "text-indigo-600 font-medium" : ""}`}>
                 {step}
               </div>
             </div>

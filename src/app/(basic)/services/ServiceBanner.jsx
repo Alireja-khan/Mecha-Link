@@ -1,6 +1,5 @@
-import Image from "next/image";
-import serviceBanner from "../../assets/images/service-banner.jpg";
-import tools from "../../assets/images/tools-f.png";
+
+import serviceBanner from "../../../assets/images/service-banner.jpg";
 
 export default function ServiceBanner() {
   return (
@@ -21,7 +20,7 @@ export default function ServiceBanner() {
         </p>
 
         {/* CTA Button */}
-        <button className="px-8 py-3 bg-orange-500 hover:bg-orange-600 text-white font-semibold rounded-full shadow-lg transition-all duration-300">
+        <button className="px-8 py-3 bg-primary hover:bg-secondary text-white font-semibold rounded-full shadow-lg transition-all duration-300">
           Explore Services
         </button>
 

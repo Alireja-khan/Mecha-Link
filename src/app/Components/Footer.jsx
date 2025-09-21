@@ -11,7 +11,7 @@ const Footer = () => {
         <div className="flex flex-col items-start gap-3 max-w-xs">
           <div className="flex items-center gap-3">
             <Link href="/">
-              <FaGear className="h-12 w-12 text-orange-500" />
+              <FaGear className="h-12 w-12 text-primary" />
             </Link>
             <h1 className="text-4xl font-bold text-white">
               MechaLink
@@ -28,22 +28,22 @@ const Footer = () => {
           <h3 className="text-lg font-semibold text-white mb-4">Quick Links</h3>
           <ul className="space-y-2 text-sm">
             <li>
-              <a href="#" className="hover:text-orange-500 transition">
+              <a href="#" className="hover:text-primary transition">
                 Home
               </a>
             </li>
             <li>
-              <a href="#" className="hover:text-orange-500 transition">
+              <a href="#" className="hover:text-primary transition">
                 About Us
               </a>
             </li>
             <li>
-              <a href="#" className="hover:text-orange-500 transition">
+              <a href="#" className="hover:text-primary transition">
                 Services
               </a>
             </li>
             <li>
-              <a href="#" className="hover:text-orange-500 transition">
+              <a href="#" className="hover:text-primary transition">
                 Contact
               </a>
             </li>
@@ -75,7 +75,7 @@ const Footer = () => {
             />
             <button
               type="submit"
-              className="bg-orange-500 px-4 py-2 text-white text-sm font-medium hover:bg-orange-500/70 transition cursor-pointer"
+              className="bg-primary px-4 py-2 text-white text-sm font-medium hover:bg-primary/70 transition cursor-pointer"
             >
               Subscribe
             </button>
@@ -90,16 +90,16 @@ const Footer = () => {
             © {new Date().getFullYear()} MechaLink. All rights reserved.
           </p>
           <div className="flex space-x-4">
-            <a href="#" className="hover:text-orange-500 transition">
+            <a href="#" className="hover:text-primary transition">
               <Facebook className="h-5 w-5" />
             </a>
-            <a href="#" className="hover:text-orange-500 transition">
+            <a href="#" className="hover:text-primary transition">
               <Twitter className="h-5 w-5" />
             </a>
-            <a href="#" className="hover:text-orange-500 transition">
+            <a href="#" className="hover:text-primary transition">
               <Instagram className="h-5 w-5" />
             </a>
-            <a href="#" className="hover:text-orange-500 transition">
+            <a href="#" className="hover:text-primary transition">
               <Linkedin className="h-5 w-5" />
             </a>
           </div>

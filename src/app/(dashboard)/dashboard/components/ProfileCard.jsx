@@ -71,8 +71,8 @@ export default function MechaLinkProfileDashboard() {
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         {stats.map((stat, idx) => (
           <div key={idx} className="bg-white rounded-2xl shadow-sm p-4 text-center">
-            <p className="text-2xl font-bold text-gray-900">{stat.value}</p>
-            <p className="text-sm text-gray-500">{stat.label}</p>
+            <p className="text-2xl font-bold ">{stat.value}</p>
+            <p className="text-sm ">{stat.label}</p>
           </div>
         ))}
       </div>
@@ -88,7 +88,7 @@ export default function MechaLinkProfileDashboard() {
               className="w-24 h-24 rounded-full object-cover mb-3"
             />
             <h2 className="font-semibold text-lg">{profile.name}</h2>
-            <p className="text-sm text-gray-500">{profile.role}</p>
+            <p className="text-sm ">{profile.role}</p>
             <span className="mt-1 px-3 py-1 bg-green-100 text-green-800 text-xs font-medium rounded-full">
               {profile.status}
             </span>
@@ -114,8 +114,8 @@ export default function MechaLinkProfileDashboard() {
                 className="p-4 border rounded-xl hover:bg-gray-50 transition"
               >
                 <p className="font-medium">{c.name}</p>
-                <p className="text-sm text-gray-500">Role: {c.role}</p>
-                <p className="text-sm text-gray-500">Specialty: {c.specialty}</p>
+                <p className="text-sm ">Role: {c.role}</p>
+                <p className="text-sm ">Specialty: {c.specialty}</p>
               </div>
             ))}
           </div>
@@ -131,8 +131,8 @@ export default function MechaLinkProfileDashboard() {
             {vehicles.map((v, idx) => (
               <li key={idx} className="p-3 border rounded-lg hover:bg-gray-50 transition">
                 <p className="font-medium">{v.name}</p>
-                <p className="text-sm text-gray-500">Plate: {v.plate}</p>
-                <p className="text-sm text-gray-500">Last Service: {v.lastService}</p>
+                <p className="text-sm ">Plate: {v.plate}</p>
+                <p className="text-sm ">Last Service: {v.lastService}</p>
               </li>
             ))}
           </ul>
@@ -142,7 +142,7 @@ export default function MechaLinkProfileDashboard() {
         <div className="bg-white shadow-sm rounded-2xl p-5">
           <h2 className="text-lg font-semibold mb-4">Service Requests</h2>
           <table className="w-full text-sm text-left">
-            <thead className="border-b text-gray-600">
+            <thead className="border-b ">
               <tr>
                 <th className="py-2">Date</th>
                 <th className="py-2">Vehicle</th>
@@ -176,7 +176,7 @@ export default function MechaLinkProfileDashboard() {
           <button className="text-sm text-indigo-600 hover:underline">+ Upload</button>
         </div>
         <table className="w-full text-sm text-left">
-          <thead className="border-b text-gray-600">
+          <thead className="border-b ">
             <tr>
               <th className="py-2">Title</th>
               <th className="py-2">Date</th>
