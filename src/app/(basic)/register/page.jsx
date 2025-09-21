@@ -1,62 +1,26 @@
 "use client";
+// app/signup/page.jsx  (Next.js 13+ App Router)
+// or pages/signup.jsx (Next.js Pages Router)
 
-import { useState, useContext } from "react";
-import { useRouter } from "next/navigation";
-import { UserContext } from "@/app/UserContext";
-// import { UserContext } from "../UserContext";
+import Lottie from "lottie-react";
+import loginIllustration from "../../../../public/assets/login/login.json"; 
+import RegisterFrom from "./components/RegisterFrom";
 
-export default function RegisterPage() {
-  const { setUser } = useContext(UserContext);
-  const [formData, setFormData] = useState({ name: "", email: "" });
-  const router = useRouter();
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-
-    // save user to context (fake login)
-    setUser({
-      name: formData.name,
-      email: formData.email,
-      avatar: "/default-avatar.png", // fallback avatar
-    });
-
-    alert("User Registered!");
-    router.push("/"); // go home after register
-  };
-
+export default function SignUpPage() {
   return (
-    <div className="flex justify-center items-center min-h-[70vh]">
-      <form
-        onSubmit={handleSubmit}
-        className="bg-white p-6 rounded shadow-md w-80"
-      >
-        <h2 className="text-xl font-bold mb-4">Register</h2>
+    <div className="min-h-screen flex items-center justify-center">
+      <div className="flex max-w-5xl w-full">
+        {/* Left Side Illustration */}
+        <div className="hidden md:flex w-1/2 items-center justify-center p-6">
+          <Lottie animationData={loginIllustration} loop={true} className="w-full h-full max-w-md" />
+        </div>
 
-        <input
-          type="text"
-          placeholder="Name"
-          value={formData.name}
-          onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-          className="w-full border p-2 mb-3 rounded"
-          required
-        />
-
-        <input
-          type="email"
-          placeholder="Email"
-          value={formData.email}
-          onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-          className="w-full border p-2 mb-3 rounded"
-          required
-        />
-
-        <button
-          type="submit"
-          className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700"
-        >
-          Register
-        </button>
-      </form>
+        {/* Right Side Form */}
+        <div className="w-full md:w-1/2 p-10 flex flex-col justify-center">
+          <h2 className="text-2xl font-semibold mb-6 text-center">Sign Up</h2>
+          <RegisterFrom></RegisterFrom>
+        </div>
+      </div>
     </div>
   );
 }
