@@ -1,9 +1,9 @@
-import { CalendarHeart, Clock, MapPinPlus, Star } from "lucide-react";
+import {CalendarHeart, Clock, MapPinPlus, Star} from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import React from "react";
 
-export default function ServiceCard({ service }) {
+export default function ServiceCard({service}) {
   return (
     <div>
       <div
@@ -16,7 +16,8 @@ export default function ServiceCard({ service }) {
             fill
             src={service.image}
             className="object-cover group-hover:scale-120 duration-500 object-top"
-            alt={service.name}/>
+            alt={service.name}
+          />
         </div>
 
         {/* service Info */}
@@ -34,19 +35,43 @@ export default function ServiceCard({ service }) {
               {service.category}
             </Link>
           </p>
-          <p className="text-base mt-3 flex gap-2 items-center"><MapPinPlus strokeWidth={1.25} className="w-6 h-6 text-2xl text-primary"/> Location: {service.location}</p>
-            <p className="text-base flex gap-2 items-center mt-3"><Clock strokeWidth={1.25} className="w-6 h-6 text-2xl text-primary"/> Working Hour: {service.workingHour}</p>
-            <p className="text-base flex gap-2 items-center mt-3"><CalendarHeart strokeWidth={1.25} className="w-6 h-6 text-2xl text-primary"/> Weekend: {service.weekend}</p>
+          <p className="text-base mt-3 flex gap-2 items-center">
+            <MapPinPlus
+              strokeWidth={1.25}
+              className="w-6 h-6 text-2xl text-primary"
+            />{" "}
+            Location: {service.location}
+          </p>
+          <p className="text-base flex gap-2 items-center mt-3">
+            <Clock
+              strokeWidth={1.25}
+              className="w-6 h-6 text-2xl text-primary"
+            />{" "}
+            Working Hour: {service.workingHour}
+          </p>
+          <p className="text-base flex gap-2 items-center mt-3">
+            <CalendarHeart
+              strokeWidth={1.25}
+              className="w-6 h-6 text-2xl text-primary"
+            />{" "}
+            Weekend: {service.weekend}
+          </p>
         </div>
 
         {/* Buttons */}
         <div className="flex justify-between gap-2 border-t border-gray-100 p-3 w-full mt-auto">
-          <button className="w-1/2  py-3 bg-primary  hover:bg-white border hover:border-primary  text-white hover:text-primary font-bold text-xl capitalize leading-none font-urbanist rounded-md transition duration-400 cursor-pointer">
+          <Link
+            href={`/services/${service.id}`}
+            className="w-1/2  py-3 bg-primary  hover:bg-white hover:border hover:border-primary  text-white hover:text-primary font-bold text-xl capitalize leading-none font-urbanist rounded-md transition duration-400 cursor-pointer text-center "
+          >
             Contact
-          </button>
-          <button className="w-1/2 py-3 border border-primary hover:bg-accent bg-white text-primary font-bold text-xl capitalize leading-none font-urbanist rounded-md transition duration-400 cursor-pointer">
-            service Details
-          </button>
+          </Link>
+          <Link
+            className="w-1/2 py-3 border hover:border border-primary hover-border-primary hover:bg-accent text-primary font-bold text-xl capitalize leading-none font-urbanist rounded-md transition duration-400 cursor-pointer text-center"
+            href={`/services/${service.id}`}
+          >
+            Service Details
+          </Link>
         </div>
       </div>
     </div>
