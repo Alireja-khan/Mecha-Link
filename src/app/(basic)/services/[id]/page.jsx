@@ -29,7 +29,7 @@ export default function ServiceDetailsPage() {
         />
         <div className="absolute inset-0 bg-black/40" />
         <div className="absolute bottom-6 left-6 text-white max-w-xl">
-          <div className="bg-orange-500 px-3 py-1 rounded-full text-sm mb-2 inline-block">
+          <div className="bg-primary px-3 py-1 rounded-full text-sm mb-2 inline-block">
             General Maintenance
           </div>
           <h1 className="text-3xl md:text-4xl font-bold mb-2">
@@ -77,10 +77,10 @@ export default function ServiceDetailsPage() {
                   </div>
                 </div>
                 <div className="flex gap-2">
-                  <button className="px-4 py-2 border border-gray-300 rounded-md hover:bg-orange-500 hover:text-white flex items-center gap-2 transition">
+                  <button className="px-4 py-2 border border-gray-300 rounded-md hover:bg-primary hover:text-white flex items-center gap-2 transition">
                     <UserPlus /> Follow
                   </button>
-                  <button className="px-4 py-2 border border-gray-300 rounded-md hover:bg-orange-500 hover:text-white flex items-center gap-2 transition">
+                  <button className="px-4 py-2 border border-gray-300 rounded-md hover:bg-primary hover:text-white flex items-center gap-2 transition">
                     <Share2 /> Share
                   </button>
                 </div>
@@ -160,8 +160,8 @@ export default function ServiceDetailsPage() {
                 </p>
               </div>
 
-              <div className="bg-orange-50 border-l-4 border-orange-500 rounded-lg p-4">
-                <h4 className="font-semibold text-orange-500 mb-1">Special Offer</h4>
+              <div className="bg-orange-50 border-l-4 border-primary rounded-lg p-4">
+                <h4 className="font-semibold text-primary mb-1">Special Offer</h4>
                 <p className="text-sm text-gray-600">
                   Book this month and get 10% off your next service! Valid for new customers only.
                 </p>
@@ -180,7 +180,7 @@ export default function ServiceDetailsPage() {
                       "Detailed service report",
                     ].map((item) => (
                       <li key={item} className="flex items-center gap-2">
-                        <Check className="text-orange-500" size={18} /> {item}
+                        <Check className="text-primary" size={18} /> {item}
                       </li>
                     ))}
                   </ul>
@@ -197,7 +197,7 @@ export default function ServiceDetailsPage() {
                       "Peace of mind driving",
                     ].map((item) => (
                       <li key={item} className="flex items-center gap-2">
-                        <Check className="text-orange-500" size={18} /> {item}
+                        <Check className="text-primary" size={18} /> {item}
                       </li>
                     ))}
                   </ul>
@@ -250,7 +250,7 @@ export default function ServiceDetailsPage() {
             {/* Booking Card */}
             <div className="bg-white rounded-lg shadow p-6 border border-gray-200 space-y-4">
               <h3 className="text-2xl font-semibold">Book This Service</h3>
-              <button className="w-full bg-orange-500 text-white py-3 rounded-md hover:bg-orange-600 transition">
+              <button className="w-full bg-primary text-white py-3 rounded-md hover:bg-secondary transition">
                 Book Now
               </button>
               <button className="w-full border border-gray-300 py-3 rounded-md hover:bg-orange-50 flex items-center justify-center gap-2 transition text-gray-700">
@@ -266,7 +266,7 @@ export default function ServiceDetailsPage() {
               <h3 className="text-lg font-semibold mb-3">Why Choose Mike?</h3>
               <div className="space-y-3">
                 <div className="flex items-center gap-3">
-                  <div className="w-5 h-5 bg-orange-500 rounded"></div>
+                  <div className="w-5 h-5 bg-primary rounded"></div>
                   <div>
                     <p className="font-medium">Verified Mechanic</p>
                     <p className="text-sm text-gray-500">Background checked</p>

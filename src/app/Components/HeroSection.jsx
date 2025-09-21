@@ -8,8 +8,8 @@ export default function HeroModern() {
 
                 {/* Text Content */}
                 <div className="flex-1 text-center lg:text-left">
-                    <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold leading-tight text-gray-900">
-                        Connect with <span className="text-orange-500">Trusted Mechanics</span> <br className="hidden sm:block" /> Anytime, Anywhere
+                    <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold leading-tight">
+                        Connect with <span className="text-primary">Trusted Mechanics</span> <br className="hidden sm:block" /> Anytime, Anywhere
                     </h1>
                     <p className="mt-6 text-lg sm:text-xl text-gray-600 max-w-2xl mx-auto lg:mx-0">
                         MechaLink helps vehicle owners find verified mechanics, book services instantly,
@@ -19,11 +19,11 @@ export default function HeroModern() {
                     {/* Buttons */}
                     <div className="mt-10 flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
                         <Link href="/services">
-                            <button className="bg-orange-500 text-white px-8 py-4 rounded-xl hover:bg-orange-600 transition-all duration-300 w-full sm:w-auto font-medium shadow-lg hover:shadow-xl transform hover:-translate-y-1">
+                            <button className="bg-primary text-white px-8 py-4 rounded-xl hover:bg-secondary transition-all duration-300 w-full sm:w-auto font-medium shadow-lg hover:shadow-xl transform hover:-translate-y-1">
                                 Find a Mechanic
                             </button>
                         </Link>
-                        <button className="border-2 border-orange-500 text-orange-500 hover:bg-orange-100 px-8 py-4 rounded-xl hover:border-orange-500 hover:text-orange-500 transition-all duration-300 w-full sm:w-auto font-medium shadow-sm hover:shadow-md">
+                        <button className="border-2 border-primary text-primary hover:bg-accent px-8 py-4 rounded-xl hover:border-primary hover:text-primary transition-all duration-300 w-full sm:w-auto font-medium shadow-sm hover:shadow-md">
                             Become a Partner
                         </button>
                     </div>
@@ -67,7 +67,7 @@ export default function HeroModern() {
                         />
                         {/* Overlay card */}
                         <div className="absolute bottom-6 left-6 bg-white/90 backdrop-blur-md rounded-2xl shadow-md p-4 flex items-center gap-4">
-                            <div className="w-12 h-12 bg-orange-500 rounded-xl flex items-center justify-center">
+                            <div className="w-12 h-12 bg-primary rounded-xl flex items-center justify-center">
                                 <svg xmlns="http://www.w3.org/2000/svg"
                                     className="h-6 w-6 text-white" fill="none"
                                     viewBox="0 0 24 24" stroke="currentColor">
@@ -85,8 +85,8 @@ export default function HeroModern() {
             </div>
 
             {/* Decorative Background Elements */}
-            <div className="absolute top-0 right-0 w-72 h-72 bg-orange-100 rounded-full blur-3xl opacity-30 -z-10"></div>
-            <div className="absolute bottom-0 left-0 w-72 h-72 bg-blue-100 rounded-full blur-3xl opacity-30 -z-10"></div>
+            {/* <div className="absolute top-15 right-0 w-72 h-72 bg-secondary rounded-full blur-3xl opacity-30 -z-10"></div>
+            <div className="absolute bottom-0 left-0 w-72 h-72 bg-secondary rounded-full blur-3xl opacity-30 -z-10"></div> */}
         </section>
     );
 }

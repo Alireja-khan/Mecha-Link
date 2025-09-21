@@ -54,13 +54,13 @@ const reasons = [
 
 const WhyChooseUs = () => {
     return (
-        <section className="py-24 bg-gradient-to-b from-gray-50 to-white relative">
+        <section className="py-24  relative">
             <div className="container mx-auto px-6 lg:px-8">
                 {/* Section Header */}
                 <div className="text-center mb-20 max-w-2xl mx-auto">
                     <h2 className="text-4xl md:text-5xl font-extrabold tracking-tight">
                         Why Choose{" "}
-                        <span className="text-orange-500">MechaLink</span>
+                        <span className="text-primary">MechaLink</span>
                     </h2>
                     <p className="text-lg md:text-xl text-gray-600 mt-4">
                         A smarter, faster, and safer way to connect with trusted mechanics
@@ -74,7 +74,7 @@ const WhyChooseUs = () => {
                         <div
                             key={index}
                             className={`
-    group rounded-2xl p-8 shadow-md hover:shadow-xl transition-all duration-300 border border-orange-500 hover:border-orange-500 flex flex-col items-center text-center relative overflow-hidden
+    group rounded-2xl p-8 shadow-md hover:shadow-xl transition-all duration-300 border border-primary hover:border-primary flex flex-col items-center text-center relative overflow-hidden
     ${index === 0 ? "lg:col-span-2 lg:row-span-2 text-white border-0 justify-center" : ""} 
     ${index === 3 ? "lg:col-span-2" : ""} 
   `}
@@ -94,14 +94,14 @@ const WhyChooseUs = () => {
                             )}
 
                             {/* Icon */}
-                            <div className="p-4 mb-6 rounded-full bg-orange-50 text-orange-500 group-hover:bg-orange-500 group-hover:text-white transition-colors duration-300 shadow-inner z-10">
+                            <div className="p-4 mb-6 rounded-full bg-orange-50 text-primary group-hover:bg-primary group-hover:text-white transition-colors duration-300 shadow-inner z-10">
                                 {reason.icon}
                             </div>
 
                             {/* Wrap text for max-width on first card */}
                             <div className={`${index === 0 ? "max-w-md" : "w-full"} z-10`}>
                                 {/* Title */}
-                                <h3 className="text-xl font-semibold mb-3  group-hover:text-orange-500 transition-colors">
+                                <h3 className="text-xl font-semibold mb-3  group-hover:text-primary transition-colors">
                                     {reason.title}
                                 </h3>
 
@@ -112,7 +112,7 @@ const WhyChooseUs = () => {
                             </div>
 
                             {/* Decorative underline */}
-                            <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-0 h-1 bg-orange-500 rounded-full group-hover:w-16 transition-all duration-300 z-10"></span>
+                            <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-0 h-1 bg-primary rounded-full group-hover:w-16 transition-all duration-300 z-10"></span>
                         </div>
 
                     ))}
