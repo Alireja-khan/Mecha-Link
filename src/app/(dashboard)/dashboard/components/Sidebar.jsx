@@ -18,6 +18,7 @@ import {
   Calendar,
   Star,
   MessageSquare,
+  WrenchIcon,
 } from "lucide-react";
 import Image from "next/image";
 
@@ -91,7 +92,13 @@ const Sidebar = ({role = "user"}) => {
         href: "/dashboard/mechanic/requests",
       },
     ],
-    user: [],
+    user: [
+      {
+        name: "Add Service Request",
+        icon: <WrenchIcon size={20} />,
+        href: "/dashboard/user/addServiceRequest",
+      },
+    ],
   };
 
   return (
