@@ -1,42 +1,50 @@
 "use client";
-// import { registerUser } from "@/app/actions/auth/registerUser";
-// import { signIn } from "next-auth/react";
-import { useRouter } from "next/navigation";
-import React from "react";
+import {useRouter} from "next/navigation";
+import React, {useState} from "react";
 import SocialLogin from "../../login/components/SocialLogin";
-// import toast from "react-hot-toast";
+import {uploadImageToImgbb} from "@/lib/uploadImgbb";
+import {UserIcon} from "lucide-react";
 
 export default function RegisterFrom() {
   const router = useRouter();
+  const [profileImage, setProfileImage] = useState(null);
+  const handleImageUpload = async (e) => {
+    const image = e.target.files[0];
+    const uploaded = await uploadImageToImgbb(image);
+    setProfileImage(uploaded);
+  };
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    // const form = e.target;
-    // const name = form.name.value;
-    // const email = form.email.value;
-    // const password = form.password.value;
-    // toast("Please wait.....");
-    // try {
-    //   const res = await registerUser({ name, email, password });
-    //   if (res.ok) {
-    //     await signIn("credentials", {
-    //       email,
-    //       password,
-    //       redirect: false,
-    //     });
-    //     toast.success("Registration successful! ✅");
-    //     router.push("/products");
-    //     form.reset();
-    //   } else {
-    //     toast.error(res.message || "Registration failed ❌");
-    //   }
-    // } catch (error) {
-    //   console.error(error);
-    //   toast.error("Something went wrong ❌");
-    // }
   };
+  console.log(profileImage);
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
+      <div>
+        <label htmlFor="imageInput">
+          <div className=" flex items-center justify-center mt-2 gap-2">
+            {profileImage ? (
+              <img
+                src={profileImage}
+                alt="preview"
+                className="w-24 h-24 object-cover rounded"
+              />
+            ) : (
+              <img
+                className="w-24 h-24 object-cover rounded mx-auto"
+                src="https://i.ibb.co.com/990my6Yq/avater.png"
+              />
+            )}
+          </div>
+          {!profileImage && <p>Upload your picture</p>}
+        </label>
+        <input
+          type="file"
+          accept="image/*"
+          id="imageInput"
+          onChange={handleImageUpload}
+          className="w-full border border-neutral rounded p-2 hidden"
+        />
+      </div>
       <div>
         <input
           type="text"
@@ -63,6 +71,8 @@ export default function RegisterFrom() {
           className="w-full border rounded-md px-3 py-2 outline-none focus:ring-1"
         />
       </div>
+
+      {/* Preview */}
 
       <button
         type="submit"

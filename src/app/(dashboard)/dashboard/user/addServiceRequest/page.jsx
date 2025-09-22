@@ -215,7 +215,7 @@ const ServiceRequest = () => {
                     },
                   })}
                   className="w-full p-2 border border-neutral rounded"
-                  placeholder="+8801XXXXXXXX"
+                  placeholder="+880123456789"
                 />
                 {errors.phoneNumber && (
                   <p className="text-sm text-red-500">
