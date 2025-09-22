@@ -4,35 +4,37 @@ import React from "react";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import SocialLogin from "./SocialLogin";
+import { userCredentials } from "@/app/actions/authActions";
+import { useSession } from "next-auth/react";
+import Swal from "sweetalert2";
 
 export default function LoginForm() {
   const router = useRouter();
+  const {update} = useSession();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    // const form = e.target;
-    // const email = form.email.value;
-    // const password = form.password.value;
-    // toast("Please wait.....");
-    // try {
-    //   const response = await signIn("credentials", {
-    //     email,
-    //     password,
-    //     callbackUrl: "/",
-    //     redirect: false,
-    //   });
-    //   //console.log({email, password});
-    //   if (response.ok) {
-    //     toast.success("Logged In SuccessFully");
-    //     router.push("/products");
-    //     form.reset();
-    //   } else {
-    //     toast.error("Failed to Logged In");
-    //   }
-    // } catch (error) {
-    //   console.log(error);
-    //   toast.error("Failed to Logged In");
-    // }
+    const email = e.target.email.value;
+    const password = e.target.password.value;
+    const formData = { email, password };
+    try {
+      const response = await userCredentials(formData);
+      if (!response.success) {
+        Swal.fire({
+          icon: "error",
+          title: response.message || "Invalid username or password",
+        });
+      } else {
+        Swal.fire({
+          icon: "success",
+          title: "Login successful",
+        })
+        await update();
+        router.push("/"); 
+      }
+    } catch (error) {
+      console.log(error);
+    }
   };
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
