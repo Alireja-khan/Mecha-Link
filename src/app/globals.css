@@ -25,7 +25,7 @@
   --color-secondary-content: oklch(98% 0.01 200);
   --color-accent:#ffedd5;
   --color-accent-content: oklch(98% 0.01 160);
-  --color-neutral: oklch(50% 0.05 240);
+  --color-neutral: #e5e7eb;
   --color-neutral-content: oklch(98% 0.01 240);
   --color-info: oklch(70% 0.2 220);
   --color-info-content: oklch(98% 0.01 220);
@@ -70,7 +70,7 @@
   --color-secondary-content: oklch(98% 0.01 200);
   --color-accent: #ffedd5;
   --color-accent-content: oklch(98% 0.01 160);
-  --color-neutral: oklch(50% 0.05 240);
+  --color-neutral: #e5e7eb;
   --color-neutral-content: oklch(98% 0.01 240);
   --color-info: oklch(70% 0.2 220);
   --color-info-content: oklch(98% 0.01 220);
@@ -93,6 +93,7 @@
   /* border size */
   --border: 1px;
 
+
   /* effects */
   --depth: 1;
   --noise: 0;
@@ -113,7 +114,7 @@ body {
 h1,
 h2,
 h3,
-h4 {
+h4,h5,h6 {
   @apply font-urbanist;
 }
 
