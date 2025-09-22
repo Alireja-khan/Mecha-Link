@@ -1,6 +1,5 @@
 "use client";
-// app/signup/page.jsx  (Next.js 13+ App Router)
-// or pages/signup.jsx (Next.js Pages Router)
+
 
 import Lottie from "lottie-react";
 import loginIllustration from "../../../../public/assets/login/login.json"; 
@@ -16,7 +15,7 @@ export default function SignUpPage() {
         </div>
 
         {/* Right Side Form */}
-        <div className="w-full md:w-1/2 p-10 flex flex-col justify-center">
+        <div className=" w-full md:w-1/2 p-10 flex flex-col justify-center">
           <h2 className="text-2xl font-semibold mb-6 text-center">Sign Up</h2>
           <RegisterFrom></RegisterFrom>
         </div>

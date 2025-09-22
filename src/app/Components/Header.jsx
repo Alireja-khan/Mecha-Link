@@ -53,7 +53,7 @@ export default function Header() {
 
   return (
     <header
-      className={`fixed top-0 w-full z-50 transition-all duration-300 ${
+      className={`sticky top-0 w-full z-50 transition-all duration-300 ${
         scrolled
           ? theme === "dark"
             ? "bg-[#343434]/95 backdrop-blur-md shadow-sm py-2"
