@@ -29,7 +29,7 @@ export default function ServiceDetailsPage() {
         />
         <div className="absolute inset-0 bg-black/40" />
         <div className="absolute bottom-6 left-6 text-white max-w-xl">
-          <div className="bg-orange-500 px-3 py-1 rounded-full text-sm mb-2 inline-block">
+          <div className="bg-primary px-3 py-1 rounded-full text-sm mb-2 inline-block">
             General Maintenance
           </div>
           <h1 className="text-3xl md:text-4xl font-bold mb-2">
@@ -46,7 +46,7 @@ export default function ServiceDetailsPage() {
               />
             </div>
             <div>
-              <p className="font-semibold">AutoFix Garage</p>
+              <p className="font-semibold">AutoFix Garage.</p>
               <p className="text-sm">4.9 (127 reviews)</p>
             </div>
           </div>
@@ -72,15 +72,15 @@ export default function ServiceDetailsPage() {
                   </div>
                   <div>
                     <h2 className="text-2xl font-semibold">Mike Thompson</h2>
-                    <p className="text-gray-500">Certified Master Mechanic</p>
+                    <p className="">Certified Master Mechanic</p>
                     <p className="text-gray-400 text-sm">Thompson Auto Care</p>
                   </div>
                 </div>
                 <div className="flex gap-2">
-                  <button className="px-4 py-2 border border-gray-300 rounded-md hover:bg-orange-500 hover:text-white flex items-center gap-2 transition">
+                  <button className="px-4 py-2 border border-gray-300 rounded-md hover:bg-primary hover:text-white flex items-center gap-2 transition">
                     <UserPlus /> Follow
                   </button>
-                  <button className="px-4 py-2 border border-gray-300 rounded-md hover:bg-orange-500 hover:text-white flex items-center gap-2 transition">
+                  <button className="px-4 py-2 border border-gray-300 rounded-md hover:bg-primary hover:text-white flex items-center gap-2 transition">
                     <Share2 /> Share
                   </button>
                 </div>
@@ -90,19 +90,19 @@ export default function ServiceDetailsPage() {
               <div className="grid md:grid-cols-4 gap-4 text-center mb-6">
                 <div>
                   <p className="font-semibold">4.9 Rating</p>
-                  <p className="text-sm text-gray-500">127 reviews</p>
+                  <p className="text-sm ">127 reviews</p>
                 </div>
                 <div>
                   <p className="font-semibold">450+ Jobs</p>
-                  <p className="text-sm text-gray-500">Completed</p>
+                  <p className="text-sm ">Completed</p>
                 </div>
                 <div>
                   <p className="font-semibold">12 Years</p>
-                  <p className="text-sm text-gray-500">Experience</p>
+                  <p className="text-sm ">Experience</p>
                 </div>
                 <div>
                   <p className="font-semibold">Downtown</p>
-                  <p className="text-sm text-gray-500">Seattle, WA</p>
+                  <p className="text-sm ">Seattle, WA</p>
                 </div>
               </div>
 
@@ -125,9 +125,9 @@ export default function ServiceDetailsPage() {
               <div className="grid md:grid-cols-2 gap-6 mt-6">
                 <div>
                   <h4 className="font-semibold mb-2">Contact Information</h4>
-                  <p className="text-sm text-gray-600">(206) 555-0123</p>
-                  <p className="text-sm text-gray-600">mike@thompsonsauto.com</p>
-                  <p className="text-sm text-gray-600">1234 Main St, Seattle, WA 98101</p>
+                  <p className="text-sm ">(206) 555-0123</p>
+                  <p className="text-sm ">mike@thompsonsauto.com</p>
+                  <p className="text-sm ">1234 Main St, Seattle, WA 98101</p>
                 </div>
                 <div>
                   <h4 className="font-semibold mb-2">Location</h4>
@@ -155,14 +155,14 @@ export default function ServiceDetailsPage() {
             <div className="bg-white rounded-lg shadow p-6 border border-gray-200 space-y-6">
               <div>
                 <h3 className="text-2xl font-semibold mb-2">Service Description</h3>
-                <p className="text-gray-600">
+                <p className="">
                   Keep your vehicle running smoothly with our comprehensive maintenance service. Certified mechanics perform inspections to ensure optimal performance, safety, and longevity.
                 </p>
               </div>
 
-              <div className="bg-orange-50 border-l-4 border-orange-500 rounded-lg p-4">
-                <h4 className="font-semibold text-orange-500 mb-1">Special Offer</h4>
-                <p className="text-sm text-gray-600">
+              <div className="bg-orange-50 border-l-4 border-primary rounded-lg p-4">
+                <h4 className="font-semibold text-primary mb-1">Special Offer</h4>
+                <p className="text-sm ">
                   Book this month and get 10% off your next service! Valid for new customers only.
                 </p>
               </div>
@@ -170,7 +170,7 @@ export default function ServiceDetailsPage() {
               <div className="grid md:grid-cols-2 gap-6">
                 <div>
                   <h4 className="font-semibold mb-2">What is Included</h4>
-                  <ul className="space-y-2 text-sm text-gray-600">
+                  <ul className="space-y-2 text-sm ">
                     {[
                       "Multi-point inspection",
                       "Fluid level checks and top-offs",
@@ -180,14 +180,14 @@ export default function ServiceDetailsPage() {
                       "Detailed service report",
                     ].map((item) => (
                       <li key={item} className="flex items-center gap-2">
-                        <Check className="text-orange-500" size={18} /> {item}
+                        <Check className="text-primary" size={18} /> {item}
                       </li>
                     ))}
                   </ul>
                 </div>
                 <div>
                   <h4 className="font-semibold mb-2">Service Benefits</h4>
-                  <ul className="space-y-2 text-sm text-gray-600">
+                  <ul className="space-y-2 text-sm ">
                     {[
                       "Prevent costly repairs",
                       "Improve fuel efficiency",
@@ -197,7 +197,7 @@ export default function ServiceDetailsPage() {
                       "Peace of mind driving",
                     ].map((item) => (
                       <li key={item} className="flex items-center gap-2">
-                        <Check className="text-orange-500" size={18} /> {item}
+                        <Check className="text-primary" size={18} /> {item}
                       </li>
                     ))}
                   </ul>
@@ -235,9 +235,9 @@ export default function ServiceDetailsPage() {
                       <div className="flex items-center gap-2 mb-1">
                         <h4 className="font-semibold">{r.name}</h4>
                         <div className="text-yellow-400">★★★★★</div>
-                        <span className="text-sm text-gray-500">{r.date}</span>
+                        <span className="text-sm ">{r.date}</span>
                       </div>
-                      <p className="text-gray-600">{r.review}</p>
+                      <p className="">{r.review}</p>
                     </div>
                   </div>
                 ))}
@@ -250,7 +250,7 @@ export default function ServiceDetailsPage() {
             {/* Booking Card */}
             <div className="bg-white rounded-lg shadow p-6 border border-gray-200 space-y-4">
               <h3 className="text-2xl font-semibold">Book This Service</h3>
-              <button className="w-full bg-orange-500 text-white py-3 rounded-md hover:bg-orange-600 transition">
+              <button className="w-full bg-primary text-white py-3 rounded-md hover:bg-secondary transition">
                 Book Now
               </button>
               <button className="w-full border border-gray-300 py-3 rounded-md hover:bg-orange-50 flex items-center justify-center gap-2 transition text-gray-700">
@@ -266,24 +266,24 @@ export default function ServiceDetailsPage() {
               <h3 className="text-lg font-semibold mb-3">Why Choose Mike?</h3>
               <div className="space-y-3">
                 <div className="flex items-center gap-3">
-                  <div className="w-5 h-5 bg-orange-500 rounded"></div>
+                  <div className="w-5 h-5 bg-primary rounded"></div>
                   <div>
                     <p className="font-medium">Verified Mechanic</p>
-                    <p className="text-sm text-gray-500">Background checked</p>
+                    <p className="text-sm ">Background checked</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-3">
                   <div className="w-5 h-5 bg-green-600 rounded"></div>
                   <div>
                     <p className="font-medium">ASE Certified</p>
-                    <p className="text-sm text-gray-500">Master technician</p>
+                    <p className="text-sm ">Master technician</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-3">
                   <div className="w-5 h-5 bg-blue-600 rounded"></div>
                   <div>
                     <p className="font-medium">Satisfaction Guaranteed</p>
-                    <p className="text-sm text-gray-500">100% money back</p>
+                    <p className="text-sm ">100% money back</p>
                   </div>
                 </div>
               </div>

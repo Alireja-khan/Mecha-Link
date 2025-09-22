@@ -180,7 +180,7 @@ export default function Services() {
           {/* Title */}
           <div className="text-center mb-12">
             <h2 className="text-4xl md:text-5xl font-extrabold text-center">
-              Explore <span className="text-orange-500">MechaLink Services</span>
+              Explore <span className="text-primary">MechaLink Services</span>
             </h2>
             <p className="text-md max-w-2xl mx-auto md:text-xl mt-3">
               Discover professional services for all your needs and manage bookings effortlessly with MechaLink.
@@ -191,7 +191,7 @@ export default function Services() {
           <div className="flex flex-col md:flex-row justify-between items-center gap-4 mb-6">
             {/* Search */}
             <div className="flex-1">
-              <div className="flex items-center gap-3 bg-orange-500 rounded-lg px-4 py-1 shadow-sm">
+              <div className="flex items-center gap-3 bg-primary rounded-lg px-4 py-1 shadow-sm">
                 <label htmlFor="search" className="text-white font-medium">
                   Search
                 </label>
@@ -201,7 +201,7 @@ export default function Services() {
                   placeholder="Shop, mechanic, or location"
                   value={searchTerm}
                   onChange={handleSearch}
-                  className="flex-1 bg-white text-gray-900 placeholder-gray-800 px-3 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
+                  className="flex-1 bg-white  placeholder-gray-800 px-3 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
                 />
               </div>
             </div>
@@ -216,10 +216,10 @@ export default function Services() {
                 id="sort"
                 value={sortOrder}
                 onChange={handleSort}
-                className="px-3 py-2 bg-white rounded-md border-2 border-orange-500 focus:outline-none focus:ring-2 focus:ring-orange-500"
+                className="px-3 py-2  rounded-md border-2 border-primary focus:outline-none focus:ring-2 focus:ring-primary"
               >
-                <option value="htl">Rating: High to Low</option>
-                <option value="lth">Rating: Low to High</option>
+                <option className="text-black" value="htl">Rating: High to Low</option>
+                <option className="text-black" value="lth">Rating: Low to High</option>
               </select>
             </div>
           </div>
@@ -242,7 +242,7 @@ export default function Services() {
                   id="itemsPerPage"
                   value={itemsPerPage}
                   onChange={handleItemsPerPage}
-                  className="px-3 py-2 border-2 rounded-lg border-orange-500 focus:outline-none"
+                  className="px-3 py-2 border-2 rounded-lg border-primary focus:outline-none"
                 >
                   <option value="12">12</option>
                   <option value="24">24</option>
@@ -255,7 +255,7 @@ export default function Services() {
             {/* Page buttons */}
             <div className="flex justify-center space-x-2">
               <button
-                className="px-5 py-1 border border-orange-500 rounded-md hover:bg-orange-500 hover:text-white transition duration-400 cursor-pointer"
+                className="px-5 py-1 border border-primary rounded-md hover:bg-primary hover:text-white transition duration-400 cursor-pointer"
                 disabled={currentPage === 1}
                 onClick={() => handlePageChange(currentPage - 1)}
               >
@@ -267,8 +267,8 @@ export default function Services() {
                   key={i}
                   className={`px-5 py-1 border rounded-md transition duration-400 cursor-pointer ${
                     currentPage === i + 1
-                      ? "bg-orange-500 text-white border-orange-500"
-                      : "border-orange-500 hover:bg-orange-500 hover:text-white"
+                      ? "bg-primary text-white border-primary"
+                      : "border-primary hover:bg-primary hover:text-white"
                   }`}
                   onClick={() => handlePageChange(i + 1)}
                 >
@@ -277,7 +277,7 @@ export default function Services() {
               ))}
 
               <button
-                className="px-5 py-1 border border-orange-500 rounded-md hover:bg-orange-500 hover:text-white transition duration-400 cursor-pointer"
+                className="px-5 py-1 border border-primary rounded-md hover:bg-primary hover:text-white transition duration-400 cursor-pointer"
                 disabled={currentPage === totalPages}
                 onClick={() => handlePageChange(currentPage + 1)}
               >

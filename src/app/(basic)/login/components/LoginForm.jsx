@@ -1,12 +1,16 @@
 "use client";
+import React from "react";
+// import { signIn, signOut } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { userCredentials } from "@/app/actions/authAction";
-import Swal from "sweetalert2";
+import toast from "react-hot-toast";
+import SocialLogin from "./SocialLogin";
+import { userCredentials } from "@/app/actions/authActions";
 import { useSession } from "next-auth/react";
+import Swal from "sweetalert2";
 
 export default function LoginForm() {
-  const {update} = useSession();
   const router = useRouter();
+  const {update} = useSession();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -58,6 +62,18 @@ export default function LoginForm() {
       >
         Sign In
       </button>
+
+      {/* Social Login */}
+      <p className="text-center">Or Sign In With</p>
+      <SocialLogin></SocialLogin>
+
+      {/* Sign Up Link */}
+      <p className="text-center text-sm mt-6">
+        Don't Have an account?{" "}
+        <a href="/register" className="text-blue-500 hover:underline">
+          Sign Up
+        </a>
+      </p>
     </form>
   );
 }
