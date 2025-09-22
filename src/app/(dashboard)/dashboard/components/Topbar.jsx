@@ -22,7 +22,7 @@ const Topbar = ({ pageTitle = "Dashboard" }) => {
         </button>
 
         {/* Quick Action */}
-        <button className="px-3 py-2 rounded-lg bg-blue-600 text-white text-sm hover:bg-blue-700 transition flex items-center gap-1">
+        <button className="px-3 py-2 rounded-lg bg-primary text-white text-sm hover:bg-accent hover:text-primary cursor-pointer transition flex items-center gap-1">
           <Plus size={16} /> <span className="hidden sm:block">New Booking</span>
         </button>
 
