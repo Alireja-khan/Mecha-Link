@@ -11,7 +11,7 @@ import HeroSection from "../components/HeroSection";
 export default function Home() {
 
     return (
-        <div className="">
+        <>
             <HeroSection />
             <ServiceSec />
             <FeaturesSection />
@@ -20,7 +20,7 @@ export default function Home() {
             <ReviewSection />
             <BlogSection />
             <Newsletter />
-        </div>
+        </>
     );
 
 }

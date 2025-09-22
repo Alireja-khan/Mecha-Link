@@ -3,7 +3,7 @@ import Link from "next/link";
 
 export default function HeroModern() {
   return (
-    <section className="relative  py-20 md:py-28 lg:py-32">
+    <section className="relative  py-20 md:py-20 ">
       <div className="container mx-auto px-6 lg:px-12 flex flex-col lg:flex-row items-center gap-16 max-w-7xl">
         {/* Text Content */}
         <div className="flex-1 text-center lg:text-left">
@@ -12,7 +12,7 @@ export default function HeroModern() {
             <br className="hidden sm:block" /> Anytime, Anywhere
           </h1>
           <p className="mt-6 text-lg sm:text-xl  max-w-2xl mx-auto lg:mx-0">
-            MechaLink helps vehicle owners find verified mechanics, book
+            MechaLink helps vehicle ownexrs find verified mechanics, book
             services instantly, and track repairs—all in one platform. Reliable.
             Fast. Hassle-free.
           </p>
