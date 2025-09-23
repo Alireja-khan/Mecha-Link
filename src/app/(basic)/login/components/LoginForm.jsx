@@ -7,7 +7,6 @@ import { userCredentials } from "@/app/actions/authActions";
 import { useSession } from "next-auth/react";
 import Swal from "sweetalert2";
 import { Eye, EyeOff } from "lucide-react";
-import FadeIn from "react-fade-in/lib/FadeIn";
 import Link from "next/link";
 
 export default function LoginForm() {
@@ -45,7 +44,6 @@ export default function LoginForm() {
 
   return (
     <form onSubmit={handleSubmit}>
-      <FadeIn>
         <div>
           <input
             type="email"
@@ -106,7 +104,6 @@ export default function LoginForm() {
             Sign Up
           </Link>
         </p>
-      </FadeIn>
     </form>
   );
 }

@@ -4,7 +4,6 @@ import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import Swal from "sweetalert2";
-import FadeIn from "react-fade-in/lib/FadeIn";
 import Link from "next/link";
 
 export default function ForgetPassForm() {
@@ -45,7 +44,6 @@ export default function ForgetPassForm() {
 
   return (
     <form onSubmit={handleSubmit}>
-      <FadeIn>
         <div>
           <input
             type="email"
@@ -69,7 +67,6 @@ export default function ForgetPassForm() {
             Back to Login
           </Link>
         </p>
-      </FadeIn>
     </form>
   );
 }

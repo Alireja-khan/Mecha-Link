@@ -3,7 +3,6 @@
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import Swal from "sweetalert2";
-import FadeIn from "react-fade-in/lib/FadeIn";
 
 export default function OTPForm() {
   const router = useRouter();
@@ -50,7 +49,6 @@ export default function OTPForm() {
 
   return (
     <form onSubmit={handleSubmit}>
-      <FadeIn>
         <div className="mb-4">
           <input
             type="text"
@@ -81,7 +79,6 @@ export default function OTPForm() {
             Resend OTP
           </button>
         </p>
-      </FadeIn>
     </form>
   );
 }
