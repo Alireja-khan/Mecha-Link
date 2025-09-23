@@ -87,7 +87,7 @@ const ServiceRequest = () => {
     }
   };
 
-  console.log(location);
+
 
   return (
     <div className="min-h-screen bg-gradient-subtle py-8 px-4">

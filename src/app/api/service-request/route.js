@@ -5,10 +5,9 @@ export async function POST(req) {
   try {
     const body = await req.json();
 
-    // connect to collection
+
     const collection = dbConnect("serviceRequests");
 
-    // insert into MongoDB
     await collection.insertOne(body);
 
     return NextResponse.json(
@@ -18,5 +17,20 @@ export async function POST(req) {
   } catch (error) {
     console.error("❌ Error saving service request:", error);
     return NextResponse.json({error: "Internal Server Error"}, {status: 500});
+  }
+}
+
+export async function GET() {
+  try {
+    const collection = dbConnect("serviceRequests");
+    const requests = await collection.find().toArray();
+
+    return NextResponse.json({ success: true, data: requests });
+  } catch (error) {
+    console.error("❌ Error fetching service requests:", error);
+    return NextResponse.json(
+      { error: "Internal Server Error" },
+      { status: 500 }
+    );
   }
 }

@@ -1,7 +1,7 @@
 "use client";
 import {useEffect, useState} from "react";
 
-export default function AddressSelector({location,setLocation}) {
+export default function AddressSelector({location, setLocation}) {
   const [locationData, setLocationData] = useState([]);
   const [selectedRegion, setSelectedRegion] = useState("");
   const [selectedDistrict, setSelectedDistrict] = useState("");
@@ -43,16 +43,22 @@ export default function AddressSelector({location,setLocation}) {
     ? locationData.find((item) => item.city === selectedCity)?.covered_area ||
       []
     : [];
-useEffect(() => {
-  if (selectedArea && selectedCity && selectedDistrict && selectedRegion) {
-    const selected = locationData.find((item) => item.city === selectedCity);
-    setLocation({
-      address: `${selectedArea}, ${selectedCity}, ${selectedDistrict}, ${selectedRegion}`,
-      latitude: selected?.latitude || null,
-      longitude: selected?.longitude || null,
-    });
-  }
-}, [selectedArea, selectedCity, selectedDistrict, selectedRegion, locationData]);
+  useEffect(() => {
+    if (selectedArea && selectedCity && selectedDistrict && selectedRegion) {
+      const selected = locationData.find((item) => item.city === selectedCity);
+      setLocation({
+        address: `${selectedArea}, ${selectedCity}, ${selectedDistrict}, ${selectedRegion}`,
+        latitude: selected?.latitude || null,
+        longitude: selected?.longitude || null,
+      });
+    }
+  }, [
+    selectedArea,
+    selectedCity,
+    selectedDistrict,
+    selectedRegion,
+    locationData,
+  ]);
 
   return (
     <div className="mt-2 space-y-4  rounded-lg">
@@ -123,7 +129,7 @@ useEffect(() => {
 
       {/* Covered Area Selector */}
       <div>
-        <label className="block mb-1 ">Covered Area</label>
+        <label className="block mb-1 "> Area</label>
         <select
           className="w-full p-2 border border-neutral rounded"
           value={selectedArea}
@@ -145,15 +151,16 @@ useEffect(() => {
           <strong>Selected Address:</strong>
         </p>
         <input
-        className="w-full"
+          className="w-full"
           type="text"
+          required
           onChange={(e) =>
             setLocation((prev) => ({
-              ...prev, 
-              address: e.target.value, 
+              ...prev,
+              address: e.target.value,
             }))
           }
-         value={location.address}
+          value={location.address}
         />
       </div>
     </div>
