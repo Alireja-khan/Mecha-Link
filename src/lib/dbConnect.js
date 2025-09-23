@@ -36,6 +36,14 @@ if (process.env.NODE_ENV === "development") {
     },
   });
   clientPromise = client.connect();
+<<<<<<< HEAD
+}
+
+export default async function dbConnect(collectionName) {
+  const client = await clientPromise;
+  return client.db(process.env.DB_NAME).collection(collectionName);
+=======
+>>>>>>> 33088b2b3f824cb282715d8d26246c423e1d4133
 }
 
 export default async function dbConnect(collectionName) {

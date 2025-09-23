@@ -96,4 +96,8 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       return session;
     },
   },
+<<<<<<< HEAD
 });
+=======
+});
+>>>>>>> 33088b2b3f824cb282715d8d26246c423e1d4133

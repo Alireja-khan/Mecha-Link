@@ -8,7 +8,7 @@ export default function ServiceCard({service}) {
     <div>
       <div
         key={service.id}
-        className="border border-gray-300 rounded-xl overflow-hidden shadow-md h-full flex flex-col group"
+        className="border border-primary rounded-xl overflow-hidden shadow-md h-full flex flex-col group"
       >
         {/* service Image */}
         <div className="h-60 w-full overflow-hidden relative">
@@ -59,7 +59,7 @@ export default function ServiceCard({service}) {
         </div>
 
         {/* Buttons */}
-        <div className="flex justify-between gap-2 border-t border-gray-100 p-3 w-full mt-auto">
+        <div className="flex justify-between gap-2 border-t border-primary p-3 w-full mt-auto">
           <Link
             href={`/services/${service.id}`}
             className="w-1/2  py-3 bg-primary  hover:bg-white hover:border hover:border-primary  text-white hover:text-primary font-bold text-xl capitalize leading-none font-urbanist rounded-md transition duration-400 cursor-pointer text-center "

@@ -5,8 +5,6 @@ import {User, MapPin} from "lucide-react";
 import Button from "@/app/shared/Button";
 import toast from "react-hot-toast";
 import AddressSelector from "../../components/AddressSelector";
-const imgbbApiKey = ""; 
-
 
 const ServiceRequest = () => {
   const {
@@ -22,7 +20,6 @@ const ServiceRequest = () => {
     longitude: null,
   });
 
-
   const images = watch("images");
 
   // Upload image to ImgBB
@@ -30,7 +27,7 @@ const ServiceRequest = () => {
     const formData = new FormData();
     formData.append("image", file);
     const res = await fetch(
-      `https://api.imgbb.com/1/upload?key=${imgbbApiKey}`,
+      `https://api.imgbb.com/1/upload?key=${process.env.NEXT_PUBLIC_ImgBB_API_KEY}`,
       {
         method: "POST",
         body: formData,
@@ -59,7 +56,6 @@ const ServiceRequest = () => {
         deviceType: data.deviceType,
         serviceDetails: {
           problemTitle: data.problemTitle,
-          problemType: data.problemType,
           description: data.description,
           images: uploadedImages,
         },
@@ -70,17 +66,28 @@ const ServiceRequest = () => {
         scheduledDate: data.scheduledDate || null,
         completedDate: null,
       };
+      console.log(formData);
+      // ✅ Send to API
+      const res = await fetch("/api/service-request", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify(formData),
+      });
 
-      console.log("🚗 Final Service Request:", formData);
-      toast.success("Service request submitted!");
+      const result = await res.json();
+      if (res.ok) {
+        toast.success("Service request submitted!");
+        console.log("✅ Saved in DB:", result.data);
+      } else {
+        toast.error(result.error || "Failed to submit request.");
+      }
     } catch (err) {
       console.error(err);
       toast.error("Failed to submit request.");
     }
   };
 
-  
-  console.log(location);
+
 
   return (
     <div className="min-h-screen bg-gradient-subtle py-8 px-4">
@@ -149,8 +156,6 @@ const ServiceRequest = () => {
                   )}
                 </div>
 
-                
-
                 <div>
                   <label>Description </label>
                   <textarea
@@ -209,9 +214,9 @@ const ServiceRequest = () => {
                   {...register("phoneNumber", {
                     required: "Phone number is required",
                     pattern: {
-                      value: /^\+8801[0-9]{8}$/,
+                      value: /^\+8801[0-9]{9}$/,
                       message:
-                        "Phone number must start with +8801 and be 11 digits long",
+                        "Phone number must start with +8801 and be 11 characters long",
                     },
                   })}
                   className="w-full p-2 border border-neutral rounded"
@@ -223,9 +228,10 @@ const ServiceRequest = () => {
                   </p>
                 )}
               </div>
-              <label className="block font-medium mt-2">Select your location</label>
-              <AddressSelector location={location} setLocation={setLocation}/>
-              
+              <label className="block font-medium mt-2">
+                Select your location
+              </label>
+              <AddressSelector location={location} setLocation={setLocation} />
             </div>
 
             {/* Scheduled Date */}
