@@ -1,12 +1,11 @@
 "use client";
 import React from "react";
-// import { signIn, signOut } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import toast from "react-hot-toast";
 import SocialLogin from "./SocialLogin";
 import { userCredentials } from "@/app/actions/authActions";
 import { useSession } from "next-auth/react";
 import Swal from "sweetalert2";
+import Link from "next/link";
 
 export default function LoginForm() {
   const router = useRouter();
@@ -33,7 +32,10 @@ export default function LoginForm() {
         router.push("/"); 
       }
     } catch (error) {
-      console.log(error);
+      Swal.fire({
+        icon: "error",
+        title: "Something went wrong",
+      })
     }
   };
   return (
@@ -70,9 +72,9 @@ export default function LoginForm() {
       {/* Sign Up Link */}
       <p className="text-center text-sm mt-6">
         Don't Have an account?{" "}
-        <a href="/register" className="text-blue-500 hover:underline">
+        <Link href="/register" className="text-blue-500 hover:underline">
           Sign Up
-        </a>
+        </Link>
       </p>
     </form>
   );
