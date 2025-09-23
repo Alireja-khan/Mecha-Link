@@ -2,16 +2,10 @@
 import { useRouter } from "next/navigation";
 import React, { useState } from "react";
 import SocialLogin from "../../login/components/SocialLogin";
-<<<<<<< HEAD
-import {uploadImageToImgbb} from "@/lib/uploadImgbb";
-import Swal from "sweetalert2";
-import Link from "next/link";
-=======
 import { uploadImageToImgbb } from "@/lib/uploadImgbb";
 import { Eye, EyeOff } from "lucide-react";
 import Link from "next/link";
 import Swal from "sweetalert2";
->>>>>>> 33088b2b3f824cb282715d8d26246c423e1d4133
 
 export default function RegisterFrom() {
   const router = useRouter();
@@ -31,11 +25,7 @@ export default function RegisterFrom() {
     const formObj = Object.fromEntries(formData.entries());
     formObj.profileImage = profileImage;
     formObj.createdAt = new Date();
-<<<<<<< HEAD
-    formObj.role= "user";
-=======
     formObj.role = "user";
->>>>>>> 33088b2b3f824cb282715d8d26246c423e1d4133
     const response = await fetch("/api/users", {
       method: "POST",
       headers: {
@@ -44,16 +34,6 @@ export default function RegisterFrom() {
       body: JSON.stringify(formObj),
     })
     const data = await response.json();
-<<<<<<< HEAD
-    if(data.insertedId){
-      Swal.fire({
-        icon: "success",
-        title: "Registration successful",
-        text:"You can login now",
-      })
-      router.push("/login");
-    }else if(!data.success){
-=======
     if (data.insertedId) {
       Swal.fire({
         icon: "success",
@@ -62,7 +42,6 @@ export default function RegisterFrom() {
       })
       router.push("/login");
     } else if (!data.success) {
->>>>>>> 33088b2b3f824cb282715d8d26246c423e1d4133
       Swal.fire({
         icon: "error",
         title: "Registration failed",
@@ -70,10 +49,6 @@ export default function RegisterFrom() {
       })
     }
   };
-<<<<<<< HEAD
-=======
-
->>>>>>> 33088b2b3f824cb282715d8d26246c423e1d4133
   return (
     <form onSubmit={handleSubmit}>
         <div className="mb-4">
@@ -123,8 +98,6 @@ export default function RegisterFrom() {
           />
         </div>
 
-<<<<<<< HEAD
-=======
         {/* Password field with toggle */}
         <div className="relative mb-4">
           <input
@@ -141,7 +114,6 @@ export default function RegisterFrom() {
             {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
           </button>
         </div>
->>>>>>> 33088b2b3f824cb282715d8d26246c423e1d4133
 
         <button
           type="submit"
@@ -150,16 +122,6 @@ export default function RegisterFrom() {
           Sign Up
         </button>
 
-<<<<<<< HEAD
-      <p className="text-center">Or Sign Up With</p>
-      <SocialLogin></SocialLogin>
-      <p className="text-center text-sm mt-6">
-        Already have an account?{" "}
-        <Link href="/login" className="text-blue-500 hover:underline">
-          Login
-        </Link>
-      </p>
-=======
         <p className="text-center">Or Sign Up With</p>
         <SocialLogin />
 
@@ -169,7 +131,6 @@ export default function RegisterFrom() {
             Log in
           </Link>
         </p>
->>>>>>> 33088b2b3f824cb282715d8d26246c423e1d4133
     </form>
   );
 }
