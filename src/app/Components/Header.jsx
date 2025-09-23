@@ -9,13 +9,19 @@ import { User as UserIcon } from "lucide-react";
 
 export default function Header() {
   const { data: session, status } = useSession();
+  const [loggedInUser, setLoggedInUser] = useState(null);
   const [scrolled, setScrolled] = useState(false);
   const pathname = usePathname();
   const [theme, setTheme] = useState("light");
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const dropdownRef = useRef(null);
 
-  // Theme load from localStorage
+  useEffect(() => {
+    fetch(`/api/users?email=${session?.user?.email}`)
+      .then((res) => res.json())
+      .then((data) => setLoggedInUser(data));
+  }, [session?.user?.email]);
+
   useEffect(() => {
     const savedTheme = localStorage.getItem("theme") || "light";
     setTheme(savedTheme);
@@ -230,7 +236,13 @@ export default function Header() {
                 }}
               >
                 <div className="w-9 h-9 rounded-full bg-gray-200 overflow-hidden flex items-center justify-center">
-                  {session.user?.image ? (
+                  {loggedInUser?.profileImage ? (
+                    <img
+                      src={loggedInUser.profileImage}
+                      alt={loggedInUser.name || "User"}
+                      className="w-full h-full object-cover"
+                    />
+                  ) : session.user?.image ? (
                     <img
                       src={session.user.image}
                       alt={session.user.name || "User"}
@@ -240,7 +252,6 @@ export default function Header() {
                     <UserIcon className="w-5 h-5 text-gray-600" />
                   )}
                 </div>
-                <span className="text-md font-medium">{session.user?.name}</span>
                 <svg
                   className={`w-4 h-4 transition-transform ${
                     userMenuOpen ? "rotate-180" : ""

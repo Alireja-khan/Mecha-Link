@@ -9,16 +9,18 @@ export default function SocialLogin() {
     <div className="mt-6 flex justify-center">
       <div style={{ display: "flex", gap: "20px", fontSize: "24px" }}>
         <button
+          type="button"
           onClick={() => userSocialLogin("google")}
           className="bg-primary text-white p-3 rounded-full cursor-pointer"
         >
-          <FaGoogle type="button"/>
+          <FaGoogle />
         </button>
         <button
+          type="button"
           onClick={() => userSocialLogin("github")}
           className="bg-primary text-white p-3 rounded-full cursor-pointer"
         >
-          <FaGithub type="button"/>
+          <FaGithub />
         </button>
       </div>
     </div>

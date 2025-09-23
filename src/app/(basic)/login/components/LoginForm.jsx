@@ -2,7 +2,6 @@
 import React, { useState } from "react";
 // import { signIn, signOut } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import toast from "react-hot-toast";
 import SocialLogin from "./SocialLogin";
 import { userCredentials } from "@/app/actions/authActions";
 import { useSession } from "next-auth/react";
@@ -32,12 +31,15 @@ export default function LoginForm() {
         Swal.fire({
           icon: "success",
           title: "Login successful",
-        });
+        })
         await update();
-        router.push("/");
+        router.push("/"); 
       }
     } catch (error) {
-      console.log(error);
+      Swal.fire({
+        icon: "error",
+        title: "Something went wrong",
+      })
     }
   };
 

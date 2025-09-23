@@ -1,38 +1,21 @@
 "use server";
 
 import { signIn, signOut } from "@/auth";
-const users = [
-  {
-    id: 1,
-    email: "admin@example.com",
-    password: "1234",
-  },
-  {
-    id: 2,
-    email: "user@example.com",
-    password: "1234",
-  },
-  {
-    id: 3,
-    email: "mechanic@example.com",
-    password: "1234",
-  },
-];
-
-const findEmail = (email) => {
-  return users.find((user) => user.email === email);
-};
+import getUserData from "@/lib/getUserData";
+import bcrypt from "bcrypt";
 export async function userSocialLogin(provider) {
   await signIn(provider, { redirectTo: "/" });
 }
 
 export async function userCredentials(formData) {
   const { email, password } = formData;
-  const user = findEmail(email);
+  const user =await getUserData(email);
   if (!user) {
     return { success: false, message: "User not found" };
   }
-  if(user.password !== password) {
+
+  const passCheck= await bcrypt.compare(password, user.password || "");
+  if(!passCheck) {
     return { success: false, message: "Invalid password" };
   }
   try {
