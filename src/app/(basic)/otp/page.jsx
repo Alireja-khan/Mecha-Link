@@ -3,7 +3,6 @@
 import Lottie from "lottie-react";
 import otpIllustration from "../../../../public/assets/login/login.json"; 
 import OTPForm from "./OTPForm/OTPForm";
-import FadeIn from "react-fade-in/lib/FadeIn";
 
 export default function OTPPage() {
   return (
@@ -20,12 +19,10 @@ export default function OTPPage() {
 
         {/* Right Side Form */}
         <div className="w-full md:w-1/2 p-10 flex flex-col justify-center">
-          <FadeIn>
             <h2 className="text-2xl font-semibold mb-6 text-center">
               Verify OTP
             </h2>
             <OTPForm />
-          </FadeIn>
         </div>
       </div>
     </div>

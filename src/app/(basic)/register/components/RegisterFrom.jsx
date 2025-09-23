@@ -4,7 +4,6 @@ import React, { useState } from "react";
 import SocialLogin from "../../login/components/SocialLogin";
 import { uploadImageToImgbb } from "@/lib/uploadImgbb";
 import { Eye, EyeOff } from "lucide-react";
-import FadeIn from "react-fade-in/lib/FadeIn";
 import Link from "next/link";
 import Swal from "sweetalert2";
 
@@ -53,7 +52,6 @@ export default function RegisterFrom() {
 
   return (
     <form onSubmit={handleSubmit}>
-      <FadeIn>
         <div className="mb-4">
           <label htmlFor="imageInput">
             <div className="flex items-center justify-center mt-2 gap-2">
@@ -134,7 +132,6 @@ export default function RegisterFrom() {
             Log in
           </Link>
         </p>
-      </FadeIn>
     </form>
   );
 }

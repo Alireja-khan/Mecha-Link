@@ -3,7 +3,6 @@
 import Lottie from "lottie-react";
 import loginIllustration from "../../../../public/assets/login/login.json"; 
 import LoginForm from "./components/LoginForm";
-import FadeIn from "react-fade-in/lib/FadeIn";
 
 export default function LoginPage() {
   return (
@@ -16,10 +15,10 @@ export default function LoginPage() {
 
         {/* Right Side Form */}
         <div className="w-full md:w-1/2 p-10 flex flex-col justify-center">
-        <FadeIn>
+        
           <h2 className="text-2xl font-semibold mb-6 text-center">Log in</h2>
             <LoginForm></LoginForm>
-            </FadeIn>
+            
         </div>
       </div>
     </div>
