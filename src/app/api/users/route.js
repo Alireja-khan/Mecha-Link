@@ -19,6 +19,7 @@ export async function POST(req, res) {
     if (isExist) return NextResponse.json({success:false, message: "You email already exist", status: 400 });
     const hashPassword = await bcrypt.hash(data.password, 10);
     data.password = hashPassword;
+ 
     const result = await collection.insertOne(data);
     return NextResponse.json(result);
 }
