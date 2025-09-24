@@ -49,7 +49,6 @@ export default function RegisterFrom() {
       })
     }
   };
-
   return (
     <form onSubmit={handleSubmit}>
         <div className="mb-4">

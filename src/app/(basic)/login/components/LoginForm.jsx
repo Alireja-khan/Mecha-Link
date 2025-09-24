@@ -1,13 +1,13 @@
 "use client";
-import React, { useState } from "react";
+import { useState } from "react";
 // import { signIn, signOut } from "next-auth/react";
-import { useRouter } from "next/navigation";
-import SocialLogin from "./SocialLogin";
 import { userCredentials } from "@/app/actions/authActions";
-import { useSession } from "next-auth/react";
-import Swal from "sweetalert2";
 import { Eye, EyeOff } from "lucide-react";
+import { useSession } from "next-auth/react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import Swal from "sweetalert2";
+import SocialLogin from "./SocialLogin";
 
 export default function LoginForm() {
   const router = useRouter();
