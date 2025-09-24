@@ -11,11 +11,11 @@ import bcrypt from "bcrypt";
 //     return  NextResponse.json(result);
 // }
 
-export async function GET(request) {
-    const collection = await dbConnect(collections.users)
-    const result = await collection.find().toArray();
-    return NextResponse.json(result);
-}
+// export async function GET(request) {
+//     const collection = await dbConnect(collections.users)
+//     const result = await collection.find().toArray();
+//     return NextResponse.json(result);
+// }
 
 
 export async function POST(req, res) {
@@ -27,5 +27,12 @@ export async function POST(req, res) {
     data.password = hashPassword;
  
     const result = await collection.insertOne(data);
+    return NextResponse.json(result);
+}
+
+export async function GET() {
+    const collection = await dbConnect(collections.users)
+    const result = await collection.find().toArray();
+    // console.log(result)
     return NextResponse.json(result);
 }
