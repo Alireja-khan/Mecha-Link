@@ -16,35 +16,29 @@ export default function OTPForm() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    const email = new URLSearchParams(window.location.search).get("email");
 
-    if (otp.length < 6) {
-      Swal.fire({
-        icon: "error",
-        title: "Invalid OTP",
-        text: "Please enter a valid 6-digit code.",
-      });
-      return;
-    }
+    const res = await fetch("/api/verify-otp", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, otp }),
+    });
+    const data = await res.json();
+    if (data.success) router.push("/login");
+    else alert(data.message);
+  };
 
-    try {
-      setLoading(true);
-      // TODO: call your backend API to verify OTP
-      // await verifyOTP({ otp });
-
-      Swal.fire({
-        icon: "success",
-        title: "OTP Verified Successfully",
-      });
-
-      router.push("/"); // redirect after success
-    } catch (error) {
-      Swal.fire({
-        icon: "error",
-        title: "OTP Verification Failed",
-        text: "Please try again.",
-      });
-    } finally {
-      setLoading(false);
+  const handleResend = async () => {
+    const res = await fetch("/api/send-otp", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email: "user@example.com" }),
+    });
+    const data = await res.json();
+    if (data.success) {
+      Swal.fire("New OTP Sent", "Check your email.", "success");
+    } else {
+      Swal.fire("Failed", "Could not send OTP", "error");
     }
   };
 
@@ -75,8 +69,8 @@ export default function OTPForm() {
           Didn’t receive the code?{" "}
           <button
             type="button"
-            className="text-primary hover:underline"
-            onClick={() => Swal.fire("New OTP Sent", "Check your email or phone.", "success")}
+            className="text-primary hover:underline cursor-pointer"
+            onClick={() => handleResend()}
           >
             Resend OTP
           </button>
