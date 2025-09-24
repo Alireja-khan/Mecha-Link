@@ -10,10 +10,10 @@ const ServiceReq = () => {
   useEffect(() => {
     const fetchRequests = async () => {
       try {
-        const res = await fetch("/api/service-request"); // fetch all requests
+        const res = await fetch("/api/service-request"); 
         const data = await res.json();
         if (data.success) {
-          setRequests(data.data); // save to state
+          setRequests(data.data); 
         }
       } catch (error) {
         console.error("❌ Error fetching requests:", error);

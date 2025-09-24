@@ -6,21 +6,18 @@ import { usePathname } from "next/navigation";
 import { FaGear } from "react-icons/fa6";
 import { signOut, useSession } from "next-auth/react";
 import { User as UserIcon } from "lucide-react";
+import getUserData from "@/lib/getUserData";
+import useUser from "@/hooks/useUser";
 
 export default function Header() {
   const { data: session, status } = useSession();
-  const [loggedInUser, setLoggedInUser] = useState(null);
   const [scrolled, setScrolled] = useState(false);
   const pathname = usePathname();
   const [theme, setTheme] = useState("light");
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const dropdownRef = useRef(null);
 
-  useEffect(() => {
-    fetch(`/api/users?email=${session?.user?.email}`)
-      .then((res) => res.json())
-      .then((data) => setLoggedInUser(data));
-  }, [session?.user?.email]);
+  const loggedInUser = useUser(session?.user?.email);
 
   useEffect(() => {
     const savedTheme = localStorage.getItem("theme") || "light";
@@ -54,7 +51,6 @@ export default function Header() {
     { href: "/", label: "Home" },
     { href: "/services", label: "Services" },
     { href: "/about", label: "About" },
-    { href: "/dashboard", label: "Dashboard" },
   ];
 
   return (
@@ -273,7 +269,7 @@ export default function Header() {
               {userMenuOpen && (
                 <div className="absolute right-0 mt-2 w-48 bg-white text-black rounded-md shadow-lg py-1 z-50 border border-gray-100">
                   <div className="px-4 py-2 border-b border-gray-100">
-                    <p className="text-sm font-medium">{session.user?.name}</p>
+                    <p className="text-sm font-medium">{loggedInUser?.name}</p>
                     <p className="text-xs truncate">{session.user?.email}</p>
                   </div>
                   <Link
@@ -291,8 +287,8 @@ export default function Header() {
                     Dashboard
                   </Link>
                   <div className="border-t border-gray-100 my-1"></div>
-                  <button
-                    className="block w-full text-left px-4 py-2 text-sm hover:bg-gray-50"
+                  <button type="button"
+                    className="cursor-pointer block w-full text-left px-4 py-2 text-sm hover:bg-gray-50"
                     onClick={() => {
                       signOut();
                       setUserMenuOpen(false);
