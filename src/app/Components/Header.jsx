@@ -6,21 +6,18 @@ import { usePathname } from "next/navigation";
 import { FaGear } from "react-icons/fa6";
 import { signOut, useSession } from "next-auth/react";
 import { User as UserIcon } from "lucide-react";
+import getUserData from "@/lib/getUserData";
+import useUser from "@/hooks/useUser";
 
 export default function Header() {
   const { data: session, status } = useSession();
-  const [loggedInUser, setLoggedInUser] = useState(null);
   const [scrolled, setScrolled] = useState(false);
   const pathname = usePathname();
   const [theme, setTheme] = useState("light");
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const dropdownRef = useRef(null);
 
-  useEffect(() => {
-    fetch(`/api/users?email=${session?.user?.email}`)
-      .then((res) => res.json())
-      .then((data) => setLoggedInUser(data));
-  }, [session?.user?.email]);
+  const loggedInUser = useUser(session?.user?.email);
 
   useEffect(() => {
     const savedTheme = localStorage.getItem("theme") || "light";
