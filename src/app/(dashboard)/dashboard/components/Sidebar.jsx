@@ -1,5 +1,5 @@
 "use client";
-import React, {useState} from "react";
+import React, { useState } from "react";
 import Link from "next/link";
 import {
   Home,
@@ -19,21 +19,21 @@ import {
   Star,
   MessageSquare,
   WrenchIcon,
+  Store,
 } from "lucide-react";
 import Image from "next/image";
 
-const Sidebar = ({role = "user"}) => {
+const Sidebar = ({ role = "user" }) => {
   const [collapsed, setCollapsed] = useState(false);
 
   // Common menu
   const commonMenu = [
-    {name: "Overview", icon: <Home size={20} />, href: "/dashboard"},
+    { name: "Overview", icon: <Home size={20} />, href: "/dashboard" },
     {
       name: "Profile",
       icon: <User size={20} />,
       href: "/dashboard/user/profile",
     },
-    //   { name: "Payments", icon: <CreditCard size={20} />, href: "/dashboard/user/payments" },
     {
       name: "Settings",
       icon: <Settings size={20} />,
@@ -98,6 +98,11 @@ const Sidebar = ({role = "user"}) => {
         icon: <WrenchIcon size={20} />,
         href: "/dashboard/user/addServiceRequest",
       },
+      {
+        name: "Add Shops",
+        icon: <Store size={20} />,
+        href: "/dashboard/user/MechanicShop",
+      },
     ],
   };
 
@@ -108,9 +113,8 @@ const Sidebar = ({role = "user"}) => {
     >
       {/* Logo */}
       <div
-        className={`p-6 text-xl font-bold border-b border-gray-200 flex ${
-          collapsed ? "justify-center" : ""
-        }`}
+        className={`p-6 text-xl font-bold border-b border-gray-200 flex ${collapsed ? "justify-center" : ""
+          }`}
       >
         {collapsed ? (
           <Link href={"/"}>ML</Link>
