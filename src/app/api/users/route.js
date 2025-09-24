@@ -11,6 +11,11 @@ export async function GET(request) {
     return  NextResponse.json(result);
 }
 
+const res = await fetch("/api/users?email=test@gmail.com");
+const user = await res.json();
+console.log(user);
+
+
 export async function POST(req, res) {
     const data = await req.json();
     const collection = await dbConnect(collections.users);
