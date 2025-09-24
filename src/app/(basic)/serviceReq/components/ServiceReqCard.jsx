@@ -18,31 +18,24 @@ import {
     Map,
     Image as ImageIcon
 } from "lucide-react";
-import getUserData from "@/lib/getUserData";
 import { useSession } from "next-auth/react";
 
 const ServiceRequestDetails = ({ request }) => {
     const [selectedImage, setSelectedImage] = useState(null);
-    const [userData, setUserData] = useState(null);
-    const [loadingUser, setLoadingUser] = useState(false);
     const { data: session, status } = useSession();
+    const [loading, setLoading] = useState(false);
     const [loggedInUser, setLoggedInUser] = useState(null);
 
 
     useEffect(() => {
+        setLoading(true);
         fetch(`/api/users?email=${session?.user?.email}`)
             .then((res) => res.json())
-            .then((data) => setLoggedInUser(data));
+            .then((data) => {
+                setLoggedInUser(data);
+                setLoading(false);
+            });
     }, [session?.user?.email]);
-
-    console.log(loggedInUser);
-
-
-
-    // Fetch user data from users collection
-
-
-
     if (!request) {
         return (
             <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -259,17 +252,17 @@ const ServiceRequestDetails = ({ request }) => {
                             </div>
 
                             <div className="space-y-4">
-                                {loadingUser ? (
+                                {loading && status === 'loading' ? (
                                     <div className="flex justify-center py-4">
                                         <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-orange-500"></div>
                                     </div>
-                                ) : userData ? (
+                                ) : loggedInUser ? (
                                     <>
                                         {/* User Profile Image */}
-                                        {userData.profileImage && (
+                                        {loggedInUser.profileImage && (
                                             <div className="flex justify-center mb-4">
                                                 <img
-                                                    src={userData.profileImage}
+                                                    src={loggedInUser.profileImage}
                                                     alt="Customer profile"
                                                     className="w-20 h-20 rounded-full object-cover border-2 border-orange-200"
                                                     onError={(e) => {
@@ -280,23 +273,23 @@ const ServiceRequestDetails = ({ request }) => {
                                         )}
 
                                         {/* User Details */}
-                                        <DetailItem label="Full Name" value={userData.name} />
-                                        <DetailItem label="Email" value={userData.email} icon={Mail} />
+                                        <DetailItem label="Full Name" value={loggedInUser.name} />
+                                        <DetailItem label="Email" value={loggedInUser.email} icon={Mail} />
                                         <DetailItem label="User ID" value={request.userId} />
 
                                         {/* Registration Date */}
-                                        {userData.createdAt && (
+                                        {loggedInUser.createdAt && (
                                             <DetailItem
                                                 label="Member Since"
-                                                value={new Date(userData.createdAt).toLocaleDateString()}
+                                                value={new Date(loggedInUser.createdAt).toLocaleDateString()}
                                             />
                                         )}
 
                                         {/* Provider info */}
-                                        {userData.provider && (
+                                        {loggedInUser.provider && (
                                             <DetailItem
                                                 label="Registered Via"
-                                                value={userData.provider.charAt(0).toUpperCase() + userData.provider.slice(1)}
+                                                value={loggedInUser.provider.charAt(0).toUpperCase() + loggedInUser.provider.slice(1)}
                                             />
                                         )}
                                     </>

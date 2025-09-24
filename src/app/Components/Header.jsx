@@ -54,7 +54,6 @@ export default function Header() {
     { href: "/", label: "Home" },
     { href: "/services", label: "Services" },
     { href: "/about", label: "About" },
-    { href: "/dashboard", label: "Dashboard" },
   ];
 
   return (
@@ -273,7 +272,7 @@ export default function Header() {
               {userMenuOpen && (
                 <div className="absolute right-0 mt-2 w-48 bg-white text-black rounded-md shadow-lg py-1 z-50 border border-gray-100">
                   <div className="px-4 py-2 border-b border-gray-100">
-                    <p className="text-sm font-medium">{session.user?.name}</p>
+                    <p className="text-sm font-medium">{loggedInUser?.name}</p>
                     <p className="text-xs truncate">{session.user?.email}</p>
                   </div>
                   <Link
@@ -291,8 +290,8 @@ export default function Header() {
                     Dashboard
                   </Link>
                   <div className="border-t border-gray-100 my-1"></div>
-                  <button
-                    className="block w-full text-left px-4 py-2 text-sm hover:bg-gray-50"
+                  <button type="button"
+                    className="cursor-pointer block w-full text-left px-4 py-2 text-sm hover:bg-gray-50"
                     onClick={() => {
                       signOut();
                       setUserMenuOpen(false);
