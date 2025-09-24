@@ -11,11 +11,11 @@ import bcrypt from "bcrypt";
 //     return  NextResponse.json(result);
 // }
 
-export async function GET(request) {
-    const collection = await dbConnect(collections.users)
-    const result = await collection.find().toArray();
-    return NextResponse.json(result);
-}
+// export async function GET(request) {
+//     const collection = await dbConnect(collections.users)
+//     const result = await collection.find().toArray();
+//     return NextResponse.json(result);
+// }
 
 
 export async function POST(req, res) {
@@ -25,6 +25,14 @@ export async function POST(req, res) {
     if (isExist) return NextResponse.json({success:false, message: "You email already exist", status: 400 });
     const hashPassword = await bcrypt.hash(data.password, 10);
     data.password = hashPassword;
+ 
     const result = await collection.insertOne(data);
+    return NextResponse.json(result);
+}
+
+export async function GET() {
+    const collection = await dbConnect(collections.users)
+    const result = await collection.find().toArray();
+    // console.log(result)
     return NextResponse.json(result);
 }
