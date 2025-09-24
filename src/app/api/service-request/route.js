@@ -6,7 +6,7 @@ export async function POST(req) {
     const body = await req.json();
 
 
-    const collection = dbConnect("serviceRequests");
+    const collection = await dbConnect("serviceRequests");
 
     await collection.insertOne(body);
 
@@ -22,7 +22,7 @@ export async function POST(req) {
 
 export async function GET() {
   try {
-    const collection = dbConnect("serviceRequests");
+    const collection = await dbConnect("serviceRequests");
     const requests = await collection.find().toArray();
 
     return NextResponse.json({ success: true, data: requests });

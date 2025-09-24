@@ -4,7 +4,6 @@
 import Lottie from "lottie-react";
 import loginIllustration from "../../../../public/assets/login/login.json"; 
 import RegisterFrom from "./components/RegisterFrom";
-import FadeIn from "react-fade-in/lib/FadeIn";
 
 export default function SignUpPage() {
   return (
@@ -17,10 +16,8 @@ export default function SignUpPage() {
 
         {/* Right Side Form */}
         <div className=" w-full md:w-1/2 p-10 flex flex-col justify-center">
-        <FadeIn>
           <h2 className="text-2xl font-semibold mb-6 text-center">Sign Up</h2>
           <RegisterFrom></RegisterFrom>
-          </FadeIn>
         </div>
       </div>
     </div>

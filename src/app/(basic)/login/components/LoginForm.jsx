@@ -1,15 +1,13 @@
 "use client";
-import React, { useState } from "react";
+import { useState } from "react";
 // import { signIn, signOut } from "next-auth/react";
-import { useRouter } from "next/navigation";
-import toast from "react-hot-toast";
-import SocialLogin from "./SocialLogin";
 import { userCredentials } from "@/app/actions/authActions";
-import { useSession } from "next-auth/react";
-import Swal from "sweetalert2";
 import { Eye, EyeOff } from "lucide-react";
-import FadeIn from "react-fade-in/lib/FadeIn";
+import { useSession } from "next-auth/react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import Swal from "sweetalert2";
+import SocialLogin from "./SocialLogin";
 
 export default function LoginForm() {
   const router = useRouter();
@@ -32,18 +30,20 @@ export default function LoginForm() {
         Swal.fire({
           icon: "success",
           title: "Login successful",
-        });
+        })
         await update();
-        router.push("/");
+        router.push("/"); 
       }
     } catch (error) {
-      console.log(error);
+      Swal.fire({
+        icon: "error",
+        title: "Something went wrong",
+      })
     }
   };
 
   return (
     <form onSubmit={handleSubmit}>
-      <FadeIn>
         <div>
           <input
             type="email"
@@ -104,7 +104,6 @@ export default function LoginForm() {
             Sign Up
           </Link>
         </p>
-      </FadeIn>
     </form>
   );
 }

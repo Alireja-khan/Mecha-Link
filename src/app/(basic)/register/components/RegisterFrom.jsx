@@ -4,8 +4,8 @@ import React, { useState } from "react";
 import SocialLogin from "../../login/components/SocialLogin";
 import { uploadImageToImgbb } from "@/lib/uploadImgbb";
 import { Eye, EyeOff } from "lucide-react";
-import FadeIn from "react-fade-in/lib/FadeIn";
 import Link from "next/link";
+import Swal from "sweetalert2";
 
 export default function RegisterFrom() {
   const router = useRouter();
@@ -20,28 +20,37 @@ export default function RegisterFrom() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const name = e.target.name.value;
-    const email = e.target.email.value;
-    const password = e.target.password.value;
-
-    const formData = { name, email, password };
-
-    const res = await fetch("/api/register", {
+    const form = e.target;
+    const formData = new FormData(form);
+    const formObj = Object.fromEntries(formData.entries());
+    formObj.profileImage = profileImage;
+    formObj.createdAt = new Date();
+    formObj.role = "user";
+    const response = await fetch("/api/users", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(formData),
-    });
-
-    const data = await res.json();
-    if (data.success) router.push(`/otp?email=${email}`);
-    else alert(data.message);
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(formObj),
+    })
+    const data = await response.json();
+    if (data.insertedId) {
+      Swal.fire({
+        icon: "success",
+        title: "Registration successful",
+        text: "You can login now",
+      })
+      router.push("/login");
+    } else if (!data.success) {
+      Swal.fire({
+        icon: "error",
+        title: "Registration failed",
+        text: data.message,
+      })
+    }
   };
-
-  console.log(profileImage);
-
   return (
     <form onSubmit={handleSubmit}>
-      <FadeIn>
         <div className="mb-4">
           <label htmlFor="imageInput">
             <div className="flex items-center justify-center mt-2 gap-2">
@@ -122,7 +131,6 @@ export default function RegisterFrom() {
             Log in
           </Link>
         </p>
-      </FadeIn>
     </form>
   );
 }
