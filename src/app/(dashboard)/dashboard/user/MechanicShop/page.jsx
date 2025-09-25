@@ -1,9 +1,11 @@
 "use client";
 import React, { useState, useRef, useEffect, forwardRef } from 'react';
 import { useForm, Controller } from 'react-hook-form';
-import { Wrench } from 'lucide-react';
+import { Wrench, X } from 'lucide-react';
 import { toast, Toaster } from 'react-hot-toast';
 import axios from 'axios';
+import useUser from '@/hooks/useUser';
+import { useSession } from 'next-auth/react';
 
 // --- Data for the Form ---
 const shopCategories = [
@@ -40,6 +42,55 @@ const servicesData = [
             "Tires & Wheels": ["Tire Change", "Wheel Balancing"],
             "Body & Care": ["Body Polishing", "Paint Touch-up", "Seat Repair"]
         }
+    },
+    {
+        type: "Trucks & Commercial Vehicles",
+        categories: {
+            "Heavy Duty Engine": [
+                "Diesel Engine Repair & Overhaul",
+                "Fleet Oil & Fluid Service",
+                "Turbocharger Service",
+                "EGR/DPF System Diagnostics & Cleaning (Emissions)",
+                "Commercial Vehicle Tune-ups"
+            ],
+            "Brakes & Air Systems": [
+                "Air Brake System Repair & Inspection",
+                "Hydraulic Brake Service",
+                "Brake Drum/Rotor Replacement",
+                "Air Compressor Repair"
+            ],
+            "Suspension & Steering": [
+                "Leaf Spring Repair & Replacement",
+                "Axle Alignment",
+                "King Pin & Bushing Service",
+                "Heavy-Duty Shock Absorber Replacement"
+            ],
+            "Transmission & Drivetrain": [
+                "Heavy-Duty Clutch Replacement",
+                "Differential Repair",
+                "PTO (Power Take-Off) System Service",
+                "Transmission Fluid Flush & Filter Change"
+            ],
+            "Tires & Wheels": [
+                "Commercial Tire Sales & Service",
+                "Tire Re-treading Management",
+                "Heavy-Duty Wheel Balancing"
+            ],
+            "Body & Trailer": [
+                "Trailer Wiring & Lighting Repair",
+                "Lift Gate/Hydraulic System Repair",
+                "Cab Body Repair & Painting"
+            ]
+        }
+    },
+    {
+        type: "Electric Vehicle (EV)",
+        categories: {
+            "High Voltage Battery": ["Battery Diagnostics & Health Check", "Battery Cooling System Service", "High Voltage Wiring Inspection"],
+            "Electric Motor & Drivetrain": ["Electric Motor Diagnostics", "Gearbox Fluid Change", "Inverter and Converter Service"],
+            "Charging System": ["On-Board Charger Repair", "Charging Port Inspection & Repair"],
+            "Standard EV Services": ["Brake System Inspection", "12V Auxiliary Battery Replacement", "Tire Service"]
+        }
     }
 ];
 
@@ -48,7 +99,8 @@ const weekendOptions = ["Friday", "Saturday", "Sunday", "Monday", "Tuesday", "We
 // --- Custom Dropdown Component ---
 const CustomDropdown = forwardRef(({ options, name, onChange, onBlur, isMulti = true, value }, ref) => {
     const [isOpen, setIsOpen] = useState(false);
-    const [selectedItems, setSelectedItems] = useState(isMulti ? (value || []) : (value ? [value] : []));
+    const initialSelected = isMulti ? (Array.isArray(value) ? value : []) : (value ? [value] : []);
+    const [selectedItems, setSelectedItems] = useState(initialSelected);
     const dropdownRef = useRef(null);
 
     useEffect(() => {
@@ -62,7 +114,7 @@ const CustomDropdown = forwardRef(({ options, name, onChange, onBlur, isMulti = 
     }, []);
 
     useEffect(() => {
-        setSelectedItems(isMulti ? (value || []) : (value ? [value] : []));
+        setSelectedItems(isMulti ? (Array.isArray(value) ? value : []) : (value ? [value] : []));
     }, [value, isMulti]);
 
     const handleToggle = () => setIsOpen(!isOpen);
@@ -81,6 +133,10 @@ const CustomDropdown = forwardRef(({ options, name, onChange, onBlur, isMulti = 
         onChange(isMulti ? newSelected : newSelected[0]);
     };
 
+    const displayValue = isMulti
+        ? selectedItems.length > 0 ? selectedItems.join(', ') : `Select ${name}...`
+        : selectedItems[0] || `Select ${name}...`;
+
     return (
         <div className="relative w-full" ref={dropdownRef}>
             <div
@@ -90,7 +146,7 @@ const CustomDropdown = forwardRef(({ options, name, onChange, onBlur, isMulti = 
                 tabIndex={0}
             >
                 <span className="text-gray-700">
-                    {selectedItems.length > 0 ? selectedItems.join(', ') : `Select ${name}...`}
+                    {displayValue}
                 </span>
                 <svg
                     className={`w-4 h-4 text-gray-500 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`}
@@ -108,7 +164,7 @@ const CustomDropdown = forwardRef(({ options, name, onChange, onBlur, isMulti = 
                 </svg>
             </div>
             {isOpen && (
-                <ul className="absolute z-10 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+                <ul className="absolute z-10 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg overflow-y-auto max-h-60">
                     {options.map((option) => (
                         <li
                             key={option}
@@ -132,7 +188,7 @@ const CertificationsInput = ({ onChange, value }) => {
     const handleAddTag = (e) => {
         if (e.key === 'Enter' || e.key === ',') {
             e.preventDefault();
-            const trimmedInput = inputValue.trim();
+            const trimmedInput = inputValue.trim().replace(/,$/, '');
             if (trimmedInput && !tags.includes(trimmedInput)) {
                 onChange([...tags, trimmedInput]);
                 setInputValue('');
@@ -168,26 +224,110 @@ const CertificationsInput = ({ onChange, value }) => {
     );
 };
 
+// --- Upload Image Function ---
+export const uploadImageToImgbb = async (imageFile) => {
+    const formData = new FormData();
+    formData.append('image', imageFile);
+
+    try {
+        const response = await fetch(`https://api.imgbb.com/1/upload?key=${process.env.NEXT_PUBLIC_ImgBB_API_KEY}`, {
+            method: 'POST',
+            body: formData
+        });
+
+        if (!response.ok) {
+            throw new Error(`ImgBB upload failed: ${response.statusText}`);
+        }
+
+        const data = await response.json();
+        return data?.data?.url;
+    } catch (error) {
+        console.error("Error uploading to ImgBB:", error);
+        throw error;
+    }
+};
+
 // --- Main MechanicShop Component ---
 export default function MechanicShop() {
-    const { register, handleSubmit, control, reset, formState: { errors } } = useForm();
-    const [activeVehicleType, setActiveVehicleType] = useState('Car');
+    const { register, handleSubmit, control, reset, setValue, formState: { errors } } = useForm();
+    const [activeVehicleType, setActiveVehicleType] = useState(servicesData[0].type);
     const [isLoading, setIsLoading] = useState(false);
+    const [logoUrl, setLogoUrl] = useState('');
+    const { data: session } = useSession();
+    const loggedInUser = useUser(session?.user?.email);
+
+    const handleFileUpload = async (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            try {
+                const url = await uploadImageToImgbb(file);
+                setLogoUrl(url);
+                setValue('logo', url);
+                toast.success("Logo uploaded successfully!");
+            } catch (err) {
+                console.error(err);
+                toast.error("Failed to upload logo!");
+            }
+        }
+    };
+
+    const handleRemoveLogo = () => {
+        setLogoUrl('');
+        setValue('logo', '');
+        toast.success("Logo removed.");
+    };
 
     const onInvalid = (errors) => {
-        console.log(errors);
-        toast.error("Please fill in all required fields.");
+        console.log("Form Errors:", errors);
+        toast.error("Please fill in all required fields and check the console for details.");
     };
 
     const onSubmit = async (data) => {
         setIsLoading(true);
+
+        const services = {};
+        for (const [vehicleType, vehicleData] of Object.entries(data.shop.vehicleTypes || {})) {
+            services[vehicleType] = {};
+            for (const [category, serviceArray] of Object.entries(vehicleData.categories || {})) {
+                const validServices = Array.isArray(serviceArray)
+                    ? serviceArray.filter(service => service)
+                    : [];
+
+                if (validServices.length > 0) {
+                    services[vehicleType][category] = validServices;
+                }
+            }
+        }
+
+        const shopData = {
+            ...data.shop,
+            vehicleTypes: services,
+            contact: {
+                ...data.shop.contact,
+                businessEmail: data.businessEmail || null,
+            },
+            logo: logoUrl || null
+        };
+
+        const payload = {
+            userId: loggedInUser?._id || session?.user?.email || null,
+            shop: shopData,
+            certifications: data.certifications,
+            socialLinks: data.socialLinks,
+            createdAt: new Date().toISOString()
+        };
+
+        console.log("Submitting Payload:", payload);
+
         try {
-            const res = await axios.post("/api/shops", data);
+            // This is the API call to your backend endpoint.
+            // Ensure you have a backend set up to handle this POST request.
+            const res = await axios.post("/api/shops", payload);
 
             if (res.status === 200 || res.status === 201) {
                 toast.success("Shop added successfully!");
-                console.log("Inserted ID:", res.data.insertedId);
                 reset();
+                setLogoUrl('');
             } else {
                 toast.error(res.data.message || "Failed to add shop");
             }
@@ -203,13 +343,12 @@ export default function MechanicShop() {
     return (
         <div className="md:container mx-auto py-10 bg-gray-50 min-h-screen">
             <Toaster />
-            <div className="mx-auto">
+            <div className="mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="text-center mb-10">
                     <h1 className="text-4xl font-extrabold text-orange-500 mb-2">Add Mechanic Shop</h1>
                     <p className="text-lg text-gray-600">Create your professional profile and manage your services</p>
                 </div>
 
-                {/* Updated form onSubmit handler to include onInvalid */}
                 <form onSubmit={handleSubmit(onSubmit, onInvalid)} className="grid md:grid-cols-2 gap-8">
                     {/* LEFT COLUMN */}
                     <div className="space-y-8">
@@ -229,15 +368,54 @@ export default function MechanicShop() {
                                     />
                                     {errors.shop?.shopName && <p className="text-sm text-red-500 mt-1">{errors.shop.shopName.message}</p>}
                                 </div>
+
+                                {/* Logo Upload */}
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700">Shop Logo URL</label>
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">Shop Logo (Optional)</label>
                                     <input
-                                        type="url"
-                                        {...register('logo')}
-                                        className="mt-1 block w-full p-2 border border-gray-300 rounded-md focus:ring-orange-500 focus:border-orange-500"
-                                        placeholder="https://example.com/logo.png"
+                                        type="file"
+                                        accept="image/*"
+                                        onChange={handleFileUpload}
+                                        className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:bg-orange-600 file:text-white hover:file:bg-orange-700 cursor-pointer"
                                     />
+                                    {logoUrl && (
+                                        <div className="relative mt-4 inline-block">
+                                            <img src={logoUrl} alt="Shop Logo" className="h-20 object-contain" />
+                                            <button
+                                                type="button"
+                                                onClick={handleRemoveLogo}
+                                                className="absolute -top-2 -right-2 h-5 w-5 bg-red-500 text-white rounded-full text-sm leading-none hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 flex items-center justify-center"
+                                                aria-label="Remove logo"
+                                            >
+                                                <X size={14} />
+                                            </button>
+                                        </div>
+                                    )}
                                 </div>
+
+                                {/* Categories */}
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700">Categories</label>
+                                    <Controller
+                                        name="shop.categories"
+                                        control={control}
+                                        defaultValue=""
+                                        rules={{ required: "Please select a category" }}
+                                        render={({ field }) => (
+                                            <CustomDropdown
+                                                options={shopCategories}
+                                                name="Category"
+                                                onChange={field.onChange}
+                                                onBlur={field.onBlur}
+                                                value={field.value}
+                                                isMulti={false}
+                                            />
+                                        )}
+                                    />
+                                    {errors.shop?.categories && <p className="text-sm text-red-500 mt-1">{errors.shop.categories.message}</p>}
+                                </div>
+
+                                {/* Certifications */}
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700">Certifications (separate with commas)</label>
                                     <Controller
@@ -247,17 +425,19 @@ export default function MechanicShop() {
                                         render={({ field }) => <CertificationsInput onChange={field.onChange} value={field.value} />}
                                     />
                                 </div>
+
+                                {/* Shop Details Textarea */}
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700">Categories</label>
-                                    <Controller
-                                        name="shop.categories"
-                                        control={control}
-                                        defaultValue={[]}
-                                        rules={{ required: "At least one category is required" }}
-                                        render={({ field }) => <CustomDropdown options={shopCategories} name="Categories" onChange={field.onChange} onBlur={field.onBlur} value={field.value} />}
-                                    />
-                                    {errors.shop?.categories && <p className="text-sm text-red-500 mt-1">{errors.shop.categories.message}</p>}
+                                    <label className="block text-sm font-medium text-gray-700">Shop Details</label>
+                                    <textarea
+                                        {...register('shop.details')}
+                                        rows={4}
+                                        className="mt-1 block w-full p-2 border border-gray-300 rounded-md focus:ring-orange-500 focus:border-orange-500"
+                                        placeholder="Add detailed description of your shop, services, or specialties..."
+                                    ></textarea>
                                 </div>
+
+                                {/* Address */}
                                 <fieldset className="border border-gray-200 p-4 rounded-lg space-y-2">
                                     <legend className="px-2 text-md font-medium text-orange-600">Address</legend>
                                     <div>
@@ -288,14 +468,18 @@ export default function MechanicShop() {
                             <h2 className="flex items-center gap-2 text-xl font-semibold text-orange-600 mb-4">Contact & Social Links</h2>
                             <div className="space-y-4">
                                 <div>
+                                    <label className="block text-sm font-medium text-gray-700">Business Email (optional)</label>
+                                    <input
+                                        type="email"
+                                        {...register('businessEmail')}
+                                        className="mt-1 block w-full p-2 border border-gray-300 rounded-md focus:ring-orange-500 focus:border-orange-500"
+                                        placeholder="you@business.com"
+                                    />
+                                </div>
+                                <div>
                                     <label className="block text-sm font-medium text-gray-700">Phone</label>
                                     <input type="tel" {...register('shop.contact.phone', { required: "Phone number is required" })} className="mt-1 block w-full p-2 border border-gray-300 rounded-md focus:ring-orange-500 focus:border-orange-500" />
                                     {errors.shop?.contact?.phone && <p className="text-sm text-red-500 mt-1">{errors.shop.contact.phone.message}</p>}
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700">Email</label>
-                                    <input type="email" {...register('shop.contact.email', { required: "Email is required" })} className="mt-1 block w-full p-2 border border-gray-300 rounded-md focus:ring-orange-500 focus:border-orange-500" />
-                                    {errors.shop?.contact?.email && <p className="text-sm text-red-500 mt-1">{errors.shop.contact.email.message}</p>}
                                 </div>
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700">WhatsApp (optional)</label>
@@ -304,10 +488,6 @@ export default function MechanicShop() {
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700">Facebook URL (optional)</label>
                                     <input type="url" {...register('socialLinks.facebook')} className="mt-1 block w-full p-2 border border-gray-300 rounded-md focus:ring-orange-500 focus:border-orange-500" />
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700">LinkedIn URL (optional)</label>
-                                    <input type="url" {...register('socialLinks.linkedin')} className="mt-1 block w-full p-2 border border-gray-300 rounded-md focus:ring-orange-500 focus:border-orange-500" />
                                 </div>
                             </div>
                         </div>
@@ -342,33 +522,51 @@ export default function MechanicShop() {
                             </div>
                         </div>
 
-                        {/* Services Offered */}
+                        {/* Services Offered - Updated to include all types */}
                         <div className="p-6 bg-white rounded-xl shadow-lg space-y-4 border border-gray-200">
                             <h2 className="flex items-center gap-2 text-xl font-semibold text-orange-600 mb-4">
                                 <Wrench className="h-6 w-6 text-orange-500" /> Services Offered
                             </h2>
-                            <div className="flex gap-4 mb-4">
-                                <button type="button" onClick={() => setActiveVehicleType('Car')} className={`px-6 py-2 rounded-lg font-semibold transition-colors ${activeVehicleType === 'Car' ? 'bg-orange-600 text-white shadow-md' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}`}>Car Services</button>
-                                <button type="button" onClick={() => setActiveVehicleType('Motorcycle')} className={`px-6 py-2 rounded-lg font-semibold transition-colors ${activeVehicleType === 'Motorcycle' ? 'bg-orange-600 text-white shadow-md' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}`}>Motorcycle Services</button>
+                            {/* Vehicle Type Tabs */}
+                            <div className="flex flex-wrap gap-3 mb-4 pb-2">
+                                {servicesData.map(vehicle => (
+                                    <button
+                                        key={vehicle.type}
+                                        type="button"
+                                        onClick={() => setActiveVehicleType(vehicle.type)}
+                                        className={`px-4 py-2 rounded-lg text-sm font-semibold transition-colors whitespace-nowrap ${activeVehicleType === vehicle.type ? 'bg-orange-600 text-white shadow-md' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}`}
+                                    >
+                                        {vehicle.type}
+                                    </button>
+                                ))}
                             </div>
-                            {servicesData.filter(vehicle => vehicle.type === activeVehicleType).map(vehicle => (
-                                <div key={vehicle.type} className="border-b border-gray-200 pb-4 mb-4 last:border-b-0">
-                                    <h3 className="text-lg font-bold text-gray-800 mb-2">{vehicle.type} Services</h3>
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                        {Object.entries(vehicle.categories).map(([category, services]) => (
-                                            <div key={category} className="space-y-2">
-                                                <h4 className="text-md font-medium text-orange-700">{category}</h4>
-                                                {services.map(service => (
-                                                    <label key={service} className="flex items-center gap-3 cursor-pointer select-none">
-                                                        <input type="checkbox" value={service} {...register(`shop.vehicleTypes.${vehicle.type}.categories.${category}`)} className="w-5 h-5 accent-orange-500 rounded-md cursor-pointer" />
-                                                        <span className="text-gray-800">{service}</span>
-                                                    </label>
-                                                ))}
-                                            </div>
-                                        ))}
+
+                            {/* Services Checkboxes */}
+                            {servicesData
+                                .filter(vehicle => vehicle.type === activeVehicleType)
+                                .map(vehicle => (
+                                    <div key={vehicle.type} className="border-b border-gray-200 pb-4 mb-4 last:border-b-0">
+                                        <h3 className="text-lg font-bold text-gray-800 mb-2">{vehicle.type} Services</h3>
+                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                            {Object.entries(vehicle.categories).map(([category, services]) => (
+                                                <div key={category} className="space-y-2">
+                                                    <h4 className="text-md font-medium text-orange-700">{category}</h4>
+                                                    {services.map(service => (
+                                                        <label key={service} className="flex items-center gap-3 cursor-pointer select-none">
+                                                            <input
+                                                                type="checkbox"
+                                                                value={service}
+                                                                {...register(`shop.vehicleTypes.${vehicle.type}.categories.${category}`)}
+                                                                className="w-5 h-5 accent-orange-500 rounded-md cursor-pointer"
+                                                            />
+                                                            <span className="text-gray-800">{service}</span>
+                                                        </label>
+                                                    ))}
+                                                </div>
+                                            ))}
+                                        </div>
                                     </div>
-                                </div>
-                            ))}
+                                ))}
                         </div>
                     </div>
 
