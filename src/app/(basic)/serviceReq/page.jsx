@@ -10,7 +10,7 @@ const ServiceReq = () => {
   useEffect(() => {
     const fetchRequests = async () => {
       try {
-        const res = await fetch("/api/serviceRequests"); // ✅ fixed URL
+        const res = await fetch("/api/service-request"); // ✅ fixed URL
         const data = await res.json();
         if (data.success) {
           setRequests(data.data);
