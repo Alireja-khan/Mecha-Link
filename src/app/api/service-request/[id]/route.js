@@ -1,13 +1,13 @@
-import dbConnect from "@/lib/dbConnect";
+import dbConnect, { collections } from "@/lib/dbConnect";
 import { ObjectId } from "mongodb";
 
 
 export async function GET(req, { params }) {
   try {
-    const { id } = params;
+    const { id } = await params;
 
   
-  const collection = await dbConnect("serviceRequests");
+  const collection = await dbConnect(collections.serviceRequests);
 
     const request = await collection.findOne({ _id: new ObjectId(id) });
 
