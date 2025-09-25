@@ -22,6 +22,7 @@ import {
   Store,
 } from "lucide-react";
 import Image from "next/image";
+import { FaGear } from "react-icons/fa6";
 
 const Sidebar = ({ role = "user" }) => {
   const [collapsed, setCollapsed] = useState(false);
@@ -116,23 +117,22 @@ const Sidebar = ({ role = "user" }) => {
         className={`p-6 text-xl font-bold border-b border-gray-200 flex ${collapsed ? "justify-center" : ""
           }`}
       >
-        {collapsed ? (
-          <Link href={"/"}>ML</Link>
-        ) : (
-          <>
-            <Link href={"/"}>
-              <Image
-                width={95}
-                height={95}
-                alt="MechaLink logo"
-                src={"/logo.png"}
-              />
-            </Link>
-          </>
-        )}
-        <div className="p-6 text-xl font-bold border-b border-gray-200">
-          {collapsed ? "ML" : "MechaLink"}
+        <div className=" text-xl font-bold ">
+          {collapsed ? <FaGear className="h-7  w-7" /> : "MechaLink"}
         </div>
+
+        {/* Collapse button */}
+      <div className="border-t border-gray-200 p-4 flex flex-col gap-2">
+        <button
+          onClick={() => setCollapsed(!collapsed)}
+          className="flex items-center gap-2 p-2 rounded-lg hover:bg-gray-100 transition"
+        >
+          {collapsed ? <ChevronRight size={20} /> : <ChevronLeft size={20} />}
+          {!collapsed && <span>Collapse</span>}
+        </button>
+      </div>
+
+      
       </div>
       {/* Menu */}
       <nav className="flex-1 p-4 space-y-2">

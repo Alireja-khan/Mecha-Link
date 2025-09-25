@@ -10,10 +10,10 @@ const ServiceReq = () => {
   useEffect(() => {
     const fetchRequests = async () => {
       try {
-        const res = await fetch("/api/service-request"); 
+        const res = await fetch("/api/serviceRequests"); // ✅ fixed URL
         const data = await res.json();
         if (data.success) {
-          setRequests(data.data); 
+          setRequests(data.data);
         }
       } catch (error) {
         console.error("❌ Error fetching requests:", error);
@@ -30,7 +30,7 @@ const ServiceReq = () => {
   return (
     <div className="space-y-6">
       {requests.map((req) => (
-        <ServiceReqCard key={req._id} request={req} />
+        <ServiceReqCard key={req._id} request={req} mode="summary" />
       ))}
     </div>
   );

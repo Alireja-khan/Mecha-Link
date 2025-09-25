@@ -7,6 +7,7 @@ import toast from "react-hot-toast";
 import AddressSelector from "../../components/AddressSelector";
 import Swal from "sweetalert2";
 import { useSession } from "next-auth/react";
+import useUser from "@/hooks/useUser";
 
 // Vehicle brands and models data
 const VEHICLE_BRANDS = {
@@ -113,6 +114,8 @@ const ServiceRequest = () => {
   const watchImages = watch("images");
   const watchUrgency = watch("urgency");
   const watchBrand = watch("brand");
+  const { data: session, status } = useSession();
+  const loggedInUser = useUser(session?.user?.email)
 
   // Reset form fields when device type changes
   useEffect(() => {
@@ -169,8 +172,8 @@ const ServiceRequest = () => {
     }
   };
 
-  const { data: session } = useSession();
-
+  // const { data: session } = useSession();
+  console.log(loggedInUser)
 
   // Handle form submit
   const onSubmit = async (data) => {
@@ -202,8 +205,10 @@ const ServiceRequest = () => {
         toast.dismiss();
       }
 
+
+
       const formData = {
-        userId: "USR789", // optional if you want a user id
+        userId: loggedInUser._id, // optional if you want a user id
         userEmail: session?.user?.email || "guest@example.com", // add email here
         deviceType: data.deviceType,
         problemCategory: data.problemCategory,
