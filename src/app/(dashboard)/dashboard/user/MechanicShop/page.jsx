@@ -459,6 +459,17 @@ export default function MechanicShop() {
                                         <label className="block text-sm font-medium text-gray-700">Postal Code</label>
                                         <input type="text" {...register('shop.address.postalCode')} className="mt-1 block w-full p-2 border border-gray-300 rounded-md focus:ring-orange-500 focus:border-orange-500" />
                                     </div>
+                                    {/* NEW: Google Maps URL Input */}
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700">Google Maps URL (Optional)</label>
+                                        <input
+                                            type="url"
+                                            {...register('shop.address.mapUrl')}
+                                            className="mt-1 block w-full p-2 border border-gray-300 rounded-md focus:ring-orange-500 focus:border-orange-500"
+                                            placeholder="Paste the Google Maps 'Share' link or Embed URL"
+                                        />
+                                    </div>
+                                    {/* END NEW */}
                                 </fieldset>
                             </div>
                         </div>
@@ -468,6 +479,11 @@ export default function MechanicShop() {
                             <h2 className="flex items-center gap-2 text-xl font-semibold text-orange-600 mb-4">Contact & Social Links</h2>
                             <div className="space-y-4">
                                 <div>
+                                    <label className="block text-sm font-medium text-gray-700">Phone</label>
+                                    <input type="tel" {...register('shop.contact.phone', { required: "Phone number is required" })} className="mt-1 block w-full p-2 border border-gray-300 rounded-md focus:ring-orange-500 focus:border-orange-500" />
+                                    {errors.shop?.contact?.phone && <p className="text-sm text-red-500 mt-1">{errors.shop.contact.phone.message}</p>}
+                                </div>
+                                <div>
                                     <label className="block text-sm font-medium text-gray-700">Business Email (optional)</label>
                                     <input
                                         type="email"
@@ -475,11 +491,6 @@ export default function MechanicShop() {
                                         className="mt-1 block w-full p-2 border border-gray-300 rounded-md focus:ring-orange-500 focus:border-orange-500"
                                         placeholder="you@business.com"
                                     />
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700">Phone</label>
-                                    <input type="tel" {...register('shop.contact.phone', { required: "Phone number is required" })} className="mt-1 block w-full p-2 border border-gray-300 rounded-md focus:ring-orange-500 focus:border-orange-500" />
-                                    {errors.shop?.contact?.phone && <p className="text-sm text-red-500 mt-1">{errors.shop.contact.phone.message}</p>}
                                 </div>
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700">WhatsApp (optional)</label>
