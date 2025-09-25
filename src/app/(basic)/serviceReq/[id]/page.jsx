@@ -18,10 +18,12 @@ import {
     Map,
     Image as ImageIcon
 } from "lucide-react";
+import { useParams } from "next/navigation";
 
-const ServiceRequestDetails = (id) => {
+const ServiceRequestDetails = () => {
     const [selectedImage, setSelectedImage] = useState(null);
     const [request, setRequest] = useState(null);
+    const {id} = useParams();
 
     useEffect(() => {
         fetch(`/api/service-request/${id}`)
