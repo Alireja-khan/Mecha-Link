@@ -7,6 +7,7 @@ export const collections = {
   vehicles: "vehicles",
   mechanics: "mechanics",
   bookings: "bookings",
+  serviceRequests: "serviceRequests"
 };
 
 let client;
