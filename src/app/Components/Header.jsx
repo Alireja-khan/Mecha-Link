@@ -49,7 +49,8 @@ export default function Header() {
 
   const navigation = [
     { href: "/", label: "Home" },
-    { href: "/services", label: "Services" },
+    { href: "/services", label: "Mechanic Shops" },
+    { href: "/serviceReq", label: "Service requests" },
     { href: "/about", label: "About" },
   ];
 
