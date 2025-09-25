@@ -4,6 +4,8 @@ import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import L from "leaflet";
 import Image from "next/image";
 import { Check, Headset, Share2, UserPlus } from "lucide-react";
+import { useParams } from "next/navigation";
+import { useEffect, useState } from "react";
 
 // Fix marker icon issue
 delete L.Icon.Default.prototype._getIconUrl;
@@ -15,6 +17,17 @@ L.Icon.Default.mergeOptions({
 });
 
 export default function ServiceDetailsPage() {
+  const {id} = useParams();
+  const [shopdata, setShopdata] = useState({});
+  useEffect(() => {
+    fetch(`/api/shops/${id}`)
+      .then((res) => res.json())
+      .then((data) => {
+        setShopdata(data);
+      });
+  }, [id]);
+
+  console.log(shopdata)
   const position = [23.8041, 90.4152];
 
   return (
@@ -38,16 +51,16 @@ export default function ServiceDetailsPage() {
           <div className="flex items-center gap-4 mt-2">
             <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-white">
               <Image
-                src="https://miro.medium.com/1*JktzC9GrA_l4yz0cCy8a5Q.jpeg"
-                alt="AutoFix Garage"
+                src={shopdata.shop?.logo || ""}
+                alt={shopdata.shop?.shopName || ""}
                 width={48}
                 height={48}
                 className="object-cover"
               />
             </div>
             <div>
-              <p className="font-semibold">AutoFix Garage.</p>
-              <p className="text-sm">4.9 (127 reviews)</p>
+              <p className="font-semibold">{shopdata.shop?.shopName}</p>
+              <p className="text-sm">{shopdata.avgRating? shopdata.avgRating : "0"} ({shopdata.reviews?.length} reviews)</p>
             </div>
           </div>
         </div>
