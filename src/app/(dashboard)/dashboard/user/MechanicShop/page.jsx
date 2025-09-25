@@ -304,13 +304,14 @@ export default function MechanicShop() {
             vehicleTypes: services,
             contact: {
                 ...data.shop.contact,
+                email: loggedInUser?.email || null,
                 businessEmail: data.businessEmail || null,
             },
             logo: logoUrl || null
         };
 
         const payload = {
-            userId: loggedInUser?._id || session?.user?.email || null,
+            userId: loggedInUser?._id || null,
             shop: shopData,
             certifications: data.certifications,
             socialLinks: data.socialLinks,
