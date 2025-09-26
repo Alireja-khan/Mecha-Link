@@ -26,6 +26,8 @@ export default function Services() {
   }, [searchTerm, sortOrder, itemsPerPage, currentPage]);
   const { result: services, totalDocs, totalPage } = totalData;
 
+  console.log(services);
+
   // ===== Handlers =====
   const handleSearch = (e) => {
     setSearchTerm(e.target.value);

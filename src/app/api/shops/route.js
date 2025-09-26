@@ -20,6 +20,13 @@ export async function GET(req) {
     const page = parseInt(searchParams.get("page"));
     const limit = parseInt(searchParams.get("limit"));
 
+    const home = searchParams.get("home");
+    if (home) {
+      const collection = await dbConnect(collections.mechanicShops);
+      const result = await collection.find().limit(6).toArray();
+      return NextResponse.json(result);
+    }
+
     let matchStage = {};
     if (search) {
       matchStage = {
