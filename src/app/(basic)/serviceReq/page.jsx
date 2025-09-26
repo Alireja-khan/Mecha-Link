@@ -48,6 +48,12 @@ const ServiceReq = () => {
     fetchRequests();
   }, []);
 
+  // Handler for status changes (like previous component)
+  const handleStatusChange = (requestId, newStatus) => {
+    // Optional: Update local state if needed
+    console.log(`Request ${requestId} status changed to ${newStatus}`);
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
 
@@ -101,7 +107,7 @@ const ServiceReq = () => {
               No Requests Found
             </p>
             <p className="text-gray-500">
-              You’re all caught up! There are currently no pending service
+              You're all caught up! There are currently no pending service
               requests.
             </p>
           </div>
@@ -110,7 +116,12 @@ const ServiceReq = () => {
         {!loading && requests.length > 0 && (
           <div className="space-y-6 pt-10">
             {requests.map((req) => (
-              <ServiceReqCard key={req._id} request={req} mode="summary" />
+              <ServiceReqCard 
+                key={req._id} 
+                request={req} 
+                mode="summary" 
+                onStatusChange={handleStatusChange}
+              />
             ))}
           </div>
         )}

@@ -64,7 +64,9 @@ const ServiceReqCard = ({ request, mode = "summary", onStatusChange }) => {
   const status = getValue(request, 'status', 'pending').toLowerCase();
   const urgencyInfo = urgencyConfig[urgency] || urgencyConfig.medium;
   const statusInfo = statusConfig[status] || statusConfig.pending;
-  const detailsUrl = `/service-requests/${request._id}`;
+  
+  // FIXED: Use the same URL pattern as previous component
+  const detailsUrl = `/serviceReq/${request._id}`;
 
   // --- Handlers ---
 
@@ -76,15 +78,33 @@ const ServiceReqCard = ({ request, mode = "summary", onStatusChange }) => {
 
     setIsLoading(true);
     try {
-      // Simulate API call
-      // const response = await fetch(`/api/service-request/${request._id}`, { ... });
-      // if (response.ok) {
-      if (onStatusChange) onStatusChange(request._id, "accepted");
-      // } else { ... }
+      const response = await fetch(`/api/service-request/${request._id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          status: "accepted",
+          acceptedDate: new Date().toISOString(),
+        }),
+      });
+      
+      if (response.ok) {
+        // Option 1: Reload page (like previous component)
+        window.location.reload();
+        // Option 2: Call callback if provided
+        // if (onStatusChange) onStatusChange(request._id, "accepted");
+      } else {
+        console.error("Failed to accept request");
+      }
     } catch (error) {
       console.error("Error accepting request:", error);
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handleViewDetails = () => {
+    if (request?._id) {
+      router.push(`/serviceReq/${request._id}`);
     }
   };
 
@@ -115,10 +135,8 @@ const ServiceReqCard = ({ request, mode = "summary", onStatusChange }) => {
   }
 
   return (
-    <div className=" py-4">
-      {/* Container applied here: md:container mx-auto */}
+    <div className="py-4">
       <div className="container mx-auto px-4 md:px-6 lg:px-8">
-
         <div className="flex flex-col md:flex-row bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-100 transition-all duration-300 hover:shadow-2xl">
 
           {/* 1. UNIQUE LEFT PANEL: Status and Date/Time */}
@@ -155,14 +173,14 @@ const ServiceReqCard = ({ request, mode = "summary", onStatusChange }) => {
                 </p>
               </div>
 
-              {/* Action Button */}
+              {/* Action Button - FIXED: Using correct URL */}
               <Link
                 href={detailsUrl}
                 className="flex items-center gap-2 px-5 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors font-semibold shadow-lg"
                 prefetch={false}
               >
                 <Eye className="w-4 h-4" />
-                Details
+                View Details
               </Link>
             </div>
 
@@ -226,7 +244,7 @@ const ServiceReqCard = ({ request, mode = "summary", onStatusChange }) => {
                   />
                 </div>
 
-                {/* Accept Action Button */}
+                {/* Accept Action Button - FIXED: Using real API call like previous component */}
                 {status === "pending" && (
                   <div className="pt-6">
                     <button
