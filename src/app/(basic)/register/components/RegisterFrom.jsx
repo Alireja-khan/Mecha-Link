@@ -40,9 +40,18 @@ export default function RegisterFrom() {
       Swal.fire({
         icon: "success",
         title: "Registration successful",
-        text: "You can login now",
+        text: "Please verify your email with OTP",
       });
-      router.push("/login");
+
+      // send OTP right after registration
+      await fetch("/api/send-otp", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: formObj.email }),
+      });
+
+      // redirect to OTP page with email param
+      router.push(`/otp?email=${formObj.email}`);
     } else if (!data.success) {
       Swal.fire({
         icon: "error",

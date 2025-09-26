@@ -24,18 +24,30 @@ export default function ForgetPassForm() {
 
     try {
       setLoading(true);
-      // TODO: call your backend API to send reset link
-      // await sendResetLink({ email });
 
-      Swal.fire({
-        icon: "success",
-        title: "Reset link sent to your email",
+      // Call your forgot-password API
+      const res = await fetch("/api/auth/forgot-password", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email }),
       });
 
-      // Optionally redirect back to login
-      router.push("/login");
+      const data = await res.json();
+
+      if (data.success) {
+        Swal.fire({
+          icon: "success",
+          title: "Reset link sent to your email",
+        });
+        router.push("/login");
+      } else {
+        Swal.fire({
+          icon: "error",
+          title: data.message || "Failed to send reset link",
+        });
+      }
     } catch (error) {
-      console.log(error);
+      console.error(error);
       toast.error("Something went wrong");
     } finally {
       setLoading(false);
@@ -44,29 +56,29 @@ export default function ForgetPassForm() {
 
   return (
     <form onSubmit={handleSubmit}>
-        <div>
-          <input
-            type="email"
-            name="email"
-            placeholder="Enter your email"
-            className="w-full border rounded-md px-3 py-2 outline-none focus:ring-1 mb-4"
-          />
-        </div>
+      <div>
+        <input
+          type="email"
+          name="email"
+          placeholder="Enter your email"
+          className="w-full border rounded-md px-3 py-2 outline-none focus:ring-1 mb-4"
+        />
+      </div>
 
-        <button
-          type="submit"
-          disabled={loading}
-          className="w-full bg-primary font-semibold text-white py-2 rounded-md transition cursor-pointer mb-4 disabled:opacity-50"
-        >
-          {loading ? "Sending..." : "Send Reset Link"}
-        </button>
+      <button
+        type="submit"
+        disabled={loading}
+        className="w-full bg-primary font-semibold text-white py-2 rounded-md transition cursor-pointer mb-4 disabled:opacity-50"
+      >
+        {loading ? "Sending..." : "Send Reset Link"}
+      </button>
 
-        <p className="text-center text-sm mt-2">
-          Remembered your password?{" "}
-          <Link href="/login" className="text-primary hover:underline">
-            Back to Login
-          </Link>
-        </p>
+      <p className="text-center text-sm mt-2">
+        Remembered your password?{" "}
+        <Link href="/login" className="text-primary hover:underline">
+          Back to Login
+        </Link>
+      </p>
     </form>
   );
 }
