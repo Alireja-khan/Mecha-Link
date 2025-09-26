@@ -42,7 +42,7 @@ const Topbar = ({ pageTitle = "Dashboard" }) => {
 
         <div className="w-px h-6 bg-gray-200 hidden sm:block" />
 
-        <div className="flex items-center gap-3 cursor-pointer p-1 rounded-full hover:bg-gray-100 transition">
+        <div className="flex items-center gap-2 cursor-pointer py-1 pl-1 pr-6 rounded-full hover:bg-gray-100 transition">
           <img
             src="https://ui-avatars.com/api/?name=Admin&background=f97316&color=fff&bold=true"
             alt="User Avatar"
