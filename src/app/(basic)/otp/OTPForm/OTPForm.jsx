@@ -9,14 +9,15 @@ export default function OTPForm() {
   const [otp, setOtp] = useState("");
   const [loading, setLoading] = useState(false);
 
+  // ✅ extract email once
+  const email = new URLSearchParams(window.location.search).get("email");
+
   const handleChange = (e) => {
     setOtp(e.target.value.replace(/\D/, ""));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const email = new URLSearchParams(window.location.search).get("email");
-
     const res = await fetch("/api/verify-otp", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -31,7 +32,7 @@ export default function OTPForm() {
     const res = await fetch("/api/send-otp", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email: "user@example.com" }),
+      body: JSON.stringify({ email }),
     });
     const data = await res.json();
     if (data.success) {
@@ -40,6 +41,7 @@ export default function OTPForm() {
       Swal.fire("Failed", "Could not send OTP", "error");
     }
   };
+
 
   return (
     <form onSubmit={handleSubmit}>

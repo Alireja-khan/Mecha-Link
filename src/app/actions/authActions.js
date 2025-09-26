@@ -14,10 +14,10 @@ export async function userCredentials(formData) {
     return { success: false, message: "User not found" };
   }
 
-  const passCheck= await bcrypt.compare(password, user.password || "");
-  if(!passCheck) {
-    return { success: false, message: "Invalid password" };
-  }
+  // const passCheck= await bcrypt.compare(password, user.password || "");
+  // if(!passCheck) {
+  //   return { success: false, message: "Invalid password" };
+  // }
   try {
      await signIn("credentials", {
       email,
