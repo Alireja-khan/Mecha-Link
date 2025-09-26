@@ -19,6 +19,12 @@ export async function userCredentials(formData) {
     return { success: false, message: "User not found" };
   }
 
+
+  // const passCheck= await bcrypt.compare(password, user.password || "");
+  // if(!passCheck) {
+  //   return { success: false, message: "Invalid password" };
+  // }
+  
   // Check if account is locked
   if (user.lockUntil && user.lockUntil > Date.now()) {
     const minutes = Math.ceil((user.lockUntil - Date.now()) / (60 * 1000));

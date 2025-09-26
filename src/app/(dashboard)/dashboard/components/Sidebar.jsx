@@ -66,37 +66,11 @@ const Sidebar = ({ role = "user" }) => {
         className={`flex items-center p-5 border-b border-gray-100 transition-all duration-300 ${isExpanded ? "justify-start gap-3" : "justify-center"
           }`}
       >
-<<<<<<< HEAD
-        {collapsed ? (
-          <Link href={"/"}>ML</Link>
-        ) : (
-          <>
-            <Link href={"/"}>
-              <Image
-                width={95}
-                height={95}
-                alt="MechaLink logo"
-                src={"/logo.png"}
-              />
-            </Link>
-          </>
-        )}
-        
-      </div>
-      {/* Menu */}
-      <nav className="flex-1 p-4 space-y-2">
-        {[...commonMenu, ...roleMenu[role]].map((item) => (
-          <Link
-            key={item.name}
-            href={item.href}
-            className="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-100 transition"
-=======
         <Link href="/" className="flex items-center gap-2" title="MechaLink Home">
           <FaGear className="h-9 w-9 text-orange-600 spin-slow" />
           <h1
             className={`text-2xl font-extrabold whitespace-nowrap transition-all duration-300 ease-in-out overflow-hidden
             ${isExpanded ? "opacity-100 max-w-[200px]" : "opacity-0 max-w-0"}`}
->>>>>>> dc3f7be04d656e203df6022e45bdb81491e3f524
           >
             Mecha<span className="text-orange-500">Link</span>
           </h1>
