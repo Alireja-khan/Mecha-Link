@@ -1,9 +1,9 @@
 "use client";
-import { useRouter } from "next/navigation";
-import React, { useState } from "react";
+import {useRouter} from "next/navigation";
+import React, {useState} from "react";
 import SocialLogin from "../../login/components/SocialLogin";
-import { uploadImageToImgbb } from "@/lib/uploadImgbb";
-import { Eye, EyeOff } from "lucide-react";
+import {uploadImageToImgbb} from "@/lib/uploadImgbb";
+import {Eye, EyeOff} from "lucide-react";
 import Link from "next/link";
 import Swal from "sweetalert2";
 
@@ -26,6 +26,8 @@ export default function RegisterFrom() {
     formObj.profileImage = profileImage;
     formObj.createdAt = new Date();
     formObj.role = "user";
+    formObj.loginAttempts = 0; 
+    formObj.lockUntil = null;
     const response = await fetch("/api/users", {
       method: "POST",
       headers: {

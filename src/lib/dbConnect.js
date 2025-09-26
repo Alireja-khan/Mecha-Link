@@ -3,10 +3,11 @@ import { MongoClient, ServerApiVersion } from "mongodb";
 const uri = process.env.MONGO_URI;
 export const collections = {
   users: "users",
-  services: "services",
+  mechanicShops: "mechanicShops",
   vehicles: "vehicles",
   mechanics: "mechanics",
   bookings: "bookings",
+  serviceRequests: "serviceRequests"
 };
 
 let client;
@@ -38,17 +39,6 @@ if (process.env.NODE_ENV === "development") {
   clientPromise = client.connect();
 }
 
-async function testConnection() {
-  try {
-    const client = await clientPromise;
-    await client.db("admin").command({ ping: 1 });
-    console.log("✅ MongoDB connection established successfully");
-  } catch (error) {
-    console.error("❌ MongoDB connection failed:", error.message);
-  }
-}
-
-testConnection()
 
 export default async function dbConnect(collectionName) {
   const client = await clientPromise;

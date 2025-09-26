@@ -1,39 +1,57 @@
 import React from "react";
-import { Bell, Plus } from "lucide-react";
+import { Bell, Plus, Search } from "lucide-react";
 
 const Topbar = ({ pageTitle = "Dashboard" }) => {
   return (
-    <header className="w-full flex items-center justify-between px-6 py-3 pb-4 border-b border-gray-200 bg-white">
-      {/* Left: Title + Breadcrumb (simple for now) */}
-      <h1 className="text-xl font-semibold">{pageTitle}</h1>
+    <header className="w-full sticky top-0 z-20 flex items-center justify-between px-8 py-3.5 border-b border-gray-100 bg-white">
 
-      {/* Right: Actions */}
-      <div className="flex items-center gap-4">
-        {/* Search bar */}
-        <input
-          type="text"
-          placeholder="Search..."
-          className="hidden md:block px-3 py-2 text-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-        />
+      <h1 className="text-2xl font-extrabold text-gray-800">
+        {pageTitle}
+      </h1>
 
-        {/* Notification */}
-        <button className="p-2 rounded-lg hover:bg-gray-100 transition">
-          <Bell size={20} />
-        </button>
+      <div className="flex items-center gap-5">
 
-        {/* Quick Action */}
-        <button className="px-3 py-2 rounded-lg bg-primary text-white text-sm hover:bg-accent hover:text-primary cursor-pointer transition flex items-center gap-1">
-          <Plus size={16} /> <span className="hidden sm:block">New Booking</span>
-        </button>
-
-        {/* User Avatar */}
-        <div className="flex items-center gap-2 cursor-pointer p-2 rounded-lg hover:bg-gray-100 transition">
-          <img
-            src="https://ui-avatars.com/api/?name=Admin"
-            alt="User Avatar"
-            className="w-8 h-8 rounded-full"
+        <div className="relative hidden lg:block">
+          <Search size={18} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+          <input
+            type="text"
+            placeholder="Search transactions, users, etc."
+            className="w-80 px-4 py-2 pl-10 text-sm border border-gray-200 rounded-xl bg-gray-50 
+                       focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500 transition"
           />
-          <span className="hidden md:block text-sm font-medium">Admin</span>
+        </div>
+
+        <div className="flex items-center gap-3">
+
+          <button
+            title="Notifications"
+            className="p-3 rounded-full text-gray-600 hover:bg-orange-50 hover:text-orange-600 transition duration-150"
+          >
+            <Bell size={20} />
+          </button>
+
+          <button
+            className="px-4 py-2 rounded-xl bg-orange-600 text-white text-sm font-semibold 
+                       hover:bg-orange-700 transition duration-150 shadow-md shadow-orange-300/50
+                       flex items-center gap-1.5"
+            title="Create New Booking"
+          >
+            <Plus size={16} /> <span className="hidden sm:block">New Booking</span>
+          </button>
+        </div>
+
+        <div className="w-px h-6 bg-gray-200 hidden sm:block" />
+
+        <div className="flex items-center gap-2 cursor-pointer py-1 pl-1 pr-6 rounded-full hover:bg-gray-100 transition">
+          <img
+            src="https://ui-avatars.com/api/?name=Admin&background=f97316&color=fff&bold=true"
+            alt="User Avatar"
+            className="w-10 h-10 rounded-full border-2 border-orange-500"
+          />
+          <div className="hidden md:flex flex-col text-left">
+            <span className="text-sm font-semibold text-gray-900">Admin User</span>
+            <span className="text-xs text-gray-500">Admin</span>
+          </div>
         </div>
       </div>
     </header>

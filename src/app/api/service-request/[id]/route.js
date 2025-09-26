@@ -1,29 +1,42 @@
-import dbConnect from "@/lib/dbConnect";
+import dbConnect, { collections } from "@/lib/dbConnect";
 import { ObjectId } from "mongodb";
-
+import { NextResponse } from "next/server";
 
 export async function GET(req, { params }) {
   try {
-    const { id } = params;
+    const { id } = await params;
 
   
-  const collection = await dbConnect("serviceRequests");
+  const collection = await dbConnect(collections.serviceRequests);
 
-    const request = await collection.findOne({ _id: new ObjectId(id) });
+    const pipeline = [
+      { $match: { _id: new ObjectId(id) } },
+      {
+        $lookup: {
+          from: "users",
+          let: { userId: "$userId" }, 
+          pipeline: [
+            {
+              $match: {
+                $expr: { $eq: ["$_id", { $toObjectId: "$$userId" }] },
+              },
+            },
+            { $project: { password: 0 } }, 
+          ],
+          as: "user",
+        },
+      },
+      { $unwind: { path: "$user", preserveNullAndEmptyArrays: true } }, 
+    ];
+
+    const [request] = await collection.aggregate(pipeline).toArray();
 
     if (!request) {
-      return new Response(
-        JSON.stringify({ error: "Service request not found" }),
-        { status: 404 }
-      );
+      return NextResponse.json({ error: "Request not found" }, { status: 404 });
     }
 
-    return new Response(JSON.stringify(request), { status: 200 });
+    return NextResponse.json(request);
   } catch (error) {
-    console.error("❌ Error fetching service request:", error);
-    return new Response(
-      JSON.stringify({ error: "Failed to fetch service request" }),
-      { status: 500 }
-    );
+    return NextResponse.json({error: "Internal Server Error",})
   }
 }
