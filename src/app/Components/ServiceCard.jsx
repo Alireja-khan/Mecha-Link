@@ -8,7 +8,6 @@ export default function ServiceCard({service}) {
   return (
     <div>
       <div
-        key={service.id}
         className="border border-primary rounded-xl overflow-hidden shadow-md h-full flex flex-col group"
       >
         {/* service Image */}
