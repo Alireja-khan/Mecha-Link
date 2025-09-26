@@ -16,6 +16,7 @@ import {
   Zap,
   Calendar,
   CreditCard,
+  Globe,
 } from "lucide-react";
 import CountUp from "react-countup";
 
@@ -62,7 +63,7 @@ const AboutPage = () => {
 
       {/* Stats Section */}
       <section className="py-16 ">
-        <div className="max-w-6xl mx-auto px-6">
+        <div className="container mx-auto px-6">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
             <div className="p-6">
               <div className="text-4xl font-bold text-orange-500 mb-2">
@@ -96,7 +97,7 @@ const AboutPage = () => {
       </section>
 
       {/* Our Story */}
-      <section className="max-w-6xl mx-auto px-6 py-20">
+      <section className="container mx-auto px-6 py-20">
         <div className="text-center mb-16">
           <h2 className="text-4xl font-bold mb-4">Our Story</h2>
           <div className="w-20 h-1 bg-orange-500 mx-auto"></div>
@@ -144,7 +145,7 @@ const AboutPage = () => {
 
       {/* Mission & Vision */}
       <section className="py-20">
-        <div className="max-w-6xl mx-auto px-6">
+        <div className="container mx-auto px-6">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold mb-4">Our Core Philosophy</h2>
             <div className="w-20 h-1 bg-orange-500 mx-auto"></div>
@@ -182,7 +183,7 @@ const AboutPage = () => {
 
       {/* Key Features */}
       <section className="py-20">
-        <div className="max-w-6xl mx-auto px-6">
+        <div className="container mx-auto px-6">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold mb-4">Why Choose MechaLink?</h2>
             <div className="w-20 h-1 bg-orange-500 mx-auto"></div>
@@ -223,7 +224,9 @@ const AboutPage = () => {
               <div className="inline-flex items-center justify-center w-12 h-12 bg-orange-100 rounded-xl mb-4">
                 <CreditCard className="w-6 h-6 text-orange-600" />
               </div>
-              <h3 className="text-xl font-semibold mb-2 text-black">Secure Payments</h3>
+              <h3 className="text-xl font-semibold mb-2 text-black">
+                Secure Payments
+              </h3>
               <p className="text-gray-600">
                 Enjoy hassle-free transactions with multiple payment options and
                 protection policies.
@@ -247,7 +250,9 @@ const AboutPage = () => {
               <div className="inline-flex items-center justify-center w-12 h-12 bg-orange-100 rounded-xl mb-4">
                 <Clock className="w-6 h-6 text-orange-600" />
               </div>
-              <h3 className="text-xl font-semibold mb-2 text-black">Service Tracking</h3>
+              <h3 className="text-xl font-semibold mb-2 text-black">
+                Service Tracking
+              </h3>
               <p className="text-gray-600">
                 Monitor your service request status from booking to completion
                 in real-time.
@@ -258,7 +263,9 @@ const AboutPage = () => {
               <div className="inline-flex items-center justify-center w-12 h-12 bg-orange-100 rounded-xl mb-4">
                 <TrendingUp className="w-6 h-6 text-orange-600" />
               </div>
-              <h3 className="text-xl font-semibold mb-2 text-black">Business Growth</h3>
+              <h3 className="text-xl font-semibold mb-2 text-black">
+                Business Growth
+              </h3>
               <p className="text-gray-600">
                 Mechanics can grow their business with our marketing tools and
                 customer reach.
@@ -270,7 +277,7 @@ const AboutPage = () => {
 
       {/* Technology Stack */}
       <section className="py-20 bg-gradient-to-r from-gray-900 to-gray-800 text-white">
-        <div className="max-w-6xl mx-auto px-6">
+        <div className="container mx-auto px-6">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold mb-4">Our Technology</h2>
             <div className="w-20 h-1 bg-orange-500 mx-auto"></div>
@@ -340,7 +347,7 @@ const AboutPage = () => {
 
       {/* Founder Section */}
       <section className="py-20">
-        <div className="max-w-6xl mx-auto px-6">
+        <div className="container mx-auto px-6">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold mb-4">Leadership Team</h2>
             <div className="w-20 h-1 bg-orange-500 mx-auto"></div>
@@ -359,7 +366,9 @@ const AboutPage = () => {
                   className="w-20 h-20 rounded-full object-cover mr-6 border-4 border-white shadow"
                 />
                 <div>
-                  <h3 className="text-2xl font-semibold text-black">Jhankar Mahbub</h3>
+                  <h3 className="text-2xl font-semibold text-black">
+                    Jhankar Mahbub
+                  </h3>
                   <p className="text-orange-600">Founder & Lead Developer</p>
                   <div className="flex mt-2">
                     {[1, 2, 3, 4, 5].map((star) => (
@@ -457,7 +466,7 @@ const AboutPage = () => {
 
       {/* Team Section */}
       <section className="py-20">
-        <div className="max-w-6xl mx-auto px-6">
+        <div className="container mx-auto px-6">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold mb-4">Our Team</h2>
             <div className="w-20 h-1 bg-orange-500 mx-auto"></div>
@@ -475,36 +484,60 @@ const AboutPage = () => {
                 image:
                   "https://i.ibb.co.com/BK7jhQh5/Gemini-Generated-Image-ddddlp1lddlp1lddlp.png",
                 featured: true,
+                facebook_profile: "https://www.facebook.com/alirejaa.khan",
+                github_profile: "https://github.com/Alireja-khan",
+                linkedin_profile: "https://www.linkedin.com/in/alireja-khan/",
+                portfolio: "https://ali-reja-4b7b7.web.app/",
               },
               {
                 name: "Omar Faruk",
                 role: "Full Stack Developer",
                 image:
                   "https://i.ibb.co.com/ym8mNNbg/Gemini-Generated-Image-i0r1rti0r1rti0r1.png",
+                facebook_profile: "https://www.facebook.com/omarfaruk56305",
+                github_profile: "https://github.com/omarfaruk-pro",
+                linkedin_profile: "https://www.linkedin.com/in/omarfaruk56305",
+                portfolio: "https://faruks-portfolio2.netlify.app/",
               },
               {
                 name: "Abrar Karim Rupu",
                 role: "Fronted Developer",
                 image:
                   "https://i.ibb.co.com/39GVXc3Q/Gemini-Generated-Image-z472a4z472a4z472.png",
+                facebook_profile: "https://www.facebook.com/abrarkarim.rupu.3",
+                github_profile: "https://github.com/Alireja-khan",
+                linkedin_profile: "https://www.linkedin.com/in/alireja-khan/",
+                portfolio: "https://ali-reja-4b7b7.web.app/",
               },
               {
                 name: "MD. Rahimul Haq",
                 role: "Backend Engineer",
                 image:
                   "https://i.ibb.co.com/Cs6LrB64/Gemini-Generated-Image-ynkbetynkbetynkb.png",
+                facebook_profile: "https://www.facebook.com/mdrhtahsin/",
+                github_profile: "https://github.com/mdrahimultahsin",
+                linkedin_profile: "https://www.linkedin.com/in/rahimultahsin/",
+                portfolio: "https://rahimul-portfolio.vercel.app/",
               },
               {
                 name: "Raheel Arfeen Rahat",
                 role: "Frontend Developer",
                 image:
                   "https://i.ibb.co.com/5X6mGPm2/550733568-1845540119507626-4770195972697828670-n.png",
+                facebook_profile: "https://www.facebook.com/RaheelArfeen",
+                github_profile: "https://github.com/RaheelArfeen",
+                linkedin_profile: "https://www.linkedin.com/in/Raheelarfeen/",
+                portfolio: "https://raheelarfeen.com/",
               },
               {
                 name: "MD. Shahan Al Munim",
                 role: "Backend Engineer",
                 image:
                   "https://i.ibb.co.com/v4cTbvVf/Gemini-Generated-Image-89jk6b89jk6b89jk.png",
+                facebook_profile: "https://www.facebook.com/munim9munim",
+                github_profile: "https://github.com/MMunim90",
+                linkedin_profile: "https://www.linkedin.com/in/m-munim/",
+                portfolio: "https://mmunim.netlify.app/",
               },
             ].map((person, i) => (
               <div
@@ -531,7 +564,11 @@ const AboutPage = () => {
                   <h3 className="text-xl font-semibold mb-1">{person.name}</h3>
                   <p className="text-gray-400 mb-4">{person.role}</p>
                   <div className="flex justify-center items-center space-x-3">
-                    <a href="#" className=" hover:text-orange-500 transition">
+                    <a
+                      href={person.facebook_profile}
+                      target="_blank"
+                      className="cursor-pointer hover:text-orange-500 transition"
+                    >
                       <svg
                         className="w-6 h-6"
                         fill="currentColor"
@@ -545,7 +582,11 @@ const AboutPage = () => {
                         />
                       </svg>
                     </a>
-                    <a href="#" className=" hover:text-orange-500 transition">
+                    <a
+                      href={person.linkedin_profile}
+                      target="_blank"
+                      className=" hover:text-orange-500 transition"
+                    >
                       <svg
                         className="w-5 h-5"
                         fill="currentColor"
@@ -555,7 +596,11 @@ const AboutPage = () => {
                         <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.761 0 5-2.239 5-5v-14c0-2.761-2.239-5-5-5zm-11.75 19h-3v-9h3v9zm-1.5-10.25c-.966 0-1.75-.784-1.75-1.75s.784-1.75 1.75-1.75 1.75.784 1.75 1.75-.784 1.75-1.75 1.75zm13.25 10.25h-3v-4.75c0-1.133-.022-2.591-1.578-2.591-1.578 0-1.818 1.231-1.818 2.503v4.838h-3v-9h2.879v1.233h.041c.401-.762 1.381-1.563 2.842-1.563 3.037 0 3.598 2 3.598 4.599v5.731z" />
                       </svg>
                     </a>
-                    <a href="#" className=" hover:text-orange-500 transition">
+                    <a
+                      href={person.github_profile}
+                      target="_blank"
+                      className=" hover:text-orange-500 transition"
+                    >
                       <svg
                         className="w-6 h-6"
                         fill="currentColor"
@@ -568,6 +613,14 @@ const AboutPage = () => {
                           clipRule="evenodd"
                         />
                       </svg>
+                    </a>
+                    
+                    <a
+                      href={person.portfolio}
+                      target="_blank"
+                      className=" hover:text-orange-500 transition"
+                    >
+                      <Globe size={24}/>
                     </a>
                   </div>
                 </div>
