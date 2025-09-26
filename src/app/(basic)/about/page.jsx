@@ -505,9 +505,9 @@ const AboutPage = () => {
                 image:
                   "https://i.ibb.co.com/39GVXc3Q/Gemini-Generated-Image-z472a4z472a4z472.png",
                 facebook_profile: "https://www.facebook.com/abrarkarim.rupu.3",
-                github_profile: "https://github.com/Alireja-khan",
-                linkedin_profile: "https://www.linkedin.com/in/alireja-khan/",
-                portfolio: "https://ali-reja-4b7b7.web.app/",
+                github_profile: "https://github.com/rupu10",
+                linkedin_profile: "https://www.linkedin.com/in/abrar-karim-rupu10/",
+                portfolio: "https://abrar-karim-rupu-portfolio-ok39rkneg-rupu10s-projects.vercel.app/",
               },
               {
                 name: "MD. Rahimul Haq",
