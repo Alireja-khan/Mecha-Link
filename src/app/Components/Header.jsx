@@ -6,6 +6,8 @@ import { usePathname } from "next/navigation";
 import { FaGear } from "react-icons/fa6";
 import { signOut, useSession } from "next-auth/react";
 import { User as UserIcon } from "lucide-react";
+import getUserData from "@/lib/getUserData";
+import useUser from "@/hooks/useUser";
 
 export default function Header() {
   const { data: session, status } = useSession();
@@ -15,7 +17,8 @@ export default function Header() {
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const dropdownRef = useRef(null);
 
-  // Theme load from localStorage
+  const loggedInUser = useUser(session?.user?.email);
+
   useEffect(() => {
     const savedTheme = localStorage.getItem("theme") || "light";
     setTheme(savedTheme);
@@ -46,9 +49,9 @@ export default function Header() {
 
   const navigation = [
     { href: "/", label: "Home" },
-    { href: "/services", label: "Services" },
+    { href: "/services", label: "Mechanic Shops" },
+    { href: "/serviceReq", label: "Service requests" },
     { href: "/about", label: "About" },
-    { href: "/dashboard", label: "Dashboard" },
   ];
 
   return (
@@ -230,7 +233,13 @@ export default function Header() {
                 }}
               >
                 <div className="w-9 h-9 rounded-full bg-gray-200 overflow-hidden flex items-center justify-center">
-                  {session.user?.image ? (
+                  {loggedInUser?.profileImage ? (
+                    <img
+                      src={loggedInUser.profileImage}
+                      alt={loggedInUser.name || "User"}
+                      className="w-full h-full object-cover"
+                    />
+                  ) : session.user?.image ? (
                     <img
                       src={session.user.image}
                       alt={session.user.name || "User"}
@@ -240,7 +249,6 @@ export default function Header() {
                     <UserIcon className="w-5 h-5 text-gray-600" />
                   )}
                 </div>
-                <span className="text-md font-medium">{session.user?.name}</span>
                 <svg
                   className={`w-4 h-4 transition-transform ${
                     userMenuOpen ? "rotate-180" : ""
@@ -262,7 +270,7 @@ export default function Header() {
               {userMenuOpen && (
                 <div className="absolute right-0 mt-2 w-48 bg-white text-black rounded-md shadow-lg py-1 z-50 border border-gray-100">
                   <div className="px-4 py-2 border-b border-gray-100">
-                    <p className="text-sm font-medium">{session.user?.name}</p>
+                    <p className="text-sm font-medium">{loggedInUser?.name}</p>
                     <p className="text-xs truncate">{session.user?.email}</p>
                   </div>
                   <Link
@@ -280,8 +288,8 @@ export default function Header() {
                     Dashboard
                   </Link>
                   <div className="border-t border-gray-100 my-1"></div>
-                  <button
-                    className="block w-full text-left px-4 py-2 text-sm hover:bg-gray-50"
+                  <button type="button"
+                    className="cursor-pointer block w-full text-left px-4 py-2 text-sm hover:bg-gray-50"
                     onClick={() => {
                       signOut();
                       setUserMenuOpen(false);

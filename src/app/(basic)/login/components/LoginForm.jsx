@@ -1,78 +1,113 @@
 "use client";
-import React from "react";
-// import { signIn, signOut } from "next-auth/react";
-import { useRouter } from "next/navigation";
-import toast from "react-hot-toast";
-import SocialLogin from "./SocialLogin";
+import { useState } from "react";
 import { userCredentials } from "@/app/actions/authActions";
+import { Eye, EyeOff } from "lucide-react";
 import { useSession } from "next-auth/react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 import Swal from "sweetalert2";
+import SocialLogin from "./SocialLogin";
 
 export default function LoginForm() {
   const router = useRouter();
-  const {update} = useSession();
+  const { update } = useSession();
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const email = e.target.email.value;
+    const email = e.target.email.value.trim();
     const password = e.target.password.value;
     const formData = { email, password };
+
     try {
       const response = await userCredentials(formData);
+
       if (!response.success) {
         Swal.fire({
           icon: "error",
-          title: response.message || "Invalid username or password",
+          title: "Login Failed",
+          text: response.message || "Invalid email or password",
         });
-      } else {
-        Swal.fire({
-          icon: "success",
-          title: "Login successful",
-        })
-        await update();
-        router.push("/"); 
+        return;
       }
+
+      Swal.fire({
+        icon: "success",
+        title: "Login Successful",
+      });
+      await update();
+      router.push("/");
     } catch (error) {
-      console.log(error);
+      Swal.fire({
+        icon: "error",
+        title: "Something went wrong",
+      });
     }
   };
+
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
+    <form onSubmit={handleSubmit}>
       <div>
         <input
           type="email"
           name="email"
           placeholder="Your email"
-          className="w-full border rounded-md px-3 py-2 outline-none focus:ring-1"
+          className="w-full border rounded-md px-3 py-2 outline-none focus:ring-1 mb-4"
+          required
         />
       </div>
 
-      <div>
+      {/* Password field with toggle */}
+      <div className="relative mb-4">
         <input
-          type="password"
+          type={showPassword ? "text" : "password"}
           name="password"
           placeholder="Your password"
-          className="w-full border rounded-md px-3 py-2 outline-none focus:ring-1"
+          className="w-full border rounded-md px-3 py-2 outline-none focus:ring-1 pr-10"
+          required
         />
+        <button
+          type="button"
+          onClick={() => setShowPassword(!showPassword)}
+          className="absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer"
+        >
+          {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+        </button>
+      </div>
+
+      {/* Remember me & Forgot password */}
+      <div className="flex items-center justify-between mb-4 text-sm">
+        <label className="flex items-center gap-2 cursor-pointer">
+          <input
+            type="checkbox"
+            name="remember"
+            className="h-4 w-4 text-primary border-gray-300 rounded"
+          />
+          Remember me
+        </label>
+
+        <Link href="/ForgetPass" className="text-primary hover:underline">
+          Forgot password?
+        </Link>
       </div>
 
       <button
         type="submit"
-        className="w-full bg-white hover:bg-gray-300 text-black py-2 rounded-md transition cursor-pointer"
+        className="w-full bg-primary font-semibold text-white py-2 rounded-md transition cursor-pointer mb-4"
       >
-        Sign In
+        Log in
       </button>
 
       {/* Social Login */}
-      <p className="text-center">Or Sign In With</p>
-      <SocialLogin></SocialLogin>
+      <p className="text-center">Or Sign in With</p>
+      <SocialLogin />
 
       {/* Sign Up Link */}
       <p className="text-center text-sm mt-6">
         Don't Have an account?{" "}
-        <a href="/register" className="text-blue-500 hover:underline">
+        <Link href="/register" className="text-primary hover:underline">
           Sign Up
-        </a>
+        </Link>
       </p>
     </form>
   );
