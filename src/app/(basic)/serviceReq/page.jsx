@@ -55,7 +55,7 @@ const ServiceReq = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen ">
 
       {/* 1. HERO BANNER SECTION */}
       <section
