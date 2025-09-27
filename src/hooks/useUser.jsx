@@ -13,5 +13,6 @@ export default function useUser(userEmail) {
     })();
   }, [userEmail]);
 
+  console.log(userEmail);
   return user;
 }

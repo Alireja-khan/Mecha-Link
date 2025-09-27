@@ -3,25 +3,15 @@ import { NextResponse } from "next/server";
 import bcrypt from "bcrypt";
 
 
-// export async function GET(request) {
-//     const { searchParams } = new URL(request.url);
-//     const email = searchParams.get('email');
-//     const collection = await dbConnect(collections.users);
-//     const result = await collection.findOne({ email });
-//     return  NextResponse.json(result);
-// }
-
 export async function GET(request) {
-    const collection = await dbConnect(collections.users)
-    const result = await collection.find().toArray();
-    return NextResponse.json(result);
+    const { searchParams } = new URL(request.url);
+    const email = searchParams.get('email');
+    const collection = await dbConnect(collections.users);
+    const result = await collection.findOne({ email });
+    return  NextResponse.json(result);
 }
 
-// export async function GET(request) {
-//     const collection = await dbConnect(collections.users)
-//     const result = await collection.find().toArray();
-//     return NextResponse.json(result);
-// }
+
 
 
 
