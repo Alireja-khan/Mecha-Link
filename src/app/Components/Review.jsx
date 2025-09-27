@@ -95,7 +95,7 @@ const ReviewSection = () => {
 
   return (
     <section className="relative">
-      {/* Title + Description OUTSIDE background image */}
+      {/* Title + Description */}
       <div className="container mx-auto px-4 text-center mb-10">
         <h2 className="text-4xl md:text-5xl font-bold mb-4 font-urbanist">
           What Our <span className="text-primary inline-block">Users Say</span>
@@ -106,12 +106,12 @@ const ReviewSection = () => {
         </p>
       </div>
 
-      {/* Background image + slider */}
+      {/* Background + Slider */}
       <div
         className="relative py-20 bg-fixed bg-center bg-cover"
         style={{
           backgroundImage:
-            "url('https://i.ibb.co.com/3mHvXnzq/jeff-caron-robert-0-CCVIu-Aj-ORE-unsplash.jpg')",
+            "url('https://i.ibb.co/3mHvXnzq/jeff-caron-robert-0-CCVIu-Aj-ORE-unsplash.jpg')",
         }}
       >
         {/* Overlay */}
@@ -120,7 +120,7 @@ const ReviewSection = () => {
         <div className="relative container mx-auto px-4">
           <Swiper
             modules={[Navigation, Pagination, A11y, Autoplay]}
-            spaceBetween={30}
+            spaceBetween={50} // reduced gap
             slidesPerView={1}
             loop={true}
             autoplay={{
@@ -140,15 +140,15 @@ const ReviewSection = () => {
             }}
             onSwiper={setSwiperInstance}
             breakpoints={{
-              640: { slidesPerView: 1 },
-              768: { slidesPerView: 2 },
-              1024: { slidesPerView: 3 },
+              640: { slidesPerView: 1, spaceBetween: 10 },
+              768: { slidesPerView: 2, spaceBetween: 15 },
+              1024: { slidesPerView: 3, spaceBetween: 15 },
             }}
             className="pb-16"
           >
             {reviews.map((review, index) => (
               <SwiperSlide key={index}>
-                <div className="group flex border border-primary flex-col bg-white rounded-xl shadow-md hover:shadow-xl transition-transform duration-300 p-6 scale-80 h-full">
+                <div className="group flex flex-col border border-primary bg-white rounded-xl shadow-md hover:shadow-xl transition-transform duration-300 p-6 h-full">
                   {/* User Profile */}
                   <div className="flex items-center mb-4">
                     <img
@@ -167,14 +167,13 @@ const ReviewSection = () => {
                     {[...Array(5)].map((_, i) => (
                       <Star
                         key={i}
-                        className={`w-5 h-5 mr-1 ${
-                          i < review.rating ? "text-primary" : "text-gray-300"
-                        }`}
+                        className={`w-5 h-5 mr-1 ${i < review.rating ? "text-primary" : "text-gray-300"
+                          }`}
                       />
                     ))}
                   </div>
 
-                  {/* Review Description */}
+                  {/* Review */}
                   <p className="text-gray-700 italic flex-1 leading-relaxed mb-4 min-h-[120px]">
                     "
                     {review.comment.split(" ").length > 30
@@ -183,7 +182,7 @@ const ReviewSection = () => {
                     "
                   </p>
 
-                  {/* Double Quote Icon */}
+                  {/* Quote Icon */}
                   <div className="flex justify-end mt-auto">
                     <Quote className="w-10 h-10 text-primary" />
                   </div>
@@ -196,7 +195,7 @@ const ReviewSection = () => {
           <div className="flex items-center mt-8 w-fit mx-auto space-x-4">
             <button
               ref={prevRef}
-              className="bg-white p-2 rounded-full shadow-lg hover:shadow-xl  hover:text-primary focus:outline-none focus:ring-2 focus:ring-primary text-black"
+              className="bg-white p-2 rounded-full shadow-lg hover:shadow-xl hover:text-primary focus:outline-none focus:ring-2 focus:ring-primary text-black"
             >
               <ChevronLeft className="h-6 w-6" />
             </button>
@@ -205,7 +204,7 @@ const ReviewSection = () => {
 
             <button
               ref={nextRef}
-              className="bg-white p-2 rounded-full shadow-lg hover:shadow-xl  hover:text-primary focus:outline-none focus:ring-2 focus:ring-primary text-black"
+              className="bg-white p-2 rounded-full shadow-lg hover:shadow-xl hover:text-primary focus:outline-none focus:ring-2 focus:ring-primary text-black"
             >
               <ChevronRight className="h-6 w-6" />
             </button>
