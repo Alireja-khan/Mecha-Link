@@ -19,6 +19,7 @@ import {
   Globe,
 } from "lucide-react";
 import CountUp from "react-countup";
+import Image from "next/image";
 
 const AboutPage = () => {
   return (
@@ -109,7 +110,7 @@ const AboutPage = () => {
 
         <div className="grid md:grid-cols-2 gap-16 items-center">
           <div className="relative">
-            <div className="absolute -inset-4 bg-gradient-to-r from-orange-100 to-amber-100 rounded-2xl transform -skew-y-3"></div>
+            <div className="absolute -inset-4 bg-gradient-to-r from-primary/5 to-secondary/10 rounded-2xl transform -skew-y-3"></div>
             <img
               src="https://img.freepik.com/free-vector/car-repair-concept-illustration_114360-1530.jpg"
               alt="MechaLink Illustration"
@@ -513,7 +514,7 @@ const AboutPage = () => {
                 name: "MD. Rahimul Haq",
                 role: "Backend Engineer",
                 image:
-                  "https://i.ibb.co.com/Cs6LrB64/Gemini-Generated-Image-ynkbetynkbetynkb.png",
+                  "https://i.ibb.co.com/JjgLYt6d/IMG-20250927-214815.jpg",
                 facebook_profile: "https://www.facebook.com/mdrhtahsin/",
                 github_profile: "https://github.com/mdrahimultahsin",
                 linkedin_profile: "https://www.linkedin.com/in/rahimultahsin/",
@@ -651,7 +652,7 @@ const AboutPage = () => {
           </div>
           <p className="mt-8 text-orange-100">
             Have questions?{" "}
-            <a href="#" className="text-white font-semibold underline">
+            <a href="https://www.facebook.com/alirejaa.khan" target="_blank" className="text-white font-semibold underline">
               Contact our team
             </a>
           </p>
