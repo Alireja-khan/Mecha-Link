@@ -19,44 +19,47 @@ const OrangeSpinner = () => (
 );
 
 const ServiceReq = () => {
-  const [requests, setRequests] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [totalData, setTotalData] = useState([]);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [itemsPerPage, setItemsPerPage] = useState(10);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [sortOrder, setSortOrder] = useState("");
 
   useEffect(() => {
-    const fetchRequests = async () => {
-      try {
-        const res = await fetch("/api/service-request");
-
-        if (!res.ok) {
-          throw new Error(`HTTP error! status: ${res.status}`);
-        }
-
-        const data = await res.json();
-
-        if (data.success) {
-          setRequests(data.data);
-        } else {
-          console.error("❌ API response indicated failure:", data.message);
-        }
-      } catch (error) {
-        console.error("❌ Error fetching requests:", error);
-      } finally {
+    setLoading(true);
+    fetch(
+      `/api/service-request?search=${searchTerm}&sort=${sortOrder}&limit=${itemsPerPage}&page=${currentPage}`
+    )
+      .then((res) => res.json())
+      .then((data) => {
+        setTotalData(data);
         setLoading(false);
-      }
-    };
+      });
+  }, [searchTerm, itemsPerPage, currentPage, sortOrder]);
+  const { result: requests = [], totalDocs, totalPage } = totalData;
 
-    fetchRequests();
-  }, []);
+  // ===== Handlers =====
+  const handleSearch = (e) => {
+    setSearchTerm(e.target.value);
+    setCurrentPage(1);
+  };
 
-  // Handler for status changes (like previous component)
-  const handleStatusChange = (requestId, newStatus) => {
-    // Optional: Update local state if needed
-    console.log(`Request ${requestId} status changed to ${newStatus}`);
+  const handleSort = (e) => {
+    setSortOrder(e.target.value);
+  };
+
+  const handleItemsPerPage = (e) => {
+    setItemsPerPage(parseInt(e.target.value));
+    setCurrentPage(1);
+  };
+
+  const handlePageChange = (page) => {
+    setCurrentPage(page);
   };
 
   return (
     <div className="min-h-screen ">
-
       {/* 1. HERO BANNER SECTION */}
       <section
         className="relative bg-cover bg-center"
@@ -70,62 +73,154 @@ const ServiceReq = () => {
             Reliable Services, Anytime
           </h1>
           <p className="text-lg md:text-xl font-medium max-w-2xl mb-8">
-            Browse trusted mechanics and service providers to keep your
-            vehicle running smoothly without the stress.
+            Browse trusted mechanics and service providers to keep your vehicle
+            and electrionic heavy gadgets running smoothly without the stress.
           </p>
-
-          {/* CTA Button */}
-          <button className="px-8 py-3 bg-primary hover:bg-secondary text-white font-semibold rounded-full shadow-lg transition-all duration-300">
-            Browse Services
-          </button>
         </div>
       </section>
 
-      {/* 2. MAIN CONTENT AREA */}
-      <div className="container mx-auto px-4 md:px-6 lg:px-8 -mt-8 pb-10">
+      <section>
+        <div className="container mx-auto px-4 md:px-6 lg:px-8 -mt-8 pb-10">
+          <div className="text-center mt-18 mb-12">
+            <h2 className="text-4xl md:text-5xl font-extrabold text-center">
+              Welcome to <span className="text-primary">MechaLink</span>
+            </h2>
+            <p className="text-md max-w-2xl mx-auto md:text-xl mt-3">
+              Explore our service requests, find the request which is best with
+              your shop category.
+            </p>
+          </div>
 
-        {/* Secondary Title/Description block */}
-        <div className="text-center mt-18">
-          <h2 className="text-4xl md:text-5xl font-extrabold text-center">
-            Welcome to <span className="text-primary">MechaLink</span>
-          </h2>
-          <p className="text-md max-w-2xl mx-auto md:text-xl mt-3">
-            Explore our service requests, connect with skilled mechanics, and
-            manage all your automotive needs in one place.
-          </p>
+          {/* Search & Sort */}
+          <div className="flex flex-col md:flex-row justify-between items-center gap-4 mb-6">
+            {/* Search */}
+            <div className="flex-1">
+              <div className="flex items-center gap-3 bg-primary rounded-lg px-4 py-1 shadow-sm">
+                <label htmlFor="search" className="text-white font-medium">
+                  Search
+                </label>
+                <input
+                  type="search"
+                  id="search"
+                  placeholder="Title, Type, or Location"
+                  value={searchTerm}
+                  onChange={handleSearch}
+                  className="flex-1 bg-white  placeholder-gray-800 px-3 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
+                />
+              </div>
+            </div>
+
+            {/* Sort */}
+            <div className="flex items-center gap-3">
+              <label htmlFor="sort" className="font-medium">
+                Sort by Priority:
+              </label>
+              <select
+                name="sort"
+                id="sort"
+                value={sortOrder}
+                onChange={handleSort}
+                className="px-3 py-2  rounded-md border-2 border-primary focus:outline-none focus:ring-2 focus:ring-primary"
+              >
+                <option className="text-black" value="">
+                  All
+                </option>
+                <option className="text-black" value="high">
+                  High
+                </option>
+                <option className="text-black" value="low">
+                  Low
+                </option>
+                <option className="text-black" value="emergency">
+                  Emergency
+                </option>
+              </select>
+            </div>
+          </div>
+
+          {loading && (
+            <div className="pt-10">
+              <OrangeSpinner />
+            </div>
+          )}
+
+          {!loading && requests.length === 0 && (
+            <div className="text-center py-16 rounded-xl shadow-lg border border-gray-200">
+              <p className="text-2xl text-orange-500 font-bold mb-2">
+                No Requests Found
+              </p>
+              <p className="text-gray-500">
+                You're all caught up! There are currently no pending service
+                requests.
+              </p>
+            </div>
+          )}
+
+          {!loading && requests.length > 0 && (
+            <div className="space-y-6 ">
+              {requests.map((req) => (
+                <ServiceReqCard key={req._id} request={req} />
+              ))}
+            </div>
+          )}
+
+          {/* Pagination & Items per page */}
+          <div className="flex justify-between mt-8 items-center">
+            {/* Items per page */}
+            <div>
+              <div className="flex items-center gap-3">
+                <label htmlFor="itemsPerPage">Show on page</label>
+                <select
+                  name="itemsPerPage"
+                  id="itemsPerPage"
+                  value={itemsPerPage}
+                  onChange={handleItemsPerPage}
+                  className="px-3 py-2 border-2 rounded-lg border-primary focus:outline-none"
+                >
+                  <option value="12">10</option>
+                  <option value="24">20</option>
+                  <option value="36">30</option>
+                  <option value="48">40</option>
+                  <option value="48">50</option>
+                </select>
+              </div>
+            </div>
+
+            {/* Page buttons */}
+            <div className="flex justify-center space-x-2">
+              <button
+                className="px-5 py-1 border border-primary rounded-md hover:bg-primary hover:text-white transition duration-400 cursor-pointer"
+                disabled={currentPage === 1}
+                onClick={() => handlePageChange(currentPage - 1)}
+              >
+                Prev
+              </button>
+
+              {Array.from({ length: totalPage }, (_, i) => (
+                <button
+                  key={i}
+                  className={`px-5 py-1 border rounded-md transition duration-400 cursor-pointer ${
+                    currentPage === i + 1
+                      ? "bg-primary text-white border-primary"
+                      : "border-primary hover:bg-primary hover:text-white"
+                  }`}
+                  onClick={() => handlePageChange(i + 1)}
+                >
+                  {i + 1}
+                </button>
+              ))}
+
+              <button
+                className="px-5 py-1 border border-primary rounded-md hover:bg-primary hover:text-white transition duration-400 cursor-pointer"
+                disabled={currentPage === totalPage}
+                onClick={() => handlePageChange(currentPage + 1)}
+              >
+                Next
+              </button>
+            </div>
+          </div>
         </div>
-
-        {loading && (
-          <div className="pt-10">
-            <OrangeSpinner />
-          </div>
-        )}
-
-        {!loading && requests.length === 0 && (
-          <div className="text-center py-16 rounded-xl shadow-lg border border-gray-200">
-            <p className="text-2xl text-orange-500 font-bold mb-2">
-              No Requests Found
-            </p>
-            <p className="text-gray-500">
-              You're all caught up! There are currently no pending service
-              requests.
-            </p>
-          </div>
-        )}
-
-        {!loading && requests.length > 0 && (
-          <div className="space-y-6 pt-10">
-            {requests.map((req) => (
-              <ServiceReqCard 
-                key={req._id} 
-                request={req} 
-                mode="summary" 
-                onStatusChange={handleStatusChange}
-              />
-            ))}
-          </div>
-        )}
-      </div>
+      </section>
     </div>
   );
 };
