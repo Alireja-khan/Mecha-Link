@@ -19,6 +19,8 @@ export default function Header() {
 
   const loggedInUser = useUser(session?.user?.email);
 
+  console.log(loggedInUser, session);
+
   useEffect(() => {
     const savedTheme = localStorage.getItem("theme") || "light";
     setTheme(savedTheme);
