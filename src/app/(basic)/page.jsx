@@ -1,11 +1,11 @@
-import BlogSection from "../components/Blog";
-import FeaturesSection from "../components/FeatureSection";
-import Newsletter from "../components/Newsletter";
-import ReviewSection from "../components/Review";
-import ServiceSec from "../components/ServiceSec";
-import WhyChooseUs from "../components/WhyChooseUs";
-import HowItWork from "../components/HowItWork";
-import HeroSection from "../components/HeroSection";
+import BlogSection from "../Components/Blog";
+import FeaturesSection from "../Components/FeatureSection";
+import Newsletter from "../Components/Newsletter";
+import ReviewSection from "../Components/Review";
+import ServiceSec from "../Components/ServiceSec";
+import WhyChooseUs from "../Components/WhyChooseUs";
+import HowItWork from "../Components/HowItWork";
+import HeroSection from "../Components/HeroSection";
 
 
 export default function Home() {
