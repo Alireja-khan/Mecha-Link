@@ -8,13 +8,12 @@ import dbConnect, { collections } from "@/lib/dbConnect";
 const MAX_ATTEMPTS = 5;
 const LOCK_TIME = 15 * 60 * 1000;
 
+
 export async function userCredentials(formData) {
   const { email, password } = formData;
   const collection = await dbConnect(collections.users);
-  // const user = await getUserData(email);
 
-
-  // Find user
+    // Find user
   const user = await collection.findOne({ email });
   if (!user) {
     return { success: false, message: "User not found" };
@@ -52,6 +51,9 @@ export async function userCredentials(formData) {
     { email },
     { $set: { loginAttempts: 0 }, $unset: { lockUntil: "" } }
   );
+ 
+  
+
 
   try {
     await signIn("credentials", {
