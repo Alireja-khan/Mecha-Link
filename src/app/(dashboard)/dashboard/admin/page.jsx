@@ -79,7 +79,7 @@ const AdminDashboardOverview = () => {
             });
     }, []);
 
-    console.log(totalData, totalShop);
+    console.log(totalData, totalShop, loggedInUser);
 
 
     // To get all the shop data //
