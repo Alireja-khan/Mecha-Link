@@ -18,6 +18,7 @@ export default function Header() {
   const dropdownRef = useRef(null);
 
   const loggedInUser = useUser(session?.user?.email);
+  console.log(session);
 
   useEffect(() => {
     const savedTheme = localStorage.getItem("theme") || "light";
