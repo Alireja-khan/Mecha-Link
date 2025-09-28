@@ -89,12 +89,35 @@ export default function AdminSettings() {
     );
   }
 
-  const handleSave = () => {
-    console.log("Profile:", profile);
-    console.log("Security:", security);
-    console.log("Preferences:", preferences);
-    console.log("Privacy:", privacy);
+  const handleSave = async () => {
+    try {
+      const res = await fetch("/api/users/dashboardUser", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: profile.email,
+          name: profile.name,
+          phone: profile.phone,
+          location: profile.location,
+          jobTitle: profile.jobTitle,
+          department: profile.department,
+          bio: profile.bio,
+        }),
+      });
+
+      const data = await res.json();
+      if (res.ok) {
+        console.log("✅ Updated successfully:", data);
+        alert("Profile updated successfully!");
+      } else {
+        alert(data.message || "Failed to update profile");
+      }
+    } catch (error) {
+      console.error("❌ Update error:", error);
+      alert("Something went wrong while updating");
+    }
   };
+
 
   const tabs = [
     { id: "profile", label: "Profile", icon: User },
@@ -120,11 +143,10 @@ export default function AdminSettings() {
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`flex items-center gap-2 px-6 py-4 border-b-2 transition-colors ${
-                  activeTab === tab.id
+                className={`flex items-center gap-2 px-6 py-4 border-b-2 transition-colors ${activeTab === tab.id
                     ? "border-blue-600 text-blue-600"
                     : "border-transparent text-gray-600 hover:text-gray-900"
-                }`}
+                  }`}
               >
                 <Icon size={18} />
                 {tab.label}

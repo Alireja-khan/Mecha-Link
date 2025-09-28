@@ -270,7 +270,7 @@ const AdminDashboardOverview = () => {
                     <Shield size={32} />
                     <h1 className="text-3xl font-bold">Admin Dashboard</h1>
                 </div>
-                <p className="text-lg opacity-90">Welcome back, {adminProfile.name}! Here’s an overview of MechaLink.</p>
+                <p className="text-lg"><span className="opacity-90">Welcome back,</span> <span className="font-semibold">{loggedInUser.name}!</span> <span className="opacity-90">Here’s an overview of MechaLink.</span></p>
             </div>
 
             {/* 📊 KPI Cards */}
@@ -416,7 +416,7 @@ const AdminDashboardOverview = () => {
                                     <li key={i} className="grid grid-cols-3 p-3 bg-gray-50 rounded-lg">
                                         <span className="font-medium">{u.name}</span>
                                         <span className="text-sm text-gray-600">{u.role}</span>
-                                        <span className="text-xs text-gray-500">{u.date}</span>
+                                        <span className="text-xs text-gray-500">{new Date(u.createdAt).toLocaleDateString()}</span>
                                     </li>
                                 ))
                             ) : (

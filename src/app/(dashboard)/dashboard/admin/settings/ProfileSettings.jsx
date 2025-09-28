@@ -16,9 +16,9 @@ export default function ProfileSettings({ profile, setProfile }) {
     <div className="space-y-6">
       <div className="flex items-center gap-6">
         <div className="w-24 h-24 rounded-full overflow-hidden border border-gray-200">
-          {loggedInUser.profileImage ? (
+          {loggedInUser? (
             <img
-              src={loggedInUser.profileImage}
+              src={loggedInUser.profileImage  }
               alt="Profile"
               className="w-full h-full object-cover"
             />
