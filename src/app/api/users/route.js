@@ -16,7 +16,17 @@ export async function GET(request) {
     result = await collection.find().toArray();
   }
 
-  return NextResponse.json(result);
+
+export async function GET(request) {
+    const collection = await dbConnect(collections.users);
+
+    // ✅ Hide sensitive fields (password, otp, otpExpiresAt)
+    const result = await collection
+        .find({}, { projection: { password: 0, otp: 0, otpExpiresAt: 0 } })
+        .toArray();
+
+    return NextResponse.json(result);
+
 }
 
 export async function POST(req) {
@@ -35,6 +45,26 @@ export async function POST(req) {
   const hashPassword = await bcrypt.hash(data.password, 10);
   data.password = hashPassword;
 
-  const result = await collection.insertOne(data);
-  return NextResponse.json(result);
+
+export async function POST(req, res) {
+    const data = await req.json();
+    const collection = await dbConnect(collections.users);
+
+    const isExist = await collection.findOne({ email: data.email });
+    if (isExist) {
+        return NextResponse.json(
+            { success: false, message: "Your email already exists" },
+            { status: 400 }
+        );
+    }
+
+    const hashPassword = await bcrypt.hash(data.password, 10);
+    data.password = hashPassword;
+
+    const result = await collection.insertOne(data);
+
+    return NextResponse.json({
+        success: true,
+        insertedId: result.insertedId,
+    });
 }
