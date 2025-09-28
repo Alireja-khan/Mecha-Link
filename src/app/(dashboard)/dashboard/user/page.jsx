@@ -1,11 +1,6 @@
-import React from 'react';
+import DashboardOverview from "../components/DashboardOverview";
 
-const page = () => {
-    return (
-        <div>
-            <h1>Hello User</h1>
-        </div>
-    );
-};
 
-export default page;
+export default function AdminPage() {
+  return <DashboardOverview />;
+}

@@ -10,16 +10,15 @@ import getUserData from "@/lib/getUserData";
 import useUser from "@/hooks/useUser";
 
 export default function Header() {
-  const { data: session, status } = useSession();
   const [scrolled, setScrolled] = useState(false);
   const pathname = usePathname();
   const [theme, setTheme] = useState("light");
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const dropdownRef = useRef(null);
 
-  const loggedInUser = useUser(session?.user?.email);
+  const {user: loggedInUser, status} = useUser();
 
-  console.log(loggedInUser, session);
+  console.log(loggedInUser, status);
 
   useEffect(() => {
     const savedTheme = localStorage.getItem("theme") || "light";
@@ -225,7 +224,7 @@ export default function Header() {
 
           {status === "loading" ? (
             <span className="loading loading-spinner loading-xs"></span>
-          ) : session ? (
+          ) : loggedInUser ? (
             <div className="relative" ref={dropdownRef}>
               <button
                 className="flex items-center space-x-2 focus:outline-none"
@@ -241,13 +240,7 @@ export default function Header() {
                       alt={loggedInUser.name || "User"}
                       className="w-full h-full object-cover"
                     />
-                  ) : session.user?.image ? (
-                    <img
-                      src={session.user.image}
-                      alt={session.user.name || "User"}
-                      className="w-full h-full object-cover"
-                    />
-                  ) : (
+                  )  : (
                     <UserIcon className="w-5 h-5 text-gray-600" />
                   )}
                 </div>
@@ -273,7 +266,7 @@ export default function Header() {
                 <div className="absolute right-0 mt-2 w-48 bg-white text-black rounded-md shadow-lg py-1 z-50 border border-gray-100">
                   <div className="px-4 py-2 border-b border-gray-100">
                     <p className="text-sm font-medium">{loggedInUser?.name}</p>
-                    <p className="text-xs truncate">{session.user?.email}</p>
+                    <p className="text-xs truncate">{loggedInUser.user?.email}</p>
                   </div>
                   <Link
                     href="/profile"

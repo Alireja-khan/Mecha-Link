@@ -4,7 +4,7 @@ import Link from "next/link";
 import React from "react";
 
 export default function ServiceCard({service}) {
-  console.log(service)
+  // console.log(service)
   return (
     <div>
       <div
