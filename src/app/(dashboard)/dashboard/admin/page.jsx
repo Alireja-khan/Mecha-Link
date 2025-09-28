@@ -42,6 +42,8 @@ const AdminDashboardOverview = () => {
     const [loading, setLoading] = useState(true);
     const [totalData, setTotalData] = useState({ result: [], totalDocs: 0, totalPage: 0 });
     const [totalShop, setTotalShop] = useState([]);
+    const [recentSignups, setRecentSignups] = useState([]);
+    const [userData, setUserData] = useState([]);
 
 
 
@@ -52,9 +54,9 @@ const AdminDashboardOverview = () => {
     useEffect(() => {
         const fetchUsers = async () => {
             try {
-                const res = await fetch("/api/users");
+                const res = await fetch("/api/users/dashboardUser?overview=true");
                 const data = await res.json();
-                setUsers(data || []);
+                setRecentSignups(data || []);
             } catch (err) {
                 console.error("Failed to fetch users:", err);
             } finally {
@@ -64,6 +66,30 @@ const AdminDashboardOverview = () => {
 
         fetchUsers();
     }, []);
+
+    console.log(recentSignups);
+
+
+    // To get all the users
+
+    useEffect(() => {
+        const fetchUsers = async () => {
+            try {
+                const res = await fetch("/api/users/dashboardUser");
+                const data = await res.json();
+                setUserData(data || []);
+            } catch (err) {
+                console.error("Failed to fetch users:", err);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchUsers();
+    }, []);
+
+    console.log(userData);
+
 
     // To get all the Requests data //
 
@@ -126,15 +152,6 @@ const AdminDashboardOverview = () => {
     };
 
 
-    const recentSignups = users
-        .slice(-5) // last 5
-        .reverse() // newest first
-        .map((u) => ({
-            name: u.name || u.email,
-            role: u.role || "Customer",
-            date: new Date(u.createdAt || Date.now()).toLocaleDateString(),
-        }));
-
 
     const { result: requests = [], totalDocs, totalPage } = totalData;
     const recentServiceReq = requests
@@ -159,7 +176,7 @@ const AdminDashboardOverview = () => {
 
     // ✅ KPI Cards
     const platformMetrics = [
-        { id: 1, title: "Total Users", value: loading ? "…" : users.length, change: "+12%", trend: "up", icon: <Users size={20} className="text-blue-500" /> },
+        { id: 1, title: "Total Users", value: loading ? "…" : userData.length, change: "+12%", trend: "up", icon: <Users size={20} className="text-blue-500" /> },
         { id: 2, title: "Total Mechanic Shop", value: loading ? "…" : shops.length, change: "+12%", trend: "up", icon: <Users size={20} className="text-blue-500" /> },
         { id: 3, title: "Total Service Requests", value: loading ? "…" : requests.length, change: "+12%", trend: "up", icon: <Users size={20} className="text-blue-500" /> },
         { id: 4, title: "Active Mechanics", value: "156", change: "+5%", trend: "up", icon: <UserCheck size={20} className="text-green-500" /> },
@@ -187,15 +204,6 @@ const AdminDashboardOverview = () => {
         { month: "Jun", revenue: 2500 },
     ];
 
-    // const serviceTypeBreakdown = [
-    //     { name: "Car", value: 55 },
-    //     { name: "Bike", value: 25 },
-    //     { name: "Truck", value: 15 },
-    //     { name: "Other", value: 5 },
-    // ];
-
-    // Group requests by deviceType from totalData
-    // Group requests by deviceType from totalData.result
     const serviceTypeCount = (totalData.result || []).reduce((acc, curr) => {
         const type = curr.deviceType || "Other";
         acc[type] = (acc[type] || 0) + 1;
