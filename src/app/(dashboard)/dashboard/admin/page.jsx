@@ -33,16 +33,18 @@ import {
     ResponsiveContainer,
     Legend,
 } from "recharts";
+import useUser from "@/hooks/useUser";
 
 const AdminDashboardOverview = () => {
 
+    const { user: loggedInUser, loading: userLoading } = useUser();
     const [users, setUsers] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [totalData, setTotalData] = useState([]);
-    const [searchTerm, setSearchTerm] = useState("");
-    const [itemsPerPage, setItemsPerPage] = useState(10);
-    const [currentPage, setCurrentPage] = useState(1);
-    const [sortOrder, setSortOrder] = useState("");
+    const [totalData, setTotalData] = useState({ result: [], totalDocs: 0, totalPage: 0 });
+    const [totalShop, setTotalShop] = useState([]);
+
+
+
 
 
     // To get all recent 5 users //
@@ -68,17 +70,49 @@ const AdminDashboardOverview = () => {
     useEffect(() => {
         setLoading(true);
         fetch(
-            `/api/service-request?search=${searchTerm}&sort=${sortOrder}&limit=${itemsPerPage}&page=${currentPage}`
+            `/api/service-request`
         )
             .then((res) => res.json())
             .then((data) => {
                 setTotalData(data);
                 setLoading(false);
             });
-    }, [searchTerm, itemsPerPage, currentPage, sortOrder]);
+    }, []);
 
-    console.log(totalData);
+    console.log(totalData, totalShop);
 
+
+    // To get all the shop data //
+
+    useEffect(() => {
+        setLoading(true);
+        fetch(
+            `/api/shops`
+        )
+            .then((res) => res.json())
+            .then((data) => {
+                setTotalShop(data);
+                setLoading(false);
+            });
+    }, []);
+
+
+    if (userLoading) {
+        return (
+            <div className="flex items-center justify-center h-screen w-screen">
+                <span className="loading loading-bars loading-xl text-orange-500"></span>
+            </div>
+        );
+    }
+
+    if (!loggedInUser) {
+        // optional redirect logic here
+        return (
+            <div className="flex items-center justify-center h-screen w-screen">
+                <span className="loading loading-bars loading-xl text-orange-500"></span>
+            </div>
+        );
+    }
 
 
 
@@ -91,14 +125,47 @@ const AdminDashboardOverview = () => {
         permissions: "Full Access",
     };
 
+
+    const recentSignups = users
+        .slice(-5) // last 5
+        .reverse() // newest first
+        .map((u) => ({
+            name: u.name || u.email,
+            role: u.role || "Customer",
+            date: new Date(u.createdAt || Date.now()).toLocaleDateString(),
+        }));
+
+
+    const { result: requests = [], totalDocs, totalPage } = totalData;
+    const recentServiceReq = requests
+        .slice(-5) // last 5
+        .reverse() // newest first
+        .map((service) => ({
+            name: service.deviceType || service.userEmail,
+            problem: service.problemCategory || "Other",
+            date: new Date(service.requestedDate || Date.now()).toLocaleDateString(),
+        }));
+
+
+    const { result: shops = [] } = totalShop;
+    const recentShops = shops
+        .slice(-5) // last 5
+        .reverse() // newest first
+        .map((s) => ({
+            name: s.shop.shopName || s.shop.contact.businessEmail,
+            serviceType: s.shop.categories || "Other",
+            date: new Date(s.shop.createdAt || Date.now()).toLocaleDateString(),
+        }));
+
     // ✅ KPI Cards
     const platformMetrics = [
         { id: 1, title: "Total Users", value: loading ? "…" : users.length, change: "+12%", trend: "up", icon: <Users size={20} className="text-blue-500" /> },
-        { id: 2, title: "Active Mechanics", value: "156", change: "+5%", trend: "up", icon: <UserCheck size={20} className="text-green-500" /> },
-        { id: 3, title: "Service Requests", value: "1,289", change: "+7%", trend: "up", icon: <Wrench size={20} className="text-orange-500" /> },
-        { id: 4, title: "Revenue", value: "$24,580", change: "+18%", trend: "up", icon: <DollarSign size={20} className="text-purple-500" /> },
-        { id: 5, title: "Avg. Rating", value: "4.6 ★", change: "+0.2", trend: "up", icon: <Star size={20} className="text-yellow-500" /> },
-        { id: 6, title: "Unresolved Complaints", value: "14", change: "-10%", trend: "down", icon: <AlertTriangle size={20} className="text-red-500" /> },
+        { id: 2, title: "Total Mechanic Shop", value: loading ? "…" : shops.length, change: "+12%", trend: "up", icon: <Users size={20} className="text-blue-500" /> },
+        { id: 3, title: "Total Service Requests", value: loading ? "…" : requests.length, change: "+12%", trend: "up", icon: <Users size={20} className="text-blue-500" /> },
+        { id: 4, title: "Active Mechanics", value: "156", change: "+5%", trend: "up", icon: <UserCheck size={20} className="text-green-500" /> },
+        { id: 5, title: "Revenue", value: "$24,580", change: "+18%", trend: "up", icon: <DollarSign size={20} className="text-purple-500" /> },
+        { id: 6, title: "Avg. Rating", value: "4.6 ★", change: "+0.2", trend: "up", icon: <Star size={20} className="text-yellow-500" /> },
+
     ];
 
     // ✅ Chart Data
@@ -120,14 +187,29 @@ const AdminDashboardOverview = () => {
         { month: "Jun", revenue: 2500 },
     ];
 
-    const serviceTypeBreakdown = [
-        { name: "Car", value: 55 },
-        { name: "Bike", value: 25 },
-        { name: "Truck", value: 15 },
-        { name: "Other", value: 5 },
-    ];
+    // const serviceTypeBreakdown = [
+    //     { name: "Car", value: 55 },
+    //     { name: "Bike", value: 25 },
+    //     { name: "Truck", value: 15 },
+    //     { name: "Other", value: 5 },
+    // ];
 
-    const COLORS = ["#4F46E5", "#22C55E", "#F59E0B", "#EF4444"];
+    // Group requests by deviceType from totalData
+    // Group requests by deviceType from totalData.result
+    const serviceTypeCount = (totalData.result || []).reduce((acc, curr) => {
+        const type = curr.deviceType || "Other";
+        acc[type] = (acc[type] || 0) + 1;
+        return acc;
+    }, {});
+
+    // Convert to recharts format
+    const serviceTypeBreakdown = Object.entries(serviceTypeCount).map(([name, value]) => ({
+        name,
+        value,
+    }));
+
+    const COLORS = ["#4F46E5", "#22C55E", "#F59E0B", "#EF4444", "#06B6D4", "#9333EA", "#3B82F6"];
+
 
     // ✅ Table Data
     const topMechanics = [
@@ -141,26 +223,6 @@ const AdminDashboardOverview = () => {
         { user: "Sophia Lee", feedback: "Mechanic arrived late.", rating: 3 },
         { user: "Liam Brown", feedback: "Fair pricing and good quality.", rating: 4 },
     ];
-
-    const recentSignups = users
-        .slice(-5) // last 5
-        .reverse() // newest first
-        .map((u) => ({
-            name: u.name || u.email,
-            role: u.role || "Customer",
-            date: new Date(u.createdAt || Date.now()).toLocaleDateString(),
-        }));
-
-
-    const { result: requests = [], totalDocs, totalPage } = totalData;
-    const recentServiceReq = requests
-        .slice(-5) // last 5
-        .reverse() // newest first
-        .map((service) => ({
-            name: service.deviceType || service.userEmail,
-            problem: service.problemCategory || "Other",
-            date: new Date(service.requestedDate || Date.now()).toLocaleDateString(),
-        }));
 
 
 
@@ -195,7 +257,7 @@ const AdminDashboardOverview = () => {
         <div className="p-8 space-y-10 min-h-screen bg-gray-50">
 
             {/* 🧭 Admin Banner */}
-            <div className="bg-gradient-to-r from-blue-600 to-purple-700 rounded-2xl p-8 text-white shadow-xl">
+            <div className="bg-primary rounded-2xl p-8 text-white shadow-xl">
                 <div className="flex items-center gap-3 mb-3">
                     <Shield size={32} />
                     <h1 className="text-3xl font-bold">Admin Dashboard</h1>
@@ -256,15 +318,44 @@ const AdminDashboardOverview = () => {
                     <h2 className="font-bold text-gray-800 mb-4">Service Type Breakdown</h2>
                     <ResponsiveContainer width="100%" height={200}>
                         <PieChart>
-                            <Pie data={serviceTypeBreakdown} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={70}>
+                            <Pie
+                                data={serviceTypeBreakdown}
+                                dataKey="value"
+                                nameKey="name"
+                                cx="50%"
+                                cy="50%"
+                                outerRadius={70}
+                                labelLine={false}
+                                label={({ cx, cy, midAngle, innerRadius, outerRadius, percent }) => {
+                                    const radius = innerRadius + (outerRadius - innerRadius) / 2;
+                                    const x = cx + radius * Math.cos(-midAngle * (Math.PI / 180));
+                                    const y = cy + radius * Math.sin(-midAngle * (Math.PI / 180));
+
+                                    return (
+                                        <text
+                                            x={x}
+                                            y={y}
+                                            fill="white"
+                                            textAnchor="middle"
+                                            dominantBaseline="central"
+                                            fontSize={12}
+                                            fontWeight="bold"
+                                        >
+                                            {(percent * 100).toFixed(0)}%
+                                        </text>
+                                    );
+                                }}
+                            >
                                 {serviceTypeBreakdown.map((entry, index) => (
-                                    <Cell key={`cell-${index}`} fill={COLORS[index]} />
+                                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                                 ))}
                             </Pie>
+
                             <Legend />
                             <Tooltip />
                         </PieChart>
                     </ResponsiveContainer>
+
                 </div>
             </div>
 
@@ -327,6 +418,27 @@ const AdminDashboardOverview = () => {
                     )}
                 </div>
 
+            </div>
+            {/* Recent Shops */}
+            <div className="bg-white p-6 rounded-2xl shadow border border-gray-100">
+                <h2 className="font-bold text-gray-800 mb-4">Recent Shops</h2>
+                {loading ? (
+                    <p className="text-gray-500">Loading users...</p>
+                ) : (
+                    <ul className="space-y-3">
+                        {recentShops.length > 0 ? (
+                            recentShops.map((s, i) => (
+                                <li key={i} className="grid grid-cols-3 p-3 bg-gray-50 rounded-lg">
+                                    <span className="font-medium">{s.name}</span>
+                                    <span className="text-sm text-gray-600">{s.serviceType}</span>
+                                    <span className="text-xs text-gray-500">{s.date}</span>
+                                </li>
+                            ))
+                        ) : (
+                            <p className="text-gray-500">No recent signups</p>
+                        )}
+                    </ul>
+                )}
             </div>
 
             {/* 💰 Financial Summary + System Health */}
