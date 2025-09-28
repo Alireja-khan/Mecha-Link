@@ -1,7 +1,12 @@
 import React from "react";
 import { Camera } from "lucide-react";
+import useUser from "@/hooks/useUser";
 
 export default function ProfileSettings({ profile, setProfile }) {
+
+    const {user: loggedInUser, status} = useUser();
+    console.log(loggedInUser);
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setProfile((prev) => ({ ...prev, [name]: value }));
@@ -11,9 +16,9 @@ export default function ProfileSettings({ profile, setProfile }) {
     <div className="space-y-6">
       <div className="flex items-center gap-6">
         <div className="w-24 h-24 rounded-full overflow-hidden border border-gray-200">
-          {profile.photoURL ? (
+          {loggedInUser.profileImage ? (
             <img
-              src={profile.photoURL}
+              src={loggedInUser.profileImage}
               alt="Profile"
               className="w-full h-full object-cover"
             />
