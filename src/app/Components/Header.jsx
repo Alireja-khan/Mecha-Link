@@ -16,7 +16,7 @@ export default function Header() {
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const dropdownRef = useRef(null);
 
-  const {user: loggedInUser, status} = useUser();
+  const { user: loggedInUser, status } = useUser();
 
   console.log(loggedInUser, status);
 
@@ -57,15 +57,14 @@ export default function Header() {
 
   return (
     <header
-      className={`sticky top-0 w-full z-50 transition-all duration-300 ${
-        scrolled
+      className={`sticky top-0 w-full z-50 transition-all duration-300 ${scrolled
           ? theme === "dark"
             ? "bg-[#343434]/95 backdrop-blur-md shadow-sm py-2"
             : "bg-white/95 backdrop-blur-md shadow-sm py-2"
           : theme === "dark"
-          ? "bg-[#343434]/90 backdrop-blur-sm py-4"
-          : "bg-white/90 backdrop-blur-sm py-4"
-      }`}
+            ? "bg-[#343434]/90 backdrop-blur-sm py-4"
+            : "bg-white/90 backdrop-blur-sm py-4"
+        }`}
     >
       <div className="container mx-auto px-4 md:px-6 flex justify-between items-center">
         {/* Logo */}
@@ -82,9 +81,8 @@ export default function Header() {
             <Link
               key={item.href}
               href={item.href}
-              className={`relative text-lg font-medium transition-colors hover:text-primary ${
-                pathname === item.href ? "text-primary" : ""
-              }`}
+              className={`relative text-lg font-medium transition-colors hover:text-primary ${pathname === item.href ? "text-primary" : ""
+                }`}
             >
               {item.label}
             </Link>
@@ -240,14 +238,13 @@ export default function Header() {
                       alt={loggedInUser.name || "User"}
                       className="w-full h-full object-cover"
                     />
-                  )  : (
+                  ) : (
                     <UserIcon className="w-5 h-5 text-gray-600" />
                   )}
                 </div>
                 <svg
-                  className={`w-4 h-4 transition-transform ${
-                    userMenuOpen ? "rotate-180" : ""
-                  }`}
+                  className={`w-4 h-4 transition-transform ${userMenuOpen ? "rotate-180" : ""
+                    }`}
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -276,12 +273,19 @@ export default function Header() {
                     Profile
                   </Link>
                   <Link
-                    href="/dashboard"
+                    href={
+                      loggedInUser?.role === "admin"
+                        ? "/dashboard/admin"
+                        : loggedInUser?.role === "mechanic"
+                          ? "/dashboard/mechanic"
+                          : "/dashboard/user"
+                    }
                     className="block px-4 py-2 text-sm hover:bg-gray-50"
                     onClick={() => setUserMenuOpen(false)}
                   >
                     Dashboard
                   </Link>
+
                   <div className="border-t border-gray-100 my-1"></div>
                   <button type="button"
                     className="cursor-pointer block w-full text-left px-4 py-2 text-sm hover:bg-gray-50"
