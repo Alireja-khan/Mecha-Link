@@ -10,9 +10,7 @@ import getUserData from "@/lib/getUserData";
 import useUser from "@/hooks/useUser";
 
 export default function Header() {
-  const sessionData = useSession();
   const { data: session, status } = useSession();
-console.log(sessionData);
   const [scrolled, setScrolled] = useState(false);
   const pathname = usePathname();
   const [theme, setTheme] = useState("light");
