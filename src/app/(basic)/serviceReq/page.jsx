@@ -39,6 +39,8 @@ const ServiceReq = () => {
   }, [searchTerm, itemsPerPage, currentPage, sortOrder]);
   const { result: requests = [], totalDocs, totalPage } = totalData;
 
+  console.log(totalData);
+
   // ===== Handlers =====
   const handleSearch = (e) => {
     setSearchTerm(e.target.value);
