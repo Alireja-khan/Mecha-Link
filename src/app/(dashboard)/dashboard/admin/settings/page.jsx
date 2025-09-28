@@ -1,28 +1,55 @@
 "use client";
-
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import useUser from "@/hooks/useUser";
-import { Lock, Key, Mail, Phone, MapPin, User, Check, Bell, Save, Camera } from "lucide-react";
+import { User, Shield, Globe, Lock, Save } from "lucide-react";
+import ProfileSettings from "./ProfileSettings";
+import SecuritySettings from "./SecuritySettings";
+import PreferencesSettings from "./PreferencesSettings";
+import PrivacySettings from "./PrivacySettings";
 
-const AdminSettings = () => {
+export default function AdminSettings() {
   const { user: loggedInUser, loading: userLoading } = useUser();
+  const [activeTab, setActiveTab] = useState("profile");
+
   const [profile, setProfile] = useState({
     name: "",
     email: "",
     phone: "",
     location: "",
     photoURL: "",
+    jobTitle: "",
+    department: "",
+    bio: "",
   });
+
   const [security, setSecurity] = useState({
     password: "",
     newPassword: "",
     confirmPassword: "",
     twoFactor: false,
     loginAlerts: false,
+    sessionTimeout: 30,
+    passwordExpiry: 90,
   });
 
-  // Populate dynamic data
-  React.useEffect(() => {
+  const [preferences, setPreferences] = useState({
+    language: "en",
+    timezone: "UTC",
+    dateFormat: "MM/DD/YYYY",
+    theme: "light",
+    emailNotifications: true,
+    pushNotifications: false,
+    smsNotifications: false,
+  });
+
+  const [privacy, setPrivacy] = useState({
+    profileVisibility: "private",
+    emailVisibility: "private",
+    activityStatus: true,
+    dataSharing: false,
+  });
+
+  useEffect(() => {
     if (loggedInUser) {
       setProfile({
         name: loggedInUser.name || "",
@@ -30,6 +57,9 @@ const AdminSettings = () => {
         phone: loggedInUser.phone || "",
         location: loggedInUser.location || "",
         photoURL: loggedInUser.photoURL || "",
+        jobTitle: loggedInUser.jobTitle || "",
+        department: loggedInUser.department || "",
+        bio: loggedInUser.bio || "",
       });
       setSecurity({
         password: "",
@@ -37,6 +67,8 @@ const AdminSettings = () => {
         confirmPassword: "",
         twoFactor: loggedInUser.security?.twoFactor || false,
         loginAlerts: loggedInUser.security?.loginAlerts || false,
+        sessionTimeout: loggedInUser.security?.sessionTimeout || 30,
+        passwordExpiry: loggedInUser.security?.passwordExpiry || 90,
       });
     }
   }, [loggedInUser]);
@@ -57,165 +89,73 @@ const AdminSettings = () => {
     );
   }
 
-  const handleProfileChange = (e) => {
-    const { name, value, type, checked } = e.target;
-    if (type === "checkbox") {
-      setSecurity((prev) => ({ ...prev, [name]: checked }));
-    } else {
-      setProfile((prev) => ({ ...prev, [name]: value }));
-    }
+  const handleSave = () => {
+    console.log("Profile:", profile);
+    console.log("Security:", security);
+    console.log("Preferences:", preferences);
+    console.log("Privacy:", privacy);
   };
 
-  const handleSave = () => {
-    // Call API to save profile & security settings
-    console.log("Profile Data:", profile);
-    console.log("Security Data:", security);
-  };
+  const tabs = [
+    { id: "profile", label: "Profile", icon: User },
+    { id: "security", label: "Security", icon: Shield },
+    { id: "preferences", label: "Preferences", icon: Globe },
+    { id: "privacy", label: "Privacy", icon: Lock },
+  ];
 
   return (
     <div className="p-8 space-y-8 min-h-screen bg-gray-50">
-      <h1 className="text-3xl font-bold text-gray-800">Admin Settings</h1>
-
-      {/* Profile Settings */}
-      <div className="bg-white p-6 rounded-2xl shadow border border-gray-100 space-y-4">
-        <h2 className="font-bold text-gray-800 mb-4">Profile Settings</h2>
-        <div className="flex items-center gap-6">
-          {/* Profile Image */}
-          <div className="w-24 h-24 rounded-full overflow-hidden border border-gray-200">
-            {profile.photoURL ? (
-              <img src={profile.photoURL} alt={profile.name} className="w-full h-full object-cover" />
-            ) : (
-              <div className="w-full h-full bg-gradient-to-tr from-blue-500 to-purple-500 flex items-center justify-center text-white text-3xl font-bold">
-                {profile.name.charAt(0)}
-              </div>
-            )}
-          </div>
-          <button className="flex items-center gap-2 px-4 py-2 bg-blue-50 text-blue-700 rounded-xl hover:bg-blue-100 transition">
-            <Camera size={18} /> Change Photo
-          </button>
-        </div>
-
-        {/* Profile Fields */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-          <div className="flex flex-col">
-            <label className="text-sm font-medium text-gray-600">Name</label>
-            <input
-              type="text"
-              name="name"
-              value={profile.name}
-              onChange={handleProfileChange}
-              className="mt-1 p-2 border border-gray-200 rounded-lg"
-            />
-          </div>
-          <div className="flex flex-col">
-            <label className="text-sm font-medium text-gray-600">Email</label>
-            <input
-              type="email"
-              name="email"
-              value={profile.email}
-              onChange={handleProfileChange}
-              className="mt-1 p-2 border border-gray-200 rounded-lg"
-            />
-          </div>
-          <div className="flex flex-col">
-            <label className="text-sm font-medium text-gray-600">Phone</label>
-            <input
-              type="text"
-              name="phone"
-              value={profile.phone}
-              onChange={handleProfileChange}
-              className="mt-1 p-2 border border-gray-200 rounded-lg"
-            />
-          </div>
-          <div className="flex flex-col">
-            <label className="text-sm font-medium text-gray-600">Location</label>
-            <input
-              type="text"
-              name="location"
-              value={profile.location}
-              onChange={handleProfileChange}
-              className="mt-1 p-2 border border-gray-200 rounded-lg"
-            />
-          </div>
+      <div className="flex justify-between items-center">
+        <h1 className="text-3xl font-bold text-gray-800">Admin Settings</h1>
+        <div className="text-sm text-gray-500">
+          Last updated: {new Date().toLocaleDateString()}
         </div>
       </div>
 
-      {/* Security Settings */}
-      <div className="bg-white p-6 rounded-2xl shadow border border-gray-100 space-y-4">
-        <h2 className="font-bold text-gray-800 mb-4">Security & Password</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="flex flex-col">
-            <label className="text-sm font-medium text-gray-600">Current Password</label>
-            <input
-              type="password"
-              name="password"
-              value={security.password}
-              onChange={handleProfileChange}
-              className="mt-1 p-2 border border-gray-200 rounded-lg"
-            />
-          </div>
-          <div className="flex flex-col">
-            <label className="text-sm font-medium text-gray-600">New Password</label>
-            <input
-              type="password"
-              name="newPassword"
-              value={security.newPassword}
-              onChange={handleProfileChange}
-              className="mt-1 p-2 border border-gray-200 rounded-lg"
-            />
-          </div>
-          <div className="flex flex-col">
-            <label className="text-sm font-medium text-gray-600">Confirm Password</label>
-            <input
-              type="password"
-              name="confirmPassword"
-              value={security.confirmPassword}
-              onChange={handleProfileChange}
-              className="mt-1 p-2 border border-gray-200 rounded-lg"
-            />
-          </div>
+      <div className="bg-white rounded-2xl shadow border border-gray-100">
+        <div className="flex border-b border-gray-200">
+          {tabs.map((tab) => {
+            const Icon = tab.icon;
+            return (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id)}
+                className={`flex items-center gap-2 px-6 py-4 border-b-2 transition-colors ${
+                  activeTab === tab.id
+                    ? "border-blue-600 text-blue-600"
+                    : "border-transparent text-gray-600 hover:text-gray-900"
+                }`}
+              >
+                <Icon size={18} />
+                {tab.label}
+              </button>
+            );
+          })}
         </div>
 
-        {/* Toggles */}
-        <div className="flex flex-col md:flex-row gap-6 mt-4">
-          <label className="flex items-center gap-2">
-            <input
-              type="checkbox"
-              name="twoFactor"
-              checked={security.twoFactor}
-              onChange={handleProfileChange}
-              className="accent-blue-600"
+        <div className="p-6">
+          {activeTab === "profile" && (
+            <ProfileSettings profile={profile} setProfile={setProfile} />
+          )}
+          {activeTab === "security" && (
+            <SecuritySettings security={security} setSecurity={setSecurity} />
+          )}
+          {activeTab === "preferences" && (
+            <PreferencesSettings
+              preferences={preferences}
+              setPreferences={setPreferences}
             />
-            Two-Factor Authentication
-          </label>
-          <label className="flex items-center gap-2">
-            <input
-              type="checkbox"
-              name="loginAlerts"
-              checked={security.loginAlerts}
-              onChange={handleProfileChange}
-              className="accent-blue-600"
-            />
-            Login Alerts
-          </label>
+          )}
+          {activeTab === "privacy" && (
+            <PrivacySettings privacy={privacy} setPrivacy={setPrivacy} />
+          )}
         </div>
       </div>
 
-      {/* Notifications */}
-      <div className="bg-white p-6 rounded-2xl shadow border border-gray-100 space-y-4">
-        <h2 className="font-bold text-gray-800 mb-4">Notifications</h2>
-        <label className="flex items-center gap-2">
-          <input type="checkbox" className="accent-blue-600" />
-          Email Notifications
-        </label>
-        <label className="flex items-center gap-2">
-          <input type="checkbox" className="accent-blue-600" />
-          SMS Notifications
-        </label>
-      </div>
-
-      {/* Save Button */}
-      <div className="flex justify-end">
+      <div className="flex justify-between items-center">
+        <button className="px-6 py-3 border border-gray-300 text-gray-700 rounded-xl hover:bg-gray-50 transition">
+          Cancel
+        </button>
         <button
           onClick={handleSave}
           className="px-6 py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition flex items-center gap-2"
@@ -225,6 +165,4 @@ const AdminSettings = () => {
       </div>
     </div>
   );
-};
-
-export default AdminSettings;
+}
