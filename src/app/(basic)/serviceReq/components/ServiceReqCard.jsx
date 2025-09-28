@@ -1,15 +1,9 @@
 "use client";
 
-import { Phone, Wrench, User, AlertTriangle, Eye, Clock, Calendar, Zap, HardHat } from "lucide-react";
+import {  Wrench, AlertTriangle, Eye, Clock, Zap, HardHat } from "lucide-react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { useState } from "react";
 
-const ServiceReqCard = ({ request, mode = "summary", onStatusChange }) => {
-  const router = useRouter();
-  const [isLoading, setIsLoading] = useState(false);
-
-  // --- Utility Functions ---
+const ServiceReqCard = ({ request }) => {
 
   const getValue = (obj, path, defaultValue = "N/A") => {
     return path.split('.').reduce((acc, key) => acc?.[key], obj) || defaultValue;
@@ -65,48 +59,7 @@ const ServiceReqCard = ({ request, mode = "summary", onStatusChange }) => {
   const urgencyInfo = urgencyConfig[urgency] || urgencyConfig.medium;
   const statusInfo = statusConfig[status] || statusConfig.pending;
   
-  // FIXED: Use the same URL pattern as previous component
-  const detailsUrl = `/serviceReq/${request._id}`;
 
-  // --- Handlers ---
-
-  const handleAcceptRequest = async () => {
-    if (!request?._id) {
-      console.error("No request ID available");
-      return;
-    }
-
-    setIsLoading(true);
-    try {
-      const response = await fetch(`/api/service-request/${request._id}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          status: "accepted",
-          acceptedDate: new Date().toISOString(),
-        }),
-      });
-      
-      if (response.ok) {
-        // Option 1: Reload page (like previous component)
-        window.location.reload();
-        // Option 2: Call callback if provided
-        // if (onStatusChange) onStatusChange(request._id, "accepted");
-      } else {
-        console.error("Failed to accept request");
-      }
-    } catch (error) {
-      console.error("Error accepting request:", error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleViewDetails = () => {
-    if (request?._id) {
-      router.push(`/serviceReq/${request._id}`);
-    }
-  };
 
   // --- Sub-Components ---
 
@@ -135,8 +88,7 @@ const ServiceReqCard = ({ request, mode = "summary", onStatusChange }) => {
   }
 
   return (
-    <div className="py-4">
-      <div className="container mx-auto px-4 md:px-6 lg:px-8">
+      <>
         <div className="flex flex-col md:flex-row bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-100 transition-all duration-300 hover:shadow-2xl">
 
           {/* 1. UNIQUE LEFT PANEL: Status and Date/Time */}
@@ -164,20 +116,20 @@ const ServiceReqCard = ({ request, mode = "summary", onStatusChange }) => {
             {/* Header / Title Section */}
             <div className="flex justify-between items-start gap-4 pb-4 border-b border-gray-100 mb-6">
               <div>
-                <h1 className="text-2xl font-extrabold text-gray-900 leading-snug capitalize">
+                <h2 className="text-2xl font-extrabold text-gray-900 leading-snug capitalize">
                   {getValue(request, 'deviceType')} - {getValue(request, 'serviceDetails.problemTitle')}
-                </h1>
+                </h2>
                 <p className={`text-sm font-medium mt-1 ${urgencyInfo.color} flex items-center gap-1`}>
                   <urgencyInfo.icon className="w-4 h-4" />
                   Urgency: {urgencyInfo.label}
                 </p>
+                <p className="mt-2"><strong>Location:</strong> {request.location.address}</p>
               </div>
 
               {/* Action Button - FIXED: Using correct URL */}
               <Link
-                href={detailsUrl}
+                href={`/serviceReq/${request._id}`}
                 className="flex items-center gap-2 px-5 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors font-semibold shadow-lg"
-                prefetch={false}
               >
                 <Eye className="w-4 h-4" />
                 View Details
@@ -208,71 +160,16 @@ const ServiceReqCard = ({ request, mode = "summary", onStatusChange }) => {
             </div>
 
             {/* Problem Description Block */}
-            <div className="mb-6 p-4 bg-gray-50 border-l-4 border-orange-300 rounded-lg">
+            <div className=" p-4 bg-gray-50 border-l-4 border-orange-300 rounded-lg">
               <h3 className="text-sm font-bold text-gray-700 uppercase mb-2">Detailed Problem</h3>
               <p className="text-gray-700 leading-relaxed text-sm">
                 {getValue(request, 'serviceDetails.description', 'No detailed description provided.')}
               </p>
             </div>
 
-            {/* CUSTOMER INFO & ACTIONS (Detail Mode) */}
-            {mode === "detail" && (
-              <div className="border-t border-gray-200 pt-6 mt-6">
-                <div className="flex items-center gap-2 mb-4">
-                  <User className="w-5 h-5 text-orange-500" />
-                  <h2 className="text-xl font-bold text-gray-900">Contact & Instructions</h2>
-                </div>
-
-                <div className="grid md:grid-cols-2 gap-6">
-                  <DetailItem
-                    label="Primary Phone"
-                    value={getValue(request, 'contactInfo.phoneNumber')}
-                    icon={Phone}
-                  />
-                  <DetailItem
-                    label="Alternate Phone"
-                    value={getValue(request, 'contactInfo.alternatePhone')}
-                    icon={Phone}
-                  />
-                </div>
-
-                <div className="mt-6 p-4 bg-orange-50 border border-orange-200 rounded-lg">
-                  <DetailItem
-                    label="Special Instructions"
-                    value={getValue(request, 'contactInfo.specialInstructions')}
-                    largeValue
-                  />
-                </div>
-
-                {/* Accept Action Button - FIXED: Using real API call like previous component */}
-                {status === "pending" && (
-                  <div className="pt-6">
-                    <button
-                      onClick={handleAcceptRequest}
-                      disabled={isLoading}
-                      className="w-full bg-orange-600 text-white py-3 rounded-xl hover:bg-orange-700 transition-colors font-bold shadow-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-                    >
-                      {isLoading ? (
-                        <>
-                          <Clock className="w-5 h-5 animate-spin" />
-                          Processing...
-                        </>
-                      ) : (
-                        <>
-                          <HardHat className="w-5 h-5" />
-                          Accept Service Request
-                        </>
-                      )}
-                    </button>
-                  </div>
-                )}
-              </div>
-            )}
-
           </div>
         </div>
-      </div>
-    </div>
+      </>
   );
 };
 

@@ -4,7 +4,7 @@ import Link from "next/link";
 import React from "react";
 
 export default function ServiceCard({service}) {
-  console.log(service)
+  // console.log(service)
   return (
     <div>
       <div
@@ -14,9 +14,9 @@ export default function ServiceCard({service}) {
         <div className="h-60 w-full overflow-hidden relative">
           <Image
             fill
-            src={service.shop.logo || ""}
+            src={service.shop.logo || "https://static.vecteezy.com/system/resources/previews/009/292/244/non_2x/default-avatar-icon-of-social-media-user-vector.jpg"}
             className="object-cover group-hover:scale-120 duration-500 object-top"
-            alt={service.shop.shopName || ""}
+            alt={service.shop.shopName || "shop"}
             // width={500}
           />
         </div>
