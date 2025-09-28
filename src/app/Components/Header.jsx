@@ -1,13 +1,12 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import useUser from "@/hooks/useUser";
+import { User as UserIcon } from "lucide-react";
+import { signOut } from "next-auth/react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useEffect, useRef, useState } from "react";
 import { FaGear } from "react-icons/fa6";
-import { signOut, useSession } from "next-auth/react";
-import { User as UserIcon } from "lucide-react";
-import getUserData from "@/lib/getUserData";
-import useUser from "@/hooks/useUser";
 
 export default function Header() {
   const [scrolled, setScrolled] = useState(false);
