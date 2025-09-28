@@ -1,14 +1,11 @@
-import React from "react";
-import ProfileCard from "../../components/ProfileCard";
+import React from 'react';
 
-const adminProfile = {
-    name: "Admin Jane",
-    email: "admin@example.com",
-    phone: "+1122334455",
-    joined: "Mar 5, 2019",
-    additionalInfo: "Manages all dashboard users and analytics",
+const page = () => {
+    return (
+        <div>
+            <h1>This is Admin Profile page</h1>
+        </div>
+    );
 };
 
-export default function AdminProfile() {
-    return <ProfileCard role="Admin" profileData={adminProfile} />;
-}
+export default page;
