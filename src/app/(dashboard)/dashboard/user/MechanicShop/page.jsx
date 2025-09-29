@@ -7,7 +7,6 @@ import axios from 'axios';
 import useUser from '@/hooks/useUser';
 import { useSession } from 'next-auth/react';
 
-// --- Data for the Form ---
 const shopCategories = [
     "Multi-Vehicle Service",
     "Car Service & Repair",
@@ -96,7 +95,6 @@ const servicesData = [
 
 const weekendOptions = ["Friday", "Saturday", "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday"];
 
-// --- Custom Dropdown Component ---
 const CustomDropdown = forwardRef(({ options, name, onChange, onBlur, isMulti = true, value }, ref) => {
     const [isOpen, setIsOpen] = useState(false);
     const initialSelected = isMulti ? (Array.isArray(value) ? value : []) : (value ? [value] : []);
@@ -179,8 +177,8 @@ const CustomDropdown = forwardRef(({ options, name, onChange, onBlur, isMulti = 
         </div>
     );
 });
+CustomDropdown.displayName = 'CustomDropdown';
 
-// --- Certifications Input Component ---
 const CertificationsInput = ({ onChange, value }) => {
     const [inputValue, setInputValue] = useState('');
     const tags = value || [];
@@ -215,7 +213,7 @@ const CertificationsInput = ({ onChange, value }) => {
                     {tags.map((tag) => (
                         <div key={tag} className="flex items-center bg-orange-100 text-orange-700 px-3 py-1 rounded-full text-sm font-medium animate-fade-in">
                             <span>{tag}</span>
-                            <button type="button" onClick={() => handleRemoveTag(tag)} className="ml-2 text-orange-500 hover:text-orange-800 focus:outline-none">&times;</button>
+                            <button type="button" onClick={() => handleRemoveTag(tag)} className="ml-2 text-orange-500 hover:text-orange-800 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 rounded-full">&times;</button>
                         </div>
                     ))}
                 </div>
@@ -224,10 +222,13 @@ const CertificationsInput = ({ onChange, value }) => {
     );
 };
 
-// --- Upload Image Function ---
 export const uploadImageToImgbb = async (imageFile) => {
     const formData = new FormData();
     formData.append('image', imageFile);
+
+    if (!process.env.NEXT_PUBLIC_ImgBB_API_KEY) {
+        throw new Error("ImgBB API key is not configured.");
+    }
 
     try {
         const response = await fetch(`https://api.imgbb.com/1/upload?key=${process.env.NEXT_PUBLIC_ImgBB_API_KEY}`, {
@@ -247,7 +248,6 @@ export const uploadImageToImgbb = async (imageFile) => {
     }
 };
 
-// --- Main MechanicShop Component ---
 export default function MechanicShop() {
     const { register, handleSubmit, control, reset, setValue, formState: { errors } } = useForm();
     const [activeVehicleType, setActiveVehicleType] = useState(servicesData[0].type);
@@ -262,24 +262,24 @@ export default function MechanicShop() {
             try {
                 const url = await uploadImageToImgbb(file);
                 setLogoUrl(url);
-                setValue('logo', url);
+                setValue('shop.logo', url);
                 toast.success("Logo uploaded successfully!");
             } catch (err) {
                 console.error(err);
-                toast.error("Failed to upload logo!");
+                toast.error("Failed to upload logo! Check console for details.");
             }
         }
     };
 
     const handleRemoveLogo = () => {
         setLogoUrl('');
-        setValue('logo', '');
+        setValue('shop.logo', '');
         toast.success("Logo removed.");
     };
 
     const onInvalid = (errors) => {
-        console.log("Form Errors:", errors);
-        toast.error("Please fill in all required fields and check the console for details.");
+        console.error("Form Errors:", errors);
+        toast.error("Please fill in all required fields.");
     };
 
     const onSubmit = async (data) => {
@@ -311,7 +311,7 @@ export default function MechanicShop() {
         };
 
         const payload = {
-            userId: loggedInUser?._id || null,
+            userId: loggedInUser?._id || session?.user?.email || null,
             shop: shopData,
             certifications: data.certifications,
             socialLinks: data.socialLinks,
@@ -321,14 +321,13 @@ export default function MechanicShop() {
         console.log("Submitting Payload:", payload);
 
         try {
-            // This is the API call to your backend endpoint.
-            // Ensure you have a backend set up to handle this POST request.
             const res = await axios.post("/api/shops", payload);
 
             if (res.status === 200 || res.status === 201) {
                 toast.success("Shop added successfully!");
                 reset();
                 setLogoUrl('');
+                setActiveVehicleType(servicesData[0].type);
             } else {
                 toast.error(res.data.message || "Failed to add shop");
             }
@@ -351,9 +350,7 @@ export default function MechanicShop() {
                 </div>
 
                 <form onSubmit={handleSubmit(onSubmit, onInvalid)} className="grid md:grid-cols-2 gap-8">
-                    {/* LEFT COLUMN */}
                     <div className="space-y-8">
-                        {/* Shop Info */}
                         <div className="p-6 bg-white rounded-xl shadow-lg space-y-4 border border-gray-200">
                             <h2 className="flex items-center gap-2 text-xl font-semibold text-orange-600 mb-4">
                                 <Wrench className="h-6 w-6 text-orange-500" /> Shop Details
@@ -370,7 +367,6 @@ export default function MechanicShop() {
                                     {errors.shop?.shopName && <p className="text-sm text-red-500 mt-1">{errors.shop.shopName.message}</p>}
                                 </div>
 
-                                {/* Logo Upload */}
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700 mb-2">Shop Logo (Optional)</label>
                                     <input
@@ -394,7 +390,6 @@ export default function MechanicShop() {
                                     )}
                                 </div>
 
-                                {/* Categories */}
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700">Categories</label>
                                     <Controller
@@ -416,7 +411,6 @@ export default function MechanicShop() {
                                     {errors.shop?.categories && <p className="text-sm text-red-500 mt-1">{errors.shop.categories.message}</p>}
                                 </div>
 
-                                {/* Certifications */}
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700">Certifications (separate with commas)</label>
                                     <Controller
@@ -427,18 +421,34 @@ export default function MechanicShop() {
                                     />
                                 </div>
 
-                                {/* Shop Details Textarea */}
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700">Shop Details</label>
-                                    <textarea
-                                        {...register('shop.details')}
-                                        rows={4}
-                                        className="mt-1 block w-full p-2 border border-gray-300 rounded-md focus:ring-orange-500 focus:border-orange-500"
-                                        placeholder="Add detailed description of your shop, services, or specialties..."
-                                    ></textarea>
-                                </div>
+                                <fieldset className="border border-gray-200 p-4 rounded-lg space-y-2">
+                                    <legend className="px-2 text-md font-medium text-orange-600">Shop Description & Staff</legend>
 
-                                {/* Address */}
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700">Shop Details</label>
+                                        <textarea
+                                            {...register('shop.details')}
+                                            rows={4}
+                                            className="mt-1 block w-full p-2 border border-gray-300 rounded-md focus:ring-orange-500 focus:border-orange-500"
+                                            placeholder="Add detailed description of your shop, services, or specialties..."
+                                        ></textarea>
+                                    </div>
+
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700">Number of Mechanics</label>
+                                        <input
+                                            type="number"
+                                            {...register('shop.mechanicCount', {
+                                                valueAsNumber: true,
+                                                min: { value: 0, message: "Count cannot be negative" },
+                                            })}
+                                            className="mt-1 block w-full p-2 border border-gray-300 rounded-md focus:ring-orange-500 focus:border-orange-500"
+                                            placeholder="E.g., 5"
+                                        />
+                                        {errors.shop?.mechanicCount && <p className="text-sm text-red-500 mt-1">{errors.shop.mechanicCount.message}</p>}
+                                    </div>
+                                </fieldset>
+
                                 <fieldset className="border border-gray-200 p-4 rounded-lg space-y-2">
                                     <legend className="px-2 text-md font-medium text-orange-600">Address</legend>
                                     <div>
@@ -460,7 +470,6 @@ export default function MechanicShop() {
                                         <label className="block text-sm font-medium text-gray-700">Postal Code</label>
                                         <input type="text" {...register('shop.address.postalCode')} className="mt-1 block w-full p-2 border border-gray-300 rounded-md focus:ring-orange-500 focus:border-orange-500" />
                                     </div>
-                                    {/* NEW: Google Maps URL Input */}
                                     <div>
                                         <label className="block text-sm font-medium text-gray-700">Google Maps URL (Optional)</label>
                                         <input
@@ -470,12 +479,10 @@ export default function MechanicShop() {
                                             placeholder="Paste the Google Maps 'Share' link or Embed URL"
                                         />
                                     </div>
-                                    {/* END NEW */}
                                 </fieldset>
                             </div>
                         </div>
 
-                        {/* Contact & Social Links */}
                         <div className="p-6 bg-white rounded-xl shadow-lg space-y-4 border border-gray-200">
                             <h2 className="flex items-center gap-2 text-xl font-semibold text-orange-600 mb-4">Contact & Social Links</h2>
                             <div className="space-y-4">
@@ -505,9 +512,7 @@ export default function MechanicShop() {
                         </div>
                     </div>
 
-                    {/* RIGHT COLUMN */}
                     <div className="space-y-8">
-                        {/* Working Hours */}
                         <div className="p-6 bg-white rounded-xl shadow-lg space-y-4 border border-gray-200">
                             <h2 className="flex items-center gap-2 text-xl font-semibold text-orange-600 mb-4">Working Hours</h2>
                             <div className="grid grid-cols-3 gap-4">
@@ -534,12 +539,10 @@ export default function MechanicShop() {
                             </div>
                         </div>
 
-                        {/* Services Offered - Updated to include all types */}
                         <div className="p-6 bg-white rounded-xl shadow-lg space-y-4 border border-gray-200">
                             <h2 className="flex items-center gap-2 text-xl font-semibold text-orange-600 mb-4">
                                 <Wrench className="h-6 w-6 text-orange-500" /> Services Offered
                             </h2>
-                            {/* Vehicle Type Tabs */}
                             <div className="flex flex-wrap gap-3 mb-4 pb-2">
                                 {servicesData.map(vehicle => (
                                     <button
@@ -553,7 +556,6 @@ export default function MechanicShop() {
                                 ))}
                             </div>
 
-                            {/* Services Checkboxes */}
                             {servicesData
                                 .filter(vehicle => vehicle.type === activeVehicleType)
                                 .map(vehicle => (
@@ -582,7 +584,6 @@ export default function MechanicShop() {
                         </div>
                     </div>
 
-                    {/* Submit Button */}
                     <div className="md:col-span-2 flex justify-center mt-6">
                         <button
                             type="submit"

@@ -1,107 +1,98 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import {
-    Wrench,
-    MapPin,
-    Calendar,
-    Users,
-    FileText,
-    Settings,
-    BarChart3,
-    Shield,
-    AlertTriangle,
-    TrendingUp,
-    UserCheck,
-    Car,
-    DollarSign,
-    Star,
-    Building2,
-    Bell,
-    Activity,
-} from "lucide-react";
-import {
-    LineChart,
-    Line,
-    XAxis,
-    YAxis,
-    CartesianGrid,
-    Tooltip,
-    PieChart,
-    Pie,
-    Cell,
-    ResponsiveContainer,
-    Legend,
-} from "recharts";
+import { Users, Store, Wrench, UserCheck, DollarSign, Star, Shield, Crown, Calendar, Eye, FileText, Settings, BarChart3 } from "lucide-react";
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, PieChart, Pie, Cell, ResponsiveContainer, Legend } from "recharts";
+import useUser from "@/hooks/useUser";
 
 const AdminDashboardOverview = () => {
-
-    const [users, setUsers] = useState([]);
+    const { user: loggedInUser, loading: userLoading } = useUser();
     const [loading, setLoading] = useState(true);
-    const [totalData, setTotalData] = useState([]);
-    const [searchTerm, setSearchTerm] = useState("");
-    const [itemsPerPage, setItemsPerPage] = useState(10);
-    const [currentPage, setCurrentPage] = useState(1);
-    const [sortOrder, setSortOrder] = useState("");
-
-
-    // To get all recent 5 users //
+    const [totalData, setTotalData] = useState({ result: [] });
+    const [totalShop, setTotalShop] = useState({ result: [] });
+    const [recentSignups, setRecentSignups] = useState([]);
+    const [userData, setUserData] = useState([]);
 
     useEffect(() => {
         const fetchUsers = async () => {
             try {
-                const res = await fetch("/api/users");
+                const res = await fetch("/api/users/dashboardUser?overview=true");
                 const data = await res.json();
-                setUsers(data || []);
+                setRecentSignups(data || []);
             } catch (err) {
                 console.error("Failed to fetch users:", err);
+            }
+        };
+
+        const fetchAllUsers = async () => {
+            try {
+                const res = await fetch("/api/users/dashboardUser");
+                const data = await res.json();
+                setUserData(data || []);
+            } catch (err) {
+                console.error("Failed to fetch users:", err);
+            }
+        };
+
+        const fetchData = async () => {
+            setLoading(true);
+            try {
+                await Promise.all([
+                    fetchUsers(),
+                    fetchAllUsers(),
+                    fetch("/api/service-request").then(res => res.json()).then(data => setTotalData(data)),
+                    fetch("/api/shops").then(res => res.json()).then(data => setTotalShop(data))
+                ]);
+            } catch (err) {
+                console.error("Failed to fetch data:", err);
             } finally {
                 setLoading(false);
             }
         };
 
-        fetchUsers();
+        fetchData();
     }, []);
 
-    // To get all the Requests data //
+    if (userLoading) {
+        return (
+            <div className="flex items-center justify-center h-screen w-screen">
+                <span className="loading loading-bars loading-xl text-orange-500"></span>
+            </div>
+        );
+    }
 
-    useEffect(() => {
-        setLoading(true);
-        fetch(
-            `/api/service-request?search=${searchTerm}&sort=${sortOrder}&limit=${itemsPerPage}&page=${currentPage}`
-        )
-            .then((res) => res.json())
-            .then((data) => {
-                setTotalData(data);
-                setLoading(false);
-            });
-    }, [searchTerm, itemsPerPage, currentPage, sortOrder]);
+    if (!loggedInUser) {
+        return (
+            <div className="flex items-center justify-center h-screen w-screen">
+                <span className="loading loading-bars loading-xl text-orange-500"></span>
+            </div>
+        );
+    }
 
-    console.log(totalData);
+    const { result: requests = [] } = totalData;
+    const { result: shops = [] } = totalShop;
 
+    const recentServiceReq = requests.slice(-5).reverse().map((service) => ({
+        name: service.deviceType || service.userEmail,
+        problem: service.problemCategory || "Other",
+        date: new Date(service.requestedDate || Date.now()).toLocaleDateString(),
+    }));
 
+    const recentShopsData = shops.slice(-5).reverse().map((s) => ({
+        name: s.shop?.shopName || s.shop?.contact?.businessEmail || "Unnamed Shop",
+        serviceType: Array.isArray(s.shop?.categories) ? s.shop.categories.join(", ") : "Other",
+        date: new Date(s.shop?.createdAt || Date.now()).toLocaleDateString(),
+    }));
 
-
-    // ✅ Admin Profile Info
-    const adminProfile = {
-        name: "Admin User",
-        joined: "January 15, 2020",
-        role: "System Administrator",
-        location: "Headquarters, Chicago, USA",
-        permissions: "Full Access",
-    };
-
-    // ✅ KPI Cards
     const platformMetrics = [
-        { id: 1, title: "Total Users", value: loading ? "…" : users.length, change: "+12%", trend: "up", icon: <Users size={20} className="text-blue-500" /> },
-        { id: 2, title: "Active Mechanics", value: "156", change: "+5%", trend: "up", icon: <UserCheck size={20} className="text-green-500" /> },
-        { id: 3, title: "Service Requests", value: "1,289", change: "+7%", trend: "up", icon: <Wrench size={20} className="text-orange-500" /> },
-        { id: 4, title: "Revenue", value: "$24,580", change: "+18%", trend: "up", icon: <DollarSign size={20} className="text-purple-500" /> },
-        { id: 5, title: "Avg. Rating", value: "4.6 ★", change: "+0.2", trend: "up", icon: <Star size={20} className="text-yellow-500" /> },
-        { id: 6, title: "Unresolved Complaints", value: "14", change: "-10%", trend: "down", icon: <AlertTriangle size={20} className="text-red-500" /> },
+        { id: 1, title: "Total Users", value: loading ? "…" : userData.length, change: "+12%", trend: "up", icon: Users, color: "orange" },
+        { id: 2, title: "Mechanic Shops", value: loading ? "…" : shops.length, change: "+8%", trend: "up", icon: Store, color: "blue" },
+        { id: 3, title: "Service Requests", value: loading ? "…" : requests.length, change: "+15%", trend: "up", icon: Wrench, color: "green" },
+        { id: 4, title: "Active Mechanics", value: "156", change: "+5%", trend: "up", icon: UserCheck, color: "purple" },
+        { id: 5, title: "Revenue", value: "$24,580", change: "+18%", trend: "up", icon: DollarSign, color: "emerald" },
+        { id: 6, title: "Avg. Rating", value: "4.6 ★", change: "+0.2", trend: "up", icon: Star, color: "yellow" },
     ];
 
-    // ✅ Chart Data
     const serviceTrends = [
         { month: "Jan", requests: 200 },
         { month: "Feb", requests: 240 },
@@ -111,271 +102,247 @@ const AdminDashboardOverview = () => {
         { month: "Jun", requests: 400 },
     ];
 
-    const revenueTrends = [
-        { month: "Jan", revenue: 1200 },
-        { month: "Feb", revenue: 1500 },
-        { month: "Mar", revenue: 1800 },
-        { month: "Apr", revenue: 1600 },
-        { month: "May", revenue: 2200 },
-        { month: "Jun", revenue: 2500 },
-    ];
+    const serviceTypeCount = requests.reduce((acc, curr) => {
+        const type = curr.deviceType || "Other";
+        acc[type] = (acc[type] || 0) + 1;
+        return acc;
+    }, {});
 
-    const serviceTypeBreakdown = [
-        { name: "Car", value: 55 },
-        { name: "Bike", value: 25 },
-        { name: "Truck", value: 15 },
-        { name: "Other", value: 5 },
-    ];
+    const serviceTypeBreakdown = Object.entries(serviceTypeCount).map(([name, value]) => ({
+        name,
+        value,
+    }));
 
-    const COLORS = ["#4F46E5", "#22C55E", "#F59E0B", "#EF4444"];
+    const COLORS = ["#EA580C", "#22C55E", "#F59E0B", "#EF4444", "#06B6D4", "#9333EA"];
 
-    // ✅ Table Data
-    const topMechanics = [
-        { name: "John Smith", jobs: 48, rating: 4.9, earnings: "$2,800" },
-        { name: "Maria Garcia", jobs: 45, rating: 4.8, earnings: "$2,500" },
-        { name: "Rahul Sharma", jobs: 41, rating: 4.7, earnings: "$2,300" },
-    ];
+    const StatCard = ({ icon: Icon, value, label, change, trend, color = "orange" }) => (
+        <div className="bg-white rounded-2xl p-6 border border-orange-100 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 group">
+            <div className="flex items-center justify-between mb-4">
+                <div className={`p-3 rounded-xl bg-${color}-500/10 group-hover:bg-${color}-500/20 transition-colors duration-300`}>
+                    <Icon className={`text-${color}-600`} size={24} />
+                </div>
+                <span className={`px-2 py-1 rounded-full text-xs font-bold ${trend === 'up' ? 'bg-green-100 text-green-600' : 'bg-red-100 text-red-600'}`}>
+                    {trend === 'up' ? '↑' : '↓'} {change}
+                </span>
+            </div>
+            <p className="text-3xl font-bold text-gray-900 mb-1">{value}</p>
+            <p className="text-gray-600 text-sm font-medium">{label}</p>
+        </div>
+    );
 
-    const feedbacks = [
-        { user: "David Miller", feedback: "Great service, quick response!", rating: 5 },
-        { user: "Sophia Lee", feedback: "Mechanic arrived late.", rating: 3 },
-        { user: "Liam Brown", feedback: "Fair pricing and good quality.", rating: 4 },
-    ];
+    // Custom label for pie chart with percentages
+    const renderCustomizedLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, percent }) => {
+        const RADIAN = Math.PI / 180;
+        const radius = innerRadius + (outerRadius - innerRadius) * 0.5;
+        const x = cx + radius * Math.cos(-midAngle * RADIAN);
+        const y = cy + radius * Math.sin(-midAngle * RADIAN);
 
-    const recentSignups = users
-        .slice(-5) // last 5
-        .reverse() // newest first
-        .map((u) => ({
-            name: u.name || u.email,
-            role: u.role || "Customer",
-            date: new Date(u.createdAt || Date.now()).toLocaleDateString(),
-        }));
-
-
-    const { result: requests = [], totalDocs, totalPage } = totalData;
-    const recentServiceReq = requests
-        .slice(-5) // last 5
-        .reverse() // newest first
-        .map((service) => ({
-            name: service.deviceType || service.userEmail,
-            problem: service.problemCategory || "Other",
-            date: new Date(service.requestedDate || Date.now()).toLocaleDateString(),
-        }));
-
-
-
-    const financialSummary = [
-        { label: "Total Revenue", value: "$24,580" },
-        { label: "Pending Payments", value: "$1,240" },
-        { label: "Completed Payments", value: "$22,300" },
-        { label: "Refunds Issued", value: "$1,040" },
-    ];
-
-    const systemHealth = [
-        { component: "API Server", status: "operational", latency: "45ms" },
-        { component: "Database", status: "operational", latency: "12ms" },
-        { component: "Payment Gateway", status: "degraded", latency: "280ms" },
-        { component: "File Storage", status: "operational", latency: "65ms" },
-    ];
-
-    // ✅ Status Badge Helper
-    const getStatusBadge = (status) => {
-        let base = "text-xs font-medium px-2.5 py-0.5 rounded-full";
-        switch (status) {
-            case "operational":
-                return <span className={`${base} bg-green-100 text-green-800`}>Operational</span>;
-            case "degraded":
-                return <span className={`${base} bg-yellow-100 text-yellow-800`}>Degraded</span>;
-            default:
-                return <span className={`${base} bg-red-100 text-red-800`}>Down</span>;
-        }
+        return (
+            <text x={x} y={y} fill="white" textAnchor={x > cx ? 'start' : 'end'} dominantBaseline="central" fontSize={12} fontWeight="bold">
+                {`${(percent * 100).toFixed(0)}%`}
+            </text>
+        );
     };
 
     return (
-        <div className="p-8 space-y-10 min-h-screen bg-gray-50">
-
-            {/* 🧭 Admin Banner */}
-            <div className="bg-gradient-to-r from-blue-600 to-purple-700 rounded-2xl p-8 text-white shadow-xl">
-                <div className="flex items-center gap-3 mb-3">
-                    <Shield size={32} />
-                    <h1 className="text-3xl font-bold">Admin Dashboard</h1>
+        <div className="min-h-screen p-6 mx-auto space-y-8">
+            {/* Header */}
+            <div className="bg-gradient-to-br from-orange-500 to-orange-600 rounded-3xl p-8 text-white shadow-2xl">
+                <div className="flex items-center gap-4 mb-4">
+                    <div className="p-3 bg-white/20 rounded-2xl">
+                        <Shield size={32} />
+                    </div>
+                    <div>
+                        <h1 className="text-4xl font-bold">Admin Dashboard</h1>
+                        <p className="text-orange-100 text-lg mt-2">
+                            Welcome back, <span className="font-semibold text-white">{loggedInUser.name}</span>
+                        </p>
+                    </div>
                 </div>
-                <p className="text-lg opacity-90">Welcome back, {adminProfile.name}! Here’s an overview of MechaLink.</p>
+                <div className="flex items-center gap-4 text-sm">
+                    <div className="flex items-center gap-2 bg-white/20 px-4 py-2 rounded-xl">
+                        <Crown size={16} />
+                        <span>System Administrator</span>
+                    </div>
+                    <div className="flex items-center gap-2 bg-white/20 px-4 py-2 rounded-xl">
+                        <Calendar size={16} />
+                        <span>Joined {new Date(loggedInUser.createdAt).toLocaleDateString()}</span>
+                    </div>
+                </div>
             </div>
 
-            {/* 📊 KPI Cards */}
+            {/* Stats Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-6">
                 {platformMetrics.map((metric) => (
-                    <div key={metric.id} className="bg-white rounded-xl p-5 shadow border border-gray-100">
-                        <div className="flex items-center justify-between">
-                            <div>
-                                <p className="text-sm text-gray-600">{metric.title}</p>
-                                <p className="text-2xl font-bold text-gray-800">{metric.value}</p>
-                                <span className={`text-sm ${metric.trend === "up" ? "text-green-600" : "text-red-600"}`}>
-                                    {metric.change} vs last month
-                                </span>
-                            </div>
-                            <div className="p-2 bg-gray-50 rounded-lg">{metric.icon}</div>
-                        </div>
-                    </div>
+                    <StatCard
+                        key={metric.id}
+                        icon={metric.icon}
+                        value={metric.value}
+                        label={metric.title}
+                        change={metric.change}
+                        trend={metric.trend}
+                        color={metric.color}
+                    />
                 ))}
             </div>
 
-            {/* 📈 Charts Section */}
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                {/* Service Trend */}
-                <div className="bg-white p-6 rounded-2xl shadow border border-gray-100">
-                    <h2 className="font-bold text-gray-800 mb-4">Service Requests Trend</h2>
-                    <ResponsiveContainer width="100%" height={200}>
+            {/* Charts */}
+            <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
+                <div className="xl:col-span-2 bg-white rounded-3xl p-8 border border-orange-100 shadow-xl">
+                    <h2 className="text-2xl font-bold text-gray-900 mb-8">Service Requests Trend</h2>
+                    <ResponsiveContainer width="100%" height={300}>
                         <LineChart data={serviceTrends}>
-                            <CartesianGrid strokeDasharray="3 3" />
-                            <XAxis dataKey="month" />
-                            <YAxis />
+                            <CartesianGrid strokeDasharray="3 3" stroke="#6b7220" />
+                            <XAxis dataKey="month" stroke="#6b7280" />
+                            <YAxis stroke="#6b7280" />
                             <Tooltip />
-                            <Line type="monotone" dataKey="requests" stroke="#2563eb" strokeWidth={2} />
+                            <Line
+                                type="monotone"
+                                dataKey="requests"
+                                stroke="#EA580C"
+                                strokeWidth={3}
+                                dot={{ fill: '#EA580C', r: 4 }}
+                            />
                         </LineChart>
                     </ResponsiveContainer>
                 </div>
 
-                {/* Revenue Trend */}
-                <div className="bg-white p-6 rounded-2xl shadow border border-gray-100">
-                    <h2 className="font-bold text-gray-800 mb-4">Revenue Overview</h2>
-                    <ResponsiveContainer width="100%" height={200}>
-                        <LineChart data={revenueTrends}>
-                            <CartesianGrid strokeDasharray="3 3" />
-                            <XAxis dataKey="month" />
-                            <YAxis />
-                            <Tooltip />
-                            <Line type="monotone" dataKey="revenue" stroke="#9333ea" strokeWidth={2} />
-                        </LineChart>
-                    </ResponsiveContainer>
-                </div>
-
-                {/* Service Type Pie */}
-                <div className="bg-white p-6 rounded-2xl shadow border border-gray-100">
-                    <h2 className="font-bold text-gray-800 mb-4">Service Type Breakdown</h2>
-                    <ResponsiveContainer width="100%" height={200}>
+                <div className="bg-white rounded-3xl p-8 border border-orange-100 shadow-xl">
+                    <h2 className="text-2xl font-bold text-gray-900 mb-8">Service Type Breakdown</h2>
+                    <ResponsiveContainer width="100%" height={300}>
                         <PieChart>
-                            <Pie data={serviceTypeBreakdown} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={70}>
+                            <Pie
+                                data={serviceTypeBreakdown}
+                                dataKey="value"
+                                nameKey="name"
+                                cx="50%"
+                                cy="50%"
+                                outerRadius={100}
+                                label={renderCustomizedLabel}
+                                labelLine={false}
+                            >
                                 {serviceTypeBreakdown.map((entry, index) => (
-                                    <Cell key={`cell-${index}`} fill={COLORS[index]} />
+                                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                                 ))}
                             </Pie>
-                            <Legend />
                             <Tooltip />
+                            <Legend />
                         </PieChart>
                     </ResponsiveContainer>
                 </div>
             </div>
 
-            {/* 📋 Tables Section */}
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-
-                {/* recentServiceReq */}
-                <div className="bg-white p-6 rounded-2xl shadow border border-gray-100">
-                    <h2 className="font-bold text-gray-800 mb-4">Recent Service Requests</h2>
-                    {loading ? (
-                        <p className="text-gray-500">Loading users...</p>
-                    ) : (
-                        <ul className="space-y-3">
-                            {recentServiceReq.length > 0 ? (
-                                recentServiceReq.map((u, i) => (
-                                    <li key={i} className="grid grid-cols-3 p-3 bg-gray-50 rounded-lg">
-                                        <span className="font-medium">{u.name}</span>
-                                        <span className="text-sm text-gray-600">{u.problem}</span>
-                                        <span className="text-xs text-gray-500">{u.date}</span>
-                                    </li>
-                                ))
-                            ) : (
-                                <p className="text-gray-500">No recent signups</p>
-                            )}
-                        </ul>
-                    )}
-                </div>
-
-                {/* Feedbacks */}
-                <div className="bg-white p-6 rounded-2xl shadow border border-gray-100">
-                    <h2 className="font-bold text-gray-800 mb-4">Recent Feedback</h2>
-                    {feedbacks.map((f, i) => (
-                        <div key={i} className="mb-4 p-3 bg-gray-50 rounded-lg">
-                            <p className="font-semibold">{f.user}</p>
-                            <p className="text-sm text-gray-600">{f.feedback}</p>
-                            <p className="text-yellow-500 mt-1">{"★".repeat(f.rating)}</p>
-                        </div>
-                    ))}
-                </div>
-
-                {/* Signups */}
-                <div className="bg-white p-6 rounded-2xl shadow border border-gray-100">
-                    <h2 className="font-bold text-gray-800 mb-4">Recent Signups</h2>
-                    {loading ? (
-                        <p className="text-gray-500">Loading users...</p>
-                    ) : (
-                        <ul className="space-y-3">
-                            {recentSignups.length > 0 ? (
-                                recentSignups.map((u, i) => (
-                                    <li key={i} className="grid grid-cols-3 p-3 bg-gray-50 rounded-lg">
-                                        <span className="font-medium">{u.name}</span>
-                                        <span className="text-sm text-gray-600">{u.role}</span>
-                                        <span className="text-xs text-gray-500">{u.date}</span>
-                                    </li>
-                                ))
-                            ) : (
-                                <p className="text-gray-500">No recent signups</p>
-                            )}
-                        </ul>
-                    )}
-                </div>
-
-            </div>
-
-            {/* 💰 Financial Summary + System Health */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                {/* Financial Summary */}
-                <div className="bg-white p-6 rounded-2xl shadow border border-gray-100">
-                    <h2 className="font-bold text-gray-800 mb-4">Financial Summary</h2>
-                    <ul className="space-y-3">
-                        {financialSummary.map((f, i) => (
-                            <li key={i} className="flex justify-between bg-gray-50 p-3 rounded-lg">
-                                <span>{f.label}</span>
-                                <span className="font-semibold">{f.value}</span>
-                            </li>
-                        ))}
-                    </ul>
-                </div>
-
-                {/* System Health */}
-                <div className="bg-white p-6 rounded-2xl shadow border border-gray-100">
-                    <h2 className="font-bold text-gray-800 mb-4">System Health</h2>
-                    <div className="space-y-3">
-                        {systemHealth.map((s, i) => (
-                            <div key={i} className="flex justify-between items-center bg-gray-50 p-3 rounded-lg">
-                                <div>
-                                    <p className="font-medium">{s.component}</p>
-                                    <p className="text-sm text-gray-600">Latency: {s.latency}</p>
-                                </div>
-                                {getStatusBadge(s.status)}
+            {/* Recent Activity */}
+            <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
+                {/* Service Requests */}
+                <div className="bg-white col-span-2 rounded-3xl p-8 border border-orange-100 shadow-xl">
+                    <div className="flex items-center justify-between mb-6">
+                        <h2 className="text-2xl font-bold text-gray-900">Recent Service Requests</h2>
+                        <Eye className="text-orange-500" size={20} />
+                    </div>
+                    <div className="space-y-4">
+                        {loading ? (
+                            <div className="text-center py-8">
+                                <span className="loading loading-bars loading-md text-orange-500"></span>
                             </div>
-                        ))}
+                        ) : recentServiceReq.length > 0 ? (
+                            recentServiceReq.map((req, i) => (
+                                <div key={i} className="flex items-center justify-between p-4 bg-orange-50 rounded-xl border border-orange-200">
+                                    <div>
+                                        <p className="font-semibold text-gray-900">{req.name}</p>
+                                        <p className="text-sm text-gray-600">{req.problem}</p>
+                                    </div>
+                                    <span className="text-xs text-gray-500">{req.date}</span>
+                                </div>
+                            ))
+                        ) : (
+                            <div className="text-center py-8 text-gray-500">No recent service requests</div>
+                        )}
                     </div>
                 </div>
-            </div>
 
-            {/* ⚙️ Quick Actions */}
-            <div className="bg-white p-6 rounded-2xl shadow border border-gray-100">
-                <h2 className="font-bold text-gray-800 mb-4">Quick Actions</h2>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                    <button className="p-4 bg-blue-50 rounded-xl text-blue-700 font-medium hover:bg-blue-100 transition flex items-center gap-2">
-                        <UserCheck size={20} /> User Management
+                {/* Recent Signups */}
+                <div className="bg-white rounded-3xl p-8 border border-orange-100 shadow-xl">
+                    <div className="flex items-center justify-between mb-6">
+                        <h2 className="text-2xl font-bold text-gray-900">Recent Signups</h2>
+                        <UserCheck className="text-orange-500" size={20} />
+                    </div>
+                    <div className="space-y-4">
+                        {loading ? (
+                            <div className="text-center py-8">
+                                <span className="loading loading-bars loading-md text-orange-500"></span>
+                            </div>
+                        ) : recentSignups.length > 0 ? (
+                            recentSignups.map((user, i) => (
+                                <div key={i} className="flex items-center gap-4 p-4 bg-orange-50 rounded-xl border border-orange-200">
+                                    <div className="w-10 h-10 bg-gradient-to-br from-orange-400 to-orange-600 rounded-xl flex items-center justify-center text-white font-bold">
+                                        {user.name?.charAt(0) || "U"}
+                                    </div>
+                                    <div className="flex-1">
+                                        <p className="font-semibold text-gray-900">{user.name}</p>
+                                        <p className="text-sm text-gray-600 capitalize">{user.role}</p>
+                                    </div>
+                                    <span className="text-xs text-gray-500">
+                                        {new Date(user.createdAt).toLocaleDateString()}
+                                    </span>
+                                </div>
+                            ))
+                        ) : (
+                            <div className="text-center py-8 text-gray-500">No recent signups</div>
+                        )}
+                    </div>
+                </div>
+
+            </div>
+                {/* Recent Shops */}
+                <div className="bg-white rounded-3xl p-8 border border-orange-100 shadow-xl">
+                    <div className="flex items-center justify-between mb-6">
+                        <h2 className="text-2xl font-bold text-gray-900">Recent Shops</h2>
+                        <Store className="text-orange-500" size={20} />
+                    </div>
+                    <div className="space-y-4">
+                        {loading ? (
+                            <div className="text-center py-8">
+                                <span className="loading loading-bars loading-md text-orange-500"></span>
+                            </div>
+                        ) : recentShopsData.length > 0 ? (
+                            recentShopsData.map((shop, i) => (
+                                <div key={i} className="flex items-center gap-4 p-4 bg-orange-50 rounded-xl border border-orange-200">
+                                    <div className="w-10 h-10 bg-gradient-to-br from-blue-400 to-blue-600 rounded-xl flex items-center justify-center text-white font-bold">
+                                        {shop.name?.charAt(0) || "S"}
+                                    </div>
+                                    <div className="flex-1">
+                                        <p className="font-semibold text-gray-900 truncate">{shop.name}</p>
+                                        <p className="text-sm text-gray-600 truncate">{shop.serviceType}</p>
+                                    </div>
+                                    <span className="text-xs text-gray-500">{shop.date}</span>
+                                </div>
+                            ))
+                        ) : (
+                            <div className="text-center py-8 text-gray-500">No recent shops</div>
+                        )}
+                    </div>
+                </div>
+
+            {/* Quick Actions */}
+            <div className="bg-white rounded-3xl p-8 border border-orange-100 shadow-xl">
+                <h2 className="text-2xl font-bold text-gray-900 mb-6">Quick Actions</h2>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <button className="flex items-center gap-3 p-4 bg-orange-500 text-white rounded-xl font-semibold transition-all duration-300 hover:bg-orange-600">
+                        <UserCheck size={20} />
+                        <span>User Management</span>
                     </button>
-                    <button className="p-4 bg-green-50 rounded-xl text-green-700 font-medium hover:bg-green-100 transition flex items-center gap-2">
-                        <Settings size={20} /> System Settings
+                    <button className="flex items-center gap-3 p-4 bg-white text-gray-700 rounded-xl font-semibold border border-orange-200 hover:bg-orange-50">
+                        <Settings size={20} />
+                        <span>System Settings</span>
                     </button>
-                    <button className="p-4 bg-purple-50 rounded-xl text-purple-700 font-medium hover:bg-purple-100 transition flex items-center gap-2">
-                        <BarChart3 size={20} /> Analytics
+                    <button className="flex items-center gap-3 p-4 bg-white text-gray-700 rounded-xl font-semibold border border-orange-200 hover:bg-orange-50">
+                        <BarChart3 size={20} />
+                        <span>Analytics</span>
                     </button>
-                    <button className="p-4 bg-orange-50 rounded-xl text-orange-700 font-medium hover:bg-orange-100 transition flex items-center gap-2">
-                        <FileText size={20} /> Reports
+                    <button className="flex items-center gap-3 p-4 bg-orange-500 text-white rounded-xl font-semibold transition-all duration-300 hover:bg-orange-600">
+                        <FileText size={20} />
+                        <span>Reports</span>
                     </button>
                 </div>
             </div>
@@ -383,4 +350,4 @@ const AdminDashboardOverview = () => {
     );
 };
 
-export default AdminDashboardOverview;
+export default AdminDashboardOverview;  
