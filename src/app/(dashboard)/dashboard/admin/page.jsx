@@ -1,37 +1,9 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import {
-    Wrench,
-    MapPin,
-    Calendar,
-    Users,
-    FileText,
-    Settings,
-    BarChart3,
-    Shield,
-    AlertTriangle,
-    TrendingUp,
-    UserCheck,
-    Car,
-    DollarSign,
-    Star,
-    Building2,
-    Bell,
-    Activity,
+import { Wrench, MapPin, Calendar, Users, FileText, Settings, BarChart3, Shield, AlertTriangle, TrendingUp, UserCheck, Car, DollarSign, Star, Building2, Bell, Activity,
 } from "lucide-react";
-import {
-    LineChart,
-    Line,
-    XAxis,
-    YAxis,
-    CartesianGrid,
-    Tooltip,
-    PieChart,
-    Pie,
-    Cell,
-    ResponsiveContainer,
-    Legend,
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, PieChart, Pie, Cell, ResponsiveContainer, Legend,
 } from "recharts";
 import useUser from "@/hooks/useUser";
 
@@ -44,9 +16,6 @@ const AdminDashboardOverview = () => {
     const [totalShop, setTotalShop] = useState([]);
     const [recentSignups, setRecentSignups] = useState([]);
     const [userData, setUserData] = useState([]);
-
-
-
 
 
     // To get all recent 5 users //

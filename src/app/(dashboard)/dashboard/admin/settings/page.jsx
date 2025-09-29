@@ -11,6 +11,9 @@ export default function AdminSettings() {
   const { user: loggedInUser, loading: userLoading } = useUser();
   const [activeTab, setActiveTab] = useState("profile");
 
+  
+
+
   const [profile, setProfile] = useState({
     name: "",
     email: "",
@@ -81,13 +84,16 @@ export default function AdminSettings() {
     );
   }
 
-  if (!loggedInUser || loggedInUser.role !== "admin") {
+  if (!loggedInUser) {
+    // optional redirect logic here
     return (
-      <div className="flex items-center justify-center h-screen w-screen text-gray-600">
-        <p>Access denied. Admins only.</p>
+      <div className="flex items-center justify-center h-screen w-screen">
+        <span className="loading loading-bars loading-xl text-orange-500"></span>
       </div>
     );
   }
+
+  // In your AdminSettings component
 
   const handleSave = async () => {
     try {
@@ -102,6 +108,7 @@ export default function AdminSettings() {
           jobTitle: profile.jobTitle,
           department: profile.department,
           bio: profile.bio,
+          profileImage: profile.photoURL, // Add this line
         }),
       });
 
@@ -144,8 +151,8 @@ export default function AdminSettings() {
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
                 className={`flex items-center gap-2 px-6 py-4 border-b-2 transition-colors ${activeTab === tab.id
-                    ? "border-blue-600 text-blue-600"
-                    : "border-transparent text-gray-600 hover:text-gray-900"
+                  ? "border-blue-600 text-blue-600"
+                  : "border-transparent text-gray-600 hover:text-gray-900"
                   }`}
               >
                 <Icon size={18} />

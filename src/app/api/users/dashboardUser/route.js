@@ -26,7 +26,16 @@ export async function GET(request) {
 export async function PUT(request) {
   try {
     const body = await request.json();
-    const { email, name, phone, location, jobTitle, department, bio } = body;
+    const { 
+      email, 
+      name, 
+      phone, 
+      location, 
+      jobTitle, 
+      department, 
+      bio, 
+      profileImage // Add this field
+    } = body;
 
     if (!email) {
       return NextResponse.json({ message: "Email is required" }, { status: 400 });
@@ -42,21 +51,25 @@ export async function PUT(request) {
         ...(jobTitle && { jobTitle }),
         ...(department && { department }),
         ...(bio && { bio }),
+        ...(profileImage && { profileImage }), // Add profile image update
         updatedAt: new Date(),
       },
     };
 
     const result = await collection.updateOne(
-      { email }, // find by email
+      { email },
       updateDoc,
-      { upsert: false } // only update if user exists
+      { upsert: false }
     );
 
     if (result.matchedCount === 0) {
       return NextResponse.json({ message: "User not found" }, { status: 404 });
     }
 
-    return NextResponse.json({ message: "Profile updated successfully" });
+    return NextResponse.json({ 
+      message: "Profile updated successfully",
+      updatedFields: Object.keys(body).filter(key => key !== 'email')
+    });
   } catch (error) {
     console.error(error);
     return NextResponse.json({ message: "Internal server error" }, { status: 500 });
