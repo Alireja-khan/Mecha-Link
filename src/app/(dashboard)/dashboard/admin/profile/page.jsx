@@ -88,16 +88,15 @@ const AdminProfile = () => {
     return (
         <div className="min-h-screen">
 
-            <div className="p-6 max-w-7xl mx-auto">
+            <div className="p-6  mx-auto">
                 {/* Hero Section with Large Profile */}
                 <div className="grid grid-cols-1 xl:grid-cols-3 gap-8 mb-8">
                     {/* Large Profile Card - Takes 2/3 width */}
                     <div className="xl:col-span-2 bg-white rounded-3xl p-8 border border-orange-100 shadow-xl">
-                        <div className="flex flex-col lg:flex-row items-center lg:items-start gap-8">
+                        <div className="flex justify-center items-center gap-8">
 
                             {/* Extra Large Profile Image */}
-                            <div className="relative group">
-                                <div className="w-48 h-68 rounded-2xl border-4 border-white shadow-2xl overflow-hidden bg-gradient-to-br from-orange-400 to-orange-600">
+                            <div className="w-88 h-88 rounded-2xl border-4 border-white shadow-2xl overflow-hidden bg-gradient-to-br from-orange-400 to-orange-600">
                                     {loggedInUser.profileImage ? ( // Changed from profileImage to profileImage
                                         <img
                                             src={loggedInUser.profileImage}
@@ -110,7 +109,6 @@ const AdminProfile = () => {
                                         </div>
                                     )}
                                 </div>
-                            </div>
 
                             {/* Profile Info */}
                             <div className="flex-1 text-center lg:text-left">
@@ -143,6 +141,7 @@ const AdminProfile = () => {
                                     </div>
                                 </div>
                             </div>
+                            
                         </div>
                     </div>
 
