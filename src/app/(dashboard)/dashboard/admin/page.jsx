@@ -192,7 +192,7 @@ const AdminDashboardOverview = () => {
                     <h2 className="text-2xl font-bold text-gray-900 mb-8">Service Requests Trend</h2>
                     <ResponsiveContainer width="100%" height={300}>
                         <LineChart data={serviceTrends}>
-                            <CartesianGrid strokeDasharray="3 3" stroke="#f3f4f6" />
+                            <CartesianGrid strokeDasharray="3 3" stroke="#6b7220" />
                             <XAxis dataKey="month" stroke="#6b7280" />
                             <YAxis stroke="#6b7280" />
                             <Tooltip />

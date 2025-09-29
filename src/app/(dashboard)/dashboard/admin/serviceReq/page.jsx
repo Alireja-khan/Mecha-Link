@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from "react";
 import useUser from "@/hooks/useUser";
 import { Check, X, Edit, Search, Filter, Download, Wrench, Clock, User, Mail, Calendar, AlertCircle } from "lucide-react";
+import Link from "next/link";
 
 const ManageServiceRequests = () => {
   const { user: loggedInUser, loading: userLoading } = useUser();
@@ -114,7 +115,7 @@ const ManageServiceRequests = () => {
             <h2 className="text-2xl font-bold text-gray-900 mb-2">All Service Requests</h2>
             <p className="text-gray-600">Manage request status and assignments</p>
           </div>
-          
+
           <div className="flex flex-col sm:flex-row gap-3 w-full lg:w-auto">
             {/* Search */}
             <div className="relative">
@@ -127,7 +128,7 @@ const ManageServiceRequests = () => {
                 className="pl-10 pr-4 py-3 border border-orange-200 rounded-xl bg-orange-50/50 focus:bg-white focus:border-orange-300 focus:outline-none transition-all duration-300 w-full lg:w-80"
               />
             </div>
-            
+
             {/* Action Buttons */}
             <div className="flex gap-3">
               <button className="flex items-center gap-2 px-4 py-3 bg-orange-50 text-orange-700 rounded-xl border border-orange-200 hover:bg-orange-100 transition-colors duration-200">
@@ -256,12 +257,15 @@ const ManageServiceRequests = () => {
                             <Check size={16} />
                           </button>
                         )}
-                        <button 
-                          className="p-2 bg-orange-500/10 text-orange-600 rounded-xl border border-orange-200 hover:bg-orange-500/20 hover:scale-105 transition-all duration-200"
-                          title="Edit"
+                        <Link href={`serviceReq/${req._id}`}
                         >
-                          <Edit size={16} />
-                        </button>
+                          <button
+                            className="p-2 bg-orange-500/10 text-orange-600 rounded-xl border border-orange-200 hover:bg-orange-500/20 hover:scale-105 transition-all duration-200"
+                            title="Edit"
+                          >
+                            <Edit size={16} />
+                          </button>
+                        </Link>
                       </div>
                     </td>
                   </tr>
