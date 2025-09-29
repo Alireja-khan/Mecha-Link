@@ -13,7 +13,7 @@ export default function DashboardRedirect() {
   const role = loggedInUser?.role; // "admin" | "mechanic" | "user"
       if (role === "admin") router.push("/dashboard/admin");
       else if (role === "mechanic") router.push("/dashboard/mechanic");
-      else router.push("/dashboard/user");
+      // else router.push("/dashboard/user");
 
   return <p className="p-8">Loading dashboard...</p>;
 }
