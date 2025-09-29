@@ -16,7 +16,7 @@ import {
     Mail,
     Map,
     Image as ImageIcon,
-    Trash2 // Added Trash2 icon for delete
+    Trash2
 } from "lucide-react";
 import { useParams } from "next/navigation";
 import Swal from 'sweetalert2';
@@ -32,6 +32,8 @@ const ServiceRequestDetails = () => {
     const currentMechanicId = loggedInUser?._id;
 
     useEffect(() => {
+        if (!id) return; // Guard against missing ID
+
         fetch(`/api/service-request/${id}`)
             .then(response => {
                 if (!response.ok) {
@@ -44,6 +46,20 @@ const ServiceRequestDetails = () => {
                     data.user = { email: data.userEmail, _id: data.userId };
                 }
                 setRequest(data);
+
+                // --- START Console Log Additions ---
+                const serviceRequestId = id;
+                const customerId = data.userId;
+                // currentMechanicId here is the ID of the logged-in user viewing the page.
+                const viewerId = loggedInUser?._id;
+
+                console.log("--- Service Request IDs ---");
+                console.log("Service Request ID (from URL):", serviceRequestId);
+                console.log("Customer User ID (from request data):", customerId);
+                console.log("Current Logged-in User ID (Mechanic/Viewer):", viewerId);
+                console.log("---------------------------");
+                // --- END Console Log Additions ---
+
             })
             .catch(error => {
                 console.error("Error fetching service request:", error);
@@ -54,7 +70,7 @@ const ServiceRequestDetails = () => {
                     confirmButtonColor: '#f97316'
                 });
             });
-    }, [id])
+    }, [id, loggedInUser?._id]) // Added loggedInUser?._id as a dependency
 
     if (!request) {
         return (
@@ -87,10 +103,8 @@ const ServiceRequestDetails = () => {
 
     const urgencyInfo = urgencyConfig[request.serviceDetails?.urgency] || urgencyConfig.medium;
 
-    const MOCK_MECHANIC_EMAIL = 'raheelarfeen@gmail.com';
-    const isMockMechanic = loggedInUser?.email === MOCK_MECHANIC_EMAIL;
-
-    const loggedInUserRole = isMockMechanic ? 'mechanic' : loggedInUser?.role?.toLowerCase();
+    // --- REMOVED MOCK_MECHANIC_EMAIL and isMockMechanic logic ---
+    const loggedInUserRole = loggedInUser?.role?.toLowerCase();
 
     const isCustomerViewingOwnRequest = loggedInUser?._id === request.userId;
 
@@ -221,9 +235,11 @@ const ServiceRequestDetails = () => {
         const address = encodeURIComponent(request.location?.address || "Service Location");
 
         if (latitude && longitude) {
-            const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${latitude},${longitude}`;
+            // Updated mapsUrl to use standard Google Maps format
+            const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${latitude},${longitude}`; 
             window.open(mapsUrl, '_blank');
         } else if (address) {
+            // Updated mapsUrl to use standard Google Maps format
             const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${address}`;
             window.open(mapsUrl, '_blank');
         } else {
