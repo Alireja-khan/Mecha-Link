@@ -9,7 +9,6 @@ import Swal from "sweetalert2";
 import { useSession } from "next-auth/react";
 import useUser from "@/hooks/useUser";
 
-// Vehicle brands and models data
 const VEHICLE_BRANDS = {
 
   car: [
@@ -29,43 +28,30 @@ const VEHICLE_BRANDS = {
   ]
 };
 
-// Vehicle models by brand
 const VEHICLE_MODELS = {
-  // Toyota models
   "Toyota": [
     "Corolla", "Camry", "Premio", "Allion", "Noah", "Voxy", "Aqua",
     "Prius", "Vitz", "Raize", "Rush", "Hilux", "Land Cruiser", "Fortuner", "Other"
   ],
-  // Honda models
   "Honda": [
     "Civic", "Accord", "City", "Fit", "Vezel", "CR-V", "HR-V", "BR-V",
     "Stepwagon", "Freed", "N-Box", "Other"
   ],
-  // Nissan models
   "Nissan": [
     "Sunny", "Tiida", "Note", "March", "X-Trail", "Qashqai", "Patrol",
     "Navara", "Juke", "Other"
   ],
-  // Yamaha bikes
   "Yamaha": [
     "YZF-R15", "MT-15", "FZ", "FZS", "R15", "MT-07", "MT-09", "YZF-R3",
     "Fazer", "FZ-S", "Other"
   ],
-  // Honda bikes
-  "Honda": [
-    "CBR", "CB", "Shine", "Unicorn", "Activa", "Dio", "Africa Twin",
-    "Gold Wing", "CBR1000RR", "Other"
-  ],
-  // Suzuki bikes
   "Suzuki": [
     "Gixxer", "Hayabusa", "V-Strom", "Burgman", "Access", "Intruder",
     "GSX-R", "Other"
   ],
-  // Default models
   "Other": ["Other"]
 };
 
-// Device type configurations
 const DEVICE_TYPES = {
   car: { label: "Car", icon: Car, categories: ["Engine", "Transmission", "Brakes", "Electrical", "AC", "Tires", "General Maintenance"] },
   bike: { label: "Bike", icon: Bike, categories: ["Engine", "Brakes", "Electrical", "Chain", "Tires", "General Maintenance"] },
@@ -114,10 +100,26 @@ const ServiceRequest = () => {
   const watchImages = watch("images");
   const watchUrgency = watch("urgency");
   const watchBrand = watch("brand");
-  const { data: session, status } = useSession();
+  const { data: session } = useSession();
   const loggedInUser = useUser(session?.user?.email)
 
-  // Reset form fields when device type changes
+  // ------------------------------------------
+  // LOG USER ID, NAME, AND EMAIL ON PAGE LOAD
+  // ------------------------------------------
+  useEffect(() => {
+    // Attempt to get the most complete user data
+    const userId = session?._id || session?.user?.id || loggedInUser?._id || "N/A";
+    const userName = session?.user?.name || loggedInUser?.name || "Guest User";
+    const userEmail = session?.user?.email || loggedInUser?.email || "guest@example.com";
+
+    console.log("--- ServiceRequest Page Loaded ---");
+    console.log(`User ID: ${userId}`);
+    console.log(`User Name: ${userName}`);
+    console.log(`User Email: ${userEmail}`);
+    console.log("----------------------------------");
+  }, [session, loggedInUser]); // Depend on session and loggedInUser to catch asynchronous loading
+  // ------------------------------------------
+
   useEffect(() => {
     if (watchDeviceType) {
       setValue("problemCategory", "");
@@ -126,7 +128,6 @@ const ServiceRequest = () => {
       setValue("year", "");
       setValue("vin", "");
 
-      // Set available brands based on device type
       if (["car", "bike", "truck"].includes(watchDeviceType)) {
         setAvailableBrands(VEHICLE_BRANDS[watchDeviceType] || []);
       } else {
@@ -136,17 +137,15 @@ const ServiceRequest = () => {
     }
   }, [watchDeviceType, setValue]);
 
-  // Update available models when brand changes
   useEffect(() => {
     if (watchBrand && watchDeviceType && ["car", "bike", "truck"].includes(watchDeviceType)) {
       setAvailableModels(VEHICLE_MODELS[watchBrand] || ["Other"]);
-      setValue("model", ""); // Reset model when brand changes
+      setValue("model", "");
     } else {
       setAvailableModels([]);
     }
   }, [watchBrand, watchDeviceType, setValue]);
 
-  // Upload image to ImgBB with progress tracking
   const uploadImageToImgbb = async (file) => {
     const formData = new FormData();
     formData.append("image", file);
@@ -172,12 +171,7 @@ const ServiceRequest = () => {
     }
   };
 
-  // const { data: session } = useSession();
-  console.log(loggedInUser)
-
-  // Handle form submit
   const onSubmit = async (data) => {
-    // Validate location
     if (!location.address || !location.latitude || !location.longitude) {
       toast.error("Please select a valid location");
       Swal.fire({
@@ -193,7 +187,6 @@ const ServiceRequest = () => {
       setUploadProgress(0);
       let uploadedImages = [];
 
-      // Upload images if any
       if (data.images && data.images.length > 0) {
         const uploadToast = toast.loading(`Uploading images (0/${data.images.length})`);
         for (let i = 0; i < data.images.length; i++) {
@@ -205,11 +198,14 @@ const ServiceRequest = () => {
         toast.dismiss();
       }
 
-
+      const userId = session?._id || session?.user?.id || loggedInUser?._id;
+      const userEmail = session?.user?.email || loggedInUser?.email || "guest@example.com";
+      const userName = session?.user?.name || loggedInUser?.name || "Guest User";
 
       const formData = {
-        userId: loggedInUser._id, // optional if you want a user id
-        userEmail: session?.user?.email || "guest@example.com", // add email here
+        userId: userId,
+        userEmail: userEmail,
+        userName: userName,
         deviceType: data.deviceType,
         problemCategory: data.problemCategory,
         serviceDetails: {
@@ -302,9 +298,7 @@ const ServiceRequest = () => {
 
         <form onSubmit={handleSubmit(onSubmit)} className="grid xl:grid-cols-3 lg:grid-cols-2 gap-6">
 
-          {/* COLUMN 1 - Device & Service Details */}
           <div className="xl:col-span-1 space-y-6">
-            {/* Device Type Selection */}
             <div className="bg-white p-6 rounded-xl shadow-sm border border-neutral h-fit">
               <h2 className="flex items-center gap-2 text-primary mb-4 text-xl font-semibold">
                 <User className="h-5 w-5" /> Device/Vehicle Information
@@ -327,7 +321,6 @@ const ServiceRequest = () => {
                   )}
                 </div>
 
-                {/* Vehicle/Device Details */}
                 {watchDeviceType && ["car", "bike", "truck"].includes(watchDeviceType) && (
                   <div className="grid gap-4 p-4 bg-gray-50 rounded-lg">
                     <div>
@@ -408,7 +401,6 @@ const ServiceRequest = () => {
                   </div>
                 )}
 
-                {/* Appliance brands for non-vehicle devices */}
                 {watchDeviceType && !["car", "bike", "truck"].includes(watchDeviceType) && watchDeviceType !== "other" && (
                   <div>
                     <label className="block text-sm font-medium mb-2">Brand (Optional)</label>
@@ -420,7 +412,6 @@ const ServiceRequest = () => {
                   </div>
                 )}
 
-                {/* Problem Category */}
                 {watchDeviceType && (
                   <div>
                     <label className="block text-sm font-medium mb-2">Problem Category *</label>
@@ -441,7 +432,6 @@ const ServiceRequest = () => {
               </div>
             </div>
 
-            {/* Service Details */}
             <div className="bg-white p-6 rounded-xl shadow-sm border border-neutral h-fit">
               <h2 className="flex items-center gap-2 text-primary mb-4 text-xl font-semibold">
                 <AlertTriangle className="h-5 w-5" /> Service Details
@@ -478,14 +468,12 @@ const ServiceRequest = () => {
               </div>
             </div>
 
-            {/* Urgency & Budget */}
             <div className="bg-white p-6 rounded-xl shadow-sm border border-neutral h-fit">
               <h2 className="flex items-center gap-2 text-primary mb-4 text-xl font-semibold">
                 ⚡ Urgency & Budget
               </h2>
 
               <div className="space-y-4">
-                {/* Urgency Level */}
                 <div>
                   <label className="block text-sm font-medium mb-2">Urgency Level</label>
                   <div className="grid grid-cols-2 gap-2">
@@ -507,7 +495,6 @@ const ServiceRequest = () => {
                   </div>
                 </div>
 
-                {/* Budget Estimate */}
                 <div>
                   <label className="block text-sm font-medium mb-2">Expected Budget Range (BDT)</label>
                   <select
@@ -530,9 +517,7 @@ const ServiceRequest = () => {
             </div>
           </div>
 
-          {/* COLUMN 2 - Contact & Location */}
           <div className="xl:col-span-1 space-y-6">
-            {/* Location */}
             <div className="bg-white p-6 rounded-xl shadow-sm border border-neutral h-fit">
               <h2 className="flex items-center gap-2 text-primary mb-4 text-xl font-semibold">
                 <MapPin className="h-5 w-5" /> Service Location
@@ -551,7 +536,6 @@ const ServiceRequest = () => {
               </div>
             </div>
 
-            {/* Image Upload */}
             <div className="bg-white p-6 rounded-xl shadow-sm border border-neutral h-fit">
               <h2 className="flex items-center gap-2 text-primary mb-4 text-xl font-semibold">
                 📸 Problem Images
@@ -587,7 +571,6 @@ const ServiceRequest = () => {
                     <p className="text-sm text-red-500 mt-1">{errors.images.message}</p>
                   )}
 
-                  {/* Image Preview */}
                   {watchImages && watchImages.length > 0 && (
                     <div className="mt-4">
                       <p className="text-sm text-gray-600 mb-2">Image Previews:</p>
@@ -620,9 +603,7 @@ const ServiceRequest = () => {
             </div>
           </div>
 
-          {/* COLUMN 3 - Scheduling & Contact Information */}
           <div className="xl:col-span-1 space-y-6">
-            {/* Scheduling */}
             <div className="bg-white p-6 rounded-xl shadow-sm border border-neutral h-fit">
               <h2 className="flex items-center gap-2 text-primary mb-4 text-xl font-semibold">
                 <Clock className="h-5 w-5" /> Scheduling Preferences
@@ -666,7 +647,6 @@ const ServiceRequest = () => {
               </div>
             </div>
 
-            {/* Contact Information */}
             <div className="bg-white p-6 rounded-xl shadow-sm border border-neutral h-fit">
               <h2 className="flex items-center gap-2 text-primary mb-4 text-xl font-semibold">
                 <User className="h-5 w-5" /> Contact Information
@@ -715,7 +695,6 @@ const ServiceRequest = () => {
             </div>
           </div>
 
-          {/* Submit Button */}
           <div className="xl:col-span-3 flex justify-center mt-8">
             <Button
               type="submit"
@@ -733,7 +712,6 @@ const ServiceRequest = () => {
             </Button>
           </div>
 
-          {/* Upload Progress */}
           {isSubmitting && uploadProgress > 0 && (
             <div className="xl:col-span-3">
               <div className="bg-blue-50 p-4 rounded-lg">
