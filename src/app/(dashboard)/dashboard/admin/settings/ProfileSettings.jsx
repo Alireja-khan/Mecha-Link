@@ -52,7 +52,7 @@ export default function ProfileSettings({ profile, setProfile }) {
       <div className="flex items-center gap-6">
         <div className="relative group">
           <div className="w-24 h-24 rounded-2xl border-4 border-white shadow-lg overflow-hidden bg-gradient-to-br from-orange-400 to-orange-600">
-            {loggedInUser.profileImage ? (
+            {loggedInUser ? (
               <img
                 src={loggedInUser.profileImage}
                 alt="Profile"
@@ -60,7 +60,7 @@ export default function ProfileSettings({ profile, setProfile }) {
               />
             ) : (
               <div className="w-full h-full bg-gradient-to-br from-orange-400 to-orange-600 flex items-center justify-center text-white text-2xl font-bold">
-                {loggedInUser.name?.charAt(0) || 'A'}
+                {loggedInUser?.name.charAt(0) || 'A'}
               </div>
             )}
           </div>
