@@ -143,7 +143,7 @@ export default function FeaturesSection() {
             <div className="grid grid-cols-2 gap-8 m-20  text-center lg:text-left">
               {stats.map((stat, idx) => (
                 <div key={idx} className="flex flex-col items-center lg:items-start">
-                  <h3 className="text-4xl md:text-5xl font-extrabold text-primary">
+                  <h3 className="text-2xl md:text-5xl font-extrabold text-primary">
                     <CountUp end={stat.value} duration={10} suffix={stat.suffix} />
                   </h3>
                   <p className="text-gray-200 text-lg font-poppins">{stat.label}</p>

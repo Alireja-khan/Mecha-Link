@@ -6,7 +6,6 @@ import ServiceSec from "../Components/ServiceSec";
 import WhyChooseUs from "../Components/WhyChooseUs";
 import HowItWork from "../Components/HowItWork";
 import HeroSection from "../Components/HeroSection";
-import useUser from "@/hooks/useUser";
 
 
 export default function Home() {
