@@ -140,8 +140,8 @@ const ServiceRequestDetails = () => {
             });
 
             if (response.ok) {
-                Swal.fire({ icon: 'success', title: 'Request Accepted!', text: 'The request has been accepted successfully.', confirmButtonColor: '#10b981' })
-                    .then(() => window.location.reload());
+                // --- REMOVED SUCCESS ALERT ---
+                window.location.reload();
             } else {
                 Swal.fire({
                     icon: 'error',
@@ -209,15 +209,7 @@ const ServiceRequestDetails = () => {
 
             const chatPath = `/dashboard/${loggedInUserRole}/messages`;
 
-            await Swal.fire({
-                icon: 'success',
-                title: apiResponse.status === 201 ? 'Chat Started Successfully!' : 'Conversation Retrieved!',
-                html: `The chat for service request #${serviceRequestId} is now active.<br/><br/>
-                       You will be redirected to your messages dashboard.`,
-                confirmButtonColor: '#f97316',
-                confirmButtonText: 'Go to Messages'
-            });
-
+            // --- REMOVED SUCCESS/RETRIEVED ALERT ---
             window.location.href = chatPath;
 
         } catch (error) {
@@ -236,7 +228,7 @@ const ServiceRequestDetails = () => {
 
         if (latitude && longitude) {
             // Updated mapsUrl to use standard Google Maps format
-            const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${latitude},${longitude}`; 
+            const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${latitude},${longitude}`;
             window.open(mapsUrl, '_blank');
         } else if (address) {
             // Updated mapsUrl to use standard Google Maps format

@@ -28,15 +28,10 @@ export async function GET(req) {
 
     let query = {};
     if (userId) {
-      query = {
-        $or: [{ customerId: userId }, { mechanicId: userId }],
-      };
+      query = { $or: [{ customerId: userId }, { mechanicId: userId }] };
     }
 
-    const chats = await chatsCollection
-      .find(query)
-      .sort({ lastMessageAt: -1 })
-      .toArray();
+    const chats = await chatsCollection.find(query).sort({ lastMessageAt: -1 }).toArray();
 
     return new Response(JSON.stringify(chats), {
       headers: { 'Content-Type': 'application/json' },
@@ -78,7 +73,6 @@ export async function POST(req) {
       );
     }
 
-    // Fetch both users’ info
     const [customerInfo, mechanicInfo] = await Promise.all([
       getUserName(customerId),
       getUserName(mechanicId),
@@ -109,6 +103,42 @@ export async function POST(req) {
   } catch (error) {
     console.error("POST /api/chats error:", error);
     return new Response(JSON.stringify({ error: 'Internal Server Error' }), {
+      headers: { 'Content-Type': 'application/json' },
+      status: 500,
+    });
+  }
+}
+
+// DELETE a particular chat by its _id
+export async function DELETE(req) {
+  try {
+    const url = new URL(req.url);
+    const chatId = url.searchParams.get('chatId');
+
+    if (!chatId) {
+      return new Response(
+        JSON.stringify({ error: 'chatId is required' }),
+        { headers: { 'Content-Type': 'application/json' }, status: 400 }
+      );
+    }
+
+    const chatsCollection = await dbConnect('chats');
+    const result = await chatsCollection.deleteOne({ _id: new ObjectId(chatId) });
+
+    if (result.deletedCount === 0) {
+      return new Response(
+        JSON.stringify({ error: 'Chat not found' }),
+        { headers: { 'Content-Type': 'application/json' }, status: 404 }
+      );
+    }
+
+    return new Response(
+      JSON.stringify({ message: 'Chat deleted successfully' }),
+      { headers: { 'Content-Type': 'application/json' }, status: 200 }
+    );
+  } catch (error) {
+    console.error("DELETE /api/chats error:", error);
+    return new Response(JSON.stringify({ error: 'Failed to delete chat' }), {
       headers: { 'Content-Type': 'application/json' },
       status: 500,
     });
