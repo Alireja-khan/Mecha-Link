@@ -11,6 +11,7 @@ export const collections = {
   chats: "chats",
   announcements: "announcements",
   coupons: "coupons",
+  reviews: "reviews",
 };
 
 let client;
