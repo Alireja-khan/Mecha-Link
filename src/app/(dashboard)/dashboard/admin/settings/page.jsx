@@ -5,7 +5,6 @@ import { User, Shield, Globe, Lock, Save } from "lucide-react";
 import ProfileSettings from "./ProfileSettings";
 import SecuritySettings from "./SecuritySettings";
 import PreferencesSettings from "./PreferencesSettings";
-import PrivacySettings from "./PrivacySettings";
 
 export default function AdminSettings() {
   const { user: loggedInUser, loading: userLoading } = useUser();
@@ -130,7 +129,6 @@ export default function AdminSettings() {
     { id: "profile", label: "Profile", icon: User },
     { id: "security", label: "Security", icon: Shield },
     { id: "preferences", label: "Preferences", icon: Globe },
-    { id: "privacy", label: "Privacy", icon: Lock },
   ];
 
   return (
@@ -174,9 +172,6 @@ export default function AdminSettings() {
               preferences={preferences}
               setPreferences={setPreferences}
             />
-          )}
-          {activeTab === "privacy" && (
-            <PrivacySettings privacy={privacy} setPrivacy={setPrivacy} />
           )}
         </div>
       </div>

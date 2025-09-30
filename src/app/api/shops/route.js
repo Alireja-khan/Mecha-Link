@@ -4,9 +4,22 @@ import { NextResponse } from "next/server";
 export async function POST(req) {
   try {
     const data = await req.json();
-    const collection = await dbConnect("mechanicShops"); // await dbConnect
-    const result = await collection.insertOne(data);
-    return NextResponse.json({ success: true, insertedId: result.insertedId });
+    const collection = await dbConnect("mechanicShops");
+    
+    // Ensure status is set, default to "pending"
+    const shopData = {
+      ...data,
+      status: data.status || "pending",
+      createdAt: new Date(),
+      updatedAt: new Date()
+    };
+
+    const result = await collection.insertOne(shopData);
+    return NextResponse.json({ 
+      success: true, 
+      insertedId: result.insertedId,
+      message: "Shop submitted for approval"
+    });
   } catch (error) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
@@ -19,25 +32,37 @@ export async function GET(req) {
     const search = searchParams.get("search");
     const page = parseInt(searchParams.get("page"));
     const limit = parseInt(searchParams.get("limit"));
+    const status = searchParams.get("status");
+    const admin = searchParams.get("admin");
 
     const home = searchParams.get("home");
     if (home) {
       const collection = await dbConnect(collections.mechanicShops);
-      const result = await collection.find().limit(6).toArray();
+      const result = await collection.find({ status: "approved" }).limit(6).toArray();
       return NextResponse.json(result);
     }
 
     let matchStage = {};
+    
+    // For admin panel, show all shops. For public, only show approved shops
+    if (!admin) {
+      matchStage.status = "approved";
+    }
+    
+    if (status && status !== "all") {
+      matchStage.status = status;
+    }
+
     if (search) {
-      matchStage = {
-        $or: [
-          { "shop.shopName": { $regex: search, $options: "i" } },
-          { "shop.categories": { $regex: search, $options: "i" } },
-          { "shop.address.street": { $regex: search, $options: "i" } },
-          { "shop.address.city": { $regex: search, $options: "i" } },
-          { "shop.address.country": { $regex: search, $options: "i" } },
-        ],
-      };
+      matchStage.$or = [
+        { "shop.shopName": { $regex: search, $options: "i" } },
+        { "shop.categories": { $regex: search, $options: "i" } },
+        { "shop.address.street": { $regex: search, $options: "i" } },
+        { "shop.address.city": { $regex: search, $options: "i" } },
+        { "shop.address.country": { $regex: search, $options: "i" } },
+        { "ownerName": { $regex: search, $options: "i" } },
+        { "ownerEmail": { $regex: search, $options: "i" } }
+      ];
     }
 
     let sortStage = {};
