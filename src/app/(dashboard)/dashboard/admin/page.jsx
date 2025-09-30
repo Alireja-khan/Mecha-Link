@@ -115,7 +115,7 @@ const AdminDashboardOverview = () => {
         }, 0);
     };
     const totalRatings = calculateTotalRatings(totalReviews);
-    const averageRatings = totalRatings/reviews.length
+    const averageRatings = (totalRatings / reviews.length).toFixed(1);
     console.log(totalRatings, averageRatings);
 
 
