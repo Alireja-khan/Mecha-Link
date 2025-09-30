@@ -12,8 +12,10 @@ const AdminDashboardOverview = () => {
     const [totalShop, setTotalShop] = useState({ result: [] });
     const [recentSignups, setRecentSignups] = useState([]);
     const [userData, setUserData] = useState([]);
+    const [totalReviews, setTotalReviews] = useState([])
 
     useEffect(() => {
+
         const fetchUsers = async () => {
             try {
                 const res = await fetch("/api/users/dashboardUser?overview=true");
@@ -34,6 +36,8 @@ const AdminDashboardOverview = () => {
             }
         };
 
+
+
         const fetchData = async () => {
             setLoading(true);
             try {
@@ -41,7 +45,8 @@ const AdminDashboardOverview = () => {
                     fetchUsers(),
                     fetchAllUsers(),
                     fetch("/api/service-request").then(res => res.json()).then(data => setTotalData(data)),
-                    fetch("/api/shops").then(res => res.json()).then(data => setTotalShop(data))
+                    fetch("/api/shops").then(res => res.json()).then(data => setTotalShop(data)),
+                    fetch("/api/reviews").then(res => res.json()).then(data => setTotalReviews(data))
                 ]);
             } catch (err) {
                 console.error("Failed to fetch data:", err);
@@ -52,6 +57,7 @@ const AdminDashboardOverview = () => {
 
         fetchData();
     }, []);
+
 
     if (userLoading) {
         return (
@@ -69,8 +75,12 @@ const AdminDashboardOverview = () => {
         );
     }
 
+    console.log(totalShop, totalReviews)
+
     const { result: requests = [] } = totalData;
     const { result: shops = [] } = totalShop;
+    const reviews = totalReviews;
+    console.log(reviews);
 
     const recentServiceReq = requests.slice(-5).reverse().map((service) => ({
         name: service.deviceType || service.userEmail,
@@ -84,13 +94,39 @@ const AdminDashboardOverview = () => {
         date: new Date(s.shop?.createdAt || Date.now()).toLocaleDateString(),
     }));
 
+    // Calculate total mechanics
+    const calculateTotalMechanics = (shopsArray) => {
+        if (!shopsArray || !Array.isArray(shopsArray)) return 0;
+
+        return shopsArray.reduce((total, shop) => {
+            const count = shop.shop?.mechanicCount || 0;
+            return total + count;
+        }, 0);
+    };
+    const totalMechanics = calculateTotalMechanics(shops);
+
+    // Calculate total mechanics
+    const calculateTotalRatings = (reviewsArray) => {
+        if (!reviewsArray || !Array.isArray(reviewsArray)) return 0;
+
+        return reviewsArray.reduce((total, review) => {
+            const count = review.rating || 0;
+            return total + count;
+        }, 0);
+    };
+    const totalRatings = calculateTotalRatings(totalReviews);
+    const averageRatings = totalRatings/reviews.length
+    console.log(totalRatings, averageRatings);
+
+
+
     const platformMetrics = [
         { id: 1, title: "Total Users", value: loading ? "…" : userData.length, change: "+12%", trend: "up", icon: Users, color: "orange" },
         { id: 2, title: "Mechanic Shops", value: loading ? "…" : shops.length, change: "+8%", trend: "up", icon: Store, color: "blue" },
         { id: 3, title: "Service Requests", value: loading ? "…" : requests.length, change: "+15%", trend: "up", icon: Wrench, color: "green" },
-        { id: 4, title: "Active Mechanics", value: "156", change: "+5%", trend: "up", icon: UserCheck, color: "purple" },
+        { id: 4, title: "Active Mechanics", value: loading ? "…" : totalMechanics, change: "+5%", trend: "up", icon: UserCheck, color: "purple" },
         { id: 5, title: "Revenue", value: "$24,580", change: "+18%", trend: "up", icon: DollarSign, color: "emerald" },
-        { id: 6, title: "Avg. Rating", value: "4.6 ★", change: "+0.2", trend: "up", icon: Star, color: "yellow" },
+        { id: 6, title: "Avg. Rating", value: loading ? "…" : averageRatings, change: "+0.2", trend: "up", icon: Star, color: "yellow" },
     ];
 
     const serviceTrends = [
@@ -145,7 +181,7 @@ const AdminDashboardOverview = () => {
     };
 
     return (
-        <div className="min-h-screen p-6 mx-auto space-y-8">
+        <div className="min-h-screen p-6  space-y-8">
             {/* Header */}
             <div className="bg-gradient-to-br from-orange-500 to-orange-600 rounded-3xl p-8 text-white shadow-2xl">
                 <div className="flex items-center gap-4 mb-4">
@@ -294,35 +330,35 @@ const AdminDashboardOverview = () => {
                 </div>
 
             </div>
-                {/* Recent Shops */}
-                <div className="bg-white rounded-3xl p-8 border border-orange-100 shadow-xl">
-                    <div className="flex items-center justify-between mb-6">
-                        <h2 className="text-2xl font-bold text-gray-900">Recent Shops</h2>
-                        <Store className="text-orange-500" size={20} />
-                    </div>
-                    <div className="space-y-4">
-                        {loading ? (
-                            <div className="text-center py-8">
-                                <span className="loading loading-bars loading-md text-orange-500"></span>
-                            </div>
-                        ) : recentShopsData.length > 0 ? (
-                            recentShopsData.map((shop, i) => (
-                                <div key={i} className="flex items-center gap-4 p-4 bg-orange-50 rounded-xl border border-orange-200">
-                                    <div className="w-10 h-10 bg-gradient-to-br from-blue-400 to-blue-600 rounded-xl flex items-center justify-center text-white font-bold">
-                                        {shop.name?.charAt(0) || "S"}
-                                    </div>
-                                    <div className="flex-1">
-                                        <p className="font-semibold text-gray-900 truncate">{shop.name}</p>
-                                        <p className="text-sm text-gray-600 truncate">{shop.serviceType}</p>
-                                    </div>
-                                    <span className="text-xs text-gray-500">{shop.date}</span>
-                                </div>
-                            ))
-                        ) : (
-                            <div className="text-center py-8 text-gray-500">No recent shops</div>
-                        )}
-                    </div>
+            {/* Recent Shops */}
+            <div className="bg-white rounded-3xl p-8 border border-orange-100 shadow-xl">
+                <div className="flex items-center justify-between mb-6">
+                    <h2 className="text-2xl font-bold text-gray-900">Recent Shops</h2>
+                    <Store className="text-orange-500" size={20} />
                 </div>
+                <div className="space-y-4">
+                    {loading ? (
+                        <div className="text-center py-8">
+                            <span className="loading loading-bars loading-md text-orange-500"></span>
+                        </div>
+                    ) : recentShopsData.length > 0 ? (
+                        recentShopsData.map((shop, i) => (
+                            <div key={i} className="flex items-center gap-4 p-4 bg-orange-50 rounded-xl border border-orange-200">
+                                <div className="w-10 h-10 bg-gradient-to-br from-blue-400 to-blue-600 rounded-xl flex items-center justify-center text-white font-bold">
+                                    {shop.name?.charAt(0) || "S"}
+                                </div>
+                                <div className="flex-1">
+                                    <p className="font-semibold text-gray-900 truncate">{shop.name}</p>
+                                    <p className="text-sm text-gray-600 truncate">{shop.serviceType}</p>
+                                </div>
+                                <span className="text-xs text-gray-500">{shop.date}</span>
+                            </div>
+                        ))
+                    ) : (
+                        <div className="text-center py-8 text-gray-500">No recent shops</div>
+                    )}
+                </div>
+            </div>
 
             {/* Quick Actions */}
             <div className="bg-white rounded-3xl p-8 border border-orange-100 shadow-xl">
