@@ -171,7 +171,7 @@ export default function Newsletter() {
             </p>
           </div>
 
-          <div className="w-full lg:w-1/2 flex items-center justify-center">
+          <div className="w-full lg:w-1/2 lg:flex items-center justify-center hidden">
             <Lottie
               animationData={newsletterAnimation}
               loop={true}
