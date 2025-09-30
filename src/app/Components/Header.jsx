@@ -65,11 +65,11 @@ export default function Header() {
             : "bg-white/90 backdrop-blur-sm py-4"
         }`}
     >
-      <div className="container mx-auto px-4 md:px-6 flex justify-between items-center">
+      <div className="w-11/12 mx-auto px-2 md:px-3 flex justify-between items-center">
         {/* Logo */}
-        <Link href="/" className="flex gap-5 items-center z-50">
-          <FaGear className="h-12  w-12" />
-          <h1 className="text-3xl font-bold">
+        <Link href="/" className="flex gap-2 items-center z-50">
+          <FaGear className="h-6 w-6 lg:h-12 lg:w-12" />
+          <h1 className="text-2xl lg:text-3xl font-bold">
             Mecha<span className="text-primary">Link</span>
           </h1>
         </Link>
@@ -80,7 +80,7 @@ export default function Header() {
             <Link
               key={item.href}
               href={item.href}
-              className={`relative text-lg font-medium transition-colors hover:text-primary ${pathname === item.href ? "text-primary" : ""
+              className={`relative text-base font-medium transition-colors hover:text-primary ${pathname === item.href ? "text-primary" : ""
                 }`}
             >
               {item.label}
@@ -89,7 +89,7 @@ export default function Header() {
         </nav>
 
         {/* Right Side */}
-        <div className="hidden md:flex items-center space-x-4">
+        <div className="flex items-center space-x-4">
           {/* Theme Switch */}
           <label className="swap swap-rotate">
             <input
