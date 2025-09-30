@@ -1,23 +1,56 @@
 "use client";
 
-import React, { useState } from "react";
-import { Bell, Plus, Search, Users, Wrench, ClipboardList } from "lucide-react";
+import React, { useState, useEffect } from "react";
+import { Bell, Users, Wrench, ClipboardList } from "lucide-react";
 import useUser from "@/hooks/useUser";
 import AdminNotifications from "./AdminNotifications";
+import NotificationCanvas from "./NotificationCanvas";
+import axios from "axios";
 
 const Topbar = ({ pageTitle = "Dashboard" }) => {
   const { user: loggedInUser } = useUser();
 
-  // notification state
   const [notifications, setNotifications] = useState([]);
-  const [showDropdown, setShowDropdown] = useState(false);
-  console.log("notification",notifications);
-  // Handle new notifications from socket
-  const handleNewNotification = (msg) => {
-    setNotifications((prev) => [msg, ...prev]);
+  const [showCanvas, setShowCanvas] = useState(false);
+
+  // ✅ Load previous notifications on page load
+  useEffect(() => {
+    const fetchNotifications = async () => {
+      try {
+        const res = await axios.get("/api/notifications");
+        if (res.data) {
+          setNotifications(res.data);
+        }
+      } catch (err) {
+        console.error("❌ Failed to fetch notifications:", err);
+      }
+    };
+    fetchNotifications();
+  }, []);
+
+  // ✅ Save new notification (local + DB)
+  const handleNewNotification = async (msg) => {
+    try {
+      setNotifications((prev) => [msg, ...prev]); // Local state update
+      await axios.post("/api/notifications", {
+        userEmail: msg?.data?.userEmail || "system@mechalink.com",
+        message: msg?.message || "New Notification",
+        type: "serviceRequest",
+        data: msg.data,
+      });
+    } catch (error) {
+      console.error("❌ Failed to save notification:", error);
+    }
   };
 
-  const toggleDropdown = () => setShowDropdown((prev) => !prev);
+  const handleDeleteNotification = async (id) => {
+    try {
+      await axios.delete(`/api/notifications?id=${id}`);
+      setNotifications((prev) => prev.filter((notif) => notif._id !== id));
+    } catch (error) {
+      console.error("❌ Failed to delete notification:", error);
+    }
+  };
 
   const getRoleStyles = (role) => {
     switch (role) {
@@ -52,79 +85,38 @@ const Topbar = ({ pageTitle = "Dashboard" }) => {
       <h1 className="text-2xl font-extrabold text-gray-800">{pageTitle}</h1>
 
       <div className="flex items-center gap-5">
-        {/* Socket listener */}
+        {/* Socket listener (gets new notifications) */}
         <AdminNotifications onNewNotification={handleNewNotification} />
 
-        {/* Search Bar */}
-        <div className="relative hidden lg:block">
-          <Search
-            size={18}
-            className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
-          />
-          <input
-            type="text"
-            placeholder="Search transactions, users, etc."
-            className="w-80 px-4 py-2 pl-10 text-sm border border-gray-200 rounded-xl bg-gray-50 
-                       focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500 transition"
-          />
-        </div>
-
-        {/* Buttons */}
-        <div className="flex items-center gap-3">
-          {/* Notification Bell */}
-          <div className="relative">
-            <button
-              title="Notifications"
-              className="p-3 rounded-full text-gray-600 hover:bg-orange-50 hover:text-orange-600 transition duration-150"
-              onClick={toggleDropdown}
-            >
-              <Bell size={20} />
-              {notifications.length > 0 && (
-                <span className="absolute top-1 right-1 w-2 h-2 bg-red-600 rounded-full"></span>
-              )}
-            </button>
-
-            {/* Notification Dropdown */}
-            {showDropdown && (
-              <div className="absolute right-0 mt-2 w-80 bg-white border border-gray-200 rounded-lg shadow-lg z-50">
-                <h4 className="px-4 py-2 font-semibold border-b border-gray-100">
-                  Notifications
-                </h4>
-                <div className="max-h-60 overflow-y-auto">
-                  {notifications.length === 0 ? (
-                    <p className="p-4 text-sm text-gray-500">No new notifications</p>
-                  ) : (
-                    notifications.map((notif, idx) => (
-                      <div
-                        key={idx}
-                        className="px-4 py-2 border-b border-gray-100 hover:bg-gray-50 transition"
-                      >
-                        <p className="text-sm text-gray-700">
-                          New Service Request: {notif?.data.serviceDetails?.problemTitle || "Untitled Service"}
-                        </p>
-                        <p className="text-xs text-gray-400">
-                          {new Date(notif.data.requestedDate).toLocaleString()}
-                        </p>
-                      </div>
-                    ))
-                  )}
-                </div>
-              </div>
+        {/* Notification Bell */}
+        <div className="relative">
+          <button
+            title="Notifications"
+            className="p-3 rounded-full text-gray-600 hover:bg-orange-50 hover:text-orange-600 transition duration-150 relative group"
+            onClick={() => setShowCanvas(true)}
+          >
+            <Bell size={20} />
+            {notifications.length > 0 && (
+              <span className="absolute top-1 -right-1 min-w-4 min-h-4 text-xs text-white bg-red-600 rounded-full flex justify-center items-center">
+                {notifications.length}
+              </span>
             )}
-          </div>
-
-          {/* Role-Based Action Button */}
-          {roleConfig && (
-            <button
-              className={`px-4 py-2 rounded-xl text-white text-sm font-semibold 
-                       transition duration-150 flex items-center gap-1.5 shadow-md ${roleConfig.btnBg}`}
-              title={roleConfig.actionText}
-            >
-              {roleConfig.actionIcon}{" "}
-              <span className="hidden sm:block">{roleConfig.actionText}</span>
-            </button>
-          )}
+            <span className="absolute -bottom-8 left-1/2 -translate-x-1/2 px-2 py-1 text-xs bg-gray-800 text-white rounded opacity-0 group-hover:opacity-100 transition">
+              Notifications
+            </span>
+          </button>
         </div>
+
+        {/* Role-Based Action Button */}
+        {roleConfig && (
+          <button
+            className={`px-4 py-2 rounded-xl text-white text-sm font-semibold transition duration-150 flex items-center gap-1.5 shadow-md ${roleConfig.btnBg}`}
+            title={roleConfig.actionText}
+          >
+            {roleConfig.actionIcon}
+            <span className="hidden sm:block">{roleConfig.actionText}</span>
+          </button>
+        )}
 
         <div className="w-px h-6 bg-gray-200 hidden sm:block" />
 
@@ -162,6 +154,67 @@ const Topbar = ({ pageTitle = "Dashboard" }) => {
           )}
         </div>
       </div>
+
+      {/* ✅ Canvas for Notifications */}
+      <NotificationCanvas
+        isOpen={showCanvas}
+        title="Notifications"
+        onClose={() => setShowCanvas(false)}
+      >
+        {notifications.length === 0 ? (
+          <p className="p-4 text-sm text-gray-500">No new notifications</p>
+        ) : (
+          notifications.map((notif, idx) => {
+            const service = notif?.data?.serviceDetails || {};
+            const location = notif?.data?.location || {};
+            const urgency = notif?.data?.serviceDetails?.urgency || "N/A";
+
+            return (
+              <div
+                key={idx}
+                className="flex justify-between items-start px-4 py-3 border-b border-gray-100 hover:bg-gray-50 transition"
+              >
+                <div>
+                  <p className="text-sm font-semibold text-gray-800">
+                    {service.problemTitle || "Untitled Service"}
+                  </p>
+                  <p className="text-xs text-gray-400 mb-1">
+                    {new Date(notif.data.requestedDate).toLocaleString()}
+                  </p>
+                  <p className="text-sm text-gray-700">
+                    👤 <span className="font-medium">{notif?.data?.userName}</span>
+                  </p>
+                  <p className="text-sm text-gray-700">
+                    ⚡ Urgency:{" "}
+                    <span
+                      className={`font-medium ${
+                        urgency === "high"
+                          ? "text-red-600"
+                          : urgency === "medium"
+                          ? "text-orange-600"
+                          : "text-green-600"
+                      }`}
+                    >
+                      {urgency}
+                    </span>
+                  </p>
+                  <p className="text-sm text-gray-700">
+                    📍 {location.address || "Location not provided"}
+                  </p>
+                </div>
+
+                {/* ❌ Delete Button */}
+                <button
+                  className="text-gray-400 hover:text-red-600 text-sm font-bold"
+                  onClick={() => handleDeleteNotification(notif._id)}
+                >
+                  ✕
+                </button>
+              </div>
+            );
+          })
+        )}
+      </NotificationCanvas>
     </header>
   );
 };

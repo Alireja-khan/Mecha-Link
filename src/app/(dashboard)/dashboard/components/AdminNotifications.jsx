@@ -3,7 +3,7 @@
 import { useEffect } from "react";
 import { io } from "socket.io-client";
 
-const socket = io("http://localhost:3001"); // replace with your socket server URL
+const socket = io("http://localhost:5000"); // replace with your socket server URL
 
 export default function AdminNotifications({ onNewNotification }) {
   useEffect(() => {
