@@ -75,7 +75,7 @@ const AdminDashboardOverview = () => {
         );
     }
 
-    console.log(totalShop, totalReviews)
+    // console.log(totalShop, totalReviews)
 
     const { result: requests = [] } = totalData;
     const { result: shops = [] } = totalShop;
@@ -105,7 +105,7 @@ const AdminDashboardOverview = () => {
     };
     const totalMechanics = calculateTotalMechanics(shops);
 
-    // Calculate total mechanics
+    // Calculate total Ratings and Average Ratings
     const calculateTotalRatings = (reviewsArray) => {
         if (!reviewsArray || !Array.isArray(reviewsArray)) return 0;
 
