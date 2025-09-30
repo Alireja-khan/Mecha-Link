@@ -127,22 +127,22 @@ export default function Services() {
             </div>
           )}
           {/* Pagination & Items per page */}
-          <div className="flex justify-between mt-8 items-center">
+          <div className="flex flex-col md:flex-row justify-between mt-8 items-center">
             {/* Items per page */}
             <div>
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-3 mb-4 md:mb-0">
                 <label htmlFor="itemsPerPage">Show on page</label>
                 <select
                   name="itemsPerPage"
                   id="itemsPerPage"
                   value={itemsPerPage}
                   onChange={handleItemsPerPage}
-                  className="px-3 py-2 border-2 rounded-lg border-primary focus:outline-none"
+                  className="px-3 py-1 border-2 rounded-lg border-primary focus:outline-none"
                 >
                   <option value="12">12</option>
-                  <option value="24">24</option>
-                  <option value="36">36</option>
-                  <option value="48">48</option>
+                  <option className="text-black" value="24">24</option>
+                  <option className="text-black" value="36">36</option>
+                  <option className="text-black" value="48">48</option>
                 </select>
               </div>
             </div>
@@ -150,7 +150,7 @@ export default function Services() {
             {/* Page buttons */}
             <div className="flex justify-center space-x-2">
               <button
-                className="px-5 py-1 border border-primary rounded-md hover:bg-primary hover:text-white transition duration-400 cursor-pointer"
+                className="px-4 py-1 border border-primary rounded-md hover:bg-primary hover:text-white transition duration-400 cursor-pointer"
                 disabled={currentPage === 1}
                 onClick={() => handlePageChange(currentPage - 1)}
               >
@@ -160,7 +160,7 @@ export default function Services() {
               {Array.from({ length: totalPage }, (_, i) => (
                 <button
                   key={i}
-                  className={`px-5 py-1 border rounded-md transition duration-400 cursor-pointer ${
+                  className={`px-4 py-1 border rounded-md transition duration-400 cursor-pointer ${
                     currentPage === i + 1
                       ? "bg-primary text-white border-primary"
                       : "border-primary hover:bg-primary hover:text-white"
@@ -172,7 +172,7 @@ export default function Services() {
               ))}
 
               <button
-                className="px-5 py-1 border border-primary rounded-md hover:bg-primary hover:text-white transition duration-400 cursor-pointer"
+                className="px-4 py-1 border border-primary rounded-md hover:bg-primary hover:text-white transition duration-400 cursor-pointer"
                 disabled={currentPage === totalPage}
                 onClick={() => handlePageChange(currentPage + 1)}
               >
