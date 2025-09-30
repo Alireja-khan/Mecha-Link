@@ -1,14 +1,11 @@
-import React from "react";
-import ProfileCard from "../../components/ProfileCard";
+import React from 'react';
 
-const mechanicProfile = {
-    name: "John Doe",
-    email: "john.doe@mechanic.com",
-    phone: "+987654321",
-    joined: "Jan 10, 2020",
-    additionalInfo: "Specializes in engine repair",
+const Page = () => {
+    return (
+        <div>
+            <h1>This is Mechanic Profile</h1>
+        </div>
+    );
 };
 
-export default function MechanicProfile() {
-    return <ProfileCard role="Mechanic" profileData={mechanicProfile} />;
-}
+export default Page;
