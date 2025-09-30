@@ -2,7 +2,8 @@
 
 import React, { useEffect, useState } from "react";
 import useUser from "@/hooks/useUser";
-import { Plus, Edit, Trash, X, Check, Search, Filter, Download, Megaphone, Calendar, Users, Bell } from "lucide-react";
+import { Plus, Edit, Trash, X, Check, Search, Filter, Download, Megaphone, Calendar, Users, Bell, Eye } from "lucide-react";
+import Swal from 'sweetalert2';
 
 const ManageAnnouncements = () => {
   const { user: loggedInUser, loading: userLoading } = useUser();
@@ -12,15 +13,75 @@ const ManageAnnouncements = () => {
   const [modalOpen, setModalOpen] = useState(false);
   const [editingAnnouncement, setEditingAnnouncement] = useState(null);
   const [formData, setFormData] = useState({ title: "", message: "" });
+  const [detailModalOpen, setDetailModalOpen] = useState(false);
+  const [selectedAnnouncement, setSelectedAnnouncement] = useState(null);
+
+  const showSuccessAlert = (title, message) => {
+    Swal.fire({
+      title: title,
+      text: message,
+      icon: 'success',
+      confirmButtonColor: '#f97316',
+      confirmButtonText: 'OK',
+      background: '#fff',
+      color: '#1f2937',
+      iconColor: '#22c55e'
+    });
+  };
+
+  const showErrorAlert = (title, message) => {
+    Swal.fire({
+      title: title,
+      text: message,
+      icon: 'error',
+      confirmButtonColor: '#f97316',
+      confirmButtonText: 'OK',
+      background: '#fff',
+      color: '#1f2937',
+      iconColor: '#ef4444'
+    });
+  };
+
+  const showConfirmDialog = (title, text, confirmButtonText = 'Yes, proceed') => {
+    return Swal.fire({
+      title: title,
+      text: text,
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#f97316',
+      cancelButtonColor: '#6b7280',
+      confirmButtonText: confirmButtonText,
+      cancelButtonText: 'Cancel',
+      background: '#fff',
+      color: '#1f2937',
+      iconColor: '#eab308',
+      reverseButtons: true
+    });
+  };
+
+  const showLoadingAlert = (title, text) => {
+    Swal.fire({
+      title: title,
+      text: text,
+      allowOutsideClick: false,
+      didOpen: () => {
+        Swal.showLoading();
+      },
+      background: '#fff',
+      color: '#1f2937'
+    });
+  };
 
   const fetchAnnouncements = async () => {
     setLoading(true);
     try {
       const res = await fetch("/api/announcements");
+      if (!res.ok) throw new Error('Failed to fetch announcements');
       const data = await res.json();
       setAnnouncements(Array.isArray(data) ? data : []);
     } catch (err) {
       console.error("Failed to fetch announcements:", err);
+      showErrorAlert('Error', 'Failed to load announcements');
     } finally {
       setLoading(false);
     }
@@ -47,43 +108,112 @@ const ManageAnnouncements = () => {
   }
 
   const handleActivate = async (id) => {
-    await fetch(`/api/announcements/${id}/activate`, { method: "PATCH" });
-    fetchAnnouncements();
+    try {
+      showLoadingAlert('Activating...', 'Please wait while we activate the announcement');
+      
+      const response = await fetch(`/api/announcements/${id}/activate`, { method: "PATCH" });
+      if (!response.ok) throw new Error('Failed to activate');
+      
+      Swal.close();
+      await fetchAnnouncements();
+      showSuccessAlert('Activated!', 'The announcement has been activated successfully');
+    } catch (error) {
+      console.error('Activation failed:', error);
+      Swal.close();
+      showErrorAlert('Error', 'Failed to activate announcement');
+    }
   };
 
   const handleDeactivate = async (id) => {
-    await fetch(`/api/announcements/${id}/deactivate`, { method: "PATCH" });
-    fetchAnnouncements();
+    try {
+      showLoadingAlert('Deactivating...', 'Please wait while we deactivate the announcement');
+      
+      const response = await fetch(`/api/announcements/${id}/deactivate`, { method: "PATCH" });
+      if (!response.ok) throw new Error('Failed to deactivate');
+      
+      Swal.close();
+      await fetchAnnouncements();
+      showSuccessAlert('Deactivated!', 'The announcement has been deactivated successfully');
+    } catch (error) {
+      console.error('Deactivation failed:', error);
+      Swal.close();
+      showErrorAlert('Error', 'Failed to deactivate announcement');
+    }
   };
 
   const handleDelete = async (id) => {
-    if (confirm("Are you sure you want to delete this announcement?")) {
-      await fetch(`/api/announcements/${id}`, { method: "DELETE" });
-      fetchAnnouncements();
+    const announcement = announcements.find(ann => ann._id === id);
+    const result = await showConfirmDialog(
+      'Are you sure?',
+      `You are about to delete the announcement "${announcement?.title}". This action cannot be undone.`,
+      'Yes, delete it!'
+    );
+
+    if (result.isConfirmed) {
+      try {
+        showLoadingAlert('Deleting...', 'Please wait while we delete the announcement');
+        
+        const response = await fetch(`/api/announcements/${id}`, { method: "DELETE" });
+        if (!response.ok) throw new Error('Failed to delete');
+        
+        Swal.close();
+        await fetchAnnouncements();
+        showSuccessAlert('Deleted!', 'The announcement has been deleted successfully');
+      } catch (error) {
+        console.error('Deletion failed:', error);
+        Swal.close();
+        showErrorAlert('Error', 'Failed to delete announcement');
+      }
     }
   };
 
   const handleFormSubmit = async (e) => {
     e.preventDefault();
-    if (!formData.title || !formData.message) return;
-
-    if (editingAnnouncement) {
-      await fetch(`/api/announcements/${editingAnnouncement._id}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
-      });
-    } else {
-      await fetch(`/api/announcements`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...formData, status: "active" }),
-      });
+    if (!formData.title || !formData.message) {
+      showErrorAlert('Validation Error', 'Please fill in both title and message fields');
+      return;
     }
-    setModalOpen(false);
-    setEditingAnnouncement(null);
-    setFormData({ title: "", message: "" });
-    fetchAnnouncements();
+
+    try {
+      showLoadingAlert(
+        editingAnnouncement ? 'Updating...' : 'Creating...',
+        editingAnnouncement ? 'Please wait while we update the announcement' : 'Please wait while we create the announcement'
+      );
+
+      if (editingAnnouncement) {
+        const response = await fetch(`/api/announcements/${editingAnnouncement._id}`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(formData),
+        });
+        if (!response.ok) throw new Error('Failed to update');
+      } else {
+        const response = await fetch(`/api/announcements`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ ...formData, status: "active" }),
+        });
+        if (!response.ok) throw new Error('Failed to create');
+      }
+
+      Swal.close();
+      setModalOpen(false);
+      setEditingAnnouncement(null);
+      setFormData({ title: "", message: "" });
+      await fetchAnnouncements();
+      
+      showSuccessAlert(
+        editingAnnouncement ? 'Updated!' : 'Created!',
+        editingAnnouncement ? 'Announcement has been updated successfully' : 'Announcement has been created successfully'
+      );
+    } catch (error) {
+      console.error('Form submission failed:', error);
+      Swal.close();
+      showErrorAlert(
+        'Error',
+        editingAnnouncement ? 'Failed to update announcement' : 'Failed to create announcement'
+      );
+    }
   };
 
   const openEditModal = (announcement) => {
@@ -92,10 +222,34 @@ const ManageAnnouncements = () => {
     setModalOpen(true);
   };
 
+  const openDetailModal = (announcement) => {
+    setSelectedAnnouncement(announcement);
+    setDetailModalOpen(true);
+  };
+
+  const handleModalClose = () => {
+    if (formData.title || formData.message) {
+      showConfirmDialog(
+        'Unsaved Changes',
+        'You have unsaved changes. Are you sure you want to close?',
+        'Yes, close'
+      ).then((result) => {
+        if (result.isConfirmed) {
+          setModalOpen(false);
+          setEditingAnnouncement(null);
+          setFormData({ title: "", message: "" });
+        }
+      });
+    } else {
+      setModalOpen(false);
+      setEditingAnnouncement(null);
+      setFormData({ title: "", message: "" });
+    }
+  };
+
+  // Search only by title
   const filteredAnnouncements = announcements.filter(
-    (a) =>
-      a.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      a.message?.toLowerCase().includes(searchTerm.toLowerCase())
+    (a) => a.title?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const getStatusBadge = (status) => {
@@ -118,19 +272,54 @@ const ManageAnnouncements = () => {
     recent: announcements.filter(ann => new Date(ann.createdAt) > new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)).length,
   };
 
-  const StatCard = ({ icon: Icon, value, label, color = "orange" }) => (
-    <div className="bg-white rounded-2xl p-6 border border-orange-100 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 group">
-      <div className="flex items-center justify-between mb-4">
-        <div className={`p-3 rounded-xl bg-${color}-500/10 group-hover:bg-${color}-500/20 transition-colors duration-300`}>
-          <Icon className={`text-${color}-600`} size={24} />
-        </div>
-      </div>
-      <p className="text-3xl font-bold text-gray-900 mb-1">{value}</p>
-      <p className="text-gray-600 text-sm font-medium">{label}</p>
-    </div>
-  );
+  const StatCard = ({ icon: Icon, value, label, color = "orange" }) => {
+    const colorClasses = {
+      orange: {
+        bg: "bg-orange-500/10",
+        bgHover: "group-hover:bg-orange-500/20",
+        text: "text-orange-600"
+      },
+      green: {
+        bg: "bg-green-500/10", 
+        bgHover: "group-hover:bg-green-500/20",
+        text: "text-green-600"
+      },
+      red: {
+        bg: "bg-red-500/10",
+        bgHover: "group-hover:bg-red-500/20", 
+        text: "text-red-600"
+      },
+      blue: {
+        bg: "bg-blue-500/10",
+        bgHover: "group-hover:bg-blue-500/20",
+        text: "text-blue-600"
+      }
+    };
 
-  
+    const classes = colorClasses[color] || colorClasses.orange;
+
+    return (
+      <div className="bg-white rounded-2xl p-6 border border-orange-100 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 group">
+        <div className="flex items-center justify-between mb-4">
+          <div className={`p-3 rounded-xl ${classes.bg} ${classes.bgHover} transition-colors duration-300`}>
+            <Icon className={classes.text} size={24} />
+          </div>
+        </div>
+        <p className="text-3xl font-bold text-gray-900 mb-1">{value}</p>
+        <p className="text-gray-600 text-sm font-medium">{label}</p>
+      </div>
+    );
+  };
+
+  const formatDate = (dateString) => {
+    return new Date(dateString || Date.now()).toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+  };
 
   return (
     <div className="min-h-screen p-6 mx-auto">
@@ -172,7 +361,7 @@ const ManageAnnouncements = () => {
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
               <input
                 type="text"
-                placeholder="Search by title or message..."
+                placeholder="Search by title..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="pl-10 pr-4 py-3 border border-orange-200 rounded-xl bg-orange-50/50 focus:bg-white focus:border-orange-300 focus:outline-none transition-all duration-300 w-full lg:w-80"
@@ -181,11 +370,17 @@ const ManageAnnouncements = () => {
 
             {/* Action Buttons */}
             <div className="flex gap-3">
-              <button className="flex items-center gap-2 px-4 py-3 bg-orange-50 text-orange-700 rounded-xl border border-orange-200 hover:bg-orange-100 transition-colors duration-200">
+              <button 
+                onClick={() => showSuccessAlert('Coming Soon!', 'Filter functionality will be implemented soon.')}
+                className="flex items-center gap-2 px-4 py-3 bg-orange-50 text-orange-700 rounded-xl border border-orange-200 hover:bg-orange-100 transition-colors duration-200"
+              >
                 <Filter size={16} />
                 Filter
               </button>
-              <button className="flex items-center gap-2 px-4 py-3 bg-orange-50 text-orange-700 rounded-xl border border-orange-200 hover:bg-orange-100 transition-colors duration-200">
+              <button 
+                onClick={() => showSuccessAlert('Coming Soon!', 'Export functionality will be implemented soon.')}
+                className="flex items-center gap-2 px-4 py-3 bg-orange-50 text-orange-700 rounded-xl border border-orange-200 hover:bg-orange-100 transition-colors duration-200"
+              >
                 <Download size={16} />
                 Export
               </button>
@@ -240,9 +435,20 @@ const ManageAnnouncements = () => {
                       </div>
                     </td>
                     <td className="px-6 py-4">
-                      <p className="text-sm text-gray-600 line-clamp-2 max-w-xs">
-                        {ann.message}
-                      </p>
+                      <div className="max-w-xs">
+                        <p className="text-sm text-gray-600 line-clamp-2 mb-2">
+                          {ann.message.length > 100 ? `${ann.message.substring(0, 100)}...` : ann.message}
+                        </p>
+                        {ann.message.length > 100 && (
+                          <button
+                            onClick={() => openDetailModal(ann)}
+                            className="text-orange-500 hover:text-orange-600 text-sm font-medium flex items-center gap-1 transition-colors duration-200"
+                          >
+                            <Eye size={14} />
+                            See more...
+                          </button>
+                        )}
+                      </div>
                     </td>
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-2">
@@ -311,16 +517,16 @@ const ManageAnnouncements = () => {
         </div>
       </div>
 
-      {/* Modal */}
+      {/* Create/Edit Modal */}
       {modalOpen && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-40 z-50 p-4">
+        <div className="fixed inset-0 flex items-center backdrop-blur-md justify-center z-50 p-4">
           <div className="bg-white rounded-3xl p-8 w-full max-w-2xl border border-orange-100 shadow-2xl">
             <div className="flex justify-between items-center mb-6">
               <h2 className="text-2xl font-bold text-gray-900">
                 {editingAnnouncement ? "Edit Announcement" : "Add New Announcement"}
               </h2>
               <button
-                onClick={() => { setModalOpen(false); setEditingAnnouncement(null); setFormData({ title: "", message: "" }); }}
+                onClick={handleModalClose}
                 className="p-2 bg-orange-50 text-orange-600 rounded-xl border border-orange-200 hover:bg-orange-100 transition-colors duration-200"
               >
                 <X size={20} />
@@ -352,7 +558,7 @@ const ManageAnnouncements = () => {
               <div className="flex justify-end gap-3 pt-4">
                 <button
                   type="button"
-                  onClick={() => { setModalOpen(false); setEditingAnnouncement(null); setFormData({ title: "", message: "" }); }}
+                  onClick={handleModalClose}
                   className="px-6 py-3 bg-white text-gray-700 rounded-xl font-semibold border border-orange-200 hover:bg-orange-50 transition-all duration-300"
                 >
                   Cancel
@@ -365,6 +571,92 @@ const ManageAnnouncements = () => {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* Detail View Modal */}
+      {detailModalOpen && selectedAnnouncement && (
+        <div className="fixed inset-0 flex items-center justify-center backdrop-blur-md z-50 p-4">
+          <div className="bg-white rounded-3xl p-8 w-full max-w-2xl border border-orange-100 shadow-2xl">
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-2xl font-bold text-gray-900">Announcement Details</h2>
+              <button
+                onClick={() => setDetailModalOpen(false)}
+                className="p-2 bg-orange-50 text-orange-600 rounded-xl border border-orange-200 hover:bg-orange-100 transition-colors duration-200"
+              >
+                <X size={20} />
+              </button>
+            </div>
+            
+            <div className="space-y-6">
+              {/* Header */}
+              <div className="flex items-center gap-4 p-4 bg-orange-50 rounded-xl border border-orange-200">
+                <div className="w-12 h-12 bg-gradient-to-br from-orange-400 to-orange-600 rounded-xl flex items-center justify-center text-white">
+                  <Megaphone size={20} />
+                </div>
+                <div>
+                  <h3 className="text-xl font-bold text-gray-900">{selectedAnnouncement.title}</h3>
+                  <div className="flex items-center gap-4 mt-1">
+                    <span className="text-sm text-gray-600">
+                      {getStatusBadge(selectedAnnouncement.status)}
+                    </span>
+                    <span className="text-sm text-gray-500">
+                      Created: {formatDate(selectedAnnouncement.createdAt)}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Message Content */}
+              <div>
+                <h4 className="text-lg font-semibold text-gray-900 mb-3">Message Content</h4>
+                <div className="p-4 bg-gray-50 rounded-xl border border-gray-200">
+                  <p className="text-gray-700 whitespace-pre-wrap leading-relaxed">
+                    {selectedAnnouncement.message}
+                  </p>
+                </div>
+              </div>
+
+              {/* Additional Information */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="p-4 bg-blue-50 rounded-xl border border-blue-200">
+                  <h5 className="font-semibold text-blue-900 mb-2">Status Information</h5>
+                  <p className="text-sm text-blue-700">
+                    This announcement is currently <span className="font-semibold">{selectedAnnouncement.status}</span> and 
+                    {selectedAnnouncement.status === 'active' ? ' is visible to all users.' : ' is not visible to users.'}
+                  </p>
+                </div>
+                <div className="p-4 bg-green-50 rounded-xl border border-green-200">
+                  <h5 className="font-semibold text-green-900 mb-2">Last Updated</h5>
+                  <p className="text-sm text-green-700">
+                    {selectedAnnouncement.updatedAt ? 
+                      formatDate(selectedAnnouncement.updatedAt) : 
+                      'No updates made yet'
+                    }
+                  </p>
+                </div>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex justify-end gap-3 pt-4">
+                <button
+                  onClick={() => setDetailModalOpen(false)}
+                  className="px-6 py-3 bg-white text-gray-700 rounded-xl font-semibold border border-orange-200 hover:bg-orange-50 transition-all duration-300"
+                >
+                  Close
+                </button>
+                <button
+                  onClick={() => {
+                    setDetailModalOpen(false);
+                    openEditModal(selectedAnnouncement);
+                  }}
+                  className="px-6 py-3 bg-orange-500 text-white rounded-xl font-semibold transition-all duration-300 hover:bg-orange-600 hover:scale-105 shadow-lg hover:shadow-xl"
+                >
+                  Edit Announcement
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       )}
