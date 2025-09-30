@@ -36,7 +36,7 @@ export default function ServiceDetailsPage() {
       });
   }, [id]);
 
-  console.log(shopdata);
+  console.log(shopdata.reviews);
 
   const geocodeAddress = async (address) => {
     const { street, city, country, postalCode } = address;
