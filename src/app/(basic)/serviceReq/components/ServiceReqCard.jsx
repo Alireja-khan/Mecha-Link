@@ -137,7 +137,7 @@ const ServiceReqCard = ({ request }) => {
             </div>
 
             {/* Service & Vehicle Info Grid */}
-            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
               <DetailItem
                 label="Device Type"
                 value={getValue(request, 'deviceType')}
