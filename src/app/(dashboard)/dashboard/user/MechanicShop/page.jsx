@@ -307,7 +307,10 @@ export default function MechanicShop() {
                 email: loggedInUser?.email || null,
                 businessEmail: data.businessEmail || null,
             },
-            logo: logoUrl || null
+            logo: logoUrl || null,
+            // Add owner information for admin panel
+            ownerName: loggedInUser?.name || "Not provided",
+            ownerEmail: loggedInUser?.email || "Not provided"
         };
 
         const payload = {
@@ -315,7 +318,9 @@ export default function MechanicShop() {
             shop: shopData,
             certifications: data.certifications,
             socialLinks: data.socialLinks,
-            createdAt: new Date().toISOString()
+            status: "pending", // Set initial status as pending
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString()
         };
 
         console.log("Submitting Payload:", payload);
@@ -324,7 +329,7 @@ export default function MechanicShop() {
             const res = await axios.post("/api/shops", payload);
 
             if (res.status === 200 || res.status === 201) {
-                toast.success("Shop added successfully!");
+                toast.success("Shop submitted for approval! It will be visible after admin approval.");
                 reset();
                 setLogoUrl('');
                 setActiveVehicleType(servicesData[0].type);

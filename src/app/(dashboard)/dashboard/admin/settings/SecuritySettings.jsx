@@ -46,7 +46,8 @@ export default function SecuritySettings({ security, setSecurity }) {
       </div>
 
       {/* Security Preferences */}
-      <div className="space-y-4">
+
+      {/* <div className="space-y-4">
         <h3 className="font-semibold text-gray-800">Security Preferences</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {[
@@ -79,10 +80,11 @@ export default function SecuritySettings({ security, setSecurity }) {
             </label>
           ))}
         </div>
-      </div>
+      </div> */}
 
       {/* Session Settings */}
-      <div className="space-y-4">
+
+      {/* <div className="space-y-4">
         <h3 className="font-semibold text-gray-800">Session Settings</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {[
@@ -115,7 +117,8 @@ export default function SecuritySettings({ security, setSecurity }) {
             </div>
           ))}
         </div>
-      </div>
+      </div> */}
+
     </div>
   );
 }
