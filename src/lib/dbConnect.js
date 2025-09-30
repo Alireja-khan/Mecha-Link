@@ -9,6 +9,7 @@ export const collections = {
   bookings: "bookings",
   serviceRequests: "serviceRequests",
   chats: "chats",
+  announcements: "announcements",
 };
 
 let client;
