@@ -16,7 +16,7 @@ export default function ReviewShow({ reviews = [] }) {
   }
 
   return (
-    <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-8">
+    <div className="bg-white sticky top-0 rounded-2xl border border-gray-100 shadow-sm p-8">
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-2xl font-bold text-gray-900">Customer Reviews</h2>
         <span className="text-sm text-gray-600">{reviews.length} review{reviews.length > 1 ? 's' : ''}</span>

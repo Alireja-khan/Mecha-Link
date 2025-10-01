@@ -264,10 +264,11 @@ export default function ServiceDetailsPage() {
 </div>
 
       {/* Main Content */}
-      <div className=" px-4 sm:px-6 lg:px-8 py-12">
+      <div className=" container">
         <div className="grid lg:grid-cols-3 gap-8">
+
           {/* Left Column - Services & Reviews */}
-          <div className="lg:col-span-2 space-y-8">
+          <div className="lg:col-span-2  space-y-8">
             {/* Services Section */}
             <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-8">
               <h2 className="text-2xl font-bold text-gray-900 mb-8">Services We Offer</h2>
