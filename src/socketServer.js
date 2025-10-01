@@ -16,9 +16,16 @@ io.on("connection", (socket) => {
     console.log(`${socket.id} joined room: ${chatId}`);
   });
 
-  // Only broadcast messages, do NOT save to DB
   socket.on("sendMessage", (msg) => {
     io.to(msg.chatId).emit("newMessage", msg);
+  });
+
+  socket.on("typing", (chatId, senderId) => {
+    socket.to(chatId).emit("typing", chatId, senderId);
+  });
+
+  socket.on("stopTyping", (chatId, senderId) => {
+    socket.to(chatId).emit("stopTyping", chatId, senderId);
   });
 
   socket.on("disconnect", () => {
