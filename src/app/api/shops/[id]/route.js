@@ -4,35 +4,48 @@ import { NextResponse } from "next/server";
 
 export async function GET(req, { params }) {
   try {
-    const { id } =await params;
+    const { id } = await params;
     const collection = await dbConnect(collections.mechanicShops);
 
     const pipeline = [
-      { $match: { _id: new ObjectId(id) } },
+      {
+        $match: { _id: new ObjectId(id) },
+      },
       {
         $lookup: {
           from: "reviews",
-          localField: "_id",
-          foreignField: "serviceId",
+          let: { shopId: { $toString: "$_id" } }, 
+          pipeline: [
+            {
+              $match: {
+                $expr: { $eq: ["$shopId", "$$shopId"] }, 
+              },
+            },
+          ],
           as: "reviews",
         },
       },
       {
         $addFields: {
           avgRating: {
-            $avg: {
-              $map: {
-                input: "$reviews",
-                as: "r",
-                in: {
-                  $cond: [
-                    { $ifNull: ["$$r.rating", false] },
-                    { $toDouble: "$$r.rating" },
-                    null,
-                  ],
+            $ifNull: [
+              {
+                $avg: {
+                  $map: {
+                    input: "$reviews",
+                    as: "r",
+                    in: {
+                      $cond: [
+                        { $ifNull: ["$$r.rating", false] },
+                        { $toDouble: "$$r.rating" },
+                        null,
+                      ],
+                    },
+                  },
                 },
               },
-            },
+              0,
+            ],
           },
         },
       },

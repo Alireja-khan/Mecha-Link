@@ -38,4 +38,3 @@ export async function POST(req, res) {
     insertedId: result.insertedId,
   });
 }
-

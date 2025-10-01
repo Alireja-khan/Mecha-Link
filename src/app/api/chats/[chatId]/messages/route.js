@@ -2,6 +2,7 @@ import dbConnect from "@/lib/dbConnect";
 import { ObjectId } from "mongodb";
 import { encryptMessage, decryptMessage } from "@/lib/crypto";
 
+// Get all messages in a chat
 export async function GET(req, context) {
     const { params } = context;
     const { chatId } = params;
@@ -29,6 +30,7 @@ export async function GET(req, context) {
     }
 }
 
+// Send a message
 export async function POST(req, context) {
     const { params } = context;
     const { chatId } = params;
@@ -54,7 +56,6 @@ export async function POST(req, context) {
 
         // Send decrypted message back to frontend
         const decryptedMessage = { ...newMessage, text };
-
         return new Response(JSON.stringify(decryptedMessage), { headers: { "Content-Type": "application/json" }, status: 201 });
     } catch (err) {
         console.error(err);
@@ -62,8 +63,9 @@ export async function POST(req, context) {
     }
 }
 
+// Clear all messages in a chat
 export async function DELETE(req, context) {
-    const { params } = context;
+    const { params, searchParams } = context;
     const { chatId } = params;
 
     if (!chatId) return new Response(JSON.stringify({ error: "chatId required" }), { status: 400 });
@@ -71,16 +73,23 @@ export async function DELETE(req, context) {
     try {
         const chatsCollection = await dbConnect("chats");
 
-        const result = await chatsCollection.updateOne(
-            { _id: new ObjectId(chatId) },
-            { $set: { messages: [], updatedAt: new Date(), lastMessageAt: null } }
-        );
+        // Use query param ?deleteChat=true to delete entire chat
+        const deleteChat = searchParams?.get("deleteChat") === "true";
 
-        if (result.matchedCount === 0) return new Response(JSON.stringify({ error: "Chat not found" }), { status: 404 });
-
-        return new Response(JSON.stringify({ message: "Messages cleared successfully" }), { headers: { "Content-Type": "application/json" }, status: 200 });
+        if (deleteChat) {
+            const result = await chatsCollection.deleteOne({ _id: new ObjectId(chatId) });
+            if (result.deletedCount === 0) return new Response(JSON.stringify({ error: "Chat not found" }), { status: 404 });
+            return new Response(JSON.stringify({ message: "Chat deleted successfully" }), { headers: { "Content-Type": "application/json" }, status: 200 });
+        } else {
+            const result = await chatsCollection.updateOne(
+                { _id: new ObjectId(chatId) },
+                { $set: { messages: [], updatedAt: new Date(), lastMessageAt: null } }
+            );
+            if (result.matchedCount === 0) return new Response(JSON.stringify({ error: "Chat not found" }), { status: 404 });
+            return new Response(JSON.stringify({ message: "Messages cleared successfully" }), { headers: { "Content-Type": "application/json" }, status: 200 });
+        }
     } catch (err) {
-        console.error("Error clearing messages:", err);
-        return new Response(JSON.stringify({ error: "Failed to clear messages" }), { status: 500 });
+        console.error("Error deleting/clearing chat:", err);
+        return new Response(JSON.stringify({ error: "Failed to process request" }), { status: 500 });
     }
 }
