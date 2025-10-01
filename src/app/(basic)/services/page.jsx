@@ -109,12 +109,12 @@ export default function Services() {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-10">
               {[...Array(6)].map((_, index) => (
                 <div key={index} className="flex w-full flex-col gap-4">
-                  <div className="skeleton h-60 w-full"></div>
-                  <div className="skeleton h-6 w-28"></div>
-                  <div className="skeleton h-6 w-full"></div>
-                  <div className="skeleton h-6 w-full"></div>
-                  <div className="skeleton h-6 w-full"></div>
-                  <div className="skeleton h-6 w-full"></div>
+                  <div className="skeleton bg-gray-100 h-60 w-full"></div>
+                  <div className="skeleton bg-gray-100 h-6 w-28"></div>
+                  <div className="skeleton bg-gray-100 h-6 w-full"></div>
+                  <div className="skeleton bg-gray-100 h-6 w-full"></div>
+                  <div className="skeleton bg-gray-100 h-6 w-full"></div>
+                  <div className="skeleton bg-gray-100 h-6 w-full"></div>
                 </div>
               ))}
             </div>
