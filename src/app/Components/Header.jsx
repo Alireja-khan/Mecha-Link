@@ -17,7 +17,9 @@ export default function Header() {
 
   const { user: loggedInUser, status } = useUser();
 
-  console.log(loggedInUser, status);
+  // drawer states
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  const [rotating, setRotating] = useState(false);
 
   useEffect(() => {
     const savedTheme = localStorage.getItem("theme") || "light";
@@ -29,14 +31,12 @@ export default function Header() {
     localStorage.setItem("theme", theme);
   }, [theme]);
 
-  // Scroll effect
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 50);
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  // Close dropdown on outside click
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
@@ -47,6 +47,16 @@ export default function Header() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  // gear toggle handler
+  const handleGearClick = () => {
+    if (rotating) return;
+    setRotating(true);
+    setTimeout(() => {
+      setRotating(false);
+      setDrawerOpen(!drawerOpen);
+    }, 600);
+  };
+
   const navigation = [
     { href: "/", label: "Home" },
     { href: "/services", label: "Mechanic Shops" },
@@ -56,23 +66,30 @@ export default function Header() {
 
   return (
     <header
-      className={`sticky top-0 w-full z-50 transition-all duration-300 ${scrolled
+      className={`sticky top-0 w-full z-50 transition-all duration-300 ${
+        scrolled
           ? theme === "dark"
             ? "bg-[#343434]/95 backdrop-blur-md shadow-sm py-2"
             : "bg-white/95 backdrop-blur-md shadow-sm py-2"
           : theme === "dark"
-            ? "bg-[#343434]/90 backdrop-blur-sm py-4"
-            : "bg-white/90 backdrop-blur-sm py-4"
-        }`}
+          ? "bg-[#343434]/90 backdrop-blur-sm py-4"
+          : "bg-white/90 backdrop-blur-sm py-4"
+      }`}
     >
-      <div className="w-11/12 mx-auto px-2 md:px-3 flex justify-between items-center">
+      <div className="w-11/12 lg:container mx-auto px-2 md:px-3 flex justify-between items-center">
         {/* Logo */}
-        <Link href="/" className="flex gap-2 items-center z-50">
-          <FaGear className="h-6 w-6 lg:h-12 lg:w-12" />
-          <h1 className="text-2xl lg:text-3xl font-bold">
-            Mecha<span className="text-primary">Link</span>
-          </h1>
-        </Link>
+        <div className="z-50">
+          <button onClick={handleGearClick} className="flex gap-2 lg:gap-3 items-center">
+            <FaGear
+              className={`h-6 w-6 lg:h-12 lg:w-12 transition-transform duration-500 ${
+                rotating && (drawerOpen ? "-rotate-90" : "rotate-90")
+              }`}
+            />
+            <h1 className="text-2xl lg:text-3xl font-bold">
+              Mecha<span className="text-primary">Link</span>
+            </h1>
+          </button>
+        </div>
 
         {/* Desktop Navigation */}
         <nav className="hidden md:flex items-center space-x-6 lg:space-x-8">
@@ -80,8 +97,9 @@ export default function Header() {
             <Link
               key={item.href}
               href={item.href}
-              className={`relative text-base font-medium transition-colors hover:text-primary ${pathname === item.href ? "text-primary" : ""
-                }`}
+              className={`relative text-base font-medium transition-colors hover:text-primary ${
+                pathname === item.href ? "text-primary" : ""
+              }`}
             >
               {item.label}
             </Link>
@@ -242,8 +260,9 @@ export default function Header() {
                   )}
                 </div>
                 <svg
-                  className={`w-4 h-4 transition-transform ${userMenuOpen ? "rotate-180" : ""
-                    }`}
+                  className={`w-4 h-4 transition-transform ${
+                    userMenuOpen ? "rotate-180" : ""
+                  }`}
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -276,8 +295,8 @@ export default function Header() {
                       loggedInUser?.role === "admin"
                         ? "/dashboard/admin"
                         : loggedInUser?.role === "mechanic"
-                          ? "/dashboard/mechanic"
-                          : "/dashboard/user"
+                        ? "/dashboard/mechanic"
+                        : "/dashboard/user"
                     }
                     className="block px-4 py-2 text-sm hover:bg-gray-50"
                     onClick={() => setUserMenuOpen(false)}
@@ -286,7 +305,8 @@ export default function Header() {
                   </Link>
 
                   <div className="border-t border-gray-100 my-1"></div>
-                  <button type="button"
+                  <button
+                    type="button"
                     className="cursor-pointer block w-full text-left px-4 py-2 text-sm hover:bg-gray-50"
                     onClick={() => {
                       signOut();
@@ -314,6 +334,31 @@ export default function Header() {
               </Link>
             </>
           )}
+        </div>
+      </div>
+
+      {/* Drawer */}
+      <div
+        className={`fixed md:hidden top-0 left-0 h-full w-64 transform transition-transform duration-500 z-40 ${
+          drawerOpen ? "translate-x-0" : "-translate-x-full"
+        }`}
+      >
+        <div className="relative p-4 top-14 left-0 bg-white">
+          <ul className="space-y-2">
+            {navigation.map((item) => (
+              <li key={item.href}>
+                <Link
+                  href={item.href}
+                  className={`block px-2 py-2 rounded hover:bg-gray-100 text-black ${
+                    pathname === item.href ? "text-primary font-semibold" : ""
+                  }`}
+                  onClick={() => setDrawerOpen(false)} 
+                >
+                  {item.label}
+                </Link>
+              </li>
+            ))}
+          </ul>
         </div>
       </div>
     </header>

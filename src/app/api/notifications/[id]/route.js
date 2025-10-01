@@ -1,18 +1,28 @@
-import dbConnect, { collections } from "@/lib/dbConnect";
 import { NextResponse } from "next/server";
 import { ObjectId } from "mongodb";
+import dbConnect, { collections } from "@/lib/dbConnect";
 
-// GET all notifications
-export async function GET() {
+// PATCH (mark as read)
+export async function PATCH(req, { params }) {
   try {
     const collection = await dbConnect(collections.notifications);
-    const result = await collection
-      .find({})
-      .sort({ createdAt: -1 })
-      .toArray();
-    return NextResponse.json(result);
+    const id = params.id;
+
+    const result = await collection.updateOne(
+      { _id: new ObjectId(id) },
+      { $set: { read: true } }
+    );
+
+    if (result.matchedCount === 0) {
+      return NextResponse.json(
+        { success: false, message: "Notification not found" },
+        { status: 404 }
+      );
+    }
+
+    return NextResponse.json({ success: true });
   } catch (error) {
-    console.error("Error fetching notifications:", error);
+    console.error("❌ Error marking notification as read:", error);
     return NextResponse.json(
       { success: false, message: "Internal Server Error" },
       { status: 500 }
@@ -21,12 +31,10 @@ export async function GET() {
 }
 
 
-
-// DELETE a single notification by ID
-export async function DELETE(req) {
+// DELETE /api/notifications/[id]
+export async function DELETE(req, { params }) {
   try {
-    const { searchParams } = new URL(req.url);
-    const id = searchParams.get("id");
+    const { id } = params;
 
     if (!id) {
       return NextResponse.json(

@@ -322,7 +322,7 @@ const ManageAnnouncements = () => {
   };
 
   return (
-    <div className="min-h-screen p-6 mx-auto">
+    <div className="min-h-screen p-6 ">
       {/* Header Section */}
       <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-8">
         <div>

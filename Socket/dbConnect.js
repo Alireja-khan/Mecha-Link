@@ -38,6 +38,7 @@ export async function dbConnect(collectionName) {
   return client.db(process.env.DB_NAME).collection(collectionName);
 }
 
+
 export const collections = {
   users: "users",
   mechanicShops: "mechanicShops",
@@ -46,5 +47,8 @@ export const collections = {
   bookings: "bookings",
   serviceRequests: "serviceRequests",
   chats: "chats",
-  notifications:"notifications"
+  announcements: "announcements",
+  coupons: "coupons",
+  notifications: "notifications",
+  reviews: "reviews",
 };

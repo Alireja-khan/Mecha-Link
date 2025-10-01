@@ -315,6 +315,7 @@ export default function MechanicShop() {
 
         const payload = {
             userId: loggedInUser?._id || session?.user?.email || null,
+            userEmail:session?.user?.email || loggedInUser?.email,
             shop: shopData,
             certifications: data.certifications,
             socialLinks: data.socialLinks,
