@@ -1,47 +1,93 @@
-import { Star } from "lucide-react";
-import React from "react";
+import { Star, User } from "lucide-react";
 
 export default function ReviewShow({ reviews = [] }) {
-  console.log(reviews);
-  return (
-    <div className="space-y-5">
-      {reviews?.length === 0 && (
-        <div className="bg-gray-100 p-5 rounded-xl">
-          <p className="text-center">No Reviews Found</p>
-        </div>
-      )}
-      {reviews?.map((review, index) => (
-        <div key={index} className=" bg-gray-100 p-5 rounded-xl">
-          <div className="flex justify-between gap-5">
-            <div className="flex items-center gap-5">
-              <img
-                className="w-20 h-20 shrink-0 rounded-full object-cover"
-                src={review?.userPhoto || "https://i.ibb.co.com/990my6Yq/avater.png"}
-                alt={review.userName}
-              />
-              <div>
-                <h4>{review.userName}</h4>
-                <p>{review.status}</p>
-              </div>
-            </div>
-            <div className="text-right">
-              <div className="inline-flex items-center gap-1 bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-medium">
-                <Star className="w-4 h-4" />
-                <span>{review.rating}</span>
-              </div>
-              
-              <p>
-                {new Date(review.createdAt).toLocaleDateString("en-US", {
-                  month: "short",
-                  day: "numeric",
-                  year: "numeric",
-                })}
-              </p>
-            </div>
+  if (reviews?.length === 0) {
+    return (
+      <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-12">
+        <div className="text-center">
+          <div className="inline-flex items-center justify-center w-16 h-16 bg-gray-100 rounded-full mb-4">
+            <Star className="w-8 h-8 text-gray-400" />
           </div>
-          <p className="mt-5">{review.feedback}</p>
+          <h3 className="text-lg font-semibold text-gray-900 mb-2">No Reviews Yet</h3>
+          <p className="text-gray-600">Be the first to share your experience!</p>
         </div>
-      ))}
+      </div>
+    );
+  }
+
+  return (
+    <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-8">
+      <div className="flex items-center justify-between mb-6">
+        <h2 className="text-2xl font-bold text-gray-900">Customer Reviews</h2>
+        <span className="text-sm text-gray-600">{reviews.length} review{reviews.length > 1 ? 's' : ''}</span>
+      </div>
+
+      <div className="space-y-4">
+        {reviews.map((review, index) => (
+          <div 
+            key={index} 
+            className="bg-gradient-to-br from-gray-50 to-gray-100/50 rounded-xl p-5 border border-gray-200 hover:border-orange-200 transition-all duration-200"
+          >
+            {/* Header */}
+            <div className="flex items-start justify-between gap-4 mb-3">
+              <div className="flex items-center gap-3 flex-1">
+                <div className="relative w-12 h-12 flex-shrink-0">
+                  {review?.userPhoto ? (
+                    <img
+                      className="w-12 h-12 rounded-full object-cover ring-2 ring-white"
+                      src={review.userPhoto}
+                      alt={review.userName || "User"}
+                    />
+                  ) : (
+                    <div className="w-12 h-12 rounded-full bg-orange-100 flex items-center justify-center ring-2 ring-white">
+                      <User className="w-6 h-6 text-orange-600" />
+                    </div>
+                  )}
+                </div>
+                
+                <div className="flex-1 min-w-0">
+                  <h4 className="font-semibold text-gray-900 truncate">
+                    {review.userName || "Anonymous"}
+                  </h4>
+                  <div className="flex items-center gap-2 mt-0.5">
+                    <span className={`inline-block px-2 py-0.5 rounded-full text-xs font-medium ${
+                      review.status === 'completed' 
+                        ? 'bg-green-100 text-green-700' 
+                        : review.status === 'in-progress'
+                        ? 'bg-blue-100 text-blue-700'
+                        : 'bg-red-100 text-red-700'
+                    }`}>
+                      {review.status}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Rating and Date */}
+              <div className="text-right flex-shrink-0">
+                <div className="inline-flex items-center gap-1 bg-orange-100 text-orange-700 px-2.5 py-1 rounded-lg text-sm font-semibold mb-1">
+                  <Star className="w-3.5 h-3.5 fill-orange-500" />
+                  <span>{review.rating}</span>
+                </div>
+                <p className="text-xs text-gray-500">
+                  {new Date(review.createdAt).toLocaleDateString("en-US", {
+                    month: "short",
+                    day: "numeric",
+                    year: "numeric",
+                  })}
+                </p>
+              </div>
+            </div>
+
+            {/* Feedback */}
+            {review.feedback && (
+              <p className="text-sm text-gray-700 leading-relaxed">
+                {review.feedback}
+              </p>
+            )}
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
