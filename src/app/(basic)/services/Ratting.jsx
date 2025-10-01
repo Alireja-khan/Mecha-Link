@@ -1,12 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import { Star } from "lucide-react";
-import Swal from "sweetalert2";
+import { Star, Send } from "lucide-react";
 
 export default function RatingForm({ onSubmit }) {
   const [rating, setRating] = useState(null);
   const [hover, setHover] = useState(0);
+  const [showAlert, setShowAlert] = useState(false);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -14,59 +14,82 @@ export default function RatingForm({ onSubmit }) {
     const formData = new FormData(form);
     const formObj = Object.fromEntries(formData.entries());
     formObj.rating = rating;
+    
     if (!rating) {
-      Swal.fire({
-        icon: "info",
-        title: "Please select rating",
-      });
+      setShowAlert(true);
+      setTimeout(() => setShowAlert(false), 3000);
+      return;
     }
+    
     onSubmit?.(formObj);
     setRating(0);
     form.reset();
   };
 
   return (
-    <div className="sticky top-16  w-full bg-white dark:bg-gray-900 shadow-lg rounded-2xl p-6 space-y-6">
-      <div className="text-center">
-        <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
-          Rate Your Experience
-        </h2>
-        <p className="text-sm text-gray-500 dark:text-gray-400">
-          We value your feedback!
+    <div className="sticky top-20 bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+      <div className="text-center mb-6">
+        <h3 className="text-lg font-bold text-gray-900 mb-1">
+          Share Your Experience
+        </h3>
+        <p className="text-sm text-gray-600">
+          Help others with your feedback
         </p>
       </div>
 
-      <form className="space-y-4" onSubmit={handleSubmit}>
-        <div className="flex justify-center gap-2">
-          {[...Array(5)].map((_, i) => {
-            const index = i + 1;
-            return (
-              <button
-                key={index}
-                type="button"
-                onClick={() => setRating(index)}
-                onMouseEnter={() => setHover(index)}
-                onMouseLeave={() => setHover(0)}
-                className="transition-transform hover:scale-110 focus:outline-none"
-              >
-                <Star
-                  size={36}
-                  className={`${
-                    index <= (hover || rating)
-                      ? "fill-primary text-primary"
-                      : "text-gray-300 dark:text-gray-600"
-                  }`}
-                />
-              </button>
-            );
-          })}
+      {/* Alert Message */}
+      {showAlert && (
+        <div className="mb-4 p-3 bg-orange-50 border border-orange-200 rounded-lg text-sm text-orange-700 animate-pulse">
+          Please select a rating to continue
+        </div>
+      )}
+
+      <form className="space-y-5" onSubmit={handleSubmit}>
+        {/* Star Rating */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-3 text-center">
+            Rate your experience
+          </label>
+          <div className="flex justify-center gap-2">
+            {[...Array(5)].map((_, i) => {
+              const index = i + 1;
+              return (
+                <button
+                  key={index}
+                  type="button"
+                  onClick={() => setRating(index)}
+                  onMouseEnter={() => setHover(index)}
+                  onMouseLeave={() => setHover(0)}
+                  className="transition-transform hover:scale-110 focus:outline-none"
+                >
+                  <Star
+                    size={32}
+                    className={`${
+                      index <= (hover || rating)
+                        ? "fill-orange-500 text-orange-500"
+                        : "text-gray-300"
+                    } transition-colors duration-200`}
+                  />
+                </button>
+              );
+            })}
+          </div>
+          {rating > 0 && (
+            <p className="text-center text-sm text-gray-600 mt-2">
+              You rated: {rating} star{rating > 1 ? 's' : ''}
+            </p>
+          )}
         </div>
 
+        {/* Status Select */}
         <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Service Status
+          </label>
           <select
             name="status"
             required
-            className="w-full p-3 rounded-lg border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-yellow-400 focus:outline-none"
+            className="w-full px-4 py-2.5 rounded-lg border border-gray-300 bg-white text-gray-900 focus:ring-2 focus:ring-orange-500 focus:border-orange-500 outline-none transition-all"
           >
             <option value="in-progress">In Progress</option>
             <option value="completed">Completed</option>
@@ -74,15 +97,25 @@ export default function RatingForm({ onSubmit }) {
           </select>
         </div>
 
-        <textarea
-          placeholder="Write your feedback..."
-          name="feedback"
-          className="w-full h-28 p-3 rounded-lg border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-yellow-400 focus:outline-none"
-        />
+        {/* Feedback Textarea */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Your Feedback
+          </label>
+          <textarea
+            placeholder="Tell us about your experience..."
+            name="feedback"
+            rows="4"
+            className="w-full px-4 py-3 rounded-lg border border-gray-300 bg-white text-gray-900 placeholder-gray-400 focus:ring-2 focus:ring-orange-500 focus:border-orange-500 outline-none transition-all resize-none"
+          />
+        </div>
 
-        <button type="submit"
-          className="cursor-pointer w-full py-2.5 font-medium rounded-lg bg-primary text-white hover:bg-primary/70 transition-colors"
+        {/* Submit Button */}
+        <button 
+          type="submit"
+          className="w-full flex items-center justify-center gap-2 bg-orange-500 text-white py-3 rounded-lg font-semibold hover:bg-orange-600 transition-all duration-200 shadow-sm hover:shadow-md"
         >
+          <Send className="w-4 h-4" />
           Submit Review
         </button>
       </form>
