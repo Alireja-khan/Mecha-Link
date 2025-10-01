@@ -79,6 +79,7 @@ const ManageUsers = () => {
     });
   };
 
+  // To get all user data
   const fetchUsers = async () => {
     setLoading(true);
     try {
@@ -98,6 +99,8 @@ const ManageUsers = () => {
     fetchUsers();
   }, []);
 
+  // console.log(users);
+
   const handleActivate = async (id) => {
     const result = await showConfirmDialog(
       'Activate User',
@@ -105,18 +108,20 @@ const ManageUsers = () => {
       'Yes, Activate'
     );
 
+
+    // To Update the Status
     if (result.isConfirmed) {
       try {
         showLoadingAlert('Activating...', 'Please wait while we activate the user');
-        
-        const response = await fetch(`/api/users/${id}/status`, {
+
+        const response = await fetch(`/api/users/dashboardUser/${id}/status`, {
           method: "PATCH",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ status: "active" }),
         });
-        
+
         if (!response.ok) throw new Error('Failed to activate user');
-        
+
         Swal.close();
         await fetchUsers();
         showSuccessAlert('Activated!', 'The user has been activated successfully');
@@ -124,36 +129,6 @@ const ManageUsers = () => {
         console.error('Activation failed:', error);
         Swal.close();
         showErrorAlert('Error', 'Failed to activate user');
-      }
-    }
-  };
-
-  const handleDeactivate = async (id) => {
-    const result = await showConfirmDialog(
-      'Deactivate User',
-      'Are you sure you want to deactivate this user? The user will not be able to access the platform.',
-      'Yes, Deactivate'
-    );
-
-    if (result.isConfirmed) {
-      try {
-        showLoadingAlert('Deactivating...', 'Please wait while we deactivate the user');
-        
-        const response = await fetch(`/api/users/${id}/status`, {
-          method: "PATCH",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ status: "inactive" }),
-        });
-        
-        if (!response.ok) throw new Error('Failed to deactivate user');
-        
-        Swal.close();
-        await fetchUsers();
-        showSuccessAlert('Deactivated!', 'The user has been deactivated successfully');
-      } catch (error) {
-        console.error('Deactivation failed:', error);
-        Swal.close();
-        showErrorAlert('Error', 'Failed to deactivate user');
       }
     }
   };
@@ -169,48 +144,61 @@ const ManageUsers = () => {
     if (result.isConfirmed) {
       try {
         showLoadingAlert('Deleting...', 'Please wait while we delete the user');
-        
-        const response = await fetch(`/api/users/${id}`, { method: "DELETE" });
-        if (!response.ok) throw new Error('Failed to delete user');
-        
+
+        const response = await fetch(`/api/users/dashboardUser/${id}`, {
+          method: "DELETE"
+        });
+
+        const result = await response.json();
+
+        if (!response.ok) {
+          throw new Error(result.error || 'Failed to delete user');
+        }
+
         Swal.close();
         await fetchUsers();
         showSuccessAlert('Deleted!', 'The user has been deleted successfully');
       } catch (error) {
         console.error('Deletion failed:', error);
         Swal.close();
-        showErrorAlert('Error', 'Failed to delete user');
+        showErrorAlert('Error', error.message || 'Failed to delete user');
       }
     }
   };
 
   const handleFormSubmit = async (e) => {
     e.preventDefault();
-    if (!formData.name || !formData.email) {
-      showErrorAlert('Validation Error', 'Please fill in name and email fields');
-      return;
-    }
+    const form = e.target;
+    const updateData = new FormData(form);
+    const formObject = Object.fromEntries(updateData.entries());
+    const { id, ...payload } = formObject;
+    const result = await showConfirmDialog(
+      'Update User',
+      `You are about to Update the user "${payload.name}". This action cannot be undone.`,
+      'Yes, Update it!'
+    );
 
-    try {
-      showLoadingAlert('Creating...', 'Please wait while we create the user');
+    if (result.isConfirmed) {
+      try {
+        showLoadingAlert('Updating...', 'Please wait while we update the user data');
 
-      const response = await fetch("/api/users", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
-      });
+        const response = await fetch(`/api/users/dashboardUser/${id}`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
 
-      if (!response.ok) throw new Error('Failed to create user');
+        if (!response.ok) throw new Error('Failed to update user data');
 
-      Swal.close();
-      setModalOpen(false);
-      setFormData({ name: "", email: "", role: "customer", status: "active", phone: "", location: "" });
-      await fetchUsers();
-      showSuccessAlert('Created!', 'User has been created successfully');
-    } catch (error) {
-      console.error('Form submission failed:', error);
-      Swal.close();
-      showErrorAlert('Error', 'Failed to create user');
+        Swal.close();
+        await fetchUsers();
+        showSuccessAlert('Updated!', 'The user data has been Updated successfully');
+        handleModalClose()
+      } catch (error) {
+        console.error('Update failed:', error);
+        Swal.close();
+        showErrorAlert('Error', 'Failed to update user data');
+      }
     }
   };
 
@@ -227,10 +215,14 @@ const ManageUsers = () => {
       role: user.role || "customer",
       status: user.status || "active",
       phone: user.phone || "",
-      location: user.location || ""
+      location: user.location || "",
+      id: user._id
     });
+    // console.log(user);
     setModalOpen(true);
   };
+
+  // console.log(formData);
 
   const handleModalClose = () => {
     setModalOpen(false);
@@ -301,13 +293,13 @@ const ManageUsers = () => {
         text: "text-orange-600"
       },
       green: {
-        bg: "bg-green-500/10", 
+        bg: "bg-green-500/10",
         bgHover: "group-hover:bg-green-500/20",
         text: "text-green-600"
       },
       red: {
         bg: "bg-red-500/10",
-        bgHover: "group-hover:bg-red-500/20", 
+        bgHover: "group-hover:bg-red-500/20",
         text: "text-red-600"
       },
       yellow: {
@@ -340,7 +332,7 @@ const ManageUsers = () => {
           <h1 className="text-4xl font-bold text-gray-900 mb-2">User Management</h1>
           <p className="text-gray-600 text-lg">Manage and monitor all platform users</p>
         </div>
-        <button 
+        <button
           onClick={() => setModalOpen(true)}
           className="flex items-center gap-3 px-6 py-4 bg-orange-500 text-white rounded-xl font-semibold transition-all duration-300 hover:bg-orange-600 hover:scale-105 shadow-lg hover:shadow-xl mt-4 lg:mt-0"
         >
@@ -365,7 +357,7 @@ const ManageUsers = () => {
             <h2 className="text-2xl font-bold text-gray-900 mb-2">All Users</h2>
             <p className="text-gray-600">Manage user accounts and permissions</p>
           </div>
-          
+
           <div className="flex flex-col sm:flex-row gap-3 w-full lg:w-auto">
             {/* Search */}
             <div className="relative">
@@ -378,17 +370,17 @@ const ManageUsers = () => {
                 className="pl-10 pr-4 py-3 border border-orange-200 rounded-xl bg-orange-50/50 focus:bg-white focus:border-orange-300 focus:outline-none transition-all duration-300 w-full lg:w-64"
               />
             </div>
-            
+
             {/* Action Buttons */}
             <div className="flex gap-3">
-              <button 
+              <button
                 onClick={() => showSuccessAlert('Coming Soon!', 'Filter functionality will be implemented soon.')}
                 className="flex items-center gap-2 px-4 py-3 bg-orange-50 text-orange-700 rounded-xl border border-orange-200 hover:bg-orange-100 transition-colors duration-200"
               >
                 <Filter size={16} />
                 Filter
               </button>
-              <button 
+              <button
                 onClick={() => showSuccessAlert('Coming Soon!', 'Export functionality will be implemented soon.')}
                 className="flex items-center gap-2 px-4 py-3 bg-orange-50 text-orange-700 rounded-xl border border-orange-200 hover:bg-orange-100 transition-colors duration-200"
               >
@@ -471,13 +463,12 @@ const ManageUsers = () => {
                       </div>
                     </td>
                     <td className="px-6 py-4">
-                      <span className={`px-3 py-1 text-sm rounded-lg border capitalize ${
-                        user.role === 'admin' 
-                          ? 'bg-purple-100 text-purple-700 border-purple-200' 
-                          : user.role === 'mechanic'
+                      <span className={`px-3 py-1 text-sm rounded-lg border capitalize ${user.role === 'admin'
+                        ? 'bg-purple-100 text-purple-700 border-purple-200'
+                        : user.role === 'mechanic'
                           ? 'bg-blue-100 text-blue-700 border-blue-200'
                           : 'bg-orange-100 text-orange-700 border-orange-200'
-                      }`}>
+                        }`}>
                         {user.role || "customer"}
                       </span>
                     </td>
@@ -570,11 +561,20 @@ const ManageUsers = () => {
                 <X size={20} />
               </button>
             </div>
+
             <form onSubmit={handleFormSubmit} className="space-y-6">
+              <input
+                name="id"
+                defaultValue={formData.id}
+                type="text"
+                hidden
+                className="sr-only"
+              />
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                   <label className="block text-gray-700 font-medium mb-3">Full Name *</label>
                   <input
+                    name="name"
                     type="text"
                     value={formData.name}
                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
@@ -586,6 +586,7 @@ const ManageUsers = () => {
                 <div>
                   <label className="block text-gray-700 font-medium mb-3">Email *</label>
                   <input
+                    name="email"
                     type="email"
                     value={formData.email}
                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
@@ -597,6 +598,7 @@ const ManageUsers = () => {
                 <div>
                   <label className="block text-gray-700 font-medium mb-3">Role</label>
                   <select
+                    name="role"
                     value={formData.role}
                     onChange={(e) => setFormData({ ...formData, role: e.target.value })}
                     className="w-full p-4 border border-orange-200 rounded-xl bg-orange-50/50 focus:bg-white focus:border-orange-300 focus:outline-none transition-all duration-300"
@@ -609,6 +611,7 @@ const ManageUsers = () => {
                 <div>
                   <label className="block text-gray-700 font-medium mb-3">Status</label>
                   <select
+                    name="status"
                     value={formData.status}
                     onChange={(e) => setFormData({ ...formData, status: e.target.value })}
                     className="w-full p-4 border border-orange-200 rounded-xl bg-orange-50/50 focus:bg-white focus:border-orange-300 focus:outline-none transition-all duration-300"
@@ -621,6 +624,7 @@ const ManageUsers = () => {
                 <div>
                   <label className="block text-gray-700 font-medium mb-3">Phone</label>
                   <input
+                    name="phone"
                     type="tel"
                     value={formData.phone}
                     onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
@@ -631,6 +635,7 @@ const ManageUsers = () => {
                 <div>
                   <label className="block text-gray-700 font-medium mb-3">Location</label>
                   <input
+                    name="location"
                     type="text"
                     value={formData.location}
                     onChange={(e) => setFormData({ ...formData, location: e.target.value })}
@@ -655,6 +660,7 @@ const ManageUsers = () => {
                 </button>
               </div>
             </form>
+
           </div>
         </div>
       )}
@@ -672,7 +678,7 @@ const ManageUsers = () => {
                 <X size={20} />
               </button>
             </div>
-            
+
             <div className="space-y-6">
               {/* Header */}
               <div className="flex items-center gap-4 p-4 bg-orange-50 rounded-xl border border-orange-200">

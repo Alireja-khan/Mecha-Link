@@ -122,19 +122,5 @@ h6 {
 }
 
 .container {
-  @apply px-5 mx-auto w-full sm:max-w-xl md:max-w-[45rem] lg:max-w-[62rem] xl:max-w-[77rem] 2xl:max-w-[93rem];
-}
-
-@keyframes slideIn {
-  from {
-    transform: translateX(100%);
-  }
-  to {
-    transform: translateX(0%);
-  }
-}
-@layer utilities {
-  .animate-slideIn {
-    animation: slideIn 0.3s ease-out forwards;
-  }
+  @apply px-5 mx-auto w-full sm:max-w-xl md:max-w-[45rem] lg:max-w-[62rem] xl:max-w-[77rem] 2xl:max-w-[100rem];
 }

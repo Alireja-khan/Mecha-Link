@@ -7,6 +7,11 @@ export async function PATCH(request, { params }) {
     const { id } = await params;
     const { status } = await request.json();
     
+    // Validate ID
+    if (!ObjectId.isValid(id)) {
+      return NextResponse.json({ error: "Invalid user ID" }, { status: 400 });
+    }
+    
     if (!status || !["active", "inactive", "pending"].includes(status)) {
       return NextResponse.json({ error: "Invalid status" }, { status: 400 });
     }

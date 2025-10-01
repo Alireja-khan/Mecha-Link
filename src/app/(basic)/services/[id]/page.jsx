@@ -3,12 +3,13 @@ import "leaflet/dist/leaflet.css";
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import L from "leaflet";
 import Image from "next/image";
-import { Check, Headset, Share2, UserPlus, MapPin, Clock, Phone, Mail, Star, Award, Calendar, Navigation, Users, Car, Bike, Truck, Zap, Facebook } from "lucide-react";
+import { Check, Headset, Share2, UserPlus, MapPin, Clock, Phone, Mail, Star, Award, Calendar, Navigation, Users, Car, Bike, Truck, Zap, Facebook, MessageSquare } from "lucide-react";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import ReviewShow from "../ReviewShow";
 import RatingForm from "../Ratting";
 import useUser from "@/hooks/useUser";
+import Swal from 'sweetalert2';
 
 delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({
@@ -23,7 +24,7 @@ export default function ServiceDetailsPage() {
   const [mapCenter, setMapCenter] = useState([51.505, -0.09]);
   const [isMapReady, setIsMapReady] = useState(false);
   const [submitSuccess, setSubmitSuccess] = useState(false);
-  const { user } = useUser();
+  const { user } = useUser(); // use 'user' consistently
 
   useEffect(() => {
     fetch(`/api/shops/${id}`)
@@ -66,6 +67,7 @@ export default function ServiceDetailsPage() {
 
   const {
     _id,
+    userId, // Owner ID is at the top level, use this for serviceProviderId
     shop = {},
     certifications = [],
     socialLinks = {},
@@ -85,6 +87,109 @@ export default function ServiceDetailsPage() {
     ownerName,
   } = shop;
 
+  const handleMessageContact = async () => {
+    const shopId = _id;
+    const customerId = user?._id;
+    const serviceProviderId = userId; // Owner ID
+
+    console.log("--- Chat Initiation Data ---");
+    console.log("Shop ID (Service Entity ID):", shopId);
+    console.log("Customer ID (Logged-in User ID):", customerId);
+    console.log("Service Provider ID (Owner ID):", serviceProviderId);
+    console.log("Shop Name:", shopName);
+    console.log("----------------------------");
+
+    if (!customerId) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Login Required',
+        text: 'You must be logged in to start a chat.',
+        confirmButtonColor: '#f97316'
+      });
+      return;
+    }
+
+    // ⭐ NEW CHECK: Prevent chat if the customer is the owner
+    if (customerId === serviceProviderId) {
+      Swal.fire({
+        icon: 'info',
+        title: 'Access Denied',
+        text: 'You cannot start a chat with your own service shop.',
+        confirmButtonColor: '#f97316'
+      });
+      console.log("Chat initiation aborted: Customer ID matches Service Provider ID.");
+      return;
+    }
+
+    if (!shopId || !serviceProviderId || !shopName) {
+      Swal.fire({
+        icon: 'warning',
+        title: 'Data Missing',
+        text: 'Cannot start chat: Missing Shop ID, Owner ID, or Shop Name.',
+        confirmButtonColor: '#f97316'
+      });
+      console.log("Chat initiation aborted: Missing required shop data.");
+      return;
+    }
+
+    const result = await Swal.fire({
+      title: 'Start Conversation?',
+      html: `Do you want to start an in-app chat with **${shopName}**?`,
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonText: 'Yes, Start Chat!',
+      cancelButtonText: 'No, Cancel',
+      confirmButtonColor: '#f97316'
+    });
+
+    if (!result.isConfirmed) {
+      console.log("Chat initiation cancelled by user.");
+      return;
+    }
+
+    try {
+      const chatRequestBody = {
+        shopId: shopId,
+        customerId: customerId,
+        mechanicId: serviceProviderId,
+        mechanicName: shopName,
+        mechanicLogo: logo,
+      };
+
+      console.log("API Request Body for /api/chats:", chatRequestBody);
+
+      const apiResponse = await fetch('/api/chats', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(chatRequestBody)
+      });
+
+      const data = await apiResponse.json();
+
+      console.log("API Response Status:", apiResponse.status, apiResponse.statusText);
+      console.log("API Response Data:", data);
+
+      if (!apiResponse.ok) {
+        throw new Error(data.message || 'Failed to create/retrieve chat.');
+      }
+
+      const chatPath = `/dashboard/${user?.role || 'customer'}/messages`;
+
+      console.log("Chat successfully initiated. Redirecting to:", chatPath);
+
+      window.location.href = chatPath;
+
+    } catch (error) {
+      console.error('Chat Error in handleMessageContact:', error);
+      Swal.fire({
+        icon: 'error',
+        title: 'Chat Error',
+        text: error.message || 'An unexpected error occurred while starting the chat.',
+        confirmButtonColor: '#f97316'
+      });
+    }
+  };
+
   const { street, city, country, postalCode } = address;
   const { phone, businessEmail, whatsapp } = contact;
   const { open, close, weekend } = workingHours;
@@ -97,7 +202,6 @@ export default function ServiceDetailsPage() {
 
   const location = [city, country].filter(Boolean).join(', ');
 
-  // Service sections with modern icons
   const serviceSections = [
     {
       title: "Car Services",
@@ -132,7 +236,7 @@ export default function ServiceDetailsPage() {
     data.userName = user?.name;
     data.userEmail = user?.email;
     data.userPhoto = user?.profileImage;
-    
+
     fetch("/api/reviews", {
       method: "POST",
       headers: {
@@ -144,7 +248,6 @@ export default function ServiceDetailsPage() {
       .then((data) => {
         setSubmitSuccess(true);
         setTimeout(() => setSubmitSuccess(false), 5000);
-        // Refresh reviews
         return fetch(`/api/shops/${id}`);
       })
       .then((res) => res.json())
@@ -158,7 +261,6 @@ export default function ServiceDetailsPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-orange-50/50 via-white to-orange-50/30">
-      {/* Success Notification */}
       {submitSuccess && (
         <div className="fixed top-4 right-4 z-50 bg-green-500 text-white px-6 py-4 rounded-xl shadow-lg">
           <p className="font-semibold">Thank you for your feedback!</p>
@@ -166,108 +268,104 @@ export default function ServiceDetailsPage() {
         </div>
       )}
 
-      {/* Header Section */}
       <div className="bg-white border-b border-gray-100">
-  <div className="px-4 sm:px-6 lg:px-8 py-10">
-    <div className="flex flex-col lg:flex-row gap-8 lg:gap-12 items-start">
-      {/* Shop Logo - Centered on mobile, left-aligned on desktop */}
-      <div className="flex-shrink-0 mx-auto lg:mx-0">
-        {logo && (
-          <div className="relative w-200 h-100 rounded-2xl overflow-hidden ring-4 ring-orange-100 shadow-lg">
-            <Image
-              src={logo}
-              alt={shopName || "Shop Logo"}
-              fill
-              className="object-cover"
-              priority
-            />
-          </div>
-        )}
-      </div>
-
-      {/* Main Content Area */}
-      <div className="flex-1 flex flex-col lg:flex-row gap-8 lg:gap-12 w-full">
-        {/* Shop Info - Takes majority of space */}
-        <div className="flex-1 space-y-6">
-          {/* Header Section */}
-          <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
-            <div className="flex-1">
-              <div className="flex flex-wrap items-center gap-3 mb-3">
-                <h1 className="text-3xl lg:text-4xl font-bold text-gray-900">
-                  {shopName || 'Shop Name'}
-                </h1>
-                <div className="flex items-center gap-1.5 bg-orange-100 text-orange-700 px-3 py-1.5 rounded-lg text-sm font-semibold">
-                  <Star className="w-4 h-4 fill-orange-500" />
-                  <span>4.8</span>
-                </div>
-              </div>
-
-              {location && (
-                <div className="flex items-center gap-2 text-gray-600 mb-2">
-                  <MapPin className="w-4 h-4" />
-                  <span className="text-sm">{location}</span>
+        <div className="px-4 sm:px-6 lg:px-8 py-10">
+          <div className="flex flex-col lg:flex-row gap-8 lg:gap-12 items-start">
+            <div className="flex-shrink-0 mx-auto lg:mx-0">
+              {logo && (
+                <div className="relative w-200 h-100 rounded-2xl overflow-hidden ring-4 ring-orange-100 shadow-lg">
+                  <Image
+                    src={logo}
+                    alt={shopName || "Shop Logo"}
+                    fill
+                    className="object-cover"
+                    priority
+                  />
                 </div>
               )}
             </div>
 
-            {/* Action Buttons - Positioned next to title on desktop */}
-            <div className="flex gap-3 sm:self-start">
-              <button className="flex items-center justify-center gap-2 bg-orange-500 text-white px-6 py-3 rounded-xl font-semibold hover:bg-orange-600 transition-all duration-200 shadow-sm hover:shadow-md min-w-[120px]">
-                <Phone className="w-4 h-4" />
-                <span className="hidden sm:inline">Contact</span>
-              </button>
-              <button className="flex items-center justify-center gap-2 bg-white text-gray-700 px-6 py-3 rounded-xl font-semibold border border-gray-200 hover:bg-gray-50 transition-all duration-200 min-w-[100px]">
-                <Share2 className="w-4 h-4" />
-                <span className="hidden sm:inline">Share</span>
-              </button>
+            <div className="flex-1 flex flex-col lg:flex-row gap-8 lg:gap-12 w-full">
+              <div className="flex-1 space-y-6">
+                <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+                  <div className="flex-1">
+                    <div className="flex flex-wrap items-center gap-3 mb-3">
+                      <h1 className="text-3xl lg:text-4xl font-bold text-gray-900">
+                        {shopName || 'Shop Name'}
+                      </h1>
+                      <div className="flex items-center gap-1.5 bg-orange-100 text-orange-700 px-3 py-1.5 rounded-lg text-sm font-semibold">
+                        <Star className="w-4 h-4 fill-orange-500 text-orange-500" />
+                        <span>4.8</span>
+                      </div>
+                    </div>
+
+                    {location && (
+                      <div className="flex items-center gap-2 text-gray-600 mb-2">
+                        <MapPin className="w-4 h-4" />
+                        <span className="text-sm">{location}</span>
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="flex gap-3 sm:self-start">
+                    <button
+                      onClick={handleMessageContact}
+                      className="flex items-center justify-center gap-2 bg-orange-500 text-white px-6 py-3 rounded-xl font-semibold hover:bg-orange-600 transition-all duration-200 shadow-sm hover:shadow-md min-w-[120px]"
+                    >
+                      <MessageSquare className="w-4 h-4" />
+                      <span className="hidden sm:inline">Message</span>
+                    </button>
+                    <button className="flex items-center justify-center gap-2 bg-white text-gray-700 px-6 py-3 rounded-xl font-semibold border border-gray-200 hover:bg-gray-50 transition-all duration-200 min-w-[100px]">
+                      <Share2 className="w-4 h-4" />
+                      <span className="hidden sm:inline">Share</span>
+                    </button>
+                  </div>
+                </div>
+
+                <div className="space-y-4">
+                  {categories && (
+                    <span className="inline-block bg-gradient-to-r from-orange-500 to-orange-600 text-white px-4 py-1.5 rounded-full text-sm font-medium shadow-sm">
+                      {categories}
+                    </span>
+                  )}
+
+                  {details && (
+                    <p className="text-gray-600 text-base leading-relaxed max-w-3xl">
+                      {details}
+                    </p>
+                  )}
+                </div>
+
+                <div className="flex flex-wrap gap-3 pt-2">
+                  {mechanicCount && (
+                    <div className="flex items-center gap-2 bg-gray-50 px-4 py-2 rounded-lg border border-gray-200">
+                      <Users className="w-4 h-4 text-orange-500" />
+                      <span className="text-sm font-medium text-gray-700">
+                        {mechanicCount} Mechanics
+                      </span>
+                    </div>
+                  )}
+                  {ownerName && ownerName !== "Not provided" && (
+                    <div className="flex items-center gap-2 bg-gray-50 px-4 py-2 rounded-lg border border-gray-200">
+                      <UserPlus className="w-4 h-4 text-orange-500" />
+                      <span className="text-sm font-medium text-gray-700">
+                        {ownerName}
+                      </span>
+                    </div>
+                  )}
+                </div>
+              </div>
             </div>
-          </div>
-
-          {/* Categories & Details */}
-          <div className="space-y-4">
-            {categories && (
-              <span className="inline-block bg-gradient-to-r from-orange-500 to-orange-600 text-white px-4 py-1.5 rounded-full text-sm font-medium shadow-sm">
-                {categories}
-              </span>
-            )}
-
-            {details && (
-              <p className="text-gray-600 text-base leading-relaxed max-w-3xl">
-                {details}
-              </p>
-            )}
-          </div>
-
-          {/* Info Pills */}
-          <div className="flex flex-wrap gap-3 pt-2">
-            {mechanicCount && (
-              <div className="flex items-center gap-2 bg-gray-50 px-4 py-2 rounded-lg border border-gray-200">
-                <Users className="w-4 h-4 text-orange-500" />
-                <span className="text-sm font-medium text-gray-700">
-                  {mechanicCount} Mechanics
-                </span>
-              </div>
-            )}
-            {ownerName && ownerName !== "Not provided" && (
-              <div className="flex items-center gap-2 bg-gray-50 px-4 py-2 rounded-lg border border-gray-200">
-                <UserPlus className="w-4 h-4 text-orange-500" />
-                <span className="text-sm font-medium text-gray-700">
-                  {ownerName}
-                </span>
-              </div>
-            )}
           </div>
         </div>
       </div>
-    </div>
-  </div>
-</div>
 
       {/* Main Content */}
-      <div className=" px-4 sm:px-6 lg:px-8 py-12">
+      <div className=" container">
         <div className="grid lg:grid-cols-3 gap-8">
+
           {/* Left Column - Services & Reviews */}
-          <div className="lg:col-span-2 space-y-8">
+          <div className="lg:col-span-2  space-y-8">
             {/* Services Section */}
             <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-8">
               <h2 className="text-2xl font-bold text-gray-900 mb-8">Services We Offer</h2>
@@ -276,7 +374,6 @@ export default function ServiceDetailsPage() {
                 {serviceSections.map((section) => (
                   section.data && Object.keys(section.data).length > 0 && (
                     <div key={section.title} className="space-y-4">
-                      {/* Section Header */}
                       <div className="flex items-center gap-3">
                         <div className={`bg-gradient-to-r ${section.gradient} p-2.5 rounded-lg text-white`}>
                           {section.icon}
@@ -284,11 +381,10 @@ export default function ServiceDetailsPage() {
                         <h3 className="text-lg font-semibold text-gray-900">{section.title}</h3>
                       </div>
 
-                      {/* Service Cards */}
                       <div className="grid sm:grid-cols-2 gap-4">
                         {Object.entries(section.data).map(([category, services]) => (
-                          <div 
-                            key={category} 
+                          <div
+                            key={category}
                             className="bg-gradient-to-br from-orange-50 to-orange-100/50 rounded-xl p-5 border border-orange-200/50 hover:border-orange-300 hover:shadow-md transition-all duration-200"
                           >
                             <h4 className="font-semibold text-gray-900 mb-3 text-sm uppercase tracking-wide">
@@ -316,17 +412,13 @@ export default function ServiceDetailsPage() {
               </div>
             </div>
 
-            {/* Reviews Section */}
             <ReviewShow reviews={shopdata.reviews} />
           </div>
 
-          {/* Right Column - Sidebar */}
           <div className="space-y-6">
-            {/* Contact Information */}
             <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 space-y-5">
               <h3 className="text-lg font-bold text-gray-900 mb-4">Contact Information</h3>
 
-              {/* Address */}
               <div className="space-y-2">
                 <div className="flex items-start gap-3">
                   <div className="bg-orange-100 p-2 rounded-lg">
@@ -347,7 +439,6 @@ export default function ServiceDetailsPage() {
 
               <div className="border-t border-gray-100"></div>
 
-              {/* Contact Details */}
               <div className="space-y-3">
                 <div className="flex items-center gap-3 text-sm">
                   <div className="bg-orange-100 p-2 rounded-lg">
@@ -377,7 +468,6 @@ export default function ServiceDetailsPage() {
 
               <div className="border-t border-gray-100"></div>
 
-              {/* Working Hours */}
               <div className="space-y-2">
                 <div className="flex items-start gap-3">
                   <div className="bg-orange-100 p-2 rounded-lg">
@@ -401,13 +491,12 @@ export default function ServiceDetailsPage() {
                 </div>
               </div>
 
-              {/* Social Links */}
               {facebook && (
                 <>
                   <div className="border-t border-gray-100"></div>
-                  <a 
-                    href={facebook} 
-                    target="_blank" 
+                  <a
+                    href={facebook}
+                    target="_blank"
                     rel="noopener noreferrer"
                     className="flex items-center gap-3 text-sm text-orange-600 hover:text-orange-700 transition-colors group"
                   >
@@ -420,7 +509,6 @@ export default function ServiceDetailsPage() {
               )}
             </div>
 
-            {/* Certifications */}
             {certifications && certifications.length > 0 && (
               <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
                 <div className="flex items-center gap-3 mb-5">
@@ -429,11 +517,11 @@ export default function ServiceDetailsPage() {
                   </div>
                   <h3 className="text-lg font-bold text-gray-900">Certifications</h3>
                 </div>
-                
+
                 <div className="space-y-3">
                   {certifications.map((cert, index) => (
-                    <div 
-                      key={index} 
+                    <div
+                      key={index}
                       className="flex items-start gap-3 p-3 bg-gradient-to-r from-orange-50 to-orange-100/50 rounded-lg border border-orange-200/50 hover:border-orange-300 transition-all duration-200"
                     >
                       <Check className="w-4 h-4 text-green-500 flex-shrink-0 mt-0.5" />
@@ -444,7 +532,6 @@ export default function ServiceDetailsPage() {
               </div>
             )}
 
-            {/* Member Since */}
             {createdAt && (
               <div className="bg-gradient-to-br from-orange-500 to-orange-600 rounded-2xl shadow-sm p-6 text-white">
                 <div className="flex items-center gap-3 mb-4">
@@ -453,7 +540,7 @@ export default function ServiceDetailsPage() {
                   </div>
                   <h3 className="text-lg font-bold">Member Since</h3>
                 </div>
-                
+
                 <div>
                   <p className="text-4xl font-bold mb-1">
                     {new Date(createdAt).getFullYear()}
@@ -469,7 +556,6 @@ export default function ServiceDetailsPage() {
               </div>
             )}
 
-            {/* Location Map */}
             <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
               <div className="flex items-center gap-3 mb-4">
                 <div className="bg-orange-100 p-2 rounded-lg">
@@ -491,7 +577,7 @@ export default function ServiceDetailsPage() {
                     scrollWheelZoom={false}
                   >
                     <TileLayer
-                      attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+                      attribution='© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
                       url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                     />
                     <Marker position={mapCenter}>
@@ -528,7 +614,6 @@ export default function ServiceDetailsPage() {
               )}
             </div>
 
-            {/* Rating Form */}
             <RatingForm onSubmit={handleFeedbackSubmit} />
           </div>
         </div>
