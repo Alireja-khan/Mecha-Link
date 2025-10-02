@@ -3,7 +3,7 @@ import http from "http";
 import {Server} from "socket.io";
 import dotenv from "dotenv";
 import {collections, dbConnect} from "./dbConnect.js";
-import { ObjectId } from "mongodb";
+import {ObjectId} from "mongodb";
 dotenv.config();
 
 const app = express();
@@ -22,6 +22,7 @@ async function start() {
     const mechanicShopsCollection = await dbConnect(collections.mechanicShops);
     const announcementsCollection = await dbConnect(collections.announcements);
     const couponsCollection = await dbConnect(collections.coupons);
+    const usersCollection = await dbConnect(collections.users);
 
     console.log("✅ Connected to MongoDB collections");
 
@@ -31,10 +32,9 @@ async function start() {
     serviceRequests.watch().on("change", async (change) => {
       if (change.operationType === "insert") {
         const newRequest = change.fullDocument;
-        console.log("📢 New Service Request:", newRequest);
 
         const notificationDoc = {
-          userEmail: newRequest?.userEmail || "system@mechalink.com",
+          _id: new ObjectId().toString(),
           message: "New service request added!",
           type: "serviceRequest",
           data: newRequest,
@@ -42,7 +42,18 @@ async function start() {
           read: false,
         };
 
-        await notifications.insertOne(notificationDoc);
+        // Push to the user who created it
+        await usersCollection.updateOne(
+          {email: newRequest.userEmail},
+          {$push: {notifications: {$each: [notificationDoc], $position: 0}}}
+        );
+
+        // Push to all mechanics & admins
+        await usersCollection.updateMany(
+          {role: {$in: ["mechanic", "admin"]}},
+          {$push: {notifications: {$each: [notificationDoc], $position: 0}}}
+        );
+
         io.emit("serviceRequestNotification", notificationDoc);
       }
     });
@@ -74,6 +85,7 @@ async function start() {
           );
 
           const notificationDoc = {
+            _id: new ObjectId().toString(),
             userEmail: updatedDoc?.userEmail, // notify the user who created the request
             message: `Service request has been assigned to "${shopName}"`,
             type: "assignment",
@@ -86,7 +98,18 @@ async function start() {
             read: false,
           };
 
-          await notifications.insertOne(notificationDoc);
+          
+        // Push to the user who created it
+        await usersCollection.updateOne(
+          {email: updatedDoc.userEmail},
+          {$push: {notifications: {$each: [notificationDoc], $position: 0}}}
+        );
+
+        // Push to all mechanics & admins
+        await usersCollection.updateMany(
+          {role: {$in: [ "admin"]}},
+          {$push: {notifications: {$each: [notificationDoc], $position: 0}}}
+        );
           io.emit("assignmentNotification", notificationDoc);
         }
       }
@@ -101,6 +124,7 @@ async function start() {
         console.log("📢 New Mechanic Shop Added:", newMechanic);
 
         const notificationDoc = {
+          _id: new ObjectId().toString(),
           userEmail: newMechanic.userEmail,
           message: `New mechanic shop added: ${newMechanic?.shop?.shopName}`,
           type: "mechanicShopAdded",
@@ -109,7 +133,13 @@ async function start() {
           read: false,
         };
 
-        await notifications.insertOne(notificationDoc);
+       
+
+        // Push to all mechanics & admins
+        await usersCollection.updateMany(
+          {role: {$in: ["admin"]}},
+          {$push: {notifications: {$each: [notificationDoc], $position: 0}}}
+        );
         io.emit("mechanicShopNotification", notificationDoc);
       }
     });
@@ -123,7 +153,8 @@ async function start() {
         console.log("📢 New Announcement Added:", newAnnouncement);
 
         const notificationDoc = {
-          userEmail: "all", // broadcast to all users and mechanics
+          _id: new ObjectId().toString(),
+          userEmail: "all", 
           message: `New announcement: ${newAnnouncement.title}`,
           type: "announcement",
           data: newAnnouncement,
@@ -131,7 +162,13 @@ async function start() {
           read: false,
         };
 
-        await notifications.insertOne(notificationDoc);
+     
+
+        // Push to all mechanics & admins
+        await usersCollection.updateMany(
+          {role: {$in: ["mechanic","user"]}},
+          {$push: {notifications: {$each: [notificationDoc], $position: 0}}}
+        );
         io.emit("announcementNotification", notificationDoc);
       }
     });
@@ -145,6 +182,7 @@ async function start() {
         console.log("📢 New Coupon Added:", newCoupon);
 
         const notificationDoc = {
+          _id: new ObjectId().toString(),
           userEmail: "all", // broadcast to all users and mechanics
           message: `New coupon available: ${newCoupon.code}`,
           type: "coupon",
@@ -153,7 +191,13 @@ async function start() {
           read: false,
         };
 
-        await notifications.insertOne(notificationDoc);
+     
+
+        // Push to all mechanics & admins
+        await usersCollection.updateMany(
+          {role: {$in: ["user","mechanic"]}},
+          {$push: {notifications: {$each: [notificationDoc], $position: 0}}}
+        );
         io.emit("couponNotification", notificationDoc);
       }
     });
@@ -162,6 +206,7 @@ async function start() {
     // Socket.io connection events
     // -----------------------------
     io.on("connection", (socket) => {
+      console.log("socket", socket);
       console.log("⚡ User connected:", socket.id);
 
       socket.on("joinChat", (chatId) => {
