@@ -17,6 +17,7 @@ export default function Header() {
 
   const {user: loggedInUser, status} = useUser();
 
+  console.log(loggedInUser, status);
   // drawer states
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [rotating, setRotating] = useState(false);
@@ -119,6 +120,7 @@ export default function Header() {
               onChange={() => setTheme(theme === "light" ? "dark" : "light")}
               checked={theme === "dark"}
             />
+
             <svg
               className="swap-off h-10 w-10 fill-current"
               xmlns="http://www.w3.org/2000/svg"
@@ -130,70 +132,14 @@ export default function Header() {
 
               {/* gear teeth: 8 small rectangles rotated around center */}
               <g fill="currentColor">
-                <rect
-                  x="11"
-                  y="0.5"
-                  width="2"
-                  height="3"
-                  rx="0.3"
-                  transform="rotate(0 12 12)"
-                />
-                <rect
-                  x="11"
-                  y="0.5"
-                  width="2"
-                  height="3"
-                  rx="0.3"
-                  transform="rotate(45 12 12)"
-                />
-                <rect
-                  x="11"
-                  y="0.5"
-                  width="2"
-                  height="3"
-                  rx="0.3"
-                  transform="rotate(90 12 12)"
-                />
-                <rect
-                  x="11"
-                  y="0.5"
-                  width="2"
-                  height="3"
-                  rx="0.3"
-                  transform="rotate(135 12 12)"
-                />
-                <rect
-                  x="11"
-                  y="0.5"
-                  width="2"
-                  height="3"
-                  rx="0.3"
-                  transform="rotate(180 12 12)"
-                />
-                <rect
-                  x="11"
-                  y="0.5"
-                  width="2"
-                  height="3"
-                  rx="0.3"
-                  transform="rotate(225 12 12)"
-                />
-                <rect
-                  x="11"
-                  y="0.5"
-                  width="2"
-                  height="3"
-                  rx="0.3"
-                  transform="rotate(270 12 12)"
-                />
-                <rect
-                  x="11"
-                  y="0.5"
-                  width="2"
-                  height="3"
-                  rx="0.3"
-                  transform="rotate(315 12 12)"
-                />
+                <rect x="11" y="0.5" width="2" height="3" rx="0.3" transform="rotate(0 12 12)" />
+                <rect x="11" y="0.5" width="2" height="3" rx="0.3" transform="rotate(45 12 12)" />
+                <rect x="11" y="0.5" width="2" height="3" rx="0.3" transform="rotate(90 12 12)" />
+                <rect x="11" y="0.5" width="2" height="3" rx="0.3" transform="rotate(135 12 12)" />
+                <rect x="11" y="0.5" width="2" height="3" rx="0.3" transform="rotate(180 12 12)" />
+                <rect x="11" y="0.5" width="2" height="3" rx="0.3" transform="rotate(225 12 12)" />
+                <rect x="11" y="0.5" width="2" height="3" rx="0.3" transform="rotate(270 12 12)" />
+                <rect x="11" y="0.5" width="2" height="3" rx="0.3" transform="rotate(315 12 12)" />
                 {/* inner hub */}
                 <circle cx="12" cy="12" r="3.5" />
                 {/* small center hole */}
@@ -202,6 +148,7 @@ export default function Header() {
             </svg>
 
             {/* piston icon (mechanical/dark) */}
+            
             <svg
               className="swap-on h-10 w-10 fill-current"
               xmlns="http://www.w3.org/2000/svg"
@@ -217,30 +164,21 @@ export default function Header() {
                 {/* shaft */}
                 <rect x="10" y="6" width="4" height="8" rx="0.6" />
                 {/* connecting rod */}
-                <rect
-                  x="11.2"
-                  y="14"
-                  width="1.6"
-                  height="5.5"
-                  rx="0.4"
-                  transform="rotate(8 12 16.75)"
-                />
+                <rect x="11.2" y="14" width="1.6" height="5.5" rx="0.4" transform="rotate(8 12 16.75)" />
                 {/* big bottom circle (crank) */}
                 <circle cx="12" cy="20.5" r="2.2" />
                 {/* detail notch on head */}
-                <rect
-                  x="8"
-                  y="3.2"
-                  width="8"
-                  height="0.7"
-                  rx="0.35"
-                  opacity="0.12"
-                />
+                <rect x="8" y="3.2" width="8" height="0.7" rx="0.35" opacity="0.12" />
               </g>
             </svg>
+
           </label>
 
-          {status === "loading" ? (
+          {
+            status === "loading" && !loggedInUser ? (
+              <span className="loading loading-spinner loading-xs"></span>
+
+            ) : status === "authenticated" && !loggedInUser ? (
             <span className="loading loading-spinner loading-xs"></span>
           ) : loggedInUser ? (
             <>
@@ -341,6 +279,7 @@ export default function Header() {
               </Link>
             </>
           )}
+          
         </div>
       </div>
 
