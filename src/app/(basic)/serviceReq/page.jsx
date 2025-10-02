@@ -160,7 +160,7 @@ const ServiceReq = () => {
 
           {!loading && requests.length > 0 && (
             <div className="space-y-6 ">
-              {requests.map((req) => (
+              {requests?.map((req) => (
                 <ServiceReqCard key={req._id} request={req} />
               ))}
             </div>

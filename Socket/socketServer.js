@@ -3,7 +3,7 @@ import http from "http";
 import {Server} from "socket.io";
 import dotenv from "dotenv";
 import {collections, dbConnect} from "./dbConnect.js";
-
+import { ObjectId } from "mongodb";
 dotenv.config();
 
 const app = express();
@@ -11,6 +11,7 @@ const server = http.createServer(app);
 const io = new Server(server, {
   cors: {origin: "*"},
 });
+const PORT = process.env.PORT || 5000;
 
 app.use(express.json());
 
@@ -47,6 +48,51 @@ async function start() {
     });
 
     // -----------------------------
+    // Watch for assignment updates
+    // -----------------------------
+    serviceRequests.watch().on("change", async (change) => {
+      if (change.operationType === "update") {
+        const updatedFields = change.updateDescription.updatedFields;
+
+        if (updatedFields.assignedShopId) {
+          const serviceId = change.documentKey._id;
+          const updatedDoc = await serviceRequests.findOne({_id: serviceId});
+
+          // Fetch assigned shop details
+          const shopDoc = await mechanicShopsCollection.findOne({
+            _id: new ObjectId(updatedFields.assignedShopId),
+          });
+          console.log(shopDoc);
+
+          const shopName = shopDoc?.shop?.shopName || "Assigned Shop";
+
+          console.log(
+            "📢 Service Request Assigned:",
+            updatedDoc,
+            "Shop:",
+            shopName
+          );
+
+          const notificationDoc = {
+            userEmail: updatedDoc?.userEmail, // notify the user who created the request
+            message: `Service request has been assigned to "${shopName}"`,
+            type: "assignment",
+            data: {
+              serviceId,
+              shopId: updatedFields.assignedShopId,
+              assignedUserId: updatedDoc?.userId,
+            },
+            createdAt: new Date(),
+            read: false,
+          };
+
+          await notifications.insertOne(notificationDoc);
+          io.emit("assignmentNotification", notificationDoc);
+        }
+      }
+    });
+
+    // -----------------------------
     // Watch for new mechanic shops
     // -----------------------------
     mechanicShopsCollection.watch().on("change", async (change) => {
@@ -77,7 +123,7 @@ async function start() {
         console.log("📢 New Announcement Added:", newAnnouncement);
 
         const notificationDoc = {
-          userEmail: newAnnouncement.email || "admin@gmail.com", // broadcast to all users and mechanics
+          userEmail: "all", // broadcast to all users and mechanics
           message: `New announcement: ${newAnnouncement.title}`,
           type: "announcement",
           data: newAnnouncement,
@@ -132,7 +178,7 @@ async function start() {
       });
     });
 
-    const PORT = process.env.PORT || 5000;
+    // Start server
     server.listen(PORT, () => {
       console.log(`🚀 Socket.IO server running on http://localhost:${PORT}`);
     });

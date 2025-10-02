@@ -31,11 +31,18 @@ export default function AdminNotifications({ onNewNotification }) {
       if (onNewNotification) onNewNotification(msg);
     });
 
+    // Assignment notifications (when a shop is assigned to a service request)
+    socket.on("assignmentNotification", (msg) => {
+      console.log("Service Request Assigned:", msg);
+      if (onNewNotification) onNewNotification(msg);
+    });
+
     return () => {
       socket.off("serviceRequestNotification");
       socket.off("mechanicShopNotification");
       socket.off("announcementNotification");
       socket.off("couponNotification");
+      socket.off("assignmentNotification");
     };
   }, [onNewNotification]);
 

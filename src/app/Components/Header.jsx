@@ -1,12 +1,12 @@
 "use client";
 
 import useUser from "@/hooks/useUser";
-import { User as UserIcon } from "lucide-react";
-import { signOut } from "next-auth/react";
+import {User as UserIcon} from "lucide-react";
+import {signOut} from "next-auth/react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
-import { FaGear } from "react-icons/fa6";
+import {usePathname} from "next/navigation";
+import {useEffect, useRef, useState} from "react";
+import {FaGear} from "react-icons/fa6";
 
 export default function Header() {
   const [scrolled, setScrolled] = useState(false);
@@ -15,7 +15,7 @@ export default function Header() {
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const dropdownRef = useRef(null);
 
-  const { user: loggedInUser, status } = useUser();
+  const {user: loggedInUser, status} = useUser();
 
   // drawer states
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -58,10 +58,10 @@ export default function Header() {
   };
 
   const navigation = [
-    { href: "/", label: "Home" },
-    { href: "/services", label: "Mechanic Shops" },
-    { href: "/serviceReq", label: "Service requests" },
-    { href: "/about", label: "About" },
+    {href: "/", label: "Home"},
+    {href: "/services", label: "Mechanic Shops"},
+    {href: "/serviceReq", label: "Service requests"},
+    {href: "/about", label: "About"},
   ];
 
   return (
@@ -79,7 +79,10 @@ export default function Header() {
       <div className=" container mx-auto px-2 md:px-3 flex justify-between items-center">
         {/* Logo */}
         <div className="z-50">
-          <button onClick={handleGearClick} className="flex gap-2 lg:gap-3 items-center">
+          <button
+            onClick={handleGearClick}
+            className="flex gap-2 lg:gap-3 items-center"
+          >
             <FaGear
               className={`h-6 w-6 lg:h-12 lg:w-12 transition-transform duration-500 ${
                 rotating && (drawerOpen ? "-rotate-90" : "rotate-90")
@@ -240,84 +243,88 @@ export default function Header() {
           {status === "loading" ? (
             <span className="loading loading-spinner loading-xs"></span>
           ) : loggedInUser ? (
-            <div className="relative" ref={dropdownRef}>
-              <button
-                className="flex items-center space-x-2 focus:outline-none"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setUserMenuOpen(!userMenuOpen);
-                }}
-              >
-                <div className="w-9 h-9 rounded-full bg-gray-200 overflow-hidden flex items-center justify-center">
-                  {loggedInUser?.profileImage ? (
-                    <img
-                      src={loggedInUser.profileImage}
-                      alt={loggedInUser.name || "User"}
-                      className="w-full h-full object-cover"
-                    />
-                  ) : (
-                    <UserIcon className="w-5 h-5 text-gray-600" />
-                  )}
-                </div>
-                <svg
-                  className={`w-4 h-4 transition-transform ${
-                    userMenuOpen ? "rotate-180" : ""
-                  }`}
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
+            <>
+              <div className="relative" ref={dropdownRef}>
+                <button
+                  className="flex items-center space-x-2 focus:outline-none"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setUserMenuOpen(!userMenuOpen);
+                  }}
                 >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M19 9l-7 7-7-7"
-                  />
-                </svg>
-              </button>
-
-              {/* Dropdown */}
-              {userMenuOpen && (
-                <div className="absolute right-0 mt-2 w-48 bg-white text-black rounded-md shadow-lg py-1 z-50 border border-gray-100">
-                  <div className="px-4 py-2 border-b border-gray-100">
-                    <p className="text-sm font-medium">{loggedInUser?.name}</p>
-                    <p className="text-xs truncate">{loggedInUser?.email}</p>
+                  <div className="w-9 h-9 rounded-full bg-gray-200 overflow-hidden flex items-center justify-center">
+                    {loggedInUser?.profileImage ? (
+                      <img
+                        src={loggedInUser.profileImage}
+                        alt={loggedInUser.name || "User"}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <UserIcon className="w-5 h-5 text-gray-600" />
+                    )}
                   </div>
-                  <Link
-                    href="/profile"
-                    className="block px-4 py-2 text-sm hover:bg-gray-50"
-                    onClick={() => setUserMenuOpen(false)}
+                  <svg
+                    className={`w-4 h-4 transition-transform ${
+                      userMenuOpen ? "rotate-180" : ""
+                    }`}
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
                   >
-                    Profile
-                  </Link>
-                  <Link
-                    href={
-                      loggedInUser?.role === "admin"
-                        ? "/dashboard/admin"
-                        : loggedInUser?.role === "mechanic"
-                        ? "/dashboard/mechanic"
-                        : "/dashboard/user"
-                    }
-                    className="block px-4 py-2 text-sm hover:bg-gray-50"
-                    onClick={() => setUserMenuOpen(false)}
-                  >
-                    Dashboard
-                  </Link>
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M19 9l-7 7-7-7"
+                    />
+                  </svg>
+                </button>
 
-                  <div className="border-t border-gray-100 my-1"></div>
-                  <button
-                    type="button"
-                    className="cursor-pointer block w-full text-left px-4 py-2 text-sm hover:bg-gray-50"
-                    onClick={() => {
-                      signOut();
-                      setUserMenuOpen(false);
-                    }}
-                  >
-                    Sign out
-                  </button>
-                </div>
-              )}
-            </div>
+                {/* Dropdown */}
+                {userMenuOpen && (
+                  <div className="absolute right-0 mt-2 w-48 bg-white text-black rounded-md shadow-lg py-1 z-50 border border-gray-100">
+                    <div className="px-4 py-2 border-b border-gray-100">
+                      <p className="text-sm font-medium">
+                        {loggedInUser?.name}
+                      </p>
+                      <p className="text-xs truncate">{loggedInUser?.email}</p>
+                    </div>
+                    <Link
+                      href="/profile"
+                      className="block px-4 py-2 text-sm hover:bg-gray-50"
+                      onClick={() => setUserMenuOpen(false)}
+                    >
+                      Profile
+                    </Link>
+                    <Link
+                      href={
+                        loggedInUser?.role === "admin"
+                          ? "/dashboard/admin"
+                          : loggedInUser?.role === "mechanic"
+                          ? "/dashboard/mechanic"
+                          : "/dashboard/user"
+                      }
+                      className="block px-4 py-2 text-sm hover:bg-gray-50"
+                      onClick={() => setUserMenuOpen(false)}
+                    >
+                      Dashboard
+                    </Link>
+
+                    <div className="border-t border-gray-100 my-1"></div>
+                    <button
+                      type="button"
+                      className="cursor-pointer block w-full text-left px-4 py-2 text-sm hover:bg-gray-50"
+                      onClick={() => {
+                        signOut();
+                        setUserMenuOpen(false);
+                      }}
+                    >
+                      Sign out
+                    </button>
+                  </div>
+                )}
+              </div>
+            </>
           ) : (
             <>
               <Link
@@ -352,7 +359,7 @@ export default function Header() {
                   className={`block px-2 py-2 rounded hover:bg-gray-100 text-black ${
                     pathname === item.href ? "text-primary font-semibold" : ""
                   }`}
-                  onClick={() => setDrawerOpen(false)} 
+                  onClick={() => setDrawerOpen(false)}
                 >
                   {item.label}
                 </Link>
