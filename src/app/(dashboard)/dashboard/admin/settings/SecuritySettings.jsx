@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import { Eye, EyeOff } from "lucide-react";
 import Swal from "sweetalert2"; // ✅ import swal
-import { toast } from "react-hot-toast";
+import { toast } from "react-hot-toast"; // assuming you have this
 
 export default function SecuritySettings({ security, setSecurity }) {
   const [showPassword, setShowPassword] = useState({
@@ -16,7 +16,7 @@ export default function SecuritySettings({ security, setSecurity }) {
     const { name, value, type, checked } = e.target;
     setSecurity((prev) => ({
       ...prev,
-      [name]: type === "checkbox" ? checked : value,
+      [name]: type === "checkbox" ? checked : (type === "number" ? parseInt(value) : value), // Parse number values
     }));
   };
 
@@ -51,7 +51,8 @@ export default function SecuritySettings({ security, setSecurity }) {
           title: "Success",
           text: "Password changed successfully",
         });
-        setSecurity({ password: "", newPassword: "", confirmPassword: "" });
+        // Reset password fields after successful change
+        setSecurity((prev) => ({ ...prev, password: "", newPassword: "", confirmPassword: "" }));
       } else {
         // ❌ Wrong current password or backend error
         Swal.fire({
@@ -71,13 +72,17 @@ export default function SecuritySettings({ security, setSecurity }) {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
+
       {/* Password Section with form */}
-      <form onSubmit={handleSubmit} className="space-y-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <form onSubmit={handleSubmit} className="space-y-6 p-6 border border-gray-200 rounded-xl bg-gray-50/50">
+        <h2 className="text-xl font-bold text-gray-800 border-b border-gray-200 pb-2 mb-4">
+          Change Password
+        </h2>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {["password", "newPassword", "confirmPassword"].map((field) => (
             <div key={field} className="flex flex-col">
-              <label className="text-sm font-medium text-gray-600 mb-2 capitalize">
+              <label className="text-sm font-medium text-gray-700 mb-2 capitalize">
                 {field.replace(/([A-Z])/g, " $1")}
               </label>
               <div className="relative">
@@ -86,7 +91,9 @@ export default function SecuritySettings({ security, setSecurity }) {
                   name={field}
                   value={security[field]}
                   onChange={handleChange}
-                  className="p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary w-full"
+                  className="p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-orange-500 w-full outline-none transition"
+                  placeholder={field === 'password' ? 'Current Password' : 'New Password'}
+                  required={field !== 'password'} // Only require new/confirm for form submission
                 />
                 <button
                   type="button"
@@ -96,7 +103,7 @@ export default function SecuritySettings({ security, setSecurity }) {
                       [field]: !prev[field],
                     }))
                   }
-                  className="absolute right-4 top-4 text-gray-400 hover:text-gray-600"
+                  className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 p-1"
                 >
                   {showPassword[field] ? (
                     <EyeOff size={18} />
@@ -107,9 +114,11 @@ export default function SecuritySettings({ security, setSecurity }) {
               </div>
             </div>
           ))}
+        </div>
+        <div className="flex justify-end pt-4">
           <button
             type="submit"
-            className="max-w-sm px-2 py-1 bg-primary text-white rounded-lg font-semibold text-xl cursor-pointer mt-[28px]"
+            className="px-6 py-3 bg-orange-500 text-white rounded-xl hover:bg-orange-600 transition font-medium shadow-md shadow-orange-200"
           >
             Change Password
           </button>
@@ -117,46 +126,48 @@ export default function SecuritySettings({ security, setSecurity }) {
       </form>
 
       {/* Security Preferences */}
-
-      {/* <div className="space-y-4">
-        <h3 className="font-semibold text-gray-800">Security Preferences</h3>
+      <div className="space-y-4">
+        <h3 className="text-xl font-bold text-gray-800 pb-2 border-b border-gray-200">
+          Security Preferences
+        </h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {[
             {
               name: "twoFactor",
               label: "Two-Factor Authentication",
-              desc: "Extra layer of security",
+              desc: "Require a second code for login for an extra layer of security.",
             },
             {
               name: "loginAlerts",
               label: "Login Alerts",
-              desc: "Get notified of new sign-ins",
+              desc: "Get notified via email when your account is logged into from a new device.",
             },
           ].map((item) => (
             <label
               key={item.name}
-              className="flex items-center gap-3 p-4 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer"
+              className="flex items-center justify-between p-4 border border-gray-200 rounded-xl hover:bg-orange-50/50 cursor-pointer transition"
             >
+              <div>
+                <div className="font-semibold text-gray-800">{item.label}</div>
+                <div className="text-sm text-gray-500">{item.desc}</div>
+              </div>
               <input
                 type="checkbox"
                 name={item.name}
                 checked={security[item.name]}
                 onChange={handleChange}
-                className="accent-blue-600"
+                className="w-5 h-5 accent-orange-500 focus:ring-orange-500/50 ml-4"
               />
-              <div>
-                <div className="font-medium">{item.label}</div>
-                <div className="text-sm text-gray-500">{item.desc}</div>
-              </div>
             </label>
           ))}
         </div>
-      </div> */}
+      </div>
 
       {/* Session Settings */}
-
-      {/* <div className="space-y-4">
-        <h3 className="font-semibold text-gray-800">Session Settings</h3>
+      <div className="space-y-4">
+        <h3 className="text-xl font-bold text-gray-800 pb-2 border-b border-gray-200">
+          Session & Password Settings
+        </h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {[
             {
@@ -164,16 +175,18 @@ export default function SecuritySettings({ security, setSecurity }) {
               label: "Session Timeout (minutes)",
               min: 5,
               max: 120,
+              desc: "Automatically log out after this many minutes of inactivity.",
             },
             {
               name: "passwordExpiry",
               label: "Password Expiry (days)",
               min: 30,
               max: 365,
+              desc: "Require a password change after this period for enhanced security.",
             },
           ].map((item) => (
             <div key={item.name} className="flex flex-col">
-              <label className="text-sm font-medium text-gray-600 mb-2">
+              <label className="text-sm font-medium text-gray-700 mb-2">
                 {item.label}
               </label>
               <input
@@ -183,13 +196,13 @@ export default function SecuritySettings({ security, setSecurity }) {
                 onChange={handleChange}
                 min={item.min}
                 max={item.max}
-                className="p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500"
+                className="p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-orange-500 outline-none transition"
               />
+              <p className="text-xs text-gray-500 mt-1">{item.desc}</p>
             </div>
           ))}
         </div>
-      </div> */}
-
+      </div>
     </div>
   );
 }
