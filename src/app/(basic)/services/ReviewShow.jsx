@@ -3,30 +3,30 @@ import { Star, User } from "lucide-react";
 export default function ReviewShow({ reviews = [] }) {
   if (reviews?.length === 0) {
     return (
-      <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-12">
+      <div className="rounded-2xl border border-primary shadow-sm p-12">
         <div className="text-center">
           <div className="inline-flex items-center justify-center w-16 h-16 bg-gray-100 rounded-full mb-4">
             <Star className="w-8 h-8 text-gray-400" />
           </div>
-          <h3 className="text-lg font-semibold text-gray-900 mb-2">No Reviews Yet</h3>
-          <p className="text-gray-600">Be the first to share your experience!</p>
+          <h3 className="text-lg font-semibold mb-2">No Reviews Yet</h3>
+          <p className="text-gray-400">Be the first to share your experience!</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="bg-white sticky top-0 rounded-2xl border border-gray-100 shadow-sm p-8">
+    <div className="sticky top-0 rounded-2xl border border-primary shadow-sm p-8">
       <div className="flex items-center justify-between mb-6">
-        <h2 className="text-2xl font-bold text-gray-900">Customer Reviews</h2>
-        <span className="text-sm text-gray-600">{reviews.length} review{reviews.length > 1 ? 's' : ''}</span>
+        <h2 className="text-2xl font-bold">Customer Reviews</h2>
+        <span className="text-sm text-gray-400">{reviews.length} review{reviews.length > 1 ? 's' : ''}</span>
       </div>
 
       <div className="space-y-4">
         {reviews.map((review, index) => (
           <div 
             key={index} 
-            className="bg-gradient-to-br from-gray-50 to-gray-100/50 rounded-xl p-5 border border-gray-200 hover:border-orange-200 transition-all duration-200"
+            className="rounded-xl p-5 border border-primary hover:border-orange-200 transition-all duration-200"
           >
             {/* Header */}
             <div className="flex items-start justify-between gap-4 mb-3">
@@ -46,7 +46,7 @@ export default function ReviewShow({ reviews = [] }) {
                 </div>
                 
                 <div className="flex-1 min-w-0">
-                  <h4 className="font-semibold text-gray-900 truncate">
+                  <h4 className="font-semibold truncate">
                     {review.userName || "Anonymous"}
                   </h4>
                   <div className="flex items-center gap-2 mt-0.5">
@@ -69,7 +69,7 @@ export default function ReviewShow({ reviews = [] }) {
                   <Star className="w-3.5 h-3.5 fill-orange-500" />
                   <span>{review.rating}</span>
                 </div>
-                <p className="text-xs text-gray-500">
+                <p className="text-xs text-gray-400">
                   {new Date(review.createdAt).toLocaleDateString("en-US", {
                     month: "short",
                     day: "numeric",
@@ -81,7 +81,7 @@ export default function ReviewShow({ reviews = [] }) {
 
             {/* Feedback */}
             {review.feedback && (
-              <p className="text-sm text-gray-700 leading-relaxed">
+              <p className="text-sm text-gray-400 leading-relaxed">
                 {review.feedback}
               </p>
             )}
