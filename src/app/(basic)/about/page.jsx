@@ -195,79 +195,79 @@ const AboutPage = () => {
           </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            <div className="p-6 bg-gray-50 rounded-xl hover:shadow-md transition">
+            <div className="p-6 rounded-xl hover:shadow-md transition border border-primary">
               <div className="inline-flex items-center justify-center w-12 h-12 bg-orange-100 rounded-xl mb-4">
                 <Shield className="w-6 h-6 text-orange-600" />
               </div>
-              <h3 className="text-xl font-semibold mb-2 text-black">
+              <h3 className="text-xl font-semibold mb-2">
                 Verified Professionals
               </h3>
-              <p className="text-gray-600">
+              <p className="text-gray-400">
                 Every mechanic on our platform undergoes a rigorous verification
                 process to ensure quality and reliability.
               </p>
             </div>
 
-            <div className="p-6 bg-gray-50 rounded-xl hover:shadow-md transition">
+            <div className="p-6 rounded-xl hover:shadow-md transition border border-primary">
               <div className="inline-flex items-center justify-center w-12 h-12 bg-orange-100 rounded-xl mb-4">
                 <MapPin className="w-6 h-6 text-orange-600" />
               </div>
-              <h3 className="text-xl font-semibold mb-2 text-black">
+              <h3 className="text-xl font-semibold mb-2">
                 Location-Based Search
               </h3>
-              <p className="text-gray-600">
+              <p className="text-gray-400">
                 Find the nearest available mechanics with our advanced mapping
                 technology.
               </p>
             </div>
 
-            <div className="p-6 bg-gray-50 rounded-xl hover:shadow-md transition">
+            <div className="p-6 rounded-xl hover:shadow-md transition border border-primary">
               <div className="inline-flex items-center justify-center w-12 h-12 bg-orange-100 rounded-xl mb-4">
                 <CreditCard className="w-6 h-6 text-orange-600" />
               </div>
-              <h3 className="text-xl font-semibold mb-2 text-black">
+              <h3 className="text-xl font-semibold mb-2">
                 Secure Payments
               </h3>
-              <p className="text-gray-600">
+              <p className="text-gray-400">
                 Enjoy hassle-free transactions with multiple payment options and
                 protection policies.
               </p>
             </div>
 
-            <div className="p-6 bg-gray-50 rounded-xl hover:shadow-md transition">
+            <div className="p-6 rounded-xl hover:shadow-md transition border border-primary">
               <div className="inline-flex items-center justify-center w-12 h-12 bg-orange-100 rounded-xl mb-4">
                 <MessageCircle className="w-6 h-6 text-orange-600" />
               </div>
-              <h3 className="text-xl font-semibold mb-2 text-black">
+              <h3 className="text-xl font-semibold mb-2">
                 Real-Time Communication
               </h3>
-              <p className="text-gray-600">
+              <p className="text-gray-400">
                 Chat directly with mechanics to discuss service details and get
                 updates.
               </p>
             </div>
 
-            <div className="p-6 bg-gray-50 rounded-xl hover:shadow-md transition">
+            <div className="p-6 rounded-xl hover:shadow-md transition border border-primary">
               <div className="inline-flex items-center justify-center w-12 h-12 bg-orange-100 rounded-xl mb-4">
                 <Clock className="w-6 h-6 text-orange-600" />
               </div>
-              <h3 className="text-xl font-semibold mb-2 text-black">
+              <h3 className="text-xl font-semibold mb-2">
                 Service Tracking
               </h3>
-              <p className="text-gray-600">
+              <p className="text-gray-400">
                 Monitor your service request status from booking to completion
                 in real-time.
               </p>
             </div>
 
-            <div className="p-6 bg-gray-50 rounded-xl hover:shadow-md transition">
+            <div className="p-6 rounded-xl hover:shadow-md transition border border-primary">
               <div className="inline-flex items-center justify-center w-12 h-12 bg-orange-100 rounded-xl mb-4">
                 <TrendingUp className="w-6 h-6 text-orange-600" />
               </div>
-              <h3 className="text-xl font-semibold mb-2 text-black">
+              <h3 className="text-xl font-semibold mb-2">
                 Business Growth
               </h3>
-              <p className="text-gray-600">
+              <p className="text-gray-400">
                 Mechanics can grow their business with our marketing tools and
                 customer reach.
               </p>
@@ -359,7 +359,7 @@ const AboutPage = () => {
           </div>
 
           <div className="grid md:grid-cols-2 gap-10 items-center">
-            <div className="bg-gray-50 border-2 border-orange-500 p-8 rounded-2xl shadow-md">
+            <div className="border-2 border-primary p-8 rounded-2xl shadow-md">
               <div className="flex items-center mb-6">
                 <img
                   src="https://i.ibb.co.com/PvHZ1B8w/Jhankar-Vai.jpg"
@@ -367,7 +367,7 @@ const AboutPage = () => {
                   className="w-20 h-20 rounded-full object-cover mr-6 border-4 border-white shadow"
                 />
                 <div>
-                  <h3 className="text-2xl font-semibold text-black">
+                  <h3 className="text-2xl font-semibold">
                     Jhankar Mahbub
                   </h3>
                   <p className="text-orange-600">Founder & Lead Developer</p>
@@ -381,7 +381,7 @@ const AboutPage = () => {
                   </div>
                 </div>
               </div>
-              <p className="text-gray-700 mb-6">
+              <p className="text-gray-400 mb-6">
                 With a passion for technology and innovation, Alireja founded
                 MechaLink to bridge the gap between skilled mechanics and
                 customers seeking reliable services. His vision drives the
@@ -390,7 +390,7 @@ const AboutPage = () => {
               <div className="flex space-x-3">
                 <a
                   href="#"
-                  className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center hover:bg-orange-500 hover:text-white transition"
+                  className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center hover:bg-orange-500 text-black transition hover:animate-spin"
                 >
                   <svg
                     className="w-5 h-5"
@@ -407,7 +407,7 @@ const AboutPage = () => {
                 </a>
                 <a
                   href="#"
-                  className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center hover:bg-orange-500 hover:text-white transition"
+                  className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center hover:bg-orange-500 text-black hover:animate-spin transition"
                 >
                   <svg
                     className="w-5 h-5"
@@ -420,7 +420,7 @@ const AboutPage = () => {
                 </a>
                 <a
                   href="#"
-                  className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center hover:bg-orange-500 hover:text-white transition"
+                  className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center hover:bg-orange-500 text-black hover:animate-spin transition"
                 >
                   <svg
                     className="w-5 h-5"
@@ -477,7 +477,7 @@ const AboutPage = () => {
             </p>
           </div>
 
-          <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {[
               {
                 name: "Alireja Khan",
@@ -534,7 +534,7 @@ const AboutPage = () => {
                 name: "MD. Shahan Al Munim",
                 role: "Backend Engineer",
                 image:
-                  "https://i.ibb.co.com/v4cTbvVf/Gemini-Generated-Image-89jk6b89jk6b89jk.png",
+                  "https://i.ibb.co.com/d0CJLhYw/formal-image.jpg",
                 facebook_profile: "https://www.facebook.com/munim9munim",
                 github_profile: "https://github.com/MMunim90",
                 linkedin_profile: "https://www.linkedin.com/in/m-munim/",

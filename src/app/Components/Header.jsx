@@ -7,6 +7,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { FaGear } from "react-icons/fa6";
+import { AiOutlineMenuFold, AiOutlineMenuUnfold } from "react-icons/ai";
 
 export default function Header() {
   const [scrolled, setScrolled] = useState(false);
@@ -76,10 +77,10 @@ export default function Header() {
           : "bg-white/90 backdrop-blur-sm py-4"
       }`}
     >
-      <div className=" container mx-auto px-2 md:px-3 flex justify-between items-center">
+      <div className="container mx-auto px-2 md:px-3 flex justify-between items-center">
         {/* Logo */}
-        <div className="z-50">
-          <button onClick={handleGearClick} className="flex gap-2 lg:gap-3 items-center">
+        <Link href="/" className="z-50">
+          <button className="flex gap-2 lg:gap-3 items-center cursor-pointer">
             <FaGear
               className={`h-6 w-6 lg:h-12 lg:w-12 transition-transform duration-500 ${
                 rotating && (drawerOpen ? "-rotate-90" : "rotate-90")
@@ -89,7 +90,7 @@ export default function Header() {
               Mecha<span className="text-primary">Link</span>
             </h1>
           </button>
-        </div>
+        </Link>
 
         {/* Desktop Navigation */}
         <nav className="hidden md:flex items-center space-x-6 lg:space-x-8">
@@ -97,7 +98,7 @@ export default function Header() {
             <Link
               key={item.href}
               href={item.href}
-              className={`relative text-base font-medium transition-colors hover:text-primary ${
+              className={`relative text-base lg:text-lg font-medium transition-colors hover:text-primary ${
                 pathname === item.href ? "text-primary" : ""
               }`}
             >
@@ -107,9 +108,10 @@ export default function Header() {
         </nav>
 
         {/* Right Side */}
-        <div className="flex items-center space-x-4">
+        <div className="flex gap-2 items-center">
+        <div className="flex items-center">
           {/* Theme Switch */}
-          <label className="swap swap-rotate">
+          <label className="swap swap-rotate absolute top-25 right-0 p-3 bg-primary rounded-l-2xl">
             <input
               type="checkbox"
               className="theme-controller"
@@ -117,7 +119,7 @@ export default function Header() {
               checked={theme === "dark"}
             />
             <svg
-              className="swap-off h-10 w-10 fill-current"
+              className="swap-off h-8 w-8 fill-current"
               xmlns="http://www.w3.org/2000/svg"
               viewBox="0 0 24 24"
               role="img"
@@ -200,7 +202,7 @@ export default function Header() {
 
             {/* piston icon (mechanical/dark) */}
             <svg
-              className="swap-on h-10 w-10 fill-current"
+              className="swap-on h-8 w-8 fill-current"
               xmlns="http://www.w3.org/2000/svg"
               viewBox="0 0 24 24"
               role="img"
@@ -284,7 +286,7 @@ export default function Header() {
                     <p className="text-xs truncate">{loggedInUser?.email}</p>
                   </div>
                   <Link
-                    href="/profile"
+                    href={`dashboard/${loggedInUser?.role}/profile`}
                     className="block px-4 py-2 text-sm hover:bg-gray-50"
                     onClick={() => setUserMenuOpen(false)}
                   >
@@ -322,18 +324,24 @@ export default function Header() {
             <>
               <Link
                 href="/login"
-                className="text-md font-medium border-2 py-2 px-4 rounded-md border-primary text-primary hover:text-white hover:bg-primary transition-colors"
+                className="text-md font-medium border-2 py-1 px-3 rounded-md border-primary text-primary hover:text-white hover:bg-primary transition-colors lg:mr-2"
               >
                 Log in
               </Link>
               <Link
                 href="/register"
-                className="bg-primary border-2 border-primary hover:bg-white hover:text-primary text-white px-4 py-2 rounded-md text-md font-medium transition-colors shadow-sm"
+                className="hidden lg:flex bg-primary border-2 border-primary hover:bg-white hover:text-primary text-white px-3 py-1 rounded-md text-md font-medium transition-colors shadow-sm"
               >
                 Sign up
               </Link>
             </>
           )}
+        </div>
+        <div className="md:hidden" onClick={handleGearClick}>
+          {
+          drawerOpen ? <AiOutlineMenuFold size={40}/> : <AiOutlineMenuUnfold size={40}/>
+        }
+        </div>
         </div>
       </div>
 
