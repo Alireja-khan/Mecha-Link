@@ -259,7 +259,7 @@ const ManageShops = () => {
     };
 
     return (
-        <div className="min-h-screen p-6 mx-auto">
+        <div className="min-h-screen p-6">
             {/* Header Section */}
             <div className="mb-8">
                 <h1 className="text-4xl font-bold text-gray-900 mb-2">Shop Management</h1>

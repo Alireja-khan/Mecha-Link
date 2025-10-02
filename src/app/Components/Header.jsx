@@ -76,7 +76,7 @@ export default function Header() {
           : "bg-white/90 backdrop-blur-sm py-4"
       }`}
     >
-      <div className="w-11/12 lg:container mx-auto px-2 md:px-3 flex justify-between items-center">
+      <div className=" container mx-auto px-2 md:px-3 flex justify-between items-center">
         {/* Logo */}
         <div className="z-50">
           <button onClick={handleGearClick} className="flex gap-2 lg:gap-3 items-center">

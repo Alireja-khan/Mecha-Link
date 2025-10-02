@@ -108,15 +108,17 @@ const ServiceRequest = () => {
   // ------------------------------------------
   useEffect(() => {
     // Attempt to get the most complete user data
-    const userId = session?._id || session?.user?.id || loggedInUser?._id || "N/A";
-    const userName = session?.user?.name || loggedInUser?.name || "Guest User";
-    const userEmail = session?.user?.email || loggedInUser?.email || "guest@example.com";
+    // const userId = session?._id || session?.user?.id || loggedInUser?._id || "N/A";
+    // const userName = session?.user?.name || loggedInUser?.name || "Guest User";
+    // const userEmail = session?.user?.email || loggedInUser?.email || "guest@example.com";
 
-    console.log("--- ServiceRequest Page Loaded ---");
-    console.log(`User ID: ${userId}`);
-    console.log(`User Name: ${userName}`);
-    console.log(`User Email: ${userEmail}`);
-    console.log("----------------------------------");
+    // console.log("--- ServiceRequest Page Loaded ---");
+    // console.log(`User ID: ${userId}`);
+    // console.log(`User Name: ${userName}`);
+    // console.log(`User Email: ${userEmail}`);
+    // console.log("----------------------------------");
+
+    console.log(loggedInUser?.user?._id);
   }, [session, loggedInUser]); // Depend on session and loggedInUser to catch asynchronous loading
   // ------------------------------------------
 
@@ -171,6 +173,8 @@ const ServiceRequest = () => {
     }
   };
 
+  console.log(loggedInUser);
+
   const onSubmit = async (data) => {
     if (!location.address || !location.latitude || !location.longitude) {
       toast.error("Please select a valid location");
@@ -198,7 +202,7 @@ const ServiceRequest = () => {
         toast.dismiss();
       }
 
-      const userId = session?._id || session?.user?.id || loggedInUser?._id;
+      const userId = loggedInUser?.user?._id;
       const userEmail = session?.user?.email || loggedInUser?.email || "guest@example.com";
       const userName = session?.user?.name || loggedInUser?.name || "Guest User";
 

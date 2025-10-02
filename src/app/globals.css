@@ -1,17 +1,15 @@
 @import "tailwindcss";
- @plugin "daisyui" {
-   themes: light --default, dark;
- }
-
+@plugin "daisyui" {
+  themes: light --default, dark;
+}
 
 @import "swiper/css";
 @import "swiper/css/navigation";
 @import "swiper/css/pagination";
 
-
 @plugin "daisyui/theme" {
   name: "light";
-  default: true; 
+  default: true;
   /* prefersdark: false; 
   color-scheme: light;  */
 
@@ -23,7 +21,7 @@
   --color-primary-content: oklch(98% 0.01 240);
   --color-secondary: #ea580c;
   --color-secondary-content: oklch(98% 0.01 200);
-  --color-accent:#ffedd5;
+  --color-accent: #ffedd5;
   --color-accent-content: oklch(98% 0.01 160);
   --color-neutral: #e5e7eb;
   --color-neutral-content: oklch(98% 0.01 240);
@@ -52,7 +50,6 @@
   --depth: 1;
   --noise: 0;
 }
-
 
 @plugin "daisyui/theme" {
   name: "dark";
@@ -93,18 +90,14 @@
   /* border size */
   --border: 1px;
 
-
   /* effects */
   --depth: 1;
   --noise: 0;
 }
 
-
-
 @theme {
   --font-urbanist: "Urbanist", sans-serif;
   --font-poppins: "Poppins", sans-serif;
-  
 }
 
 body {
@@ -114,7 +107,9 @@ body {
 h1,
 h2,
 h3,
-h4,h5,h6 {
+h4,
+h5,
+h6 {
   @apply font-urbanist;
 }
 
@@ -127,5 +122,5 @@ h4,h5,h6 {
 }
 
 .container {
-  @apply px-5 mx-auto w-full sm:max-w-xl md:max-w-[45rem] lg:max-w-[62rem] xl:max-w-[77rem] 2xl:max-w-[93rem];
+  @apply px-5 mx-auto w-full sm:max-w-xl md:max-w-[45rem] lg:max-w-[62rem] xl:max-w-[77rem] 2xl:max-w-[100rem];
 }

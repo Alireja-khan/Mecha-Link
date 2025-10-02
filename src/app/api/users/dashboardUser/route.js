@@ -2,9 +2,7 @@ import dbConnect, { collections } from "@/lib/dbConnect";
 import { NextResponse } from "next/server";
 import { ObjectId } from "mongodb";
 
-
-// ✅ GET — already implemented
-
+// GET - Fetch all users
 export async function GET(request) {
   const { searchParams } = new URL(request.url);
   const overview = searchParams.get("overview");
@@ -18,11 +16,56 @@ export async function GET(request) {
   return NextResponse.json(result);
 }
 
+// POST - Create new user
+export async function POST(request) {
+  try {
+    const body = await request.json();
+    const { 
+      name, 
+      email, 
+      role = "customer",
+      status = "pending",
+      phone,
+      location
+    } = body;
 
+    if (!email || !name) {
+      return NextResponse.json({ message: "Name and email are required" }, { status: 400 });
+    }
 
+    const collection = await dbConnect(collections.users);
 
-// ✅ PUT — update user info (add fields if missing)
+    // Check if user already exists
+    const existingUser = await collection.findOne({ email });
+    if (existingUser) {
+      return NextResponse.json({ message: "User already exists" }, { status: 400 });
+    }
 
+    const userData = {
+      name,
+      email,
+      role,
+      status,
+      phone: phone || null,
+      location: location || null,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    };
+
+    const result = await collection.insertOne(userData);
+
+    return NextResponse.json({ 
+      success: true, 
+      message: "User created successfully",
+      userId: result.insertedId 
+    }, { status: 201 });
+  } catch (error) {
+    console.error(error);
+    return NextResponse.json({ message: "Internal server error" }, { status: 500 });
+  }
+}
+
+// PUT - update user info
 export async function PUT(request) {
   try {
     const body = await request.json();
@@ -34,7 +77,9 @@ export async function PUT(request) {
       jobTitle, 
       department, 
       bio, 
-      profileImage // Add this field
+      profileImage,
+      role,
+      status
     } = body;
 
     if (!email) {
@@ -51,7 +96,9 @@ export async function PUT(request) {
         ...(jobTitle && { jobTitle }),
         ...(department && { department }),
         ...(bio && { bio }),
-        ...(profileImage && { profileImage }), // Add profile image update
+        ...(profileImage && { profileImage }),
+        ...(role && { role }),
+        ...(status && { status }),
         updatedAt: new Date(),
       },
     };
