@@ -35,6 +35,8 @@ delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({
   iconRetinaUrl:
     "https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon-2x.png",
+  iconRetinaUrl:
+    "https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon-2x.png",
   iconUrl: "https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon.png",
   shadowUrl: "https://unpkg.com/leaflet@1.7.1/dist/images/marker-shadow.png",
 });
@@ -62,13 +64,18 @@ export default function ServiceDetailsPage() {
     const { street, city, country, postalCode } = address;
     const fullAddress = `${street}, ${city}, ${country} ${postalCode}`;
 
+
     try {
       const response = await fetch(
         `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(
           fullAddress
         )}`
+        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(
+          fullAddress
+        )}`
       );
       const data = await response.json();
+
 
       if (data && data.length > 0) {
         setMapCenter([parseFloat(data[0].lat), parseFloat(data[0].lon)]);
@@ -77,6 +84,7 @@ export default function ServiceDetailsPage() {
         setIsMapReady(true);
       }
     } catch (error) {
+      console.error("Geocoding error:", error);
       console.error("Geocoding error:", error);
       setIsMapReady(true);
     }
@@ -88,6 +96,9 @@ export default function ServiceDetailsPage() {
     return `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(
       fullAddress
     )}`;
+    return `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(
+      fullAddress
+    )}`;
   };
 
   const {
@@ -96,6 +107,7 @@ export default function ServiceDetailsPage() {
     shop = {},
     certifications = [],
     socialLinks = {},
+    createdAt,
     createdAt,
   } = shopdata || {};
 
@@ -299,6 +311,29 @@ export default function ServiceDetailsPage() {
       });
   };
 
+  const handleFeedbackSubmit = (data) => {
+    if (!data.rating) return null;
+    data.createdAt = new Date();
+    data.shopId = _id;
+    data.userName = user?.name;
+    data.userEmail = user?.email;
+    data.userPhoto = user?.profileImage;
+    fetch("/api/reviews", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        Swal.fire({
+          icon: "success",
+          title: "Feedback submitted successfully",
+          text: "Thanks for your feedback! Your feedback is valueable for us and our users.",
+        });
+      });
+  };
   return (
     <div className="min-h-screen">
       {submitSuccess && (
@@ -649,6 +684,10 @@ export default function ServiceDetailsPage() {
                     center={mapCenter}
                     zoom={15}
                     style={{ height: "100%", width: "100%" }}
+                  <MapContainer
+                    center={mapCenter}
+                    zoom={15}
+                    style={{ height: "100%", width: "100%" }}
                     scrollWheelZoom={false}
                   >
                     <TileLayer
@@ -677,7 +716,11 @@ export default function ServiceDetailsPage() {
                 )}
               </div>
 
+
               {street && (
+                <a
+                  href={getDirectionsUrl()}
+                  target="_blank"
                 <a
                   href={getDirectionsUrl()}
                   target="_blank"
@@ -697,3 +740,4 @@ export default function ServiceDetailsPage() {
     </div>
   );
 }
+
