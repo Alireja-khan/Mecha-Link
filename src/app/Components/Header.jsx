@@ -290,7 +290,7 @@ export default function Header() {
           drawerOpen ? "translate-x-0" : "-translate-x-full"
         }`}
       >
-        <div className="relative p-4 top-14 left-0 bg-white">
+        <div className="relative p-4 top-14 left-0 bg-orange-100">
           <ul className="space-y-2">
             {navigation.map((item) => (
               <li key={item.href}>
