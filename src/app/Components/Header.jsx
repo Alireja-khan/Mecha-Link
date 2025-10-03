@@ -17,8 +17,6 @@ export default function Header() {
   const dropdownRef = useRef(null);
 
   const { user: loggedInUser, status } = useUser();
-
-  console.log(loggedInUser, status);
   // drawer states
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [rotating, setRotating] = useState(false);
@@ -173,13 +171,15 @@ export default function Header() {
 
           </label>
 
-          {
-            status === "loading" && !loggedInUser ? (
+          {(status==='loading') && (
               <span className="loading loading-spinner loading-xs"></span>
-
-            ) : status === "authenticated" && !loggedInUser ? (
-            <span className="loading loading-spinner loading-xs"></span>
-          ) : loggedInUser ? (
+            )}
+            {
+              (!loggedInUser && status === 'authenticated') && (
+                <span className="loading loading-spinner loading-xs"></span>
+              )
+            }
+             {loggedInUser && (
             <div className="relative" ref={dropdownRef}>
               <button
                 className="flex items-center space-x-2 focus:outline-none"
@@ -258,7 +258,8 @@ export default function Header() {
                 </div>
               )}
             </div>
-          ) : (
+          )} 
+          {(!loggedInUser && status=='unauthenticated') && (
             <>
               <Link
                 href="/login"
