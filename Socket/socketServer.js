@@ -98,18 +98,17 @@ async function start() {
             read: false,
           };
 
-          
-        // Push to the user who created it
-        await usersCollection.updateOne(
-          {email: updatedDoc.userEmail},
-          {$push: {notifications: {$each: [notificationDoc], $position: 0}}}
-        );
+          // Push to the user who created it
+          await usersCollection.updateOne(
+            {email: updatedDoc.userEmail},
+            {$push: {notifications: {$each: [notificationDoc], $position: 0}}}
+          );
 
-        // Push to all mechanics & admins
-        await usersCollection.updateMany(
-          {role: {$in: [ "admin"]}},
-          {$push: {notifications: {$each: [notificationDoc], $position: 0}}}
-        );
+          // Push to all mechanics & admins
+          await usersCollection.updateMany(
+            {role: {$in: ["admin"]}},
+            {$push: {notifications: {$each: [notificationDoc], $position: 0}}}
+          );
           io.emit("assignmentNotification", notificationDoc);
         }
       }
@@ -133,8 +132,6 @@ async function start() {
           read: false,
         };
 
-       
-
         // Push to all mechanics & admins
         await usersCollection.updateMany(
           {role: {$in: ["admin"]}},
@@ -154,7 +151,7 @@ async function start() {
 
         const notificationDoc = {
           _id: new ObjectId().toString(),
-          userEmail: "all", 
+          userEmail: "all",
           message: `New announcement: ${newAnnouncement.title}`,
           type: "announcement",
           data: newAnnouncement,
@@ -162,11 +159,9 @@ async function start() {
           read: false,
         };
 
-     
-
         // Push to all mechanics & admins
         await usersCollection.updateMany(
-          {role: {$in: ["mechanic","user"]}},
+          {role: {$in: ["mechanic", "user"]}},
           {$push: {notifications: {$each: [notificationDoc], $position: 0}}}
         );
         io.emit("announcementNotification", notificationDoc);
@@ -191,11 +186,9 @@ async function start() {
           read: false,
         };
 
-     
-
         // Push to all mechanics & admins
         await usersCollection.updateMany(
-          {role: {$in: ["user","mechanic"]}},
+          {role: {$in: ["user", "mechanic"]}},
           {$push: {notifications: {$each: [notificationDoc], $position: 0}}}
         );
         io.emit("couponNotification", notificationDoc);
@@ -223,9 +216,15 @@ async function start() {
       });
     });
 
-    // Start server
+    app.get("/", (req, res) => {
+      res.send("Socket.IO server is running!");
+    });
+
     server.listen(PORT, () => {
-      console.log(`🚀 Socket.IO server running on http://localhost:${PORT}`);
+      const host = process.env.PORT
+        ? `https://mechalink-socket-server.onrender.com/`
+        : `http://localhost:${PORT}`;
+      console.log(`🚀 Socket.IO server running on ${host}`);
     });
   } catch (err) {
     console.error("❌ Server error:", err);
