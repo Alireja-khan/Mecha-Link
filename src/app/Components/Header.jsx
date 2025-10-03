@@ -67,16 +67,54 @@ export default function Header() {
       }`}
     >
       <div className="container mx-auto px-4 md:px-6 flex justify-between items-center">
-        {/* Logo */}
+        <div className="flex items-center">
+          {/* Logo */}
         <Link href="/" className="flex gap-5 items-center z-50">
           <FaGear className="h-12  w-12" />
-          <h1 className="text-3xl font-bold">
+          <h1 className="text-3xl font-bold hidden lg:block">
             Mecha<span className="text-primary">Link</span>
           </h1>
         </Link>
 
+        <div className="dropdown lg:hidden">
+          <div tabIndex={0} role="button" className="btn btn-ghost btn-circle">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-5 w-5"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              {" "}
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M4 6h16M4 12h16M4 18h7"
+              />{" "}
+            </svg>
+          </div>
+          <ul
+            tabIndex={0}
+            className="menu menu-sm dropdown-content bg-base-100 rounded-box z-1 mt-3 w-52 shadow"
+          >
+            {navigation.map((item) => (
+            <Link
+              key={item.href}
+              href={item.href}
+              className={`relative md:text-lg font-medium transition-colors hover:text-primary ${
+                pathname === item.href ? "text-primary" : ""
+              }`}
+            >
+              {item.label}
+            </Link>
+          ))}
+          </ul>
+        </div>
+        </div>
+
         {/* Desktop Navigation */}
-        <nav className="hidden md:flex items-center space-x-6 lg:space-x-8">
+        <nav className="hidden lg:flex items-center space-x-6 lg:space-x-8">
           {navigation.map((item) => (
             <Link
               key={item.href}
@@ -91,7 +129,7 @@ export default function Header() {
         </nav>
 
         {/* Right Side */}
-        <div className="hidden md:flex items-center space-x-4">
+        <div className="flex justify-between items-center space-x-4">
           {/* Theme Switch */}
           <label className="swap swap-rotate">
             <input
@@ -288,7 +326,8 @@ export default function Header() {
                     Dashboard
                   </Link>
                   <div className="border-t border-gray-100 my-1"></div>
-                  <button type="button"
+                  <button
+                    type="button"
                     className="cursor-pointer block w-full text-left px-4 py-2 text-sm hover:bg-gray-50"
                     onClick={() => {
                       signOut();
