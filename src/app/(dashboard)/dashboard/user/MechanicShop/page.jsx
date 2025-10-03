@@ -4,100 +4,153 @@ import { useForm, Controller } from 'react-hook-form';
 import { Wrench, X } from 'lucide-react';
 import { toast, Toaster } from 'react-hot-toast';
 import axios from 'axios';
-import useUser from '@/hooks/useUser';
-import { useSession } from 'next-auth/react';
+
+const locationData = {
+    Dhaka: {
+        Dhaka: ["Dhamrai", "Dohar", "Keraniganj", "Savar", "Uttara", "Gulshan", "Mirpur"],
+        Faridpur: ["Faridpur Sadar", "Bhanga", "Boalmari", "Alfadanga", "Nagarkanda", "Saltha"],
+        Gazipur: ["Gazipur Sadar", "Kaliakoir", "Kapasia", "Sreepur"],
+        Gopalganj: ["Gopalganj Sadar", "Kashiani", "Muksudpur", "Tungipara"],
+        Kishoreganj: ["Kishoreganj Sadar", "Bhairab", "Karimganj", "Katiadi", "Mithamoin", "Nikli"],
+        Madaripur: ["Madaripur Sadar", "Shibchar", "Rajoir", "Kalkini"],
+        Manikganj: ["Manikganj Sadar", "Singair", "Shibalaya", "Daulatpur"],
+        Munshiganj: ["Munshiganj Sadar", "Gajaria", "Louhajang", "Sreenagar"],
+        Narayanganj: ["Narayanganj Sadar", "Araihazar", "Sonargaon", "Bandar", "Rupganj"],
+        Narsingdi: ["Narsingdi Sadar", "Belabo", "Palash", "Raipura", "Shibpur"],
+        Tangail: ["Tangail Sadar", "Basail", "Bhuapur", "Delduar", "Ghatail", "Gopalpur", "Mirzapur", "Nagarpur", "Sakhipur"],
+        Rajbari: ["Rajbari Sadar", "Baliakandi", "Pangsha", "Kalukhali", "Goalanda"],
+        Shariatpur: ["Shariatpur Sadar", "Gosairhat", "Bhedarganj", "Naria", "Zanjira"]
+    },
+
+    Chattogram: {
+        Chattogram: ["Chattogram Sadar", "Pahartali", "Mirsharai", "Sitakunda", "Fatikchhari", "Hathazari", "Rangunia"],
+        CoxsBazar: ["Cox's Bazar Sadar", "Chakaria", "Teknaf", "Ukhia", "Maheshkhali", "Ramu"],
+        Bandarban: ["Bandarban Sadar", "Ruma", "Thanchi", "Lama", "Rowangchhari"],
+        Khagrachhari: ["Khagrachhari Sadar", "Lakshmipur", "Dighinala", "Manikchhari", "Panchhari", "Mahalchhari"],
+        Noakhali: ["Noakhali Sadar", "Chatkhil", "Hatiya", "Senbagh", "Begumganj", "Companiganj"],
+        Feni: ["Feni Sadar", "Chhagalnaiya", "Parshuram", "Daganbhuiyan", "Fulgazi"],
+        Cumilla: ["Cumilla Sadar", "Chandina", "Debidwar", "Muradnagar", "Meghna", "Barura"],
+        Brahmanbaria: ["Brahmanbaria Sadar", "Ashuganj", "Kasba", "Nabinagar", "Sarail"],
+        Rangamati: ["Rangamati Sadar", "Kaptai", "Kanchana", "Baghaichhari", "Rajasthali"],
+        Chandpur: ["Chandpur Sadar", "Haimchar", "Hajiganj", "Kachua", "Matlab Dakshin", "Shahrasti"],
+        Lakshmipur: ["Lakshmipur Sadar", "Ramganj", "Raipur", "Ramgati", "Kamalnagar"]
+    },
+
+    Khulna: {
+        Khulna: ["Khulna Sadar", "Dacope", "Dumuria", "Batiaghata", "Koyra", "Phultala", "Rupsa", "Terokhada"],
+        Jessore: ["Jessore Sadar", "Bagherpara", "Jhikargacha", "Manirampur", "Sharsha", "Keshabpur"],
+        Satkhira: ["Satkhira Sadar", "Debhata", "Kaliganj", "Shyamnagar", "Tala", "Kalaroa"],
+        Bagerhat: ["Bagerhat Sadar", "Chitalmari", "Kachua", "Morrelganj", "Mongla", "Rampal", "Sarankhola"],
+        Meherpur: ["Meherpur Sadar", "Mujibnagar", "Gangni", "Shalikha"],
+        Chuadanga: ["Chuadanga Sadar", "Alamdanga", "Damurhuda", "Jibannagar"],
+        Narail: ["Narail Sadar", "Lohagara", "Kalia"],
+        Magura: ["Magura Sadar", "Mohammadpur", "Shalikha", "Sreepur"],
+        Jhenaidah: ["Jhenaidah Sadar", "Harinakunda", "Kaliganj", "Kotchandpur", "Maheshpur"],
+        Kushtia: ["Kushtia Sadar", "Bheramara", "Daulatpur", "Khoksa", "Mirpur", "Kumarkhali"]
+    },
+
+    Rajshahi: {
+        Rajshahi: ["Rajshahi Sadar", "Bagmara", "Godagari", "Paba", "Puthia", "Tanore", "Charghat"],
+        Bogra: ["Bogra Sadar", "Dhunot", "Kahaloo", "Shibganj", "Sherpur", "Sariakandi", "Nandigram", "Gabtali", "Shajahanpur"],
+        Pabna: ["Pabna Sadar", "Bera", "Ishwardi", "Santhia", "Atgharia", "Bhangura", "Chatmohar", "Faridpur", "Sujanagar"],
+        Naogaon: ["Naogaon Sadar", "Atrai", "Raninagar", "Manda", "Dhamoirhat", "Patnitala", "Porsha", "Badalgachhi", "Sapahar", "Niamatpur", "Mohanpur"],
+        Chapainawabganj: ["Chapainawabganj Sadar", "Shibganj", "Gomostapur", "Nachole"],
+        Joypurhat: ["Joypurhat Sadar", "Akkelpur", "Kalai", "Khetlal", "Panchbibi"],
+        Natore: ["Natore Sadar", "Baraigram", "Bagatipara", "Lalpur", "Gurudaspur", "Singra"],
+        Sirajganj: ["Sirajganj Sadar", "Belkuchi", "Chauhali", "Kamarkhanda", "Shahjadpur", "Tarash", "Ullapara"]
+    },
+
+    Barishal: {
+        Barishal: ["Barishal Sadar", "Agailjhara", "Babuganj", "Bakerganj", "Banaripara", "Gaurnadi", "Hizla", "Mehendiganj", "Muladi", "Wazirpur"],
+        Patuakhali: ["Patuakhali Sadar", "Bauphal", "Kalapara", "Dashmina", "Rangabali", "Dumki", "Mirzaganj"],
+        Bhola: ["Bhola Sadar", "Borhanuddin", "Charfassion", "Daulatkhan", "Lalmohan", "Tazumuddin", "Burhanuddin"],
+        Jhalokathi: ["Jhalokathi Sadar", "Kathalia", "Nalchity", "Rajapur"],
+        Pirojpur: ["Pirojpur Sadar", "Bhandaria", "Kawkhali", "Mathbaria", "Nazirpur", "Nesarabad"],
+        Barguna: ["Barguna Sadar", "Amtali", "Bamna", "Betagi", "Patharghata", "Taltoli"]
+    },
+
+    Sylhet: {
+        Sylhet: ["Sylhet Sadar", "Balaganj", "Bishwanath", "Fenchuganj", "Gowainghat", "Jaintiapur", "Kanaighat", "Osmani Nagar"],
+        Habiganj: ["Habiganj Sadar", "Ajmiriganj", "Bahubal", "Chunarughat", "Madhabpur", "Nabiganj"],
+        Moulvibazar: ["Moulvibazar Sadar", "Barlekha", "Juri", "Kulaura", "Rajnagar", "Sreemangal"],
+        Sunamganj: ["Sunamganj Sadar", "Chhatak", "Dharampasha", "Dohalia", "Jagannathpur", "Shalla", "Bishwamvarpur", "Derai"]
+    },
+
+    Rangpur: {
+        Rangpur: ["Rangpur Sadar", "Badarganj", "Gangachara", "Kaunia", "Mithapukur", "Pirganj", "Pirgachha", "Taraganj"],
+        Dinajpur: ["Dinajpur Sadar", "Birampur", "Ghoraghat", "Kaharole", "Khansama", "Nawabganj", "Parbatipur", "Birganj"],
+        Kurigram: ["Kurigram Sadar", "Bhurungamari", "Chilmari", "Nageswari", "Rajarhat", "Raomari", "Ulipur", "Phulbari"],
+        Gaibandha: ["Gaibandha Sadar", "Gobindaganj", "Palashbari", "Sadullapur", "Sundarganj", "Saghata"],
+        Lalmonirhat: ["Lalmonirhat Sadar", "Aditmari", "Hatibandha", "Kaliganj", "Patgram"],
+        Nilphamari: ["Nilphamari Sadar", "Dimla", "Jaldhaka", "Saidpur", "Kishoreganj"],
+        Thakurgaon: ["Thakurgaon Sadar", "Baliadangi", "Haripur", "Pirganj", "Ranisankail"],
+        Panchagarh: ["Panchagarh Sadar", "Atwari", "Boda", "Debiganj", "Tetulia"]
+    },
+
+    Mymensingh: {
+        Mymensingh: ["Mymensingh Sadar", "Bhaluka", "Gaffargaon", "Trishal", "Muktagachha", "Nandail", "Phulpur", "Haluaghat"],
+        Jamalpur: ["Jamalpur Sadar", "Bokshiganj", "Dewanganj", "Melandah", "Sarishabari", "Madarganj", "Islampur", "Jamalgonj"],
+        Netrokona: ["Netrokona Sadar", "Atpara", "Khaliajuri", "Kendua", "Durgapur", "Kalmakanda", "Mohanganj", "Purbadhala"],
+        Sherpur: ["Sherpur Sadar", "Nakla", "Nalita", "Jhenaigati", "Sreebardi"]
+    }
+};
+
+const allDivisions = Object.keys(locationData);
 
 const shopCategories = [
-    "Multi-Vehicle Service",
     "Car Service & Repair",
     "Motorcycle Service & Repair",
-    "Electric Vehicle Specialist",
-    "Body & Paint Specialist",
-    "Tire & Wheel Specialist",
-    "AC & Cooling Specialist"
+    "Truck/Commercial Vehicle Service",
+    "Home Appliance Repair",
+    "HV/AC & Cooling Specialist",
+    "Car Detailing & Accessories",
 ];
 
-const servicesData = [
-    {
-        type: "Car",
-        categories: {
-            "Engine & Performance": ["Engine Diagnostics", "Engine Overhaul", "Oil & Filter Change", "Fuel Injector Cleaning", "Timing Belt Replacement", "Fuel Pump Repair"],
-            "Electrical & Battery": ["Battery Replacement", "Alternator Repair", "Starter Motor Repair", "ECU Programming", "Key Programming"],
-            "Transmission & Clutch": ["Transmission Repair", "Clutch Replacement", "Gearbox Service"],
-            "Brakes & Suspension": ["Brake Repair", "ABS System Repair", "Suspension Work", "Steering Alignment"],
-            "Cooling & AC": ["Cooling System Service", "Radiator Repair", "AC Repair", "AC Gas Refill"],
-            "Tires & Wheels": ["Tire Replacement", "Tire Balancing", "Wheel Alignment"],
-            "Body & Exterior": ["Body Denting & Painting", "Scratch Removal", "Accident Repair", "Glass & Windshield Replacement", "Headlight & Taillight Repair"],
-            "Cleaning & Care": ["Car Wash", "Interior Cleaning", "Car Polishing & Detailing"]
-        }
+const servicesData = {
+    "Car Service & Repair": {
+        "Engine & Drivetrain": ["Oil & Filter Change (Standard/Synthetic)", "Engine Diagnostics (Check Engine Light)", "Timing Belt/Chain Service", "Transmission Fluid Flush", "Clutch Replacement"],
+        "Brakes & Suspension": ["Brake Pad & Rotor Replacement", "ABS System Diagnostics", "Shock/Strut Replacement", "Wheel Alignment & Balancing"],
+        "Electrical Systems": ["Battery Testing & Replacement", "Alternator & Starter Repair", "Wiring & Fuse Repair", "Headlight/Taillight Restoration"],
+        "Body & Glass": ["Minor Dent Removal", "Windshield Chip Repair", "Scratch Polish"],
     },
-    {
-        type: "Motorcycle",
-        categories: {
-            "Engine & Performance": ["Engine Tuning", "Oil Change", "Piston & Cylinder Repair"],
-            "Transmission & Drive": ["Clutch Repair", "Gearbox Repair", "Chain & Sprocket Replacement"],
-            "Brakes & Suspension": ["Brake Adjustment", "Disc Brake Repair", "Shock Absorber Repair"],
-            "Electrical": ["Battery Replacement", "Wiring Repair", "Headlight & Indicator Repair"],
-            "Tires & Wheels": ["Tire Change", "Wheel Balancing"],
-            "Body & Care": ["Body Polishing", "Paint Touch-up", "Seat Repair"]
-        }
+    "Motorcycle Service & Repair": {
+        "Engine Maintenance": ["Regular Service & Tune-up", "Oil Change (Mineral/Semi/Full Synthetic)", "Carburetor Cleaning & Tuning", "Spark Plug Replacement"],
+        "Drive & Transmission": ["Chain/Belt Adjustment & Replacement", "Clutch Plate Replacement", "Gearbox Oil Change"],
+        "Brakes & Safety": ["Brake Shoe/Pad Replacement", "Cable Adjustments", "Suspension Fork Seal Replacement"],
+        "Tires & Wheels": ["Puncture Repair", "Tire Replacement", "Wheel Balancing"],
     },
-    {
-        type: "Trucks & Commercial Vehicles",
-        categories: {
-            "Heavy Duty Engine": [
-                "Diesel Engine Repair & Overhaul",
-                "Fleet Oil & Fluid Service",
-                "Turbocharger Service",
-                "EGR/DPF System Diagnostics & Cleaning (Emissions)",
-                "Commercial Vehicle Tune-ups"
-            ],
-            "Brakes & Air Systems": [
-                "Air Brake System Repair & Inspection",
-                "Hydraulic Brake Service",
-                "Brake Drum/Rotor Replacement",
-                "Air Compressor Repair"
-            ],
-            "Suspension & Steering": [
-                "Leaf Spring Repair & Replacement",
-                "Axle Alignment",
-                "King Pin & Bushing Service",
-                "Heavy-Duty Shock Absorber Replacement"
-            ],
-            "Transmission & Drivetrain": [
-                "Heavy-Duty Clutch Replacement",
-                "Differential Repair",
-                "PTO (Power Take-Off) System Service",
-                "Transmission Fluid Flush & Filter Change"
-            ],
-            "Tires & Wheels": [
-                "Commercial Tire Sales & Service",
-                "Tire Re-treading Management",
-                "Heavy-Duty Wheel Balancing"
-            ],
-            "Body & Trailer": [
-                "Trailer Wiring & Lighting Repair",
-                "Lift Gate/Hydraulic System Repair",
-                "Cab Body Repair & Painting"
-            ]
-        }
+    "Truck/Commercial Vehicle Service": {
+        "Heavy Duty Engine": ["Diesel Engine Overhaul", "Fleet Oil & Fluid Service", "Turbocharger Inspection", "EGR/DPF Emissions Service"],
+        "Air & Hydraulic Brakes": ["Air Brake System Inspection & Repair", "Hydraulic Brake Service", "Brake Drum/Rotor Replacement"],
+        "Drivetrain & Axles": ["Heavy-Duty Clutch Replacement", "Differential Repair", "Axle Alignment"],
+        "Vehicle Body & Electrical": ["Trailer Wiring & Lighting Repair", "Cab Body Repair", "Lift Gate System Service"],
     },
-    {
-        type: "Electric Vehicle (EV)",
-        categories: {
-            "High Voltage Battery": ["Battery Diagnostics & Health Check", "Battery Cooling System Service", "High Voltage Wiring Inspection"],
-            "Electric Motor & Drivetrain": ["Electric Motor Diagnostics", "Gearbox Fluid Change", "Inverter and Converter Service"],
-            "Charging System": ["On-Board Charger Repair", "Charging Port Inspection & Repair"],
-            "Standard EV Services": ["Brake System Inspection", "12V Auxiliary Battery Replacement", "Tire Service"]
-        }
+    "Home Appliance Repair": {
+        "Washing Machine": ["Drum/Bearing Replacement", "Motor Repair", "Drain Pump Service", "Control Panel Fixing"],
+        "Refrigerator/Freezer": ["Gas Leak & Refill", "Compressor Replacement", "Thermostat & Defrost Heater Repair", "Door Seal Replacement"],
+        "Oven & Stove": ["Burner Element Replacement (Electric)", "Gas Line Inspection", "Ignition System Repair"],
+        "Dishwasher & Dryer": ["Drainage Unclogging", "Heating Element Repair", "Cycle Control Board Repair"],
+    },
+    "HVAC & Cooling Specialist": {
+        "Residential AC": ["Split/Window AC Installation & Servicing", "Gas Refilling (R22/R410A)", "Coil Cleaning", "Compressor Repair"],
+        "Commercial HVAC": ["Duct Cleaning & Installation", "Central AC Maintenance Contract", "Chiller System Repair"],
+        "Refrigeration Units": ["Cold Room Service", "Ice Machine Repair", "Commercial Display Freezer Repair"],
+    },
+    "Car Detailing & Accessories": {
+        "Premium Detailing": ["Full Interior Deep Cleaning", "Exterior Paint Correction", "Ceramic Coating Application", "Engine Bay Detailing"],
+        "Accessories Installation": ["Audio System & Speaker Upgrade", "Dashcam & GPS Tracker Installation", "Seat Cover & Floor Mat Customization"],
+        "Paint Protection Film (PPF)": ["Full Car PPF Installation", "Partial Panel Protection"],
     }
-];
+};
 
 const weekendOptions = ["Friday", "Saturday", "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday"];
 
-const CustomDropdown = forwardRef(({ options, name, onChange, onBlur, isMulti = true, value }, ref) => {
+const CustomDropdown = forwardRef(({ options, name, onChange, onBlur, isMulti = true, value, placeholder = "" }, ref) => {
     const [isOpen, setIsOpen] = useState(false);
-    const initialSelected = isMulti ? (Array.isArray(value) ? value : []) : (value ? [value] : []);
+    const initialSelected = isMulti
+        ? (Array.isArray(value) ? value : [])
+        : (value ? [value] : []);
+
     const [selectedItems, setSelectedItems] = useState(initialSelected);
     const dropdownRef = useRef(null);
 
@@ -115,7 +168,11 @@ const CustomDropdown = forwardRef(({ options, name, onChange, onBlur, isMulti = 
         setSelectedItems(isMulti ? (Array.isArray(value) ? value : []) : (value ? [value] : []));
     }, [value, isMulti]);
 
-    const handleToggle = () => setIsOpen(!isOpen);
+    const handleToggle = () => {
+        if (options.length > 0) {
+            setIsOpen(!isOpen);
+        }
+    };
 
     const handleSelect = (item) => {
         let newSelected;
@@ -123,27 +180,28 @@ const CustomDropdown = forwardRef(({ options, name, onChange, onBlur, isMulti = 
             newSelected = selectedItems.includes(item)
                 ? selectedItems.filter(i => i !== item)
                 : [...selectedItems, item];
+            onChange(newSelected);
         } else {
             newSelected = [item];
             setIsOpen(false);
+            onChange(item);
         }
         setSelectedItems(newSelected);
-        onChange(isMulti ? newSelected : newSelected[0]);
     };
 
     const displayValue = isMulti
-        ? selectedItems.length > 0 ? selectedItems.join(', ') : `Select ${name}...`
-        : selectedItems[0] || `Select ${name}...`;
+        ? selectedItems.length > 0 ? selectedItems.join(', ') : placeholder || `Select ${name}...`
+        : selectedItems[0] || placeholder || `Select ${name}...`;
 
     return (
         <div className="relative w-full" ref={dropdownRef}>
             <div
-                className="flex items-center justify-between w-full p-2 border border-gray-300 rounded-lg cursor-pointer hover:border-orange-500 focus-within:border-orange-500 transition-colors"
+                className={`flex items-center justify-between w-full p-2 border rounded-lg cursor-pointer transition-colors ${options.length === 0 ? 'bg-gray-100 text-gray-400 cursor-not-allowed' : 'bg-white border-gray-300 hover:border-orange-500 focus-within:border-orange-500'}`}
                 onClick={handleToggle}
                 onBlur={onBlur}
                 tabIndex={0}
             >
-                <span className="text-gray-700">
+                <span className={`truncate ${selectedItems.length > 0 ? 'text-gray-700' : 'text-gray-400'}`}>
                     {displayValue}
                 </span>
                 <svg
@@ -154,15 +212,13 @@ const CustomDropdown = forwardRef(({ options, name, onChange, onBlur, isMulti = 
                 >
                     <path
                         fillRule="evenodd"
-                        d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0
-                        111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0
-                        010-1.414z"
+                        d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
                         clipRule="evenodd"
                     />
                 </svg>
             </div>
-            {isOpen && (
-                <ul className="absolute z-10 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg overflow-y-auto max-h-60">
+            {isOpen && options.length > 0 && (
+                <ul className="absolute z-20 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-xl overflow-y-auto">
                     {options.map((option) => (
                         <li
                             key={option}
@@ -222,16 +278,14 @@ const CertificationsInput = ({ onChange, value }) => {
     );
 };
 
-export const uploadImageToImgbb = async (imageFile) => {
+const uploadImageToImgbb = async (imageFile) => {
     const formData = new FormData();
     formData.append('image', imageFile);
 
-    if (!process.env.NEXT_PUBLIC_ImgBB_API_KEY) {
-        throw new Error("ImgBB API key is not configured.");
-    }
+    const apiKey = "";
 
     try {
-        const response = await fetch(`https://api.imgbb.com/1/upload?key=${process.env.NEXT_PUBLIC_ImgBB_API_KEY}`, {
+        const response = await fetch(`https://api.imgbb.com/1/upload?key=${apiKey}`, {
             method: 'POST',
             body: formData
         });
@@ -243,18 +297,44 @@ export const uploadImageToImgbb = async (imageFile) => {
         const data = await response.json();
         return data?.data?.url;
     } catch (error) {
-        console.error("Error uploading to ImgBB:", error);
         throw error;
     }
 };
 
 export default function MechanicShop() {
-    const { register, handleSubmit, control, reset, setValue, formState: { errors } } = useForm();
-    const [activeVehicleType, setActiveVehicleType] = useState(servicesData[0].type);
+    const { register, handleSubmit, control, reset, setValue, watch, formState: { errors } } = useForm({
+        defaultValues: {
+            shop: {
+                address: {
+                    country: 'Bangladesh',
+                }
+            }
+        }
+    });
     const [isLoading, setIsLoading] = useState(false);
     const [logoUrl, setLogoUrl] = useState('');
-    const { data: session } = useSession();
-    const loggedInUser = useUser(session?.user?.email);
+
+    const selectedCategory = watch('shop.categories');
+
+    const selectedDivision = watch('shop.address.division');
+    const selectedDistrict = watch('shop.address.district');
+
+    const districts = selectedDivision ? Object.keys(locationData[selectedDivision]) : [];
+    const cities = (selectedDivision && selectedDistrict) ? locationData[selectedDivision][selectedDistrict] : [];
+
+    useEffect(() => {
+        if (!selectedDivision) {
+            setValue('shop.address.district', '');
+            setValue('shop.address.city', '');
+        }
+    }, [selectedDivision, setValue]);
+
+    useEffect(() => {
+        if (!selectedDistrict) {
+            setValue('shop.address.city', '');
+        }
+    }, [selectedDistrict, setValue]);
+
 
     const handleFileUpload = async (e) => {
         const file = e.target.files[0];
@@ -265,7 +345,6 @@ export default function MechanicShop() {
                 setValue('shop.logo', url);
                 toast.success("Logo uploaded successfully!");
             } catch (err) {
-                console.error(err);
                 toast.error("Failed to upload logo! Check console for details.");
             }
         }
@@ -278,73 +357,68 @@ export default function MechanicShop() {
     };
 
     const onInvalid = (errors) => {
-        console.error("Form Errors:", errors);
-        toast.error("Please fill in all required fields.");
+        toast.error("Please fill in all required fields and correct errors.");
     };
 
     const onSubmit = async (data) => {
         setIsLoading(true);
 
-        const services = {};
-        for (const [vehicleType, vehicleData] of Object.entries(data.shop.vehicleTypes || {})) {
-            services[vehicleType] = {};
-            for (const [category, serviceArray] of Object.entries(vehicleData.categories || {})) {
-                const validServices = Array.isArray(serviceArray)
-                    ? serviceArray.filter(service => service)
-                    : [];
+        const categoriesToProcess = data.shop.categories ? [data.shop.categories] : [];
 
-                if (validServices.length > 0) {
-                    services[vehicleType][category] = validServices;
+        const services = {};
+        for (const category of categoriesToProcess) {
+            const categoryData = data.shop.vehicleTypes?.[category]?.categories;
+            if (categoryData) {
+                services[category] = {};
+                for (const [subCategory, serviceArray] of Object.entries(categoryData)) {
+                    const validServices = Array.isArray(serviceArray)
+                        ? serviceArray.filter(service => service)
+                        : [];
+
+                    if (validServices.length > 0) {
+                        services[category][subCategory] = validServices;
+                    }
                 }
             }
         }
 
         const shopData = {
             ...data.shop,
+            categories: data.shop.categories ? [data.shop.categories] : null,
             vehicleTypes: services,
             contact: {
                 ...data.shop.contact,
-                email: loggedInUser?.email || null,
-                businessEmail: data.businessEmail || null,
+                email: data.businessEmail || null,
             },
             logo: logoUrl || null,
-            // Add owner information for admin panel
-            ownerName: loggedInUser?.name || "Not provided",
-            ownerEmail: loggedInUser?.email || "Not provided"
+            ownerName: "User Name",
+            ownerEmail: "user@email.com"
         };
 
         const payload = {
-            userId: loggedInUser?._id || session?.user?.email || null,
-            userEmail:session?.user?.email || loggedInUser?.email,
+            userId: "temp-user-id",
+            userEmail: "user@email.com",
             shop: shopData,
             certifications: data.certifications,
             socialLinks: data.socialLinks,
-            status: "pending", // Set initial status as pending
+            status: "pending",
             createdAt: new Date().toISOString(),
             updatedAt: new Date().toISOString()
         };
 
-        console.log("Submitting Payload:", payload);
-
         try {
-            const res = await axios.post("/api/shops", payload);
-
-            if (res.status === 200 || res.status === 201) {
-                toast.success("Shop submitted for approval! It will be visible after admin approval.");
-                reset();
-                setLogoUrl('');
-                setActiveVehicleType(servicesData[0].type);
-            } else {
-                toast.error(res.data.message || "Failed to add shop");
-            }
+            toast.success("Mock API submission successful. (Check console)");
+            console.log("Submitted Payload:", payload);
+            reset();
+            setLogoUrl('');
         } catch (error) {
-            console.error("Axios request failed:", error);
-            const errorMessage = error.response?.data?.message || "Something went wrong!";
-            toast.error(errorMessage);
+            toast.error("Submission failed.");
         } finally {
             setIsLoading(false);
         }
     };
+
+    const selectedCategoriesArray = selectedCategory ? [selectedCategory] : [];
 
     return (
         <div className="md:container mx-auto py-10 bg-gray-50 min-h-screen">
@@ -383,7 +457,7 @@ export default function MechanicShop() {
                                     />
                                     {logoUrl && (
                                         <div className="relative mt-4 inline-block">
-                                            <img src={logoUrl} alt="Shop Logo" className="h-20 object-contain" />
+                                            <img src={logoUrl} alt="Shop Logo" className="h-20 object-contain border border-gray-200 p-1 rounded-md" />
                                             <button
                                                 type="button"
                                                 onClick={handleRemoveLogo}
@@ -397,12 +471,12 @@ export default function MechanicShop() {
                                 </div>
 
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700">Categories</label>
+                                    <label className="block text-sm font-medium text-gray-700">Category</label>
                                     <Controller
                                         name="shop.categories"
                                         control={control}
-                                        defaultValue=""
-                                        rules={{ required: "Please select a category" }}
+                                        defaultValue={""}
+                                        rules={{ required: "Please select your primary category" }}
                                         render={({ field }) => (
                                             <CustomDropdown
                                                 options={shopCategories}
@@ -454,41 +528,109 @@ export default function MechanicShop() {
                                         {errors.shop?.mechanicCount && <p className="text-sm text-red-500 mt-1">{errors.shop.mechanicCount.message}</p>}
                                     </div>
                                 </fieldset>
-
-                                <fieldset className="border border-gray-200 p-4 rounded-lg space-y-2">
-                                    <legend className="px-2 text-md font-medium text-orange-600">Address</legend>
-                                    <div>
-                                        <label className="block text-sm font-medium text-gray-700">Street</label>
-                                        <input type="text" {...register('shop.address.street', { required: "Street is required" })} className="mt-1 block w-full p-2 border border-gray-300 rounded-md focus:ring-orange-500 focus:border-orange-500" />
-                                        {errors.shop?.address?.street && <p className="text-sm text-red-500 mt-1">{errors.shop.address.street.message}</p>}
-                                    </div>
-                                    <div>
-                                        <label className="block text-sm font-medium text-gray-700">City</label>
-                                        <input type="text" {...register('shop.address.city', { required: "City is required" })} className="mt-1 block w-full p-2 border border-gray-300 rounded-md focus:ring-orange-500 focus:border-orange-500" />
-                                        {errors.shop?.address?.city && <p className="text-sm text-red-500 mt-1">{errors.shop.address.city.message}</p>}
-                                    </div>
-                                    <div>
-                                        <label className="block text-sm font-medium text-gray-700">Country</label>
-                                        <input type="text" {...register('shop.address.country', { required: "Country is required" })} className="mt-1 block w-full p-2 border border-gray-300 rounded-md focus:ring-orange-500 focus:border-orange-500" />
-                                        {errors.shop?.address?.country && <p className="text-sm text-red-500 mt-1">{errors.shop.address.country.message}</p>}
-                                    </div>
-                                    <div>
-                                        <label className="block text-sm font-medium text-gray-700">Postal Code</label>
-                                        <input type="text" {...register('shop.address.postalCode')} className="mt-1 block w-full p-2 border border-gray-300 rounded-md focus:ring-orange-500 focus:border-orange-500" />
-                                    </div>
-                                    <div>
-                                        <label className="block text-sm font-medium text-gray-700">Google Maps URL (Optional)</label>
-                                        <input
-                                            type="url"
-                                            {...register('shop.address.mapUrl')}
-                                            className="mt-1 block w-full p-2 border border-gray-300 rounded-md focus:ring-orange-500 focus:border-orange-500"
-                                            placeholder="Paste the Google Maps 'Share' link or Embed URL"
-                                        />
-                                    </div>
-                                </fieldset>
                             </div>
                         </div>
 
+                        <div className="p-6 bg-white rounded-xl shadow-lg space-y-4 border border-gray-200">
+                            <h2 className="flex items-center gap-2 text-xl font-semibold text-orange-600 mb-4">Address</h2>
+                            <div className="space-y-4">
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700">Division</label>
+                                    <Controller
+                                        name="shop.address.division"
+                                        control={control}
+                                        defaultValue=""
+                                        rules={{ required: "Division is required" }}
+                                        render={({ field }) => (
+                                            <CustomDropdown
+                                                options={allDivisions}
+                                                name="Division"
+                                                placeholder="Select Division"
+                                                onChange={field.onChange}
+                                                onBlur={field.onBlur}
+                                                value={field.value}
+                                                isMulti={false}
+                                            />
+                                        )}
+                                    />
+                                    {errors.shop?.address?.division && <p className="text-sm text-red-500 mt-1">{errors.shop.address.division.message}</p>}
+                                </div>
+
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700">District</label>
+                                    <Controller
+                                        name="shop.address.district"
+                                        control={control}
+                                        defaultValue=""
+                                        rules={{ required: "District is required" }}
+                                        render={({ field }) => (
+                                            <CustomDropdown
+                                                options={districts}
+                                                name="District"
+                                                placeholder={selectedDivision ? "Select District" : "Select Division first"}
+                                                onChange={field.onChange}
+                                                onBlur={field.onBlur}
+                                                value={field.value}
+                                                isMulti={false}
+                                            />
+                                        )}
+                                    />
+                                    {errors.shop?.address?.district && <p className="text-sm text-red-500 mt-1">{errors.shop.address.district.message}</p>}
+                                </div>
+
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700">City / Upazila</label>
+                                    <Controller
+                                        name="shop.address.city"
+                                        control={control}
+                                        defaultValue=""
+                                        rules={{ required: "City/Upazila is required" }}
+                                        render={({ field }) => (
+                                            <CustomDropdown
+                                                options={cities}
+                                                name="City / Upazila"
+                                                placeholder={selectedDistrict ? "Select City/Upazila" : "Select District first"}
+                                                onChange={field.onChange}
+                                                onBlur={field.onBlur}
+                                                value={field.value}
+                                                isMulti={false}
+                                            />
+                                        )}
+                                    />
+                                    {errors.shop?.address?.city && <p className="text-sm text-red-500 mt-1">{errors.shop.address.city.message}</p>}
+                                </div>
+
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700">Street Address</label>
+                                    <input type="text" {...register('shop.address.street', { required: "Street is required" })} className="mt-1 block w-full p-2 border border-gray-300 rounded-md focus:ring-orange-500 focus:border-orange-500" placeholder="Road/Area/Plot Number" />
+                                    {errors.shop?.address?.street && <p className="text-sm text-red-500 mt-1">{errors.shop.address.street.message}</p>}
+                                </div>
+
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700">Country</label>
+                                    <input type="text" {...register('shop.address.country', { required: "Country is required" })} className="mt-1 block w-full p-2 border border-gray-300 rounded-md focus:ring-orange-500 focus:border-orange-500" readOnly />
+                                    {errors.shop?.address?.country && <p className="text-sm text-red-500 mt-1">{errors.shop.address.country.message}</p>}
+                                </div>
+
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700">Postal Code</label>
+                                    <input type="text" {...register('shop.address.postalCode')} className="mt-1 block w-full p-2 border border-gray-300 rounded-md focus:ring-orange-500 focus:border-orange-500" />
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700">Google Maps URL</label>
+                                    <input
+                                        type="url"
+                                        {...register('shop.address.mapUrl', { required: "Google Maps URL is required" })}
+                                        className="mt-1 block w-full p-2 border border-gray-300 rounded-md focus:ring-orange-500 focus:border-orange-500"
+                                        placeholder="Paste the Google Maps 'Share' link or Embed URL"
+                                    />
+                                    {errors.shop?.address?.mapUrl && <p className="text-sm text-red-500 mt-1">{errors.shop.address.mapUrl.message}</p>}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="space-y-8">
                         <div className="p-6 bg-white rounded-xl shadow-lg space-y-4 border border-gray-200">
                             <h2 className="flex items-center gap-2 text-xl font-semibold text-orange-600 mb-4">Contact & Social Links</h2>
                             <div className="space-y-4">
@@ -516,9 +658,7 @@ export default function MechanicShop() {
                                 </div>
                             </div>
                         </div>
-                    </div>
 
-                    <div className="space-y-8">
                         <div className="p-6 bg-white rounded-xl shadow-lg space-y-4 border border-gray-200">
                             <h2 className="flex items-center gap-2 text-xl font-semibold text-orange-600 mb-4">Working Hours</h2>
                             <div className="grid grid-cols-3 gap-4">
@@ -549,66 +689,57 @@ export default function MechanicShop() {
                             <h2 className="flex items-center gap-2 text-xl font-semibold text-orange-600 mb-4">
                                 <Wrench className="h-6 w-6 text-orange-500" /> Services Offered
                             </h2>
-                            <div className="flex flex-wrap gap-3 mb-4 pb-2">
-                                {servicesData.map(vehicle => (
-                                    <button
-                                        key={vehicle.type}
-                                        type="button"
-                                        onClick={() => setActiveVehicleType(vehicle.type)}
-                                        className={`px-4 py-2 rounded-lg text-sm font-semibold transition-colors whitespace-nowrap ${activeVehicleType === vehicle.type ? 'bg-orange-600 text-white shadow-md' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}`}
-                                    >
-                                        {vehicle.type}
-                                    </button>
-                                ))}
-                            </div>
 
-                            {servicesData
-                                .filter(vehicle => vehicle.type === activeVehicleType)
-                                .map(vehicle => (
-                                    <div key={vehicle.type} className="border-b border-gray-200 pb-4 mb-4 last:border-b-0">
-                                        <h3 className="text-lg font-bold text-gray-800 mb-2">{vehicle.type} Services</h3>
+                            {selectedCategoriesArray.length === 0 && (
+                                <p className="text-gray-500 italic p-4 bg-gray-50 rounded-md">
+                                    Please select your primary Category from the Shop Details section (left column) to list your services here.
+                                </p>
+                            )}
+
+                            {selectedCategoriesArray.length > 0 && selectedCategoriesArray.map(category => {
+                                const categoryServices = servicesData[category];
+                                if (!categoryServices) return null;
+
+                                return (
+                                    <div key={category} className="border-b border-gray-200 pb-4 mb-4 last:border-b-0">
+                                        <h3 className="text-lg font-bold text-gray-800 mb-3">{category}</h3>
                                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                            {Object.entries(vehicle.categories).map(([category, services]) => (
-                                                <div key={category} className="space-y-2">
-                                                    <h4 className="text-md font-medium text-orange-700">{category}</h4>
-                                                    {services.map(service => (
-                                                        <label key={service} className="flex items-center gap-3 cursor-pointer select-none">
+                                            {Object.entries(categoryServices).map(([subCategory, services]) => (
+                                                <div key={subCategory} className="space-y-2">
+                                                    <h4 className="text-md font-medium text-orange-700">{subCategory}</h4>
+                                                    {services.map((service) => (
+                                                        <div key={service} className="flex items-start">
                                                             <input
                                                                 type="checkbox"
+                                                                id={`${category}-${subCategory}-${service}`}
                                                                 value={service}
-                                                                {...register(`shop.vehicleTypes.${vehicle.type}.categories.${category}`)}
-                                                                className="w-5 h-5 accent-orange-500 rounded-md cursor-pointer"
+                                                                {...register(`shop.vehicleTypes.${category}.categories.${subCategory}`)}
+                                                                className="h-4 w-4 text-orange-600 border-gray-300 rounded focus:ring-orange-500 mt-1"
                                                             />
-                                                            <span className="text-gray-800">{service}</span>
-                                                        </label>
+                                                            <label
+                                                                htmlFor={`${category}-${subCategory}-${service}`}
+                                                                className="ml-3 text-sm font-medium text-gray-700 cursor-pointer select-none"
+                                                            >
+                                                                {service}
+                                                            </label>
+                                                        </div>
                                                     ))}
                                                 </div>
                                             ))}
                                         </div>
                                     </div>
-                                ))}
+                                );
+                            })}
                         </div>
                     </div>
 
-                    <div className="md:col-span-2 flex justify-center mt-6">
+                    <div className="md:col-span-2 mt-8 w-full flex items-center justify-center">
                         <button
                             type="submit"
                             disabled={isLoading}
-                            className="w-full sm:w-auto px-8 py-3 bg-orange-600 text-white font-bold rounded-lg shadow-md hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 transition-colors disabled:bg-orange-400 disabled:cursor-not-allowed"
+                            className="w-fit text-center py-3 px-4 border border-transparent rounded-md shadow-sm text-lg font-medium text-white bg-orange-600 hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                         >
-                            {isLoading ? (
-                                <>
-                                    <span className="flex items-center">
-                                        Adding...
-                                        <svg className="animate-spin h-5 w-5 ml-2 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                                        </svg>
-                                    </span>
-                                </>
-                            ) : (
-                                "Add Shop"
-                            )}
+                            {isLoading ? 'Submitting...' : 'Submit Shop for Approval'}
                         </button>
                     </div>
                 </form>
