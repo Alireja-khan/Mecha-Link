@@ -67,24 +67,22 @@ export default function Header() {
 
   return (
     <header
-      className={`sticky top-0 w-full z-50 transition-all duration-300 ${
-        scrolled
+      className={`sticky top-0 w-full z-50 transition-all duration-300 ${scrolled
           ? theme === "dark"
             ? "bg-[#343434]/95 backdrop-blur-md shadow-sm py-2"
             : "bg-white/95 backdrop-blur-md shadow-sm py-2"
           : theme === "dark"
-          ? "bg-[#343434]/90 backdrop-blur-sm py-4"
-          : "bg-white/90 backdrop-blur-sm py-4"
-      }`}
+            ? "bg-[#343434]/90 backdrop-blur-sm py-4"
+            : "bg-white/90 backdrop-blur-sm py-4"
+        }`}
     >
       <div className=" container mx-auto px-2 md:px-3 flex justify-between items-center">
         {/* Logo */}
         <div className="z-50">
           <button onClick={handleGearClick} className="flex gap-2 lg:gap-3 items-center">
             <FaGear
-              className={`h-6 w-6 lg:h-12 lg:w-12 transition-transform duration-500 ${
-                rotating && (drawerOpen ? "-rotate-90" : "rotate-90")
-              }`}
+              className={`h-6 w-6 lg:h-12 lg:w-12 transition-transform duration-500 ${rotating && (drawerOpen ? "-rotate-90" : "rotate-90")
+                }`}
             />
             <h1 className="text-2xl lg:text-3xl font-bold">
               Mecha<span className="text-primary">Link</span>
@@ -98,9 +96,8 @@ export default function Header() {
             <Link
               key={item.href}
               href={item.href}
-              className={`relative text-base font-medium transition-colors hover:text-primary ${
-                pathname === item.href ? "text-primary" : ""
-              }`}
+              className={`relative text-base font-medium transition-colors hover:text-primary ${pathname === item.href ? "text-primary" : ""
+                }`}
             >
               {item.label}
             </Link>
@@ -145,7 +142,7 @@ export default function Header() {
             </svg>
 
             {/* piston icon (mechanical/dark) */}
-            
+
             <svg
               className="swap-on h-10 w-10 fill-current"
               xmlns="http://www.w3.org/2000/svg"
@@ -171,113 +168,116 @@ export default function Header() {
 
           </label>
 
-          {status === "loading" ? (
-  <span className="loading loading-spinner loading-xs"></span>
-) : loggedInUser ? (
-  <div className="relative" ref={dropdownRef}>
-    <button
-      className="flex items-center space-x-2 focus:outline-none"
-      onClick={(e) => {
-        e.stopPropagation();
-        setUserMenuOpen(!userMenuOpen);
-      }}
-    >
-      <div className="w-9 h-9 rounded-full bg-gray-200 overflow-hidden flex items-center justify-center">
-        {loggedInUser?.profileImage ? (
-          <img
-            src={loggedInUser.profileImage}
-            alt={loggedInUser.name || "User"}
-            className="w-full h-full object-cover"
-          />
-        ) : (
-          <UserIcon className="w-5 h-5 text-gray-600" />
-        )}
-      </div>
-      <svg
-        className={`w-4 h-4 transition-transform ${
-          userMenuOpen ? "rotate-180" : ""
-        }`}
-        fill="none"
-        stroke="currentColor"
-        viewBox="0 0 24 24"
-      >
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth={2}
-          d="M19 9l-7 7-7-7"
-        />
-      </svg>
-    </button>
+          {status === "loading" && (
+            <span className="loading loading-spinner loading-xs"></span>
+          )} 
+          {status === "authenticated" && !loggedInUser && (
+            <span className="loading loading-spinner loading-xs"></span>
+          )} 
+          {loggedInUser && (
+            <div className="relative" ref={dropdownRef}>
+              <button
+                className="flex items-center space-x-2 focus:outline-none"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setUserMenuOpen(!userMenuOpen);
+                }}
+              >
+                <div className="w-9 h-9 rounded-full bg-gray-200 overflow-hidden flex items-center justify-center">
+                  {loggedInUser?.profileImage ? (
+                    <img
+                      src={loggedInUser.profileImage}
+                      alt={loggedInUser.name || "User"}
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <UserIcon className="w-5 h-5 text-gray-600" />
+                  )}
+                </div>
+                <svg
+                  className={`w-4 h-4 transition-transform ${userMenuOpen ? "rotate-180" : ""
+                    }`}
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M19 9l-7 7-7-7"
+                  />
+                </svg>
+              </button>
 
-    {/* Dropdown */}
-    {userMenuOpen && (
-      <div className="absolute right-0 mt-2 w-48 bg-white text-black rounded-md shadow-lg py-1 z-50 border border-gray-100">
-        <div className="px-4 py-2 border-b border-gray-100">
-          <p className="text-sm font-medium">{loggedInUser?.name}</p>
-          <p className="text-xs truncate">{loggedInUser?.email}</p>
-        </div>
-        <Link
-          href="/profile"
-          className="block px-4 py-2 text-sm hover:bg-gray-50"
-          onClick={() => setUserMenuOpen(false)}
-        >
-          Profile
-        </Link>
-        <Link
-          href={
-            loggedInUser?.role === "admin"
-              ? "/dashboard/admin"
-              : loggedInUser?.role === "mechanic"
-              ? "/dashboard/mechanic"
-              : "/dashboard/user"
-          }
-          className="block px-4 py-2 text-sm hover:bg-gray-50"
-          onClick={() => setUserMenuOpen(false)}
-        >
-          Dashboard
-        </Link>
+              {/* Dropdown */}
+              {userMenuOpen && (
+                <div className="absolute right-0 mt-2 w-48 bg-white text-black rounded-md shadow-lg py-1 z-50 border border-gray-100">
+                  <div className="px-4 py-2 border-b border-gray-100">
+                    <p className="text-sm font-medium">{loggedInUser?.name}</p>
+                    <p className="text-xs truncate">{loggedInUser?.email}</p>
+                  </div>
+                  <Link
+                    href="/profile"
+                    className="block px-4 py-2 text-sm hover:bg-gray-50"
+                    onClick={() => setUserMenuOpen(false)}
+                  >
+                    Profile
+                  </Link>
+                  <Link
+                    href={
+                      loggedInUser?.role === "admin"
+                        ? "/dashboard/admin"
+                        : loggedInUser?.role === "mechanic"
+                          ? "/dashboard/mechanic"
+                          : "/dashboard/user"
+                    }
+                    className="block px-4 py-2 text-sm hover:bg-gray-50"
+                    onClick={() => setUserMenuOpen(false)}
+                  >
+                    Dashboard
+                  </Link>
 
-        <div className="border-t border-gray-100 my-1"></div>
-        <button
-          type="button"
-          className="cursor-pointer block w-full text-left px-4 py-2 text-sm hover:bg-gray-50"
-          onClick={() => {
-            signOut();
-            setUserMenuOpen(false);
-          }}
-        >
-          Sign out
-        </button>
-      </div>
-    )}
-  </div>
-) : (
-  <>
-    <Link
-      href="/login"
-      className="text-md font-medium border-2 py-2 px-4 rounded-md border-primary text-primary hover:text-white hover:bg-primary transition-colors"
-    >
-      Log in
-    </Link>
-    <Link
-      href="/register"
-      className="bg-primary border-2 border-primary hover:bg-white hover:text-primary text-white px-4 py-2 rounded-md text-md font-medium transition-colors shadow-sm"
-    >
-      Sign up
-    </Link>
-  </>
-)}
+                  <div className="border-t border-gray-100 my-1"></div>
+                  <button
+                    type="button"
+                    className="cursor-pointer block w-full text-left px-4 py-2 text-sm hover:bg-gray-50"
+                    onClick={() => {
+                      signOut();
+                      setUserMenuOpen(false);
+                    }}
+                  >
+                    Sign out
+                  </button>
+                </div>
+              )}
+            </div>
+          )} 
+          {!loggedInUser && status === "unauthenticated" && (
+            <>
+              <Link
+                href="/login"
+                className="text-md font-medium border-2 py-2 px-4 rounded-md border-primary text-primary hover:text-white hover:bg-primary transition-colors"
+              >
+                Log in
+              </Link>
+              <Link
+                href="/register"
+                className="bg-primary border-2 border-primary hover:bg-white hover:text-primary text-white px-4 py-2 rounded-md text-md font-medium transition-colors shadow-sm"
+              >
+                Sign up
+              </Link>
+            </>
+          )}
 
-          
+
         </div>
       </div>
 
       {/* Drawer */}
       <div
-        className={`fixed md:hidden top-0 left-0 h-full w-64 transform transition-transform duration-500 z-40 ${
-          drawerOpen ? "translate-x-0" : "-translate-x-full"
-        }`}
+        className={`fixed md:hidden top-0 left-0 h-full w-64 transform transition-transform duration-500 z-40 ${drawerOpen ? "translate-x-0" : "-translate-x-full"
+          }`}
       >
         <div className="relative p-4 top-14 left-0 bg-white">
           <ul className="space-y-2">
@@ -285,10 +285,9 @@ export default function Header() {
               <li key={item.href}>
                 <Link
                   href={item.href}
-                  className={`block px-2 py-2 rounded hover:bg-gray-100 text-black ${
-                    pathname === item.href ? "text-primary font-semibold" : ""
-                  }`}
-                  onClick={() => setDrawerOpen(false)} 
+                  className={`block px-2 py-2 rounded hover:bg-gray-100 text-black ${pathname === item.href ? "text-primary font-semibold" : ""
+                    }`}
+                  onClick={() => setDrawerOpen(false)}
                 >
                   {item.label}
                 </Link>

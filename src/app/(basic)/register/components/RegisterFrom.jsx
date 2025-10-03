@@ -61,9 +61,7 @@ export default function RegisterFrom() {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ email: formObj.email }),
         });
-
         toast.success("OTP send on your mail");
-
         router.push(`/otp?email=${formObj.email}`);
       } else {
         setLoading(false);
