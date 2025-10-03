@@ -6,6 +6,7 @@ import ServiceSec from "../Components/ServiceSec";
 import WhyChooseUs from "../Components/WhyChooseUs";
 import HowItWork from "../Components/HowItWork";
 import HeroSection from "../Components/HeroSection";
+import Map from "../Components/Map";
 
 
 export default function Home() {
@@ -19,6 +20,7 @@ export default function Home() {
             <WhyChooseUs />
             <HowItWork />
             <ReviewSection />
+            <Map />
             <BlogSection />
             <Newsletter />
         </>

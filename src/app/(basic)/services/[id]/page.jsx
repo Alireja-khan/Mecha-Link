@@ -3,17 +3,38 @@ import "leaflet/dist/leaflet.css";
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import L from "leaflet";
 import Image from "next/image";
-import { Check, Headset, Share2, UserPlus, MapPin, Clock, Phone, Mail, Star, Award, Calendar, Navigation, Users, Car, Bike, Truck, Zap, Facebook, MessageSquare } from "lucide-react";
+import {
+  Check,
+  Headset,
+  Share2,
+  UserPlus,
+  MapPin,
+  Clock,
+  Phone,
+  Mail,
+  Star,
+  Award,
+  Calendar,
+  Navigation,
+  Users,
+  Car,
+  Bike,
+  Truck,
+  Zap,
+  Facebook,
+  MessageSquare,
+} from "lucide-react";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import ReviewShow from "../ReviewShow";
 import RatingForm from "../Ratting";
 import useUser from "@/hooks/useUser";
-import Swal from 'sweetalert2';
+import Swal from "sweetalert2";
 
 delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({
-  iconRetinaUrl: "https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon-2x.png",
+  iconRetinaUrl:
+    "https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon-2x.png",
   iconUrl: "https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon.png",
   shadowUrl: "https://unpkg.com/leaflet@1.7.1/dist/images/marker-shadow.png",
 });
@@ -43,7 +64,9 @@ export default function ServiceDetailsPage() {
 
     try {
       const response = await fetch(
-        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(fullAddress)}`
+        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(
+          fullAddress
+        )}`
       );
       const data = await response.json();
 
@@ -54,7 +77,7 @@ export default function ServiceDetailsPage() {
         setIsMapReady(true);
       }
     } catch (error) {
-      console.error('Geocoding error:', error);
+      console.error("Geocoding error:", error);
       setIsMapReady(true);
     }
   };
@@ -62,7 +85,9 @@ export default function ServiceDetailsPage() {
   const getDirectionsUrl = () => {
     const { street, city, country, postalCode } = shopdata.shop?.address || {};
     const fullAddress = `${street}, ${city}, ${country} ${postalCode}`;
-    return `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(fullAddress)}`;
+    return `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(
+      fullAddress
+    )}`;
   };
 
   const {
@@ -71,7 +96,7 @@ export default function ServiceDetailsPage() {
     shop = {},
     certifications = [],
     socialLinks = {},
-    createdAt
+    createdAt,
   } = shopdata || {};
 
   const {
@@ -101,10 +126,10 @@ export default function ServiceDetailsPage() {
 
     if (!customerId) {
       Swal.fire({
-        icon: 'error',
-        title: 'Login Required',
-        text: 'You must be logged in to start a chat.',
-        confirmButtonColor: '#f97316'
+        icon: "error",
+        title: "Login Required",
+        text: "You must be logged in to start a chat.",
+        confirmButtonColor: "#f97316",
       });
       return;
     }
@@ -112,34 +137,36 @@ export default function ServiceDetailsPage() {
     // ⭐ NEW CHECK: Prevent chat if the customer is the owner
     if (customerId === serviceProviderId) {
       Swal.fire({
-        icon: 'info',
-        title: 'Access Denied',
-        text: 'You cannot start a chat with your own service shop.',
-        confirmButtonColor: '#f97316'
+        icon: "info",
+        title: "Access Denied",
+        text: "You cannot start a chat with your own service shop.",
+        confirmButtonColor: "#f97316",
       });
-      console.log("Chat initiation aborted: Customer ID matches Service Provider ID.");
+      console.log(
+        "Chat initiation aborted: Customer ID matches Service Provider ID."
+      );
       return;
     }
 
     if (!shopId || !serviceProviderId || !shopName) {
       Swal.fire({
-        icon: 'warning',
-        title: 'Data Missing',
-        text: 'Cannot start chat: Missing Shop ID, Owner ID, or Shop Name.',
-        confirmButtonColor: '#f97316'
+        icon: "warning",
+        title: "Data Missing",
+        text: "Cannot start chat: Missing Shop ID, Owner ID, or Shop Name.",
+        confirmButtonColor: "#f97316",
       });
       console.log("Chat initiation aborted: Missing required shop data.");
       return;
     }
 
     const result = await Swal.fire({
-      title: 'Start Conversation?',
+      title: "Start Conversation?",
       html: `Do you want to start an in-app chat with **${shopName}**?`,
-      icon: 'question',
+      icon: "question",
       showCancelButton: true,
-      confirmButtonText: 'Yes, Start Chat!',
-      cancelButtonText: 'No, Cancel',
-      confirmButtonColor: '#f97316'
+      confirmButtonText: "Yes, Start Chat!",
+      cancelButtonText: "No, Cancel",
+      confirmButtonColor: "#f97316",
     });
 
     if (!result.isConfirmed) {
@@ -158,34 +185,39 @@ export default function ServiceDetailsPage() {
 
       console.log("API Request Body for /api/chats:", chatRequestBody);
 
-      const apiResponse = await fetch('/api/chats', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(chatRequestBody)
+      const apiResponse = await fetch("/api/chats", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(chatRequestBody),
       });
 
       const data = await apiResponse.json();
 
-      console.log("API Response Status:", apiResponse.status, apiResponse.statusText);
+      console.log(
+        "API Response Status:",
+        apiResponse.status,
+        apiResponse.statusText
+      );
       console.log("API Response Data:", data);
 
       if (!apiResponse.ok) {
-        throw new Error(data.message || 'Failed to create/retrieve chat.');
+        throw new Error(data.message || "Failed to create/retrieve chat.");
       }
 
-      const chatPath = `/dashboard/${user?.role || 'customer'}/messages`;
+      const chatPath = `/dashboard/${user?.role || "customer"}/messages`;
 
       console.log("Chat successfully initiated. Redirecting to:", chatPath);
 
       window.location.href = chatPath;
-
     } catch (error) {
-      console.error('Chat Error in handleMessageContact:', error);
+      console.error("Chat Error in handleMessageContact:", error);
       Swal.fire({
-        icon: 'error',
-        title: 'Chat Error',
-        text: error.message || 'An unexpected error occurred while starting the chat.',
-        confirmButtonColor: '#f97316'
+        icon: "error",
+        title: "Chat Error",
+        text:
+          error.message ||
+          "An unexpected error occurred while starting the chat.",
+        confirmButtonColor: "#f97316",
       });
     }
   };
@@ -193,40 +225,48 @@ export default function ServiceDetailsPage() {
   const { street, city, country, postalCode } = address;
   const { phone, businessEmail, whatsapp } = contact;
   const { open, close, weekend } = workingHours;
-  const { Car: CarServices = {}, Motorcycle = {}, "Trucks & Commercial Vehicles": Trucks = {}, "Electric Vehicle (EV)": ElectricVehicle = {} } = vehicleTypes;
+  const {
+    Car: CarServices = {},
+    Motorcycle = {},
+    "Trucks & Commercial Vehicles": Trucks = {},
+    "Electric Vehicle (EV)": ElectricVehicle = {},
+  } = vehicleTypes;
   const { facebook } = socialLinks;
 
-  const fullAddress = street || city || country ?
-    `${street || ''}${street ? ', ' : ''}${city || ''}${city ? ', ' : ''}${country || ''}${postalCode ? ' ' + postalCode : ''}`.trim()
-    : 'Address not provided';
+  const fullAddress =
+    street || city || country
+      ? `${street || ""}${street ? ", " : ""}${city || ""}${city ? ", " : ""}${
+          country || ""
+        }${postalCode ? " " + postalCode : ""}`.trim()
+      : "Address not provided";
 
-  const location = [city, country].filter(Boolean).join(', ');
+  const location = [city, country].filter(Boolean).join(", ");
 
   const serviceSections = [
     {
       title: "Car Services",
       data: CarServices,
       icon: <Car className="w-5 h-5" />,
-      gradient: "from-orange-500 to-orange-600"
+      gradient: "from-orange-500 to-orange-600",
     },
     {
       title: "Motorcycle Services",
       data: Motorcycle,
       icon: <Bike className="w-5 h-5" />,
-      gradient: "from-orange-600 to-orange-700"
+      gradient: "from-orange-600 to-orange-700",
     },
     {
       title: "Trucks & Commercial",
       data: Trucks,
       icon: <Truck className="w-5 h-5" />,
-      gradient: "from-orange-500 to-orange-600"
+      gradient: "from-orange-500 to-orange-600",
     },
     {
       title: "Electric Vehicle (EV)",
       data: ElectricVehicle,
       icon: <Zap className="w-5 h-5" />,
-      gradient: "from-orange-600 to-orange-700"
-    }
+      gradient: "from-orange-600 to-orange-700",
+    },
   ];
 
   const handleFeedbackSubmit = (data) => {
@@ -255,25 +295,27 @@ export default function ServiceDetailsPage() {
         setShopdata(data);
       })
       .catch((error) => {
-        console.error('Error submitting review:', error);
+        console.error("Error submitting review:", error);
       });
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-orange-50/50 via-white to-orange-50/30">
+    <div className="min-h-screen">
       {submitSuccess && (
         <div className="fixed top-4 right-4 z-50 bg-green-500 text-white px-6 py-4 rounded-xl shadow-lg">
           <p className="font-semibold">Thank you for your feedback!</p>
-          <p className="text-sm">Your review has been submitted successfully.</p>
+          <p className="text-sm">
+            Your review has been submitted successfully.
+          </p>
         </div>
       )}
 
-      <div className="bg-white border-b border-gray-100">
+      <div className="border-b border-primary">
         <div className="px-4 sm:px-6 lg:px-8 py-10">
           <div className="flex flex-col lg:flex-row gap-8 lg:gap-12 items-start">
             <div className="flex-shrink-0 mx-auto lg:mx-0">
               {logo && (
-                <div className="relative w-200 h-100 rounded-2xl overflow-hidden ring-4 ring-orange-100 shadow-lg">
+                <div className="relative w-92 h-56 md:w-[800px] md:h-72 lg:w-[900px] lg:h-[450px] rounded-lg overflow-hidden ring-2  ring-orange-100 shadow-lg object-cover">
                   <Image
                     src={logo}
                     alt={shopName || "Shop Logo"}
@@ -290,8 +332,8 @@ export default function ServiceDetailsPage() {
                 <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
                   <div className="flex-1">
                     <div className="flex flex-wrap items-center gap-3 mb-3">
-                      <h1 className="text-3xl lg:text-4xl font-bold text-gray-900">
-                        {shopName || 'Shop Name'}
+                      <h1 className="text-3xl lg:text-4xl font-bold">
+                        {shopName || "Shop Name"}
                       </h1>
                       <div className="flex items-center gap-1.5 bg-orange-100 text-orange-700 px-3 py-1.5 rounded-lg text-sm font-semibold">
                         <Star className="w-4 h-4 fill-orange-500 text-orange-500" />
@@ -300,7 +342,7 @@ export default function ServiceDetailsPage() {
                     </div>
 
                     {location && (
-                      <div className="flex items-center gap-2 text-gray-600 mb-2">
+                      <div className="flex items-center gap-2 text-gray-400 mb-2">
                         <MapPin className="w-4 h-4" />
                         <span className="text-sm">{location}</span>
                       </div>
@@ -330,7 +372,7 @@ export default function ServiceDetailsPage() {
                   )}
 
                   {details && (
-                    <p className="text-gray-600 text-base leading-relaxed max-w-3xl">
+                    <p className="text-gray-400 text-base leading-relaxed max-w-3xl">
                       {details}
                     </p>
                   )}
@@ -361,54 +403,67 @@ export default function ServiceDetailsPage() {
       </div>
 
       {/* Main Content */}
-      <div className=" container">
+      <div className=" container my-6">
         <div className="grid lg:grid-cols-3 gap-8">
-
           {/* Left Column - Services & Reviews */}
-          <div className="lg:col-span-2  space-y-8">
+          <div className="lg:col-span-2 space-y-8">
             {/* Services Section */}
-            <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-8">
-              <h2 className="text-2xl font-bold text-gray-900 mb-8">Services We Offer</h2>
+            <div className="rounded-2xl border border-primary shadow-sm p-8">
+              <h2 className="text-2xl font-bold mb-8">Services We Offer</h2>
 
               <div className="space-y-8">
-                {serviceSections.map((section) => (
-                  section.data && Object.keys(section.data).length > 0 && (
-                    <div key={section.title} className="space-y-4">
-                      <div className="flex items-center gap-3">
-                        <div className={`bg-gradient-to-r ${section.gradient} p-2.5 rounded-lg text-white`}>
-                          {section.icon}
-                        </div>
-                        <h3 className="text-lg font-semibold text-gray-900">{section.title}</h3>
-                      </div>
-
-                      <div className="grid sm:grid-cols-2 gap-4">
-                        {Object.entries(section.data).map(([category, services]) => (
+                {serviceSections.map(
+                  (section) =>
+                    section.data &&
+                    Object.keys(section.data).length > 0 && (
+                      <div key={section.title} className="space-y-4">
+                        <div className="flex items-center gap-3">
                           <div
-                            key={category}
-                            className="bg-gradient-to-br from-orange-50 to-orange-100/50 rounded-xl p-5 border border-orange-200/50 hover:border-orange-300 hover:shadow-md transition-all duration-200"
+                            className={`bg-gradient-to-r ${section.gradient} p-2.5 rounded-lg text-white`}
                           >
-                            <h4 className="font-semibold text-gray-900 mb-3 text-sm uppercase tracking-wide">
-                              {category}
-                            </h4>
-                            <ul className="space-y-2">
-                              {services && services.slice(0, 4).map((service, index) => (
-                                <li key={index} className="flex items-start text-gray-700 text-sm">
-                                  <Check className="w-4 h-4 text-green-500 mr-2 flex-shrink-0 mt-0.5" />
-                                  <span>{service}</span>
-                                </li>
-                              ))}
-                              {services && services.length > 4 && (
-                                <li className="text-orange-600 font-medium text-xs pt-1">
-                                  +{services.length - 4} more
-                                </li>
-                              )}
-                            </ul>
+                            {section.icon}
                           </div>
-                        ))}
+                          <h3 className="text-lg font-semibold">
+                            {section.title}
+                          </h3>
+                        </div>
+
+                        <div className="grid sm:grid-cols-2 gap-4">
+                          {Object.entries(section.data).map(
+                            ([category, services]) => (
+                              <div
+                                key={category}
+                                className="rounded-xl p-5 border border-primary hover:shadow-md transition-all duration-200"
+                              >
+                                <h4 className="font-semibold mb-3 text-sm uppercase tracking-wide">
+                                  {category}
+                                </h4>
+                                <ul className="space-y-2">
+                                  {services &&
+                                    services
+                                      .slice(0, 4)
+                                      .map((service, index) => (
+                                        <li
+                                          key={index}
+                                          className="flex items-start text-gray-400 text-sm"
+                                        >
+                                          <Check className="w-4 h-4 text-green-500 mr-2 flex-shrink-0 mt-0.5" />
+                                          <span>{service}</span>
+                                        </li>
+                                      ))}
+                                  {services && services.length > 4 && (
+                                    <li className="text-orange-600 font-medium text-xs pt-1">
+                                      +{services.length - 4} more
+                                    </li>
+                                  )}
+                                </ul>
+                              </div>
+                            )
+                          )}
+                        </div>
                       </div>
-                    </div>
-                  )
-                ))}
+                    )
+                )}
               </div>
             </div>
 
@@ -416,8 +471,8 @@ export default function ServiceDetailsPage() {
           </div>
 
           <div className="space-y-6">
-            <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 space-y-5">
-              <h3 className="text-lg font-bold text-gray-900 mb-4">Contact Information</h3>
+            <div className="rounded-2xl border border-primary shadow-sm p-6 space-y-5">
+              <h3 className="text-lg font-bold mb-4">Contact Information</h3>
 
               <div className="space-y-2">
                 <div className="flex items-start gap-3">
@@ -425,11 +480,15 @@ export default function ServiceDetailsPage() {
                     <MapPin className="w-4 h-4 text-orange-600" />
                   </div>
                   <div className="flex-1">
-                    <h4 className="font-semibold text-sm text-gray-900 mb-1">Address</h4>
-                    <div className="text-sm text-gray-600 space-y-0.5">
-                      <p>{street || 'Not provided'}</p>
+                    <h4 className="font-semibold text-sm mb-1">Address</h4>
+                    <div className="text-sm text-gray-400 space-y-0.5">
+                      <p>{street || "Not provided"}</p>
                       {(city || country) && (
-                        <p>{city || ''}{city && country ? ', ' : ''}{country || ''}</p>
+                        <p>
+                          {city || ""}
+                          {city && country ? ", " : ""}
+                          {country || ""}
+                        </p>
                       )}
                       {postalCode && <p>{postalCode}</p>}
                     </div>
@@ -437,36 +496,44 @@ export default function ServiceDetailsPage() {
                 </div>
               </div>
 
-              <div className="border-t border-gray-100"></div>
+              <div className="border-t border-primary"></div>
 
               <div className="space-y-3">
                 <div className="flex items-center gap-3 text-sm">
                   <div className="bg-orange-100 p-2 rounded-lg">
                     <Phone className="w-4 h-4 text-orange-600" />
                   </div>
-                  <span className="text-gray-700">{phone || 'Not provided'}</span>
+                  <span className="text-gray-400">
+                    {phone || "Not provided"}
+                  </span>
                 </div>
 
                 <div className="flex items-center gap-3 text-sm">
                   <div className="bg-orange-100 p-2 rounded-lg">
                     <Mail className="w-4 h-4 text-orange-600" />
                   </div>
-                  <span className="text-gray-700 break-all">{businessEmail || 'Not provided'}</span>
+                  <span className="text-gray-400 break-all">
+                    {businessEmail || "Not provided"}
+                  </span>
                 </div>
 
                 {whatsapp && (
                   <div className="flex items-center gap-3 text-sm">
                     <div className="bg-orange-100 p-2 rounded-lg">
-                      <svg className="w-4 h-4 text-orange-600" viewBox="0 0 24 24" fill="currentColor">
+                      <svg
+                        className="w-4 h-4 text-orange-600"
+                        viewBox="0 0 24 24"
+                        fill="currentColor"
+                      >
                         <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884" />
                       </svg>
                     </div>
-                    <span className="text-gray-700">{whatsapp}</span>
+                    <span className="text-gray-400">{whatsapp}</span>
                   </div>
                 )}
               </div>
 
-              <div className="border-t border-gray-100"></div>
+              <div className="border-t border-primary"></div>
 
               <div className="space-y-2">
                 <div className="flex items-start gap-3">
@@ -474,17 +541,23 @@ export default function ServiceDetailsPage() {
                     <Clock className="w-4 h-4 text-orange-600" />
                   </div>
                   <div className="flex-1">
-                    <h4 className="font-semibold text-sm text-gray-900 mb-2">Working Hours</h4>
+                    <h4 className="font-semibold text-sm mb-2">
+                      Working Hours
+                    </h4>
                     <div className="space-y-1.5 text-sm">
                       <div className="flex justify-between items-center">
-                        <span className="text-gray-600">Weekdays</span>
-                        <span className="font-medium text-gray-900">
-                          {open && close ? `${open} - ${close}` : 'Not provided'}
+                        <span className="text-gray-400">Weekdays</span>
+                        <span className="font-medium">
+                          {open && close
+                            ? `${open} - ${close}`
+                            : "Not provided"}
                         </span>
                       </div>
                       <div className="flex justify-between items-center">
-                        <span className="text-gray-600">Weekend</span>
-                        <span className="font-medium text-gray-900">{weekend || 'Not provided'}</span>
+                        <span className="text-gray-400">Weekend</span>
+                        <span className="font-medium">
+                          {weekend || "Not provided"}
+                        </span>
                       </div>
                     </div>
                   </div>
@@ -493,7 +566,7 @@ export default function ServiceDetailsPage() {
 
               {facebook && (
                 <>
-                  <div className="border-t border-gray-100"></div>
+                  <div className="border-t border-primary"></div>
                   <a
                     href={facebook}
                     target="_blank"
@@ -510,22 +583,24 @@ export default function ServiceDetailsPage() {
             </div>
 
             {certifications && certifications.length > 0 && (
-              <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+              <div className="rounded-2xl border border-primary shadow-sm p-6">
                 <div className="flex items-center gap-3 mb-5">
                   <div className="bg-orange-100 p-2 rounded-lg">
                     <Award className="w-5 h-5 text-orange-600" />
                   </div>
-                  <h3 className="text-lg font-bold text-gray-900">Certifications</h3>
+                  <h3 className="text-lg font-bold">Certifications</h3>
                 </div>
 
                 <div className="space-y-3">
                   {certifications.map((cert, index) => (
                     <div
                       key={index}
-                      className="flex items-start gap-3 p-3 bg-gradient-to-r from-orange-50 to-orange-100/50 rounded-lg border border-orange-200/50 hover:border-orange-300 transition-all duration-200"
+                      className="flex items-start gap-3 p-3 rounded-lg border border-primary bg-orange-100"
                     >
                       <Check className="w-4 h-4 text-green-500 flex-shrink-0 mt-0.5" />
-                      <span className="text-sm font-medium text-gray-700">{cert}</span>
+                      <span className="text-sm font-medium text-orange-950">
+                        {cert}
+                      </span>
                     </div>
                   ))}
                 </div>
@@ -546,26 +621,26 @@ export default function ServiceDetailsPage() {
                     {new Date(createdAt).getFullYear()}
                   </p>
                   <p className="text-orange-100 text-sm">
-                    {new Date(createdAt).toLocaleDateString('en-US', {
-                      month: 'long',
-                      day: 'numeric',
-                      year: 'numeric'
+                    {new Date(createdAt).toLocaleDateString("en-US", {
+                      month: "long",
+                      day: "numeric",
+                      year: "numeric",
                     })}
                   </p>
                 </div>
               </div>
             )}
 
-            <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+            <div className="rounded-2xl border border-primary shadow-sm p-6">
               <div className="flex items-center gap-3 mb-4">
                 <div className="bg-orange-100 p-2 rounded-lg">
                   <MapPin className="w-5 h-5 text-orange-600" />
                 </div>
-                <h3 className="text-lg font-bold text-gray-900">Location</h3>
+                <h3 className="text-lg font-bold">Location</h3>
               </div>
 
-              {fullAddress && fullAddress !== 'Address not provided' && (
-                <p className="text-sm text-gray-600 mb-4">{fullAddress}</p>
+              {fullAddress && fullAddress !== "Address not provided" && (
+                <p className="text-sm text-gray-400 mb-4">{fullAddress}</p>
               )}
 
               <div className="h-64 rounded-xl overflow-hidden bg-gray-100 border border-gray-200 mb-4">
@@ -573,7 +648,7 @@ export default function ServiceDetailsPage() {
                   <MapContainer
                     center={mapCenter}
                     zoom={15}
-                    style={{ height: '100%', width: '100%' }}
+                    style={{ height: "100%", width: "100%" }}
                     scrollWheelZoom={false}
                   >
                     <TileLayer
@@ -583,13 +658,14 @@ export default function ServiceDetailsPage() {
                     <Marker position={mapCenter}>
                       <Popup>
                         <div className="text-center">
-                          <strong>{shopName || 'Shop Location'}</strong>
-                          {fullAddress && fullAddress !== 'Address not provided' && (
-                            <>
-                              <br />
-                              <span className="text-sm">{fullAddress}</span>
-                            </>
-                          )}
+                          <strong>{shopName || "Shop Location"}</strong>
+                          {fullAddress &&
+                            fullAddress !== "Address not provided" && (
+                              <>
+                                <br />
+                                <span className="text-sm">{fullAddress}</span>
+                              </>
+                            )}
                         </div>
                       </Popup>
                     </Marker>
