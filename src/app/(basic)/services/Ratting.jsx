@@ -27,12 +27,12 @@ export default function RatingForm({ onSubmit }) {
   };
 
   return (
-    <div className="sticky top-20 bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+    <div className="sticky top-20 rounded-2xl border border-primary shadow-sm p-6">
       <div className="text-center mb-6">
-        <h3 className="text-lg font-bold text-gray-900 mb-1">
+        <h3 className="text-lg font-bold mb-1">
           Share Your Experience
         </h3>
-        <p className="text-sm text-gray-600">
+        <p className="text-sm text-gray-400">
           Help others with your feedback
         </p>
       </div>
@@ -47,7 +47,7 @@ export default function RatingForm({ onSubmit }) {
       <form className="space-y-5" onSubmit={handleSubmit}>
         {/* Star Rating */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-3 text-center">
+          <label className="block text-sm font-medium text-gray-400 mb-3 text-center">
             Rate your experience
           </label>
           <div className="flex justify-center gap-2">
@@ -67,7 +67,7 @@ export default function RatingForm({ onSubmit }) {
                     className={`${
                       index <= (hover || rating)
                         ? "fill-orange-500 text-orange-500"
-                        : "text-gray-300"
+                        : "text-primary"
                     } transition-colors duration-200`}
                   />
                 </button>
@@ -75,7 +75,7 @@ export default function RatingForm({ onSubmit }) {
             })}
           </div>
           {rating > 0 && (
-            <p className="text-center text-sm text-gray-600 mt-2">
+            <p className="text-center text-sm text-gray-400 mt-2">
               You rated: {rating} star{rating > 1 ? 's' : ''}
             </p>
           )}
@@ -83,30 +83,30 @@ export default function RatingForm({ onSubmit }) {
 
         {/* Status Select */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label className="block text-sm font-medium text-gray-400 mb-2">
             Service Status
           </label>
           <select
             name="status"
             required
-            className="w-full px-4 py-2.5 rounded-lg border border-gray-300 bg-white text-gray-900 focus:ring-2 focus:ring-orange-500 focus:border-orange-500 outline-none transition-all"
+            className="w-full px-4 py-2.5 rounded-lg border border-primary focus:ring-2 focus:ring-orange-500 focus:border-orange-500 outline-none transition-all"
           >
             <option value="in-progress">In Progress</option>
-            <option value="completed">Completed</option>
-            <option value="rejected">Rejected</option>
+            <option className="text-black" value="completed">Completed</option>
+            <option className="text-black" value="rejected">Rejected</option>
           </select>
         </div>
 
         {/* Feedback Textarea */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label className="block text-sm font-medium text-gray-400 mb-2">
             Your Feedback
           </label>
           <textarea
             placeholder="Tell us about your experience..."
             name="feedback"
             rows="4"
-            className="w-full px-4 py-3 rounded-lg border border-gray-300 bg-white text-gray-900 placeholder-gray-400 focus:ring-2 focus:ring-orange-500 focus:border-orange-500 outline-none transition-all resize-none"
+            className="w-full px-4 py-3 rounded-lg border border-primary placeholder-gray-400 focus:ring-2 focus:ring-orange-500 focus:border-orange-500 outline-none transition-all resize-none"
           />
         </div>
 
