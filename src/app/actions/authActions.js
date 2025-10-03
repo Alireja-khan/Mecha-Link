@@ -5,22 +5,22 @@ import getUserData from "@/lib/getUserData";
 import bcrypt from "bcrypt";
 import dbConnect, { collections } from "@/lib/dbConnect";
 
-// Lockout config
-const MAX_ATTEMPTS = 5;        // max wrong tries
-const LOCK_TIME = 15 * 60 * 1000; // 15 minutes
+const MAX_ATTEMPTS = 5;
+const LOCK_TIME = 15 * 60 * 1000;
+
 
 export async function userCredentials(formData) {
   const { email, password } = formData;
   const collection = await dbConnect(collections.users);
 
-  // Find user
+    // Find user
   const user = await collection.findOne({ email });
   if (!user) {
     return { success: false, message: "User not found" };
   }
 
 
-  // const passCheck= await bcrypt.compare(password, user.password || "");
+  // const passCheck = await bcrypt.compare(password, user.password || "");
   // if(!passCheck) {
   //   return { success: false, message: "Invalid password" };
   // }
@@ -31,7 +31,6 @@ export async function userCredentials(formData) {
     return { success: false, message: `Account locked. Try again in ${minutes} min.` };
   }
 
-  // Verify password
   const passCheck = await bcrypt.compare(password, user.password || "");
   if (!passCheck) {
     const attempts = (user.loginAttempts || 0) + 1;
@@ -52,6 +51,9 @@ export async function userCredentials(formData) {
     { email },
     { $set: { loginAttempts: 0 }, $unset: { lockUntil: "" } }
   );
+ 
+  
+
 
   try {
     await signIn("credentials", {

@@ -1,91 +1,76 @@
 "use client";
 
-import { 
-    CheckCircle, 
-    ArrowRight, 
-    MapPin, 
-    User, 
-    CalendarCheck, 
-    MessageCircle, 
-    CreditCard, 
-    Star, 
-    BarChart 
+import {
+    CheckCircle,
+    ArrowRight,
+    MapPin,
+    User,
+    CalendarCheck,
+    MessageCircle,
+    CreditCard,
+    Star,
+    BarChart
 } from "lucide-react";
 import { useState } from "react";
+import Image from "next/image";
 
 const HowToWork = () => {
     const [activeStep, setActiveStep] = useState(null);
-    
+
     const steps = [
         {
-            title: "Discover Mechanics",
+            title: "Find Mechanics",
             description:
-                "Search trusted mechanics by category, location, rating, and experience.",
-            icon: <MapPin className="w-8 h-8" />,
+                "Search trusted mechanics by category, location, and rating. Utilize smart filters to pinpoint the perfect match for your specific vehicle repair needs.",
+            icon: <MapPin className="w-6 h-6" />,
+            image: "https://placehold.co/500x300/FFA500/FFFFFF/png?text=Search+by+Map",
         },
         {
-            title: "View Profiles & Portfolios",
+            title: "Check Profiles",
             description:
-                "Check mechanic profiles, skills, shop details, and past work before requesting service.",
-            icon: <User className="w-8 h-8" />,
+                "View comprehensive mechanic profiles, verify their skills, and review past work portfolios before making a service request. Transparency builds trust.",
+            icon: <User className="w-6 h-6" />,
+            image: "https://placehold.co/500x300/FFA500/FFFFFF/png?text=Mechanic+Profile",
         },
         {
-            title: "Post Service Request",
+            title: "Book Service",
             description:
-                "Submit a detailed request describing your problem to selected mechanics.",
-            icon: <CalendarCheck className="w-8 h-8" />,
+                "Easily schedule a convenient time slot that fits your busy calendar, based on the mechanic's real-time availability. Confirm your booking instantly.",
+            icon: <CalendarCheck className="w-6 h-6" />,
+            image: "https://placehold.co/500x300/FFA500/FFFFFF/png?text=Booking+Calendar",
         },
         {
-            title: "Schedule & Book Service",
+            title: "Chat with Mechanics",
             description:
-                "Choose a convenient time slot based on mechanic availability for your service.",
-            icon: <CheckCircle className="w-8 h-8" />,
+                "Communicate directly and securely with the mechanic to clarify job details, get estimated quotes, or share necessary updates throughout the service process.",
+            icon: <MessageCircle className="w-6 h-6" />,
+            image: "https://placehold.co/500x300/FFA500/FFFFFF/png?text=Secure+Chat",
         },
         {
-            title: "Track Request Status",
+            title: "Secure Payment",
             description:
-                "Receive real-time updates as your request moves from Pending → Accepted → Completed.",
-            icon: <CheckCircle className="w-8 h-8" />,
+                "Pay safely online using our supported secure gateways. Benefit from exclusive discounts and receive a transparent, itemized invoice for the services rendered.",
+            icon: <CreditCard className="w-6 h-6" />,
+            image: "https://placehold.co/500x300/FFA500/FFFFFF/png?text=Secure+Payment",
         },
         {
-            title: "Real-Time Chat",
+            title: "Rate & Review",
             description:
-                "Communicate directly with mechanics to clarify details or share updates.",
-            icon: <MessageCircle className="w-8 h-8" />,
-        },
-        {
-            title: "Make Secure Payment",
-            description:
-                "Pay safely online using supported gateways and apply coupons or discounts.",
-            icon: <CreditCard className="w-8 h-8" />,
-        },
-        {
-            title: "Rate & Review Mechanics",
-            description:
-                "Provide feedback after service completion and help others choose trusted mechanics.",
-            icon: <Star className="w-8 h-8" />,
-        },
-        {
-            title: "View Outcomes & Analytics",
-            description:
-                "Track results and performance insights for continuous improvement.",
-            icon: <BarChart className="w-8 h-8" />,
+                "Once the service is complete, provide valuable feedback by rating and reviewing the mechanic. Your input helps maintain quality and guides other users.",
+            icon: <Star className="w-6 h-6" />,
+            image: "https://placehold.co/500x300/FFA500/FFFFFF/png?text=Rate+and+Review",
         },
     ];
 
     return (
         <section className="py-16 font-roboto relative overflow-hidden">
-            {/* Decorative elements */}
-            {/* <div className="absolute top-0 left-0 w-72 h-72 bg-accent rounded-full -translate-x-1/2 -translate-y-1/2 opacity-50"></div>
-            <div className="absolute bottom-0 right-0 w-96 h-96 bg-blue-100 rounded-full translate-x-1/3 translate-y-1/3 opacity-40"></div> */}
-            
             <div className="container mx-auto px-4 relative z-10">
                 {/* Section Header */}
                 <div className="text-center mb-16">
                     <h2 className="text-4xl md:text-5xl font-bold mb-4 font-roboto-con">
                         How <span className="text-primary font-caveat inline-block">MechaLink Works</span>
                     </h2>
-                    <p className="text-xl  max-w-2xl mx-auto font-nunito-sans">
+                    <p className="text-base md:text-xl max-w-2xl mx-auto font-nunito-sans">
                         Follow these steps to understand the complete workflow and get connected with trusted mechanics efficiently.
                     </p>
                 </div>
@@ -93,49 +78,67 @@ const HowToWork = () => {
                 {/* Interactive Timeline Steps */}
                 <div className="relative">
                     {/* Connecting line */}
-                    <div className="absolute left-4 top-10 bottom-10 w-1 bg-gradient-to-b from-orange-400 to-blue-400 hidden md:block"></div>
-                    
+                    <div className="absolute left-4 top-10 bottom-45 w-1 bg-orange-400 hidden md:block"></div>
+
                     <div className="grid grid-cols-1 gap-10">
                         {steps.map((step, index) => (
-                            <div 
+                            <div
                                 key={index}
-                                className="flex group"
+                                className="flex md:flex-row flex-col items-start md:gap-0 gap-4 group"
                                 onMouseEnter={() => setActiveStep(index)}
                                 onMouseLeave={() => setActiveStep(null)}
                             >
-                                {/* Step indicator */}
+                                {/* Step indicator (unchanged) */}
                                 <div className="flex flex-col items-center mr-6">
-                                    <div className={`w-10 h-10 rounded-full flex items-center justify-center z-10 relative ${
-                                        activeStep === index 
-                                            ? "bg-primary scale-110 ring-4 ring-orange-200" 
-                                            : " border-2 border-orange-400"
-                                    } transition-all duration-300`}>
-                                        <div className={`${activeStep === index ? "text-white" : "text-primary"}`}>
+                                    <div className={`w-10 h-10 rounded-full flex items-center justify-center z-10 relative right-0.5 ${activeStep === index
+                                        ? "bg-primary  scale-110 ring-4 ring-orange-200 "
+                                        : " border-2 border-orange-400 bg-white"
+                                        } transition-all duration-300`}>
+                                        <div className={` ${activeStep === index ? "text-white" : "text-primary"}`}>
                                             {step.icon}
                                         </div>
                                     </div>
-                                    {index < steps.length - 1 && (
-                                        <div className="flex-1 w-0.5 bg-orange-300 my-2 md:hidden"></div>
-                                    )}
                                 </div>
-                                
-                                {/* Content card with dynamic animation */}
-                                <div className={`flex-1  rounded-2xl p-6 transform transition-all duration-300 ${
-                                    activeStep === index 
-                                        ? "shadow-xl -translate-y-1 border-l-4 border-primary" 
-                                        : "shadow-md"
-                                }`}>
-                                    <div className="flex items-start justify-between">
-                                        <div>
-                                            <span className="text-sm font-semibold text-primary mb-1 block">
-                                                Step {index + 1}
-                                            </span>
-                                            <h3 className="text-xl font-semibold mb-2">{step.title}</h3>
-                                            <p className=" text-sm">{step.description}</p>
+
+                                {/* Content card with dynamic animation and IMAGE */}
+                                <div className={`flex-1 rounded-2xl p-6 transform transition-all duration-300 ${activeStep === index
+                                    ? "shadow-xl -translate-y-1 border-l-4 border-primary bg-white"
+                                    : "shadow-md border border-gray-100"
+                                    }`}>
+                                    <div className="flex flex-col md:flex-row items-center gap-6"> {/* Added flex-row for image and text layout */}
+                                        {/* Image on the left (or top on small screens) */}
+                                        <div className="md:w-1/3 w-full h-40 flex-shrink-0">
+                                            {/* Using Next.js Image component for optimization */}
+                                            <Image
+                                                src={step.image}
+                                                alt={step.title}
+                                                width={500} // Example width
+                                                height={300} // Example height, adjust as needed
+                                                className="rounded-lg object-cover w-full h-full shadow-sm"
+                                            />
                                         </div>
-                                        <ArrowRight className={`w-5 h-5 text-primary transition-transform duration-300 ${
-                                            activeStep === index ? "translate-x-1" : ""
-                                        }`} />
+
+                                        {/* Text content on the right (or bottom on small screens) */}
+                                        <div className="md:w-2/3 w-full">
+                                            {/* Step Number Badge and Arrow */}
+                                            <div className="flex items-center justify-between mb-3">
+                                                <span className="font-semibold text-white bg-primary py-1 px-3 rounded-full inline-block shadow-md">
+                                                    Step {index + 1}
+                                                </span>
+                                                <ArrowRight className={`w-5 h-5 text-primary transition-transform duration-300 ${activeStep === index ? "translate-x-1" : ""
+                                                    }`} />
+                                            </div>
+
+                                            <hr className="mb-3 border-t border-gray-200" /> {/* Separator Line */}
+
+                                            {/* Title and Description */}
+                                            <div>
+                                                <h3 className="text-3xl font-bold mb-2 text-gray-800">{step.title}</h3>
+                                                <p className="text-base text-gray-600 leading-relaxed">
+                                                    {step.description}
+                                                </p>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>

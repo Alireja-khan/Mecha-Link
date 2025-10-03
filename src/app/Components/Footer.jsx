@@ -11,13 +11,13 @@ const Footer = () => {
         <div className="flex flex-col items-start gap-3 max-w-xs">
           <div className="flex items-center gap-3">
             <Link href="/">
-              <FaGear className="h-12 w-12 text-primary" />
+              <FaGear className="h-8 w-8 lg:h-12 lg:w-12 text-primary" />
             </Link>
-            <h1 className="text-4xl font-bold text-white">
+            <h1 className="text-xl lg:text-4xl font-bold text-white">
               MechaLink
             </h1>
           </div>
-          <p className="text-gray-300 text-sm font-poppins leading-relaxed">
+          <p className="text-gray-400 text-xs font-poppins leading-relaxed">
             Connecting drivers with trusted mechanics and auto services.
           </p>
         </div>
@@ -67,7 +67,7 @@ const Footer = () => {
           <p className="text-sm text-gray-400 mb-3">
             Get updates on offers, tips, and news.
           </p>
-          <form className="flex items-center bg-gray-800 rounded-lg overflow-hidden">
+          <form className="hidden lg:flex items-center bg-gray-800 rounded-lg overflow-hidden">
             <input
               type="email"
               placeholder="Your email"

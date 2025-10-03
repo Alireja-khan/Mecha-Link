@@ -4,7 +4,8 @@ import Link from "next/link";
 export default function HeroModern() {
   return (
     <section className="relative  py-20 md:py-20 ">
-      <div className="container mx-auto px-6 lg:px-12 flex flex-col lg:flex-row items-center gap-16 max-w-7xl">
+      <div className="container mx-auto px-6 lg:px-12 flex flex-col-reverse lg:flex-row items-center gap-16 max-w-7xl">
+        
         {/* Text Content */}
         <div className="flex-1 text-center lg:text-left">
           <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold leading-tight">
@@ -58,7 +59,7 @@ export default function HeroModern() {
         <div className="flex-1 relative">
           <div className="relative rounded-3xl overflow-hidden shadow-2xl border-8 border-white transform hover:scale-[1.02] transition-all duration-500">
             <Image
-              src="https://i.ibb.co.com/1fnb83Qs/pexels-chevanon-1108101.jpg" // replace with your asset
+              src="https://i.ibb.co.com/1fnb83Qs/pexels-chevanon-1108101.jpg" 
               alt="Mechanic working illustration"
               width={600}
               height={400}
