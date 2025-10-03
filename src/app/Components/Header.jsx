@@ -171,107 +171,104 @@ export default function Header() {
 
           </label>
 
-          {
-            status === "loading" && !loggedInUser ? (
-              <span className="loading loading-spinner loading-xs"></span>
+          {status === "loading" ? (
+  <span className="loading loading-spinner loading-xs"></span>
+) : loggedInUser ? (
+  <div className="relative" ref={dropdownRef}>
+    <button
+      className="flex items-center space-x-2 focus:outline-none"
+      onClick={(e) => {
+        e.stopPropagation();
+        setUserMenuOpen(!userMenuOpen);
+      }}
+    >
+      <div className="w-9 h-9 rounded-full bg-gray-200 overflow-hidden flex items-center justify-center">
+        {loggedInUser?.profileImage ? (
+          <img
+            src={loggedInUser.profileImage}
+            alt={loggedInUser.name || "User"}
+            className="w-full h-full object-cover"
+          />
+        ) : (
+          <UserIcon className="w-5 h-5 text-gray-600" />
+        )}
+      </div>
+      <svg
+        className={`w-4 h-4 transition-transform ${
+          userMenuOpen ? "rotate-180" : ""
+        }`}
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          d="M19 9l-7 7-7-7"
+        />
+      </svg>
+    </button>
 
-            ) : status === "authenticated" && !loggedInUser ? (
-            <span className="loading loading-spinner loading-xs"></span>
-          ) : loggedInUser ? (
-            <div className="relative" ref={dropdownRef}>
-              <button
-                className="flex items-center space-x-2 focus:outline-none"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setUserMenuOpen(!userMenuOpen);
-                }}
-              >
-                <div className="w-9 h-9 rounded-full bg-gray-200 overflow-hidden flex items-center justify-center">
-                  {loggedInUser?.profileImage ? (
-                    <img
-                      src={loggedInUser.profileImage}
-                      alt={loggedInUser.name || "User"}
-                      className="w-full h-full object-cover"
-                    />
-                  ) : (
-                    <UserIcon className="w-5 h-5 text-gray-600" />
-                  )}
-                </div>
-                <svg
-                  className={`w-4 h-4 transition-transform ${
-                    userMenuOpen ? "rotate-180" : ""
-                  }`}
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M19 9l-7 7-7-7"
-                  />
-                </svg>
-              </button>
+    {/* Dropdown */}
+    {userMenuOpen && (
+      <div className="absolute right-0 mt-2 w-48 bg-white text-black rounded-md shadow-lg py-1 z-50 border border-gray-100">
+        <div className="px-4 py-2 border-b border-gray-100">
+          <p className="text-sm font-medium">{loggedInUser?.name}</p>
+          <p className="text-xs truncate">{loggedInUser?.email}</p>
+        </div>
+        <Link
+          href="/profile"
+          className="block px-4 py-2 text-sm hover:bg-gray-50"
+          onClick={() => setUserMenuOpen(false)}
+        >
+          Profile
+        </Link>
+        <Link
+          href={
+            loggedInUser?.role === "admin"
+              ? "/dashboard/admin"
+              : loggedInUser?.role === "mechanic"
+              ? "/dashboard/mechanic"
+              : "/dashboard/user"
+          }
+          className="block px-4 py-2 text-sm hover:bg-gray-50"
+          onClick={() => setUserMenuOpen(false)}
+        >
+          Dashboard
+        </Link>
 
-              {/* Dropdown */}
-              {userMenuOpen && (
-                <div className="absolute right-0 mt-2 w-48 bg-white text-black rounded-md shadow-lg py-1 z-50 border border-gray-100">
-                  <div className="px-4 py-2 border-b border-gray-100">
-                    <p className="text-sm font-medium">{loggedInUser?.name}</p>
-                    <p className="text-xs truncate">{loggedInUser?.email}</p>
-                  </div>
-                  <Link
-                    href="/profile"
-                    className="block px-4 py-2 text-sm hover:bg-gray-50"
-                    onClick={() => setUserMenuOpen(false)}
-                  >
-                    Profile
-                  </Link>
-                  <Link
-                    href={
-                      loggedInUser?.role === "admin"
-                        ? "/dashboard/admin"
-                        : loggedInUser?.role === "mechanic"
-                        ? "/dashboard/mechanic"
-                        : "/dashboard/user"
-                    }
-                    className="block px-4 py-2 text-sm hover:bg-gray-50"
-                    onClick={() => setUserMenuOpen(false)}
-                  >
-                    Dashboard
-                  </Link>
+        <div className="border-t border-gray-100 my-1"></div>
+        <button
+          type="button"
+          className="cursor-pointer block w-full text-left px-4 py-2 text-sm hover:bg-gray-50"
+          onClick={() => {
+            signOut();
+            setUserMenuOpen(false);
+          }}
+        >
+          Sign out
+        </button>
+      </div>
+    )}
+  </div>
+) : (
+  <>
+    <Link
+      href="/login"
+      className="text-md font-medium border-2 py-2 px-4 rounded-md border-primary text-primary hover:text-white hover:bg-primary transition-colors"
+    >
+      Log in
+    </Link>
+    <Link
+      href="/register"
+      className="bg-primary border-2 border-primary hover:bg-white hover:text-primary text-white px-4 py-2 rounded-md text-md font-medium transition-colors shadow-sm"
+    >
+      Sign up
+    </Link>
+  </>
+)}
 
-                  <div className="border-t border-gray-100 my-1"></div>
-                  <button
-                    type="button"
-                    className="cursor-pointer block w-full text-left px-4 py-2 text-sm hover:bg-gray-50"
-                    onClick={() => {
-                      signOut();
-                      setUserMenuOpen(false);
-                    }}
-                  >
-                    Sign out
-                  </button>
-                </div>
-              )}
-            </div>
-          ) : (
-            <>
-              <Link
-                href="/login"
-                className="text-md font-medium border-2 py-2 px-4 rounded-md border-primary text-primary hover:text-white hover:bg-primary transition-colors"
-              >
-                Log in
-              </Link>
-              <Link
-                href="/register"
-                className="bg-primary border-2 border-primary hover:bg-white hover:text-primary text-white px-4 py-2 rounded-md text-md font-medium transition-colors shadow-sm"
-              >
-                Sign up
-              </Link>
-            </>
-          )}
           
         </div>
       </div>
