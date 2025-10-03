@@ -206,12 +206,12 @@ const ConversationListItem = ({ conv, userId, active, onSelect, onDeleteUser }) 
 
             <div className="flex-1 min-w-0">
                 <p className="font-bold text-gray-800 truncate text-base">{otherUser.name}</p>
-                <p className={`text-sm mt-0.5 truncate ${active ? "text-primary font-medium" : "text-gray-500"}`}>
+                <p className={`text-sm mt-0.5 truncate max-w-[200px] ${active ? "text-primary font-medium" : "text-gray-500"}`}>
                     {conv.lastMessagePreview || conv.serviceTitle || "No messages yet"}
                 </p>
             </div>
 
-            <div className={`text-xs text-right flex-shrink-0 min-w-[50px] self-start mt-1 ${active ? "text-primary font-bold" : "text-gray-400"}`}>
+            <div className={`text-xs text-right flex-shrink-0 w-fit self-start mt-1 ${active ? "text-primary font-bold" : "text-gray-400"}`}>
                 {timeDisplay}
             </div>
 
@@ -271,7 +271,7 @@ export default function UserMessagesPage() {
     const [error, setError] = useState(null);
     const [showChat, setShowChat] = useState(false);
     const [isMobileDevice, setIsMobileDevice] = useState(
-        typeof window !== "undefined" ? window.innerWidth < 1024 : false
+        typeof window !== "undefined" ? window.innerWidth < 1280 : false
     );
     const [isMessageLoading, setIsMessageLoading] = useState(false);
     const [isOtherUserTyping, setIsOtherUserTyping] = useState(false);
@@ -290,7 +290,7 @@ export default function UserMessagesPage() {
 
     // --- EFFECT: Resize and Mobile Check ---
     useEffect(() => {
-        const handleResize = () => setIsMobileDevice(window.innerWidth < 1024);
+        const handleResize = () => setIsMobileDevice(window.innerWidth < 1280);
         handleResize();
         window.addEventListener("resize", handleResize);
         return () => window.removeEventListener("resize", handleResize);
@@ -660,7 +660,7 @@ export default function UserMessagesPage() {
         : { name: "", image: null };
 
     return (
-        <div className="flex w-full overflow-x-hidden h-[calc(100vh-75px)] sm:h-[calc(100vh-77px)] lg:h-[calc(100vh-80px)]">
+        <div className="flex w-full overflow-x-hidden h-[calc(100vh-65px)] sm:h-[calc(100vh-77px)] lg:h-[calc(100vh-80px)]  mx-auto p-4">
             <style jsx global>{`
                 @keyframes typing-dot {
                     0%, 100% { transform: translateY(0); opacity: 0.5; }
@@ -686,7 +686,7 @@ export default function UserMessagesPage() {
                 /* --- Scrollbar Hiding CSS END --- */
             `}</style>
 
-            <div className="flex flex-1 overflow-hidden border border-gray-200 bg-white shadow-2xl">
+            <div className="flex flex-1 overflow-hidden border border-gray-200 bg-white shadow-2xl rounded-xl">
                 {/* --- Conversation List Panel --- */}
                 {(!showChat || !isMobileDevice) && (
                     <div className="w-full lg:w-1/3 xl:w-1/4 flex flex-col overflow-y-auto border-r border-gray-100 flex-shrink-0 transition-all duration-300 ease-in-out">

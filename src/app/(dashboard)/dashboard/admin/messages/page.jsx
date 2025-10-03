@@ -195,29 +195,29 @@ const ConversationListItem = ({ conv, userId, active, onSelect, onDeleteUser }) 
     return (
         <div
             onClick={() => onSelect(conv)}
-            className={`group flex items-center gap-4 p-4 mx-3 my-2 rounded-xl cursor-pointer transition-all duration-300 ease-in-out relative 
-                ${active
-                    ? "bg-primary/10 shadow-lg shadow-primary/10 ring-2 ring-primary/50 transform scale-[1.01] z-10"
-                    : "hover:bg-gray-100 hover:shadow-md"
+            className={`group flex items-center gap-4 p-4 mx-3 my-1.5 rounded-lg cursor-pointer transition-all duration-200 ease-in-out relative 
+                        ${active
+                    ? "bg-primary/10 ring-2 ring-primary/20"
+                    : "hover:bg-gray-50 border-gray-100"
                 }`}
         >
             <Avatar src={otherUser.image} alt={otherUser.name} />
+
             <div className="flex-1 min-w-0">
-                <p className="font-bold text-gray-800 truncate text-lg">{otherUser.name}</p>
-                <p className={`text-sm mt-0.5 truncate ${active ? "text-primary font-medium" : "text-gray-500"}`}>
-                    {conv.lastMessagePreview || "Start a conversation."}
+                <p className="font-bold text-gray-800 truncate text-base">{otherUser.name}</p>
+                <p className={`text-sm mt-0.5 truncate max-w-[200px] ${active ? "text-primary font-medium" : "text-gray-500"}`}>
+                    {conv.lastMessagePreview || conv.serviceTitle || "No messages yet"}
                 </p>
             </div>
 
-            {/* Added time display back to list item */}
-            <div className={`text-xs text-right flex-shrink-0 min-w-[50px] self-start mt-1 ${active ? "text-primary font-bold" : "text-gray-400"}`}>
+            <div className={`text-xs text-right flex-shrink-0 w-fit self-start mt-1 ${active ? "text-primary font-bold" : "text-gray-400"}`}>
                 {timeDisplay}
             </div>
 
             <div className="relative z-20 flex-shrink-0" ref={menuRef} onClick={(e) => e.stopPropagation()}>
                 <button
                     onClick={() => setIsMenuOpen(!isMenuOpen)}
-                    className={`p-1 rounded-full ${active ? "text-primary hover:bg-primary/20" : "text-gray-400 hover:text-gray-700 hover:bg-gray-200"} transition-colors`}
+                    className="p-1 rounded-full text-gray-400 hover:text-gray-700 hover:bg-gray-200 transition-colors"
                     aria-label="Conversation actions"
                 >
                     <MoreVertical className="w-5 h-5" />
@@ -671,41 +671,40 @@ export default function AdminMessagesPage() {
 
 
     return (
-        <div className="flex w-full overflow-x-hidden h-[calc(100vh-75px)] sm:h-[calc(100vh-77px)] lg:h-[calc(100vh-80px)]">
+        <div className="flex w-full overflow-x-hidden h-[calc(100vh-65px)] sm:h-[calc(100vh-77px)] lg:h-[calc(100vh-80px)] mx-auto p-4 ">
             <style jsx global>{`
-                @keyframes typing-dot {
-                    0%, 100% { transform: translateY(0); opacity: 0.5; }
-                    50% { transform: translateY(-3px); opacity: 1; }
-                }
+                    @keyframes typing-dot {
+                        0%, 100% { transform: translateY(0); opacity: 0.5; }
+                        50% { transform: translateY(-3px); opacity: 1; }
+                    }
+    
+                    .animate-typing-dot-0 { animation: typing-dot 0.9s infinite ease-in-out; animation-delay: 0s; }
+                    .animate-typing-dot-15 { animation: typing-dot 0.9s infinite ease-in-out; animation-delay: 0.15s; }
+                    .animate-typing-dot-30 { animation: typing-dot 0.9s infinite ease-in-out; animation-delay: 0.3s; }
+                    
+                    /* --- Scrollbar Hiding CSS START --- */
+                    .hide-scrollbar {
+                        /* For Firefox */
+                        scrollbar-width: none;
+                        /* For IE and Edge */
+                        -ms-overflow-style: none;
+                    }
+    
+                    /* For Webkit browsers (Chrome, Safari, newer Edge) */
+                    .hide-scrollbar::-webkit-scrollbar {
+                        display: none;
+                    }
+                    /* --- Scrollbar Hiding CSS END --- */
+                `}</style>
 
-                .animate-typing-dot-0 { animation: typing-dot 0.9s infinite ease-in-out; animation-delay: 0s; }
-                .animate-typing-dot-15 { animation: typing-dot 0.9s infinite ease-in-out; animation-delay: 0.15s; }
-                .animate-typing-dot-30 { animation: typing-dot 0.9s infinite ease-in-out; animation-delay: 0.3s; }
-                
-                /* --- Scrollbar Hiding CSS START --- */
-                .hide-scrollbar {
-                    /* For Firefox */
-                    scrollbar-width: none;
-                    /* For IE and Edge */
-                    -ms-overflow-style: none;
-                }
-
-                /* For Webkit browsers (Chrome, Safari, newer Edge) */
-                .hide-scrollbar::-webkit-scrollbar {
-                    display: none;
-                }
-                /* --- Scrollbar Hiding CSS END --- */
-            `}</style>
-
-            <div className="flex flex-1 overflow-hidden border border-gray-200 bg-white shadow-2xl">
-
-                {/* Conversation List Panel */}
+            <div className="flex flex-1 overflow-hidden border border-gray-200 bg-white shadow-2xl rounded-xl">
+                {/* --- Conversation List Panel --- */}
                 {(!showChat || !isMobileDevice) && (
                     <div className="w-full lg:w-1/3 xl:w-1/4 flex flex-col overflow-y-auto border-r border-gray-100 flex-shrink-0 transition-all duration-300 ease-in-out">
                         <div className="sticky top-0 z-10 bg-white border-b border-gray-100">
                             <h2 className="text-2xl font-extrabold text-gray-800 p-5">
                                 <MessageSquare className="w-6 h-6 inline mr-2 text-primary" />
-                                Admin Chats
+                                Chats
                             </h2>
                         </div>
 
@@ -721,9 +720,9 @@ export default function AdminMessagesPage() {
                             </p>
                         ) : conversations.length === 0 ? (
                             <div className="p-10 text-center text-gray-400">
-                                <MessageSquare className="w-10 h-10 text-gray-300 mx-auto mb-3" />
-                                <p className="font-semibold text-lg">No Active Chats</p>
-                                <p className="text-sm mt-1">Users or mechanics will appear here when they contact you.</p>
+                                <MessageSquare className="w-10 h-10 mx-auto mb-4 text-gray-300" />
+                                <p className="font-semibold text-lg">No conversations yet.</p>
+                                <p className="text-sm mt-1">Start a service request to initiate a chat!</p>
                             </div>
                         ) : (
                             <div className="flex flex-col py-2">
@@ -731,7 +730,7 @@ export default function AdminMessagesPage() {
                                     <ConversationListItem
                                         key={conv._id}
                                         conv={conv}
-                                        userId={user._id}
+                                        userId={user?._id}
                                         active={activeConversation?._id === conv._id}
                                         onSelect={handleSelectConversation}
                                         onDeleteUser={handleDeleteChat}
@@ -742,15 +741,19 @@ export default function AdminMessagesPage() {
                     </div>
                 )}
 
-                {/* Chat Panel */}
+                {/* --- Chat Window Panel --- */}
                 {(activeConversation && (showChat || !isMobileDevice)) ? (
                     <div className={`flex-1 flex flex-col overflow-hidden ${isMobileDevice && activeConversation ? 'w-full' : ''}`}>
                         <>
-                            {/* Header (flex-shrink-0) */}
+                            {/* Chat Header */}
                             <div className="flex-shrink-0 flex items-center justify-between p-4 bg-primary text-white shadow-xl sticky top-0 z-10">
                                 <div className="flex items-center gap-3">
                                     {isMobileDevice && (
-                                        <button onClick={() => { setShowChat(false); setActiveConversation(null); }} className="p-1 rounded-full hover:bg-white/20 transition">
+                                        <button
+                                            onClick={() => setShowChat(false)}
+                                            className="p-1 rounded-full hover:bg-white/20 transition"
+                                            aria-label="Back to conversations"
+                                        >
                                             <ArrowLeft className="w-6 h-6" />
                                         </button>
                                     )}
@@ -760,7 +763,6 @@ export default function AdminMessagesPage() {
                                     </div>
                                 </div>
 
-                                {/* Chat Menu */}
                                 <div className="relative" ref={chatMenuRef}>
                                     <button
                                         onClick={() => setIsMenuOpen(!isMenuOpen)}
@@ -785,7 +787,7 @@ export default function AdminMessagesPage() {
                                 </div>
                             </div>
 
-                            {/* Messages Area (flex-1 overflow-y-auto) */}
+                            {/* Message Area */}
                             <div
                                 ref={messageContainerRef}
                                 className="flex-1 p-6 space-y-4 overflow-y-auto hide-scrollbar"
@@ -801,7 +803,7 @@ export default function AdminMessagesPage() {
                                 ) : messages.length === 0 ? (
                                     <div className="text-gray-400 text-center py-16">
                                         <Send className="w-12 h-12 mx-auto mb-4 text-gray-300" />
-                                        <p className="font-semibold text-lg text-gray-600">Start Your Conversation</p>
+                                        <p className="font-semibold text-lg text-gray-600">Start your conversation!</p>
                                         <p className="text-sm mt-1">Type a message below to begin chatting with **{otherUserForHeader.name}**.</p>
                                     </div>
                                 ) : (
@@ -813,10 +815,11 @@ export default function AdminMessagesPage() {
                                         const msg = item.data;
                                         return (
                                             <div key={msg?._id || idx} className={`flex ${msg?.senderId === user?._id ? "justify-end" : "justify-start"}`}>
+                                                {/* ✨ KEY CHANGE HERE: Passing createdAt as 'time' prop */}
                                                 <MessageBubble
                                                     text={msg?.text}
                                                     isSender={msg?.senderId === user?._id}
-                                                    time={msg?.createdAt} // Passing the time!
+                                                    time={msg?.createdAt}
                                                 />
                                             </div>
                                         );
@@ -832,7 +835,7 @@ export default function AdminMessagesPage() {
                                 <div ref={messagesEndRef} />
                             </div>
 
-                            {/* Input section (flex-shrink-0) */}
+                            {/* Input Bar */}
                             <div className="flex items-center justify-center flex-shrink-0 p-4 border-t border-gray-100 gap-3 bg-white sticky bottom-0 z-10 shadow-[0_-5px_15px_rgba(0,0,0,0.05)]">
                                 <input
                                     type="text"
@@ -841,11 +844,11 @@ export default function AdminMessagesPage() {
                                     placeholder="Type your message..."
                                     className="flex-1 border-2 border-gray-200 rounded-full px-5 py-3 text-gray-800 transition-all duration-200 focus:ring-4 focus:ring-primary/20 focus:border-primary/50 shadow-md placeholder:text-gray-400"
                                     onKeyDown={e => e.key === "Enter" && handleSend()}
-                                    disabled={!activeConversation || isMessageLoading}
+                                    disabled={isMessageLoading}
                                 />
                                 <button
                                     onClick={handleSend}
-                                    disabled={!input.trim() || isMessageLoading || !activeConversation}
+                                    disabled={!input.trim() || isMessageLoading}
                                     className="bg-primary text-white w-12 h-12 rounded-full flex items-center justify-center shadow-xl shadow-primary/40 hover:bg-primary/90 transition-all duration-200 transform hover:scale-[1.03] active:scale-95 disabled:opacity-50 disabled:shadow-none"
                                     aria-label="Send Message"
                                 >
@@ -859,7 +862,7 @@ export default function AdminMessagesPage() {
                         <div className="text-center text-gray-500 p-10">
                             <MessageSquare className="w-16 h-16 mx-auto mb-4 text-gray-300" />
                             <p className="text-xl font-semibold">Select a conversation to start chatting</p>
-                            <p className="mt-2 text-sm">Review conversations with your users and mechanics.</p>
+                            <p className="mt-2 text-sm">Your chats with mechanics and customers will appear here.</p>
                         </div>
                     </div>
                 )}

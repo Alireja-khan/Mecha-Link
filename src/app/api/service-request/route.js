@@ -31,11 +31,6 @@ export async function GET(req) {
       return NextResponse.json(result);
     }
 
-    // Added by Alireja //
-
-
-    // ******************************** //
-
     let matchStage = {};
     if (search) {
       matchStage = {

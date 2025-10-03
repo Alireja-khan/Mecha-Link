@@ -1,23 +1,183 @@
 "use client";
 
-import React, { useState } from "react";
-import { Bell, Plus, Search, Users, Wrench, ClipboardList } from "lucide-react";
+import React, { useState, useEffect, useRef } from "react";
+import {
+  Bell,
+  Users,
+  Wrench,
+  ClipboardList,
+  Menu,
+  LogOut,
+  User,
+} from "lucide-react";
 import useUser from "@/hooks/useUser";
 import AdminNotifications from "./AdminNotifications";
+import NotificationCanvas from "./NotificationCanvas";
+import axios from "axios";
 
-const Topbar = ({ pageTitle = "Dashboard" }) => {
-  const { user: loggedInUser } = useUser();
+const transitionClasses = "transition duration-200 ease-in-out";
 
-  // notification state
-  const [notifications, setNotifications] = useState([]);
-  const [showDropdown, setShowDropdown] = useState(false);
-  console.log("notification",notifications);
-  // Handle new notifications from socket
-  const handleNewNotification = (msg) => {
-    setNotifications((prev) => [msg, ...prev]);
+// ✅ User Dropdown Component
+const UserDropdown = ({ loggedInUser, roleConfig }) => {
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const dropdownRef = useRef(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setDropdownOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () =>
+      document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const handleLogout = () => {
+    console.log("Logging out...");
+    setDropdownOpen(false);
   };
 
-  const toggleDropdown = () => setShowDropdown((prev) => !prev);
+  return (
+    <div
+      ref={dropdownRef}
+      className="relative flex items-center gap-3 cursor-pointer py-1.5 pl-1.5 pr-1.5 md:pr-4 rounded-full hover:bg-gray-100 transition duration-150"
+      onClick={() => setDropdownOpen((prev) => !prev)}
+    >
+      {loggedInUser && (
+        <img
+          src={
+            loggedInUser.profileImage
+              ? loggedInUser.profileImage
+              : `https://ui-avatars.com/api/?name=${loggedInUser.name}&background=f97316&color=fff&bold=true`
+          }
+          alt={loggedInUser.name || "User Avatar"}
+          className="w-11 h-11 md:w-12 md:h-12 rounded-full border border-orange-500 object-cover flex-shrink-0"
+        />
+      )}
+
+      {loggedInUser?.role && (
+        <div className="hidden sm:flex flex-col text-left justify-center min-w-0">
+          <span className="text-base font-semibold text-gray-900 truncate max-w-[90px] md:max-w-[140px]">
+            {loggedInUser.name || "Unknown"}
+          </span>
+          <span
+            className={`text-xs font-medium px-2 py-0.5 rounded-md border self-start ${roleConfig.badgeColor}`}
+          >
+            {loggedInUser.role.charAt(0).toUpperCase() +
+              loggedInUser.role.slice(1)}
+          </span>
+        </div>
+      )}
+
+      {dropdownOpen && (
+        <div
+          className={`absolute right-0 top-16 w-56 bg-white shadow-xl rounded-lg border border-gray-100 p-3 z-30 transform opacity-100 scale-100 origin-top-right ${transitionClasses}`}
+          onClick={(e) => e.stopPropagation()}
+        >
+          <div className="sm:hidden p-2 mb-2 border-b border-gray-100">
+            <p className="text-sm font-semibold text-gray-900 truncate">
+              {loggedInUser.name || "Unknown"}
+            </p>
+            <span
+              className={`text-xs font-medium px-2 py-0.5 mt-1 inline-block rounded-md border ${roleConfig.badgeColor}`}
+            >
+              {loggedInUser.role.charAt(0).toUpperCase() +
+                loggedInUser.role.slice(1)}
+            </span>
+          </div>
+
+          <button className="flex items-center w-full px-3 py-2 text-sm text-gray-700 hover:bg-orange-50 hover:text-orange-600 rounded-md">
+            <User size={18} className="mr-2" />
+            Profile
+          </button>
+          <button
+            onClick={handleLogout}
+            className="flex items-center w-full px-3 py-2 text-sm text-red-600 hover:bg-red-50 rounded-md mt-1"
+          >
+            <LogOut size={18} className="mr-2" />
+            Logout
+          </button>
+        </div>
+      )}
+    </div>
+  );
+};
+
+// ✅ Updated Topbar with increased size
+const Topbar = ({ pageTitle = "Dashboard", setIsMobileOpen }) => {
+  const { user: loggedInUser } = useUser();
+
+  const [notifications, setNotifications] = useState([]);
+  const [showCanvas, setShowCanvas] = useState(false);
+
+  useEffect(() => {
+    const fetchNotifications = async () => {
+      try {
+        const res = await axios.get("/api/notifications");
+        if (res.data) {
+          let filtered = res.data;
+
+          if (loggedInUser?.role === "admin") {
+            filtered = res.data;
+          } else if (loggedInUser?.role === "mechanic") {
+            filtered = res.data.filter((n) =>
+              ["serviceRequest", "coupon", "announcement"].includes(n.type)
+            );
+          } else if (loggedInUser?.role === "user") {
+            filtered = res.data.filter((n) =>
+              ["coupon", "announcement"].includes(n.type)
+            );
+          }
+
+          setNotifications(filtered);
+        }
+      } catch (err) {
+        console.error("Failed to fetch notifications:", err);
+      }
+    };
+
+    if (loggedInUser) {
+      fetchNotifications();
+    }
+  }, [loggedInUser]);
+
+  const handleNewNotification = (msg) => {
+    if (!loggedInUser) return;
+
+    if (loggedInUser.role === "admin") {
+      setNotifications((prev) => [msg, ...prev]);
+    } else if (loggedInUser.role === "mechanic") {
+      if (["serviceRequest", "coupon", "announcement"].includes(msg.type)) {
+        setNotifications((prev) => [msg, ...prev]);
+      }
+    } else if (loggedInUser.role === "user") {
+      if (["coupon", "announcement"].includes(msg.type)) {
+        setNotifications((prev) => [msg, ...prev]);
+      }
+    }
+  };
+
+  const handleDeleteNotification = async (id) => {
+    try {
+      await axios.delete(`/api/notifications/${id}`);
+      setNotifications((prev) => prev.filter((notif) => notif._id !== id));
+    } catch (error) {
+      console.error("Failed to delete notification:", error);
+    }
+  };
+
+  const handleMarkAsRead = async () => {
+    try {
+      const unreadNotifications = notifications.filter((n) => !n.read);
+      for (const notif of unreadNotifications) {
+        await axios.patch(`/api/notifications/${notif._id}`, { read: true });
+      }
+      setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
+    } catch (err) {
+      console.error("Failed to mark notifications as read:", err);
+    }
+  };
 
   const getRoleStyles = (role) => {
     switch (role) {
@@ -25,143 +185,126 @@ const Topbar = ({ pageTitle = "Dashboard" }) => {
         return {
           badgeColor: "bg-red-100 text-red-600 border-red-400",
           actionText: "Manage Users",
-          actionIcon: <Users size={16} />,
+          actionIcon: <Users size={18} />,
           btnBg: "bg-red-600 hover:bg-red-700 shadow-red-300/50",
         };
       case "mechanic":
         return {
           badgeColor: "bg-blue-100 text-blue-600 border-blue-400",
           actionText: "Service Requests",
-          actionIcon: <Wrench size={16} />,
+          actionIcon: <Wrench size={18} />,
           btnBg: "bg-blue-600 hover:bg-blue-700 shadow-blue-300/50",
         };
       default:
         return {
           badgeColor: "bg-orange-100 text-orange-600 border-orange-400",
           actionText: "New Booking",
-          actionIcon: <ClipboardList size={16} />,
+          actionIcon: <ClipboardList size={18} />,
           btnBg: "bg-orange-600 hover:bg-orange-700 shadow-orange-300/50",
         };
     }
   };
 
   const roleConfig = loggedInUser ? getRoleStyles(loggedInUser.role) : null;
+  const unreadCount = notifications.filter((n) => !n.read).length;
 
   return (
-    <header className="w-full sticky top-0 z-20 flex items-center justify-between px-8 py-3.5 border-b border-gray-100 bg-white">
-      <h1 className="text-2xl font-extrabold text-gray-800">{pageTitle}</h1>
+    <header className="sticky top-0 z-20 flex items-center justify-between px-4 sm:px-8 md:px-10 py-3 sm:py-2 border-b border-gray-100 bg-white">
+      <div className="flex items-center gap-4">
+        {/* ✅ Hamburger Button */}
+        <button
+          className="p-3 rounded-lg text-gray-700 hover:bg-gray-100 hover:text-orange-600 transition duration-150 2xl:hidden"
+          onClick={() => setIsMobileOpen(true)}
+        >
+          <Menu size={26} />
+        </button>
+        <h1 className="text-2xl md:text-3xl font-extrabold text-gray-800 truncate">
+          {pageTitle}
+        </h1>
+      </div>
 
-      <div className="flex items-center gap-5">
-        {/* Socket listener */}
+      <div className="flex items-center gap-3 sm:gap-4 md:gap-6">
         <AdminNotifications onNewNotification={handleNewNotification} />
 
-        {/* Search Bar */}
-        <div className="relative hidden lg:block">
-          <Search
-            size={18}
-            className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
-          />
-          <input
-            type="text"
-            placeholder="Search transactions, users, etc."
-            className="w-80 px-4 py-2 pl-10 text-sm border border-gray-200 rounded-xl bg-gray-50 
-                       focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500 transition"
-          />
-        </div>
-
-        {/* Buttons */}
-        <div className="flex items-center gap-3">
-          {/* Notification Bell */}
-          <div className="relative">
-            <button
-              title="Notifications"
-              className="p-3 rounded-full text-gray-600 hover:bg-orange-50 hover:text-orange-600 transition duration-150"
-              onClick={toggleDropdown}
-            >
-              <Bell size={20} />
-              {notifications.length > 0 && (
-                <span className="absolute top-1 right-1 w-2 h-2 bg-red-600 rounded-full"></span>
-              )}
-            </button>
-
-            {/* Notification Dropdown */}
-            {showDropdown && (
-              <div className="absolute right-0 mt-2 w-80 bg-white border border-gray-200 rounded-lg shadow-lg z-50">
-                <h4 className="px-4 py-2 font-semibold border-b border-gray-100">
-                  Notifications
-                </h4>
-                <div className="max-h-60 overflow-y-auto">
-                  {notifications.length === 0 ? (
-                    <p className="p-4 text-sm text-gray-500">No new notifications</p>
-                  ) : (
-                    notifications.map((notif, idx) => (
-                      <div
-                        key={idx}
-                        className="px-4 py-2 border-b border-gray-100 hover:bg-gray-50 transition"
-                      >
-                        <p className="text-sm text-gray-700">
-                          New Service Request: {notif?.data.serviceDetails?.problemTitle || "Untitled Service"}
-                        </p>
-                        <p className="text-xs text-gray-400">
-                          {new Date(notif.data.requestedDate).toLocaleString()}
-                        </p>
-                      </div>
-                    ))
-                  )}
-                </div>
-              </div>
+        <div className="relative">
+          <button
+            title="Notifications"
+            className="p-3 sm:p-3.5 rounded-full text-gray-600 hover:bg-orange-50 hover:text-orange-600 transition duration-150 relative group"
+            onClick={() => {
+              setShowCanvas(true);
+              handleMarkAsRead();
+            }}
+          >
+            <Bell size={22} className="sm:w-6 sm:h-6" />
+            {unreadCount > 0 && (
+              <span className="absolute top-1 -right-1 min-w-5 min-h-5 text-[11px] sm:text-sm text-white bg-red-600 rounded-full flex justify-center items-center px-[3px] font-bold">
+                {unreadCount}
+              </span>
             )}
-          </div>
-
-          {/* Role-Based Action Button */}
-          {roleConfig && (
-            <button
-              className={`px-4 py-2 rounded-xl text-white text-sm font-semibold 
-                       transition duration-150 flex items-center gap-1.5 shadow-md ${roleConfig.btnBg}`}
-              title={roleConfig.actionText}
+            <span
+              className={`absolute -bottom-8 left-1/2 -translate-x-1/2 px-2 py-1 text-[11px] sm:text-sm bg-gray-800 text-white rounded opacity-0 group-hover:opacity-100 ${transitionClasses} hidden sm:block pointer-events-none`}
             >
-              {roleConfig.actionIcon}{" "}
-              <span className="hidden sm:block">{roleConfig.actionText}</span>
-            </button>
-          )}
+              Notifications
+            </span>
+          </button>
         </div>
 
-        <div className="w-px h-6 bg-gray-200 hidden sm:block" />
+        {roleConfig && (
+          <button
+            className={`px-4 py-2 sm:py-2.5 rounded-lg sm:rounded-xl text-white text-sm sm:text-base font-semibold transition flex items-center gap-2 shadow-md ${roleConfig.btnBg}`}
+            title={roleConfig.actionText}
+          >
+            {roleConfig.actionIcon}
+            <span className="hidden md:block">{roleConfig.actionText}</span>
+          </button>
+        )}
 
-        {/* User Info */}
-        <div className="flex items-center gap-2 cursor-pointer py-1 pl-1 pr-6 rounded-full hover:bg-gray-100 transition">
-          {loggedInUser && (
-            <img
-              src={
-                loggedInUser.profileImage
-                  ? loggedInUser.profileImage
-                  : `https://ui-avatars.com/api/?name=${
-                      loggedInUser.role === "admin"
-                        ? "Admin"
-                        : loggedInUser.role === "mechanic"
-                        ? "Mechanic"
-                        : "User"
-                    }&background=f97316&color=fff&bold=true`
-              }
-              alt={loggedInUser.name || "User Avatar"}
-              className="w-10 h-10 rounded-full border-2 border-orange-500"
-            />
-          )}
-          {loggedInUser?.role && (
-            <div className="hidden md:flex flex-col text-left">
-              <span className="text-sm font-semibold text-gray-900">
-                {loggedInUser.name || "Unknown User"}
-              </span>
-              <span
-                className={`text-xs font-medium px-2 py-0.5 rounded-md border ${roleConfig.badgeColor}`}
-              >
-                {loggedInUser.role.charAt(0).toUpperCase() +
-                  loggedInUser.role.slice(1)}
-              </span>
-            </div>
-          )}
-        </div>
+        <UserDropdown loggedInUser={loggedInUser} roleConfig={roleConfig} />
       </div>
+
+      <NotificationCanvas
+        isOpen={showCanvas}
+        title="Notifications"
+        onClose={() => setShowCanvas(false)}
+      >
+        {notifications.length === 0 ? (
+          <p className="p-5 text-sm text-gray-500">No new notifications</p>
+        ) : (
+          notifications.map((notif) => {
+            const createdAt = notif.createdAt
+              ? new Date(notif.createdAt).toLocaleString()
+              : "Date not available";
+
+            return (
+              <div
+                key={notif._id}
+                className="flex flex-col gap-2 px-5 py-3 border-b border-gray-100 hover:bg-gray-50 transition"
+              >
+                <div className="flex justify-between items-start">
+                  <p
+                    className={`text-sm font-semibold ${!notif.read ? "text-gray-900" : "text-gray-700"
+                      }`}
+                  >
+                    {notif.message || "Notification"}
+                  </p>
+                  <button
+                    className="text-gray-400 hover:text-red-600 text-xs font-bold transition duration-150"
+                    onClick={() => handleDeleteNotification(notif._id)}
+                  >
+                    ✕
+                  </button>
+                </div>
+                {notif.data && (
+                  <p className="text-xs text-gray-500 truncate">
+                    {JSON.stringify(notif.data)}
+                  </p>
+                )}
+                <p className="text-[11px] text-gray-400 self-end">{createdAt}</p>
+              </div>
+            );
+          })
+        )}
+      </NotificationCanvas>
     </header>
   );
 };
