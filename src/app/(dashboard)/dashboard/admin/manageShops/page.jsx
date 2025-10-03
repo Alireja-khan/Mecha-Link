@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import useUser from "@/hooks/useUser";
-import { Check, X, Search, Filter, Download, Store, Clock, User, Mail, MapPin, Eye, Ban, MessageSquare } from "lucide-react";
+import { Check, X, Search, Filter, Download, Store, Clock, User, Mail, MapPin, Eye, Ban, MessageSquare, Trash2 } from "lucide-react";
 import Swal from 'sweetalert2';
 
 // Utility component (for the header stats)
@@ -248,6 +248,47 @@ const ManageShops = () => {
         }
     };
 
+    // Delete shop function
+    const handleDeleteShop = async (shop) => {
+        const result = await showConfirmDialog(
+            'Delete Shop',
+            `Are you sure you want to delete "${shop.shop?.shopName}"? This action cannot be undone.`,
+            'Yes, Delete'
+        );
+
+        if (result.isConfirmed) {
+            try {
+                showLoadingAlert('Deleting...', 'Please wait while we delete the shop');
+
+                const response = await fetch(`/api/shops/${shop._id}`, {
+                    method: "DELETE",
+                    headers: { "Content-Type": "application/json" },
+                });
+
+                if (!response.ok) throw new Error('Failed to delete shop');
+
+                Swal.close();
+                
+                // Close modals if the deleted shop is open
+                if (selectedShop?._id === shop._id) {
+                    setDetailModalOpen(false);
+                    setSelectedShop(null);
+                }
+                if (shopToAction?._id === shop._id) {
+                    setActionModalOpen(false);
+                    setShopToAction(null);
+                }
+
+                await fetchShops();
+                showSuccessAlert('Deleted!', 'Shop has been deleted successfully');
+            } catch (error) {
+                console.error('Delete failed:', error);
+                Swal.close();
+                showErrorAlert('Error', 'Failed to delete shop');
+            }
+        }
+    };
+
     const openDetailModal = (shop) => {
         setSelectedShop(shop);
         setDetailModalOpen(true);
@@ -326,6 +367,13 @@ const ManageShops = () => {
                             title="View Details"
                         >
                             <Eye size={16} />
+                        </button>
+                        <button
+                            onClick={() => handleDeleteShop(shop)}
+                            className="p-2 bg-red-500/10 text-red-600 rounded-lg border border-red-200 hover:bg-red-500/20 transition-colors"
+                            title="Delete Shop"
+                        >
+                            <Trash2 size={16} />
                         </button>
                     </div>
                 </div>
@@ -481,6 +529,13 @@ const ManageShops = () => {
                                                 >
                                                     <Eye size={16} />
                                                 </button>
+                                                <button
+                                                    onClick={() => handleDeleteShop(shop)}
+                                                    className="p-2 bg-red-500/10 text-red-600 rounded-xl border border-red-200 hover:bg-red-500/20 hover:scale-105 transition-all duration-200"
+                                                    title="Delete Shop"
+                                                >
+                                                    <Trash2 size={16} />
+                                                </button>
                                             </div>
                                         </td>
                                     </tr>
@@ -624,6 +679,12 @@ const ManageShops = () => {
                                     className="px-6 py-3 bg-white text-gray-700 rounded-xl font-semibold border border-orange-200 hover:bg-orange-50 transition-all duration-300"
                                 >
                                     Close
+                                </button>
+                                <button
+                                    onClick={() => handleDeleteShop(selectedShop)}
+                                    className="px-6 py-3 bg-red-500 text-white rounded-xl font-semibold transition-all duration-300 hover:bg-red-600 hover:scale-105 shadow-lg hover:shadow-xl"
+                                >
+                                    Delete Shop
                                 </button>
                                 <button
                                     onClick={() => {
