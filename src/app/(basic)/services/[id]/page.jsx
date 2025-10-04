@@ -39,18 +39,38 @@ L.Icon.Default.mergeOptions({
   shadowUrl: "https://unpkg.com/leaflet@1.7.1/dist/images/marker-shadow.png",
 });
 
+// Service icons mapping based on category
+const serviceIcons = {
+  "Car Service & Repair": <Car className="w-5 h-5" />,
+  "Motorcycle Service & Repair": <Bike className="w-5 h-5" />,
+  "Truck/Commercial Vehicle Service": <Truck className="w-5 h-5" />,
+  "Home Appliance Repair": <Zap className="w-5 h-5" />,
+  "HVAC & Cooling Specialist": <Zap className="w-5 h-5" />,
+  "Car Detailing & Accessories": <Car className="w-5 h-5" />,
+};
+
+const gradientClasses = {
+  "Car Service & Repair": "from-orange-500 to-orange-600",
+  "Motorcycle Service & Repair": "from-orange-600 to-orange-700",
+  "Truck/Commercial Vehicle Service": "from-blue-500 to-blue-600",
+  "Home Appliance Repair": "from-green-500 to-green-600",
+  "HVAC & Cooling Specialist": "from-purple-500 to-purple-600",
+  "Car Detailing & Accessories": "from-teal-500 to-teal-600",
+};
+
 export default function ServiceDetailsPage() {
   const { id } = useParams();
   const [shopdata, setShopdata] = useState({});
   const [mapCenter, setMapCenter] = useState([51.505, -0.09]);
   const [isMapReady, setIsMapReady] = useState(false);
   const [submitSuccess, setSubmitSuccess] = useState(false);
-  const { user } = useUser(); // use 'user' consistently
+  const { user } = useUser();
 
   useEffect(() => {
     fetch(`/api/shops/${id}`)
       .then((res) => res.json())
       .then((data) => {
+        console.log("Shop Data:", data); // Debug log
         setShopdata(data);
         if (data.shop?.address) {
           geocodeAddress(data.shop.address);
@@ -92,7 +112,7 @@ export default function ServiceDetailsPage() {
 
   const {
     _id,
-    userId, // Owner ID is at the top level, use this for serviceProviderId
+    userId,
     shop = {},
     certifications = [],
     socialLinks = {},
@@ -112,10 +132,41 @@ export default function ServiceDetailsPage() {
     ownerName,
   } = shop;
 
+  console.log("Vehicle Types:", vehicleTypes); // Debug log
+  console.log("Categories:", categories); // Debug log
+
+  // FIXED: Create service sections based on the actual data structure
+  const serviceSections = [];
+  
+  if (vehicleTypes && typeof vehicleTypes === 'object') {
+    Object.entries(vehicleTypes).forEach(([category, categoryData]) => {
+      if (categoryData && typeof categoryData === 'object' && Object.keys(categoryData).length > 0) {
+        serviceSections.push({
+          title: category,
+          data: categoryData,
+          icon: serviceIcons[category] || <Wrench className="w-5 h-5" />,
+          gradient: gradientClasses[category] || "from-orange-500 to-orange-600",
+        });
+      }
+    });
+  }
+
+  // If no services found in vehicleTypes, check if there are categories
+  if (serviceSections.length === 0 && categories && categories.length > 0) {
+    categories.forEach(category => {
+      serviceSections.push({
+        title: category,
+        data: {},
+        icon: serviceIcons[category] || <Wrench className="w-5 h-5" />,
+        gradient: gradientClasses[category] || "from-orange-500 to-orange-600",
+      });
+    });
+  }
+
   const handleMessageContact = async () => {
     const shopId = _id;
     const customerId = user?._id;
-    const serviceProviderId = userId; // Owner ID
+    const serviceProviderId = userId;
 
     console.log("--- Chat Initiation Data ---");
     console.log("Shop ID (Service Entity ID):", shopId);
@@ -134,7 +185,6 @@ export default function ServiceDetailsPage() {
       return;
     }
 
-    // ⭐ NEW CHECK: Prevent chat if the customer is the owner
     if (customerId === serviceProviderId) {
       Swal.fire({
         icon: "info",
@@ -225,12 +275,6 @@ export default function ServiceDetailsPage() {
   const { street, city, country, postalCode } = address;
   const { phone, businessEmail, whatsapp } = contact;
   const { open, close, weekend } = workingHours;
-  const {
-    Car: CarServices = {},
-    Motorcycle = {},
-    "Trucks & Commercial Vehicles": Trucks = {},
-    "Electric Vehicle (EV)": ElectricVehicle = {},
-  } = vehicleTypes;
   const { facebook } = socialLinks;
 
   const fullAddress =
@@ -241,33 +285,6 @@ export default function ServiceDetailsPage() {
       : "Address not provided";
 
   const location = [city, country].filter(Boolean).join(", ");
-
-  const serviceSections = [
-    {
-      title: "Car Services",
-      data: CarServices,
-      icon: <Car className="w-5 h-5" />,
-      gradient: "from-orange-500 to-orange-600",
-    },
-    {
-      title: "Motorcycle Services",
-      data: Motorcycle,
-      icon: <Bike className="w-5 h-5" />,
-      gradient: "from-orange-600 to-orange-700",
-    },
-    {
-      title: "Trucks & Commercial",
-      data: Trucks,
-      icon: <Truck className="w-5 h-5" />,
-      gradient: "from-orange-500 to-orange-600",
-    },
-    {
-      title: "Electric Vehicle (EV)",
-      data: ElectricVehicle,
-      icon: <Zap className="w-5 h-5" />,
-      gradient: "from-orange-600 to-orange-700",
-    },
-  ];
 
   const handleFeedbackSubmit = (data) => {
     if (!data.rating) return null;
@@ -365,10 +382,17 @@ export default function ServiceDetailsPage() {
                 </div>
 
                 <div className="space-y-4">
-                  {categories && (
-                    <span className="inline-block bg-gradient-to-r from-orange-500 to-orange-600 text-white px-4 py-1.5 rounded-full text-sm font-medium shadow-sm">
-                      {categories}
-                    </span>
+                  {categories && categories.length > 0 && (
+                    <div className="flex flex-wrap gap-2">
+                      {categories.map((category, index) => (
+                        <span 
+                          key={index}
+                          className="inline-block bg-gradient-to-r from-orange-500 to-orange-600 text-white px-4 py-1.5 rounded-full text-sm font-medium shadow-sm"
+                        >
+                          {category}
+                        </span>
+                      ))}
+                    </div>
                   )}
 
                   {details && (
@@ -411,47 +435,51 @@ export default function ServiceDetailsPage() {
             <div className="rounded-2xl border border-primary shadow-sm p-8">
               <h2 className="text-2xl font-bold mb-8">Services We Offer</h2>
 
-              <div className="space-y-8">
-                {serviceSections.map(
-                  (section) =>
-                    section.data &&
-                    Object.keys(section.data).length > 0 && (
-                      <div key={section.title} className="space-y-4">
-                        <div className="flex items-center gap-3">
-                          <div
-                            className={`bg-gradient-to-r ${section.gradient} p-2.5 rounded-lg text-white`}
-                          >
-                            {section.icon}
-                          </div>
-                          <h3 className="text-lg font-semibold">
-                            {section.title}
-                          </h3>
+              {serviceSections.length === 0 ? (
+                <div className="text-center py-8">
+                  <p className="text-gray-500 text-lg">
+                    No services listed yet.
+                  </p>
+                </div>
+              ) : (
+                <div className="space-y-8">
+                  {serviceSections.map((section) => (
+                    <div key={section.title} className="space-y-4">
+                      <div className="flex items-center gap-3">
+                        <div
+                          className={`bg-gradient-to-r ${section.gradient} p-2.5 rounded-lg text-white`}
+                        >
+                          {section.icon}
                         </div>
+                        <h3 className="text-lg font-semibold">
+                          {section.title}
+                        </h3>
+                      </div>
 
+                      {section.data && Object.keys(section.data).length > 0 ? (
                         <div className="grid sm:grid-cols-2 gap-4">
                           {Object.entries(section.data).map(
-                            ([category, services]) => (
+                            ([subCategory, services]) => (
                               <div
-                                key={category}
+                                key={subCategory}
                                 className="rounded-xl p-5 border border-primary hover:shadow-md transition-all duration-200"
                               >
                                 <h4 className="font-semibold mb-3 text-sm uppercase tracking-wide">
-                                  {category}
+                                  {subCategory}
                                 </h4>
                                 <ul className="space-y-2">
-                                  {services &&
-                                    services
-                                      .slice(0, 4)
-                                      .map((service, index) => (
-                                        <li
-                                          key={index}
-                                          className="flex items-start text-gray-400 text-sm"
-                                        >
-                                          <Check className="w-4 h-4 text-green-500 mr-2 flex-shrink-0 mt-0.5" />
-                                          <span>{service}</span>
-                                        </li>
-                                      ))}
-                                  {services && services.length > 4 && (
+                                  {Array.isArray(services) && services
+                                    .slice(0, 4)
+                                    .map((service, index) => (
+                                      <li
+                                        key={index}
+                                        className="flex items-start text-gray-400 text-sm"
+                                      >
+                                        <Check className="w-4 h-4 text-green-500 mr-2 flex-shrink-0 mt-0.5" />
+                                        <span>{service}</span>
+                                      </li>
+                                    ))}
+                                  {Array.isArray(services) && services.length > 4 && (
                                     <li className="text-orange-600 font-medium text-xs pt-1">
                                       +{services.length - 4} more
                                     </li>
@@ -461,15 +489,21 @@ export default function ServiceDetailsPage() {
                             )
                           )}
                         </div>
-                      </div>
-                    )
-                )}
-              </div>
+                      ) : (
+                        <p className="text-gray-500 text-sm italic">
+                          No specific services listed for this category.
+                        </p>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
 
             <ReviewShow reviews={shopdata.reviews} />
           </div>
 
+          {/* Right Column - Contact Info, Certifications, etc. */}
           <div className="space-y-6">
             <div className="rounded-2xl border border-primary shadow-sm p-6 space-y-5">
               <h3 className="text-lg font-bold mb-4">Contact Information</h3>

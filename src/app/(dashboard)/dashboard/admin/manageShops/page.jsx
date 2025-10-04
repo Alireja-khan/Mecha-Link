@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import useUser from "@/hooks/useUser";
-import { Check, X, Search, Filter, Download, Store, Clock, User, Mail, MapPin, Eye, Ban, MessageSquare } from "lucide-react";
+import { Check, X, Search, Filter, Download, Store, Clock, User, Mail, MapPin, Eye, Ban, MessageSquare, Trash2 } from "lucide-react";
 import Swal from 'sweetalert2';
 
 // Utility component (for the header stats)
@@ -64,7 +64,6 @@ const formatDateShort = (dateString) => {
     });
 };
 
-
 const ManageShops = () => {
     const { user: loggedInUser, loading: userLoading } = useUser();
     const [shops, setShops] = useState([]);
@@ -73,11 +72,15 @@ const ManageShops = () => {
     const [statusFilter, setStatusFilter] = useState("all");
     const [detailModalOpen, setDetailModalOpen] = useState(false);
     const [selectedShop, setSelectedShop] = useState(null);
-    const [rejectionModalOpen, setRejectionModalOpen] = useState(false);
-    const [shopToReject, setShopToReject] = useState(null);
-    const [rejectionReason, setRejectionReason] = useState("");
+    const [actionModalOpen, setActionModalOpen] = useState(false);
+    const [shopToAction, setShopToAction] = useState(null);
+    const [actionData, setActionData] = useState({
+        latitude: "",
+        longitude: "",
+        status: "pending"
+    });
 
-    // SweetAlert2 Functions (unchanged)
+    // SweetAlert2 Functions
     const showSuccessAlert = (title, message) => {
         Swal.fire({
             title: title,
@@ -153,79 +156,136 @@ const ManageShops = () => {
         fetchShops();
     }, []);
 
-    const handleApprove = async (id) => {
+    const openActionModal = (shop) => {
+        setShopToAction(shop);
+        // Pre-fill existing location data if available
+        setActionData({
+            latitude: shop.shop?.location?.latitude || "",
+            longitude: shop.shop?.location?.longitude || "",
+            status: shop.status || "pending"
+        });
+        setActionModalOpen(true);
+    };
+
+    const handleActionSubmit = async () => {
+        // Validate required fields
+        if (!actionData.latitude || !actionData.longitude) {
+            showErrorAlert('Validation Error', 'Please provide both latitude and longitude');
+            return;
+        }
+
+        // Validate numeric values
+        const lat = parseFloat(actionData.latitude);
+        const lng = parseFloat(actionData.longitude);
+        
+        if (isNaN(lat) || isNaN(lng)) {
+            showErrorAlert('Validation Error', 'Latitude and longitude must be valid numbers');
+            return;
+        }
+
+        if (lat < -90 || lat > 90) {
+            showErrorAlert('Validation Error', 'Latitude must be between -90 and 90');
+            return;
+        }
+
+        if (lng < -180 || lng > 180) {
+            showErrorAlert('Validation Error', 'Longitude must be between -180 and 180');
+            return;
+        }
+
         const result = await showConfirmDialog(
-            'Approve Shop',
-            'Are you sure you want to approve this shop? This will make it visible to users.',
-            'Yes, Approve'
+            'Update Shop Status',
+            `Are you sure you want to update this shop status to ${actionData.status} and set the location?`,
+            'Yes, Update'
         );
 
         if (result.isConfirmed) {
             try {
-                showLoadingAlert('Approving...', 'Please wait while we approve the shop');
+                showLoadingAlert('Updating...', 'Please wait while we update the shop');
 
-                const response = await fetch(`/api/shops/${id}/status`, {
+                const response = await fetch(`/api/shops/${shopToAction._id}/status`, {
                     method: "PATCH",
                     headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ status: "approved" }),
+                    body: JSON.stringify({
+                        status: actionData.status,
+                        location: {
+                            latitude: lat,
+                            longitude: lng
+                        },
+                        ...(actionData.status === "rejected" && { rejectionReason: "Status updated via admin panel" })
+                    }),
                 });
 
-                if (!response.ok) throw new Error('Failed to approve shop');
+                if (!response.ok) throw new Error('Failed to update shop');
 
                 Swal.close();
+                setActionModalOpen(false);
+                setActionData({ latitude: "", longitude: "", status: "pending" });
+                setShopToAction(null);
+
+                // Update the selected shop status if the detail modal is open
+                if (selectedShop?._id === shopToAction._id) {
+                    setSelectedShop(prev => ({ 
+                        ...prev, 
+                        status: actionData.status,
+                        shop: {
+                            ...prev.shop,
+                            location: {
+                                latitude: lat,
+                                longitude: lng
+                            }
+                        }
+                    }));
+                }
+
                 await fetchShops();
-                showSuccessAlert('Approved!', 'The shop has been approved successfully');
-                if (selectedShop?._id === id) setSelectedShop(prev => ({ ...prev, status: "approved" }));
+                showSuccessAlert('Updated!', 'Shop status and location have been updated successfully');
             } catch (error) {
-                console.error('Approval failed:', error);
+                console.error('Update failed:', error);
                 Swal.close();
-                showErrorAlert('Error', 'Failed to approve shop');
+                showErrorAlert('Error', 'Failed to update shop');
             }
         }
     };
 
-    const handleReject = (shop) => {
-        setShopToReject(shop);
-        setRejectionReason(""); // Reset reason
-        setRejectionModalOpen(true);
-    };
+    // Delete shop function
+    const handleDeleteShop = async (shop) => {
+        const result = await showConfirmDialog(
+            'Delete Shop',
+            `Are you sure you want to delete "${shop.shop?.shopName}"? This action cannot be undone.`,
+            'Yes, Delete'
+        );
 
-    const confirmRejection = async () => {
-        if (!rejectionReason.trim()) {
-            showErrorAlert('Validation Error', 'Please provide a reason for rejection');
-            return;
-        }
+        if (result.isConfirmed) {
+            try {
+                showLoadingAlert('Deleting...', 'Please wait while we delete the shop');
 
-        try {
-            showLoadingAlert('Rejecting...', 'Please wait while we reject the shop');
+                const response = await fetch(`/api/shops/${shop._id}`, {
+                    method: "DELETE",
+                    headers: { "Content-Type": "application/json" },
+                });
 
-            const response = await fetch(`/api/shops/${shopToReject._id}/status`, {
-                method: "PATCH",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    status: "rejected",
-                    rejectionReason: rejectionReason.trim()
-                }),
-            });
+                if (!response.ok) throw new Error('Failed to delete shop');
 
-            if (!response.ok) throw new Error('Failed to reject shop');
+                Swal.close();
+                
+                // Close modals if the deleted shop is open
+                if (selectedShop?._id === shop._id) {
+                    setDetailModalOpen(false);
+                    setSelectedShop(null);
+                }
+                if (shopToAction?._id === shop._id) {
+                    setActionModalOpen(false);
+                    setShopToAction(null);
+                }
 
-            Swal.close();
-            setRejectionModalOpen(false);
-            setRejectionReason("");
-
-            // Update the selected shop status if the modal is open
-            if (selectedShop?._id === shopToReject._id) {
-                setSelectedShop(prev => ({ ...prev, status: "rejected", rejectionReason: rejectionReason.trim() }));
+                await fetchShops();
+                showSuccessAlert('Deleted!', 'Shop has been deleted successfully');
+            } catch (error) {
+                console.error('Delete failed:', error);
+                Swal.close();
+                showErrorAlert('Error', 'Failed to delete shop');
             }
-
-            setShopToReject(null);
-            await fetchShops();
-            showSuccessAlert('Rejected!', 'The shop has been rejected successfully');
-        } catch (error) {
-            console.error('Rejection failed:', error);
-            Swal.close();
-            showErrorAlert('Error', 'Failed to reject shop');
         }
     };
 
@@ -248,7 +308,6 @@ const ManageShops = () => {
         return matchesSearch && matchesStatus;
     });
     // ----------------------
-
 
     const getStatusBadge = (status) => {
         const base = "px-2 sm:px-3 py-1 text-xs font-semibold rounded-full border whitespace-nowrap";
@@ -295,30 +354,26 @@ const ManageShops = () => {
                         <span className="text-xs text-gray-500 flex items-center gap-1"><Clock size={12} />{formatDateShort(shop.createdAt)}</span>
                     </div>
                     <div className="flex gap-2">
-                        {shop.status === "pending" && (
-                            <>
-                                <button
-                                    onClick={() => handleApprove(shop._id)}
-                                    className="p-2 bg-green-500/10 text-green-600 rounded-lg border border-green-200 hover:bg-green-500/20 transition-colors"
-                                    title="Approve"
-                                >
-                                    <Check size={16} />
-                                </button>
-                                <button
-                                    onClick={() => handleReject(shop)}
-                                    className="p-2 bg-red-500/10 text-red-600 rounded-lg border border-red-200 hover:bg-red-500/20 transition-colors"
-                                    title="Reject"
-                                >
-                                    <X size={16} />
-                                </button>
-                            </>
-                        )}
+                        <button
+                            onClick={() => openActionModal(shop)}
+                            className="p-2 bg-green-500/10 text-green-600 rounded-lg border border-green-200 hover:bg-green-500/20 transition-colors"
+                            title="Update Status & Location"
+                        >
+                            <Check size={16} />
+                        </button>
                         <button
                             onClick={() => openDetailModal(shop)}
                             className="p-2 bg-orange-500/10 text-orange-600 rounded-lg border border-orange-200 hover:bg-orange-500/20 transition-colors"
                             title="View Details"
                         >
                             <Eye size={16} />
+                        </button>
+                        <button
+                            onClick={() => handleDeleteShop(shop)}
+                            className="p-2 bg-red-500/10 text-red-600 rounded-lg border border-red-200 hover:bg-red-500/20 transition-colors"
+                            title="Delete Shop"
+                        >
+                            <Trash2 size={16} />
                         </button>
                     </div>
                 </div>
@@ -460,33 +515,27 @@ const ManageShops = () => {
                                         </td>
                                         <td className="px-6 py-4">
                                             <div className="flex justify-center gap-2">
-                                                {shop.status === "pending" && (
-                                                    <>
-                                                        <button
-                                                            onClick={() => handleApprove(shop._id)}
-                                                            className="p-2 bg-green-500/10 text-green-600 rounded-xl border border-green-200 hover:bg-green-500/20 hover:scale-105 transition-all duration-200"
-                                                            title="Approve"
-                                                        >
-                                                            <Check size={16} />
-                                                        </button>
-                                                        <button
-                                                            onClick={() => handleReject(shop)}
-                                                            className="p-2 bg-red-500/10 text-red-600 rounded-xl border border-red-200 hover:bg-red-500/20 hover:scale-105 transition-all duration-200"
-                                                            title="Reject"
-                                                        >
-                                                            <X size={16} />
-                                                        </button>
-                                                    </>
-                                                )}
-                                                {(shop.status === "approved" || shop.status === "rejected") && (
-                                                    <button
-                                                        onClick={() => openDetailModal(shop)}
-                                                        className="p-2 bg-orange-500/10 text-orange-600 rounded-xl border border-orange-200 hover:bg-orange-500/20 hover:scale-105 transition-all duration-200"
-                                                        title="View Details"
-                                                    >
-                                                        <Eye size={16} />
-                                                    </button>
-                                                )}
+                                                <button
+                                                    onClick={() => openActionModal(shop)}
+                                                    className="p-2 bg-green-500/10 text-green-600 rounded-xl border border-green-200 hover:bg-green-500/20 hover:scale-105 transition-all duration-200"
+                                                    title="Update Status & Location"
+                                                >
+                                                    <Check size={16} />
+                                                </button>
+                                                <button
+                                                    onClick={() => openDetailModal(shop)}
+                                                    className="p-2 bg-orange-500/10 text-orange-600 rounded-xl border border-orange-200 hover:bg-orange-500/20 hover:scale-105 transition-all duration-200"
+                                                    title="View Details"
+                                                >
+                                                    <Eye size={16} />
+                                                </button>
+                                                <button
+                                                    onClick={() => handleDeleteShop(shop)}
+                                                    className="p-2 bg-red-500/10 text-red-600 rounded-xl border border-red-200 hover:bg-red-500/20 hover:scale-105 transition-all duration-200"
+                                                    title="Delete Shop"
+                                                >
+                                                    <Trash2 size={16} />
+                                                </button>
                                             </div>
                                         </td>
                                     </tr>
@@ -571,6 +620,12 @@ const ManageShops = () => {
                                         <p className="text-purple-700"><strong>City:</strong> {selectedShop.shop?.address?.city || "Not provided"}</p>
                                         <p className="text-purple-700"><strong>Country:</strong> {selectedShop.shop?.address?.country || "Not provided"}</p>
                                         <p className="text-purple-700"><strong>Postal Code:</strong> {selectedShop.shop?.address?.postalCode || "Not provided"}</p>
+                                        {selectedShop.shop?.location && (
+                                            <>
+                                                <p className="text-purple-700"><strong>Latitude:</strong> {selectedShop.shop.location.latitude || "Not set"}</p>
+                                                <p className="text-purple-700"><strong>Longitude:</strong> {selectedShop.shop.location.longitude || "Not set"}</p>
+                                            </>
+                                        )}
                                     </div>
                                 </div>
 
@@ -625,45 +680,38 @@ const ManageShops = () => {
                                 >
                                     Close
                                 </button>
-                                {selectedShop.status === "pending" && (
-                                    <>
-                                        <button
-                                            onClick={() => {
-                                                setDetailModalOpen(false);
-                                                handleApprove(selectedShop._id);
-                                            }}
-                                            className="px-6 py-3 bg-green-500 text-white rounded-xl font-semibold transition-all duration-300 hover:bg-green-600 hover:scale-105 shadow-lg hover:shadow-xl"
-                                        >
-                                            Approve Shop
-                                        </button>
-                                        <button
-                                            onClick={() => {
-                                                setDetailModalOpen(false);
-                                                handleReject(selectedShop);
-                                            }}
-                                            className="px-6 py-3 bg-red-500 text-white rounded-xl font-semibold transition-all duration-300 hover:bg-red-600 hover:scale-105 shadow-lg hover:shadow-xl"
-                                        >
-                                            Reject Shop
-                                        </button>
-                                    </>
-                                )}
+                                <button
+                                    onClick={() => handleDeleteShop(selectedShop)}
+                                    className="px-6 py-3 bg-red-500 text-white rounded-xl font-semibold transition-all duration-300 hover:bg-red-600 hover:scale-105 shadow-lg hover:shadow-xl"
+                                >
+                                    Delete Shop
+                                </button>
+                                <button
+                                    onClick={() => {
+                                        setDetailModalOpen(false);
+                                        openActionModal(selectedShop);
+                                    }}
+                                    className="px-6 py-3 bg-green-500 text-white rounded-xl font-semibold transition-all duration-300 hover:bg-green-600 hover:scale-105 shadow-lg hover:shadow-xl"
+                                >
+                                    Update Status & Location
+                                </button>
                             </div>
                         </div>
                     </div>
                 </div>
             )}
 
-            {/* Rejection Reason Modal */}
-            {rejectionModalOpen && shopToReject && (
+            {/* Action Modal for Status & Location Update */}
+            {actionModalOpen && shopToAction && (
                 <div className="fixed inset-0 flex items-center justify-center backdrop-blur-md z-50 p-4">
                     <div className="bg-white rounded-3xl p-6 sm:p-8 w-full max-w-md border border-orange-100 shadow-2xl">
                         <div className="flex justify-between items-center mb-6">
-                            <h2 className="text-xl sm:text-2xl font-bold text-gray-900">Reject Shop</h2>
+                            <h2 className="text-xl sm:text-2xl font-bold text-gray-900">Update Shop</h2>
                             <button
                                 onClick={() => {
-                                    setRejectionModalOpen(false);
-                                    setRejectionReason("");
-                                    setShopToReject(null);
+                                    setActionModalOpen(false);
+                                    setActionData({ latitude: "", longitude: "", status: "pending" });
+                                    setShopToAction(null);
                                 }}
                                 className="p-2 bg-orange-50 text-orange-600 rounded-xl border border-orange-200 hover:bg-orange-100 transition-colors duration-200"
                             >
@@ -673,34 +721,65 @@ const ManageShops = () => {
 
                         <div className="space-y-4">
                             <p className="text-gray-700 text-sm sm:text-base">
-                                Please provide a reason for rejecting <strong>{shopToReject.shop?.shopName}</strong>:
+                                Update status and location for <strong>{shopToAction.shop?.shopName}</strong>:
                             </p>
 
-                            <textarea
-                                value={rejectionReason}
-                                onChange={(e) => setRejectionReason(e.target.value)}
-                                placeholder="Enter rejection reason..."
-                                className="w-full p-4 border border-orange-200 rounded-xl bg-orange-50/50 focus:bg-white focus:border-orange-300 focus:outline-none transition-all duration-300 resize-none text-sm"
-                                rows={4}
-                                required
-                            ></textarea>
+                            {/* Status Selection */}
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">Status</label>
+                                <select
+                                    value={actionData.status}
+                                    onChange={(e) => setActionData(prev => ({ ...prev, status: e.target.value }))}
+                                    className="w-full p-3 border border-orange-200 rounded-xl bg-orange-50/50 focus:bg-white focus:border-orange-300 focus:outline-none transition-all duration-300 text-sm"
+                                >
+                                    <option value="pending">Pending</option>
+                                    <option value="approved">Approved</option>
+                                    <option value="rejected">Rejected</option>
+                                </select>
+                            </div>
+
+                            {/* Latitude Field */}
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">Latitude</label>
+                                <input
+                                    type="text"
+                                    placeholder="Enter latitude (e.g., 40.7128)"
+                                    value={actionData.latitude}
+                                    onChange={(e) => setActionData(prev => ({ ...prev, latitude: e.target.value }))}
+                                    className="w-full p-3 border border-orange-200 rounded-xl bg-orange-50/50 focus:bg-white focus:border-orange-300 focus:outline-none transition-all duration-300 text-sm"
+                                />
+                                <p className="text-xs text-gray-500 mt-1">Must be between -90 and 90</p>
+                            </div>
+
+                            {/* Longitude Field */}
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">Longitude</label>
+                                <input
+                                    type="text"
+                                    placeholder="Enter longitude (e.g., -74.0060)"
+                                    value={actionData.longitude}
+                                    onChange={(e) => setActionData(prev => ({ ...prev, longitude: e.target.value }))}
+                                    className="w-full p-3 border border-orange-200 rounded-xl bg-orange-50/50 focus:bg-white focus:border-orange-300 focus:outline-none transition-all duration-300 text-sm"
+                                />
+                                <p className="text-xs text-gray-500 mt-1">Must be between -180 and 180</p>
+                            </div>
 
                             <div className="flex justify-end gap-3 pt-4 flex-wrap">
                                 <button
                                     onClick={() => {
-                                        setRejectionModalOpen(false);
-                                        setRejectionReason("");
-                                        setShopToReject(null);
+                                        setActionModalOpen(false);
+                                        setActionData({ latitude: "", longitude: "", status: "pending" });
+                                        setShopToAction(null);
                                     }}
                                     className="px-6 py-3 bg-white text-gray-700 rounded-xl font-semibold border border-orange-200 hover:bg-orange-50 transition-all duration-300"
                                 >
                                     Cancel
                                 </button>
                                 <button
-                                    onClick={confirmRejection}
-                                    className="px-6 py-3 bg-red-500 text-white rounded-xl font-semibold transition-all duration-300 hover:bg-red-600 hover:scale-105 shadow-lg hover:shadow-xl"
+                                    onClick={handleActionSubmit}
+                                    className="px-6 py-3 bg-green-500 text-white rounded-xl font-semibold transition-all duration-300 hover:bg-green-600 hover:scale-105 shadow-lg hover:shadow-xl"
                                 >
-                                    Confirm Rejection
+                                    Submit
                                 </button>
                             </div>
                         </div>
