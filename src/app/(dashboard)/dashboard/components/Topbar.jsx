@@ -11,9 +11,7 @@ import {
   User,
 } from "lucide-react";
 import useUser from "@/hooks/useUser";
-import AdminNotifications from "./AdminNotifications";
-import NotificationCanvas from "./NotificationCanvas";
-import axios from "axios";
+import NotificationWidget from "@/app/shared/NotificationWidget";
 
 const transitionClasses = "transition duration-200 ease-in-out";
 
@@ -108,76 +106,6 @@ const UserDropdown = ({ loggedInUser, roleConfig }) => {
 const Topbar = ({ pageTitle = "Dashboard", setIsMobileOpen }) => {
   const { user: loggedInUser } = useUser();
 
-  const [notifications, setNotifications] = useState([]);
-  const [showCanvas, setShowCanvas] = useState(false);
-
-  useEffect(() => {
-    const fetchNotifications = async () => {
-      try {
-        const res = await axios.get("/api/notifications");
-        if (res.data) {
-          let filtered = res.data;
-
-          if (loggedInUser?.role === "admin") {
-            filtered = res.data;
-          } else if (loggedInUser?.role === "mechanic") {
-            filtered = res.data.filter((n) =>
-              ["serviceRequest", "coupon", "announcement"].includes(n.type)
-            );
-          } else if (loggedInUser?.role === "user") {
-            filtered = res.data.filter((n) =>
-              ["coupon", "announcement"].includes(n.type)
-            );
-          }
-
-          setNotifications(filtered);
-        }
-      } catch (err) {
-        console.error("Failed to fetch notifications:", err);
-      }
-    };
-
-    if (loggedInUser) {
-      fetchNotifications();
-    }
-  }, [loggedInUser]);
-
-  const handleNewNotification = (msg) => {
-    if (!loggedInUser) return;
-
-    if (loggedInUser.role === "admin") {
-      setNotifications((prev) => [msg, ...prev]);
-    } else if (loggedInUser.role === "mechanic") {
-      if (["serviceRequest", "coupon", "announcement"].includes(msg.type)) {
-        setNotifications((prev) => [msg, ...prev]);
-      }
-    } else if (loggedInUser.role === "user") {
-      if (["coupon", "announcement"].includes(msg.type)) {
-        setNotifications((prev) => [msg, ...prev]);
-      }
-    }
-  };
-
-  const handleDeleteNotification = async (id) => {
-    try {
-      await axios.delete(`/api/notifications/${id}`);
-      setNotifications((prev) => prev.filter((notif) => notif._id !== id));
-    } catch (error) {
-      console.error("Failed to delete notification:", error);
-    }
-  };
-
-  const handleMarkAsRead = async () => {
-    try {
-      const unreadNotifications = notifications.filter((n) => !n.read);
-      for (const notif of unreadNotifications) {
-        await axios.patch(`/api/notifications/${notif._id}`, { read: true });
-      }
-      setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
-    } catch (err) {
-      console.error("Failed to mark notifications as read:", err);
-    }
-  };
 
   const getRoleStyles = (role) => {
     switch (role) {
@@ -206,7 +134,6 @@ const Topbar = ({ pageTitle = "Dashboard", setIsMobileOpen }) => {
   };
 
   const roleConfig = loggedInUser ? getRoleStyles(loggedInUser.role) : null;
-  const unreadCount = notifications.filter((n) => !n.read).length;
 
   return (
     <header className="sticky top-0 z-20 flex items-center justify-between px-4 sm:px-8 md:px-10 py-3 sm:py-2 border-b border-gray-100 bg-white">
@@ -223,31 +150,9 @@ const Topbar = ({ pageTitle = "Dashboard", setIsMobileOpen }) => {
         </h1>
       </div>
 
-      <div className="flex items-center gap-3 sm:gap-4 md:gap-6">
-        <AdminNotifications onNewNotification={handleNewNotification} />
-
-        <div className="relative">
-          <button
-            title="Notifications"
-            className="p-3 sm:p-3.5 rounded-full text-gray-600 hover:bg-orange-50 hover:text-orange-600 transition duration-150 relative group"
-            onClick={() => {
-              setShowCanvas(true);
-              handleMarkAsRead();
-            }}
-          >
-            <Bell size={22} className="sm:w-6 sm:h-6" />
-            {unreadCount > 0 && (
-              <span className="absolute top-1 -right-1 min-w-5 min-h-5 text-[11px] sm:text-sm text-white bg-red-600 rounded-full flex justify-center items-center px-[3px] font-bold">
-                {unreadCount}
-              </span>
-            )}
-            <span
-              className={`absolute -bottom-8 left-1/2 -translate-x-1/2 px-2 py-1 text-[11px] sm:text-sm bg-gray-800 text-white rounded opacity-0 group-hover:opacity-100 ${transitionClasses} hidden sm:block pointer-events-none`}
-            >
-              Notifications
-            </span>
-          </button>
-        </div>
+      <div className="flex items-center gap-5">
+        {/* Notification Widget */}
+        {loggedInUser && <NotificationWidget loggedInUser={loggedInUser} />}
 
         {roleConfig && (
           <button
@@ -259,52 +164,32 @@ const Topbar = ({ pageTitle = "Dashboard", setIsMobileOpen }) => {
           </button>
         )}
 
-        <UserDropdown loggedInUser={loggedInUser} roleConfig={roleConfig} />
-      </div>
-
-      <NotificationCanvas
-        isOpen={showCanvas}
-        title="Notifications"
-        onClose={() => setShowCanvas(false)}
-      >
-        {notifications.length === 0 ? (
-          <p className="p-5 text-sm text-gray-500">No new notifications</p>
-        ) : (
-          notifications.map((notif) => {
-            const createdAt = notif.createdAt
-              ? new Date(notif.createdAt).toLocaleString()
-              : "Date not available";
-
-            return (
-              <div
-                key={notif._id}
-                className="flex flex-col gap-2 px-5 py-3 border-b border-gray-100 hover:bg-gray-50 transition"
+        {/* User Info */}
+        {loggedInUser && (
+          <div className="flex items-center gap-2 cursor-pointer py-1 pl-1 pr-6 rounded-full hover:bg-gray-100 transition">
+            <img
+              src={
+                loggedInUser.profileImage
+                  ? loggedInUser.profileImage
+                  : `https://ui-avatars.com/api/?name=${loggedInUser.name}&background=f97316&color=fff&bold=true`
+              }
+              alt={loggedInUser.name || "User Avatar"}
+              className="w-10 h-10 rounded-full border-2 border-orange-500"
+            />
+            <div className="hidden md:flex flex-col text-left">
+              <span className="text-sm font-semibold text-gray-900">
+                {loggedInUser.name || "Unknown User"}
+              </span>
+              <span
+                className={`text-xs font-medium px-2 py-0.5 rounded-md border ${roleConfig.badgeColor}`}
               >
-                <div className="flex justify-between items-start">
-                  <p
-                    className={`text-sm font-semibold ${!notif.read ? "text-gray-900" : "text-gray-700"
-                      }`}
-                  >
-                    {notif.message || "Notification"}
-                  </p>
-                  <button
-                    className="text-gray-400 hover:text-red-600 text-xs font-bold transition duration-150"
-                    onClick={() => handleDeleteNotification(notif._id)}
-                  >
-                    ✕
-                  </button>
-                </div>
-                {notif.data && (
-                  <p className="text-xs text-gray-500 truncate">
-                    {JSON.stringify(notif.data)}
-                  </p>
-                )}
-                <p className="text-[11px] text-gray-400 self-end">{createdAt}</p>
-              </div>
-            );
-          })
+                {loggedInUser.role.charAt(0).toUpperCase() +
+                  loggedInUser.role.slice(1)}
+              </span>
+            </div>
+          </div>
         )}
-      </NotificationCanvas>
+      </div>
     </header>
   );
 };
