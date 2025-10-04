@@ -22,29 +22,17 @@ import { useParams } from "next/navigation";
 import Swal from 'sweetalert2';
 import useUser from "@/hooks/useUser";
 
-
-
-
 const ServiceRequestDetails = () => {
    const [selectedImage, setSelectedImage] = useState(null);
    const [request, setRequest] = useState(null);
    const { id } = useParams();
    const { user: loggedInUser, status } = useUser();
 
-
-
-
    const customerUserId = request?.userId;
    const currentMechanicId = loggedInUser?._id;
 
-
-
-
    useEffect(() => {
        if (!id) return; // Guard against missing ID
-
-
-
 
        fetch(`/api/service-request/${id}`)
            .then(response => {
@@ -59,17 +47,11 @@ const ServiceRequestDetails = () => {
                }
                setRequest(data);
 
-
-
-
                // --- START Console Log Additions ---
                const serviceRequestId = id;
                const customerId = data.userId;
                // currentMechanicId here is the ID of the logged-in user viewing the page.
                const viewerId = loggedInUser?._id;
-
-
-
 
                console.log("--- Service Request IDs ---");
                console.log("Service Request ID (from URL):", serviceRequestId);
@@ -77,9 +59,6 @@ const ServiceRequestDetails = () => {
                console.log("Current Logged-in User ID (Mechanic/Viewer):", viewerId);
                console.log("---------------------------");
                // --- END Console Log Additions ---
-
-
-
 
            })
            .catch(error => {
@@ -93,9 +72,6 @@ const ServiceRequestDetails = () => {
            });
    }, [id, loggedInUser?._id]) // Added loggedInUser?._id as a dependency
 
-
-
-
    if (!request) {
        return (
            <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -107,9 +83,6 @@ const ServiceRequestDetails = () => {
        );
    }
 
-
-
-
    const statusConfig = {
        pending: { color: "bg-yellow-100 text-yellow-800 border-yellow-200", icon: Clock, label: "Pending" },
        accepted: { color: "bg-orange-100 text-orange-800 border-orange-200", icon: CheckCircle, label: "Accepted" },
@@ -118,14 +91,8 @@ const ServiceRequestDetails = () => {
        cancelled: { color: "bg-red-100 text-red-800 border-red-200", icon: XCircle, label: "Cancelled" }
    };
 
-
-
-
    const statusInfo = statusConfig[request.status?.toLowerCase()] || statusConfig.pending;
    const StatusIcon = statusInfo.icon;
-
-
-
 
    const urgencyConfig = {
        low: { color: "text-green-600 bg-green-50", label: "Low Priority" },
@@ -134,36 +101,18 @@ const ServiceRequestDetails = () => {
        emergency: { color: "text-red-600 bg-red-50", label: "Emergency" }
    };
 
-
-
-
    const urgencyInfo = urgencyConfig[request.serviceDetails?.urgency] || urgencyConfig.medium;
-
-
-
 
    // --- REMOVED MOCK_MECHANIC_EMAIL and isMockMechanic logic ---
    const loggedInUserRole = loggedInUser?.role?.toLowerCase();
 
-
-
-
    const isCustomerViewingOwnRequest = loggedInUser?._id === request.userId;
-
-
-
 
    const showMessagingButton = loggedInUserRole === 'mechanic' && !isCustomerViewingOwnRequest;
    const showCallButton = loggedInUserRole === 'mechanic' && !isCustomerViewingOwnRequest;
 
-
-
-
    // Check if the user is an Admin to show the clear all button
    const showAdminClearButton = loggedInUserRole === 'admin';
-
-
-
 
    const nonMechanicMessage = isCustomerViewingOwnRequest
        ? "This is your service request. Contact options are for service providers."
@@ -171,17 +120,11 @@ const ServiceRequestDetails = () => {
            ? "Messaging is disabled for Admin review."
            : "";
 
-
-
-
    const handleAcceptRequest = async () => {
        if (loggedInUserRole !== 'mechanic') {
            Swal.fire({ icon: 'warning', title: 'Permission Denied', text: 'Only a mechanic can accept this request.', confirmButtonColor: '#f97316' });
            return;
        }
-
-
-
 
        try {
            const response = await fetch(`/api/service-requests/${id}`, {
@@ -195,9 +138,6 @@ const ServiceRequestDetails = () => {
                    acceptedDate: new Date().toISOString()
                })
            });
-
-
-
 
            if (response.ok) {
                // --- REMOVED SUCCESS ALERT ---
@@ -221,13 +161,6 @@ const ServiceRequestDetails = () => {
        }
    };
 
-
-
-
-
-
-
-
    const handleContactCustomer = () => {
        const phoneNumber = request.contactInfo?.phoneNumber;
        if (phoneNumber) {
@@ -235,14 +168,8 @@ const ServiceRequestDetails = () => {
        }
    };
 
-
-
-
    const handleMessageContact = async () => {
        const serviceRequestId = request._id;
-
-
-
 
        if (!serviceRequestId || !customerUserId || !currentMechanicId) {
            Swal.fire({
@@ -254,9 +181,6 @@ const ServiceRequestDetails = () => {
            return;
        }
 
-
-
-
        const result = await Swal.fire({
            title: 'Start Conversation?',
            html: `Do you want to start an in-app chat for service request **#${serviceRequestId}**?`,
@@ -267,13 +191,7 @@ const ServiceRequestDetails = () => {
            confirmButtonColor: '#f97316'
        });
 
-
-
-
        if (!result.isConfirmed) return;
-
-
-
 
        try {
            const apiResponse = await fetch('/api/chats', {
@@ -286,24 +204,12 @@ const ServiceRequestDetails = () => {
                })
            });
 
-
-
-
            const data = await apiResponse.json();
-
-
-
 
            const chatPath = `/dashboard/${loggedInUserRole}/messages`;
 
-
-
-
            // --- REMOVED SUCCESS/RETRIEVED ALERT ---
            window.location.href = chatPath;
-
-
-
 
        } catch (error) {
            Swal.fire({
@@ -315,15 +221,9 @@ const ServiceRequestDetails = () => {
        }
    };
 
-
-
-
    const handleOpenMaps = () => {
        const { latitude, longitude } = request.location || {};
        const address = encodeURIComponent(request.location?.address || "Service Location");
-
-
-
 
        if (latitude && longitude) {
            // Updated mapsUrl to use standard Google Maps format
@@ -342,9 +242,6 @@ const ServiceRequestDetails = () => {
            });
        }
    };
-
-
-
 
    return (
        <div className="min-h-screen py-10 sm:py-12">
@@ -365,9 +262,6 @@ const ServiceRequestDetails = () => {
                            </p>
                        </div>
 
-
-
-
                        <div className="flex flex-col sm:flex-row gap-3 w-full lg:w-auto">
                            {showCallButton && (
                                <button
@@ -378,9 +272,6 @@ const ServiceRequestDetails = () => {
                                    Call Customer
                                </button>
                            )}
-
-
-
 
                            {showMessagingButton ? (
                                <button
@@ -399,9 +290,6 @@ const ServiceRequestDetails = () => {
                    </div>
                </div>
 
-
-
-
                <div className="grid lg:grid-cols-3 gap-6">
                    <div className="lg:col-span-2 space-y-6">
                        <InfoCard title="Service Information" icon={Wrench}>
@@ -419,18 +307,12 @@ const ServiceRequestDetails = () => {
                            </div>
                        </InfoCard>
 
-
-
-
                        <InfoCard title="Problem Details" icon={AlertTriangle}>
                            <div className="flex items-center gap-3 mb-4 -mt-2">
                                <span className={`px-3 py-1 rounded-full text-xs font-medium ${urgencyInfo.color}`}>
                                    {urgencyInfo.label}
                                </span>
                            </div>
-
-
-
 
                            <div className="space-y-4">
                                <DetailItem label="Problem Title" value={request.serviceDetails?.problemTitle} largeValue />
@@ -440,9 +322,6 @@ const ServiceRequestDetails = () => {
                                        {request.serviceDetails?.description || "No detailed description provided by the customer."}
                                    </p>
                                </div>
-
-
-
 
                                {request.serviceDetails?.images?.length > 0 && (
                                    <div>
@@ -468,9 +347,6 @@ const ServiceRequestDetails = () => {
                            </div>
                        </InfoCard>
 
-
-
-
                        <InfoCard title="Service Location" icon={MapPin}>
                            <div className="space-y-3">
                                <DetailItem label="Address" value={request.location?.address} largeValue />
@@ -483,9 +359,6 @@ const ServiceRequestDetails = () => {
                                </button>
                            </div>
                        </InfoCard>
-
-
-
 
                        <InfoCard title="Request Timeline" icon={Clock}>
                            <div className="space-y-2">
@@ -519,9 +392,6 @@ const ServiceRequestDetails = () => {
                        </InfoCard>
                    </div>
 
-
-
-
                    <div className="space-y-6">
                        <InfoCard title="Customer Information" icon={User}>
                            <div className="space-y-4">
@@ -543,14 +413,8 @@ const ServiceRequestDetails = () => {
                                    )}
                                </div>
 
-
-
-
                                <DetailItem label="Full Name" value={request?.userName || "Not Provided"} />
                                <DetailItem label="Email" value={request.user?.email || request.userEmail} icon={Mail} />
-
-
-
 
                                <div className="pt-4 border-t border-gray-100 space-y-3">
                                    <h3 className="text-sm font-semibold text-gray-400">Request Contact</h3>
@@ -569,9 +433,6 @@ const ServiceRequestDetails = () => {
                                </div>
                            </div>
                        </InfoCard>
-
-
-
 
                        <InfoCard title="Schedule & Budget" icon={CalendarClock}>
                            <div className="space-y-3">
@@ -607,9 +468,6 @@ const ServiceRequestDetails = () => {
                            </div>
                        </InfoCard>
 
-
-
-
                        {loggedInUserRole === 'mechanic' && request.status === 'pending' && (
                            <div className="bg-white rounded-xl shadow-lg border border-gray-100 p-6">
                                <h2 className="text-xl font-semibold mb-4 text-orange-600">Service Action</h2>
@@ -638,9 +496,6 @@ const ServiceRequestDetails = () => {
                    </div>
                </div>
            </div>
-
-
-
 
            {selectedImage && (
                <div
@@ -672,9 +527,6 @@ const ServiceRequestDetails = () => {
    );
 };
 
-
-
-
 const InfoCard = ({ title, icon: Icon, children }) => (
    <div className="rounded-xl shadow-lg border border-primary p-6">
        <div className="flex items-center gap-3 mb-5 border-b border-primary pb-3">
@@ -684,9 +536,6 @@ const InfoCard = ({ title, icon: Icon, children }) => (
        {children}
    </div>
 );
-
-
-
 
 const DetailItem = ({ label, value, icon: Icon, capitalize = false, largeValue = false }) => (
    <div>
@@ -700,15 +549,9 @@ const DetailItem = ({ label, value, icon: Icon, capitalize = false, largeValue =
    </div>
 );
 
-
-
-
 const TimelineItem = ({ date, title, description, active = false, pending = false }) => {
    const color = active ? 'bg-orange-500' : pending ? 'bg-gray-300' : 'bg-green-500';
    const textColor = active ? 'font-semibold' : 'text-gray-400';
-
-
-
 
    return (
        <div className="flex gap-3 relative">
@@ -728,8 +571,5 @@ const TimelineItem = ({ date, title, description, active = false, pending = fals
        </div>
    );
 };
-
-
-
 
 export default ServiceRequestDetails;

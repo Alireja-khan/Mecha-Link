@@ -365,6 +365,10 @@ export default function MechanicShop() {
 
         const categoriesToProcess = data.shop.categories ? [data.shop.categories] : [];
 
+        const currentUserId = loggedInUser?._id || session?.user?.email || "unknown-user-id";
+        const currentUserEmail = session?.user?.email || loggedInUser?.email || data.businessEmail;
+        const currentUserName = loggedInUser?.name || session?.user?.name || "Not provided";
+
         const services = {};
         for (const category of categoriesToProcess) {
             const categoryData = data.shop.vehicleTypes?.[category]?.categories;
@@ -372,7 +376,7 @@ export default function MechanicShop() {
                 services[category] = {};
                 for (const [subCategory, serviceArray] of Object.entries(categoryData)) {
                     const validServices = Array.isArray(serviceArray)
-                        ? serviceArray.filter(service => service)
+                        ? serviceArray.filter((service) => service)
                         : [];
 
                     if (validServices.length > 0) {
@@ -388,31 +392,38 @@ export default function MechanicShop() {
             vehicleTypes: services,
             contact: {
                 ...data.shop.contact,
-                email: data.businessEmail || null,
+                email: data.businessEmail || currentUserEmail || null,
             },
             logo: logoUrl || null,
-            ownerName: "User Name",
-            ownerEmail: "user@email.com"
+            ownerName: currentUserName,
+            ownerEmail: currentUserEmail,
         };
 
         const payload = {
-            userId: "temp-user-id",
-            userEmail: "user@email.com",
+            userId: currentUserId,
+            userEmail: currentUserEmail,
             shop: shopData,
             certifications: data.certifications,
             socialLinks: data.socialLinks,
             status: "pending",
             createdAt: new Date().toISOString(),
-            updatedAt: new Date().toISOString()
+            updatedAt: new Date().toISOString(),
         };
 
         try {
-            toast.success("Mock API submission successful. (Check console)");
-            console.log("Submitted Payload:", payload);
-            reset();
-            setLogoUrl('');
+            const res = await axios.post("/api/shops", payload);
+
+            if (res.status === 200 || res.status === 201) {
+                toast.success("Shop submitted for approval! It will be visible after admin approval. ✅");
+                reset();
+                setLogoUrl("");
+            } else {
+                toast.error(res.data.message || "Failed to add shop");
+            }
         } catch (error) {
-            toast.error("Submission failed.");
+            const errorMessage = error.response?.data?.message || "Submission failed. Please check your network and form fields.";
+            console.error("Submission Error:", error);
+            toast.error(errorMessage);
         } finally {
             setIsLoading(false);
         }
