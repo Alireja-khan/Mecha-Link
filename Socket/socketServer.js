@@ -4,6 +4,7 @@ import {Server} from "socket.io";
 import dotenv from "dotenv";
 import {collections, dbConnect} from "./dbConnect.js";
 import {ObjectId} from "mongodb";
+
 dotenv.config();
 
 const app = express();
@@ -17,8 +18,10 @@ app.use(express.json());
 
 async function start() {
   try {
+    // -----------------------------
+    // MongoDB Collections
+    // -----------------------------
     const serviceRequests = await dbConnect(collections.serviceRequests);
-    const notifications = await dbConnect(collections.notifications);
     const mechanicShopsCollection = await dbConnect(collections.mechanicShops);
     const announcementsCollection = await dbConnect(collections.announcements);
     const couponsCollection = await dbConnect(collections.coupons);
@@ -27,7 +30,7 @@ async function start() {
     console.log("✅ Connected to MongoDB collections");
 
     // -----------------------------
-    // Watch for new service requests
+    // Watch: New Service Requests
     // -----------------------------
     serviceRequests.watch().on("change", async (change) => {
       if (change.operationType === "insert") {
@@ -42,13 +45,11 @@ async function start() {
           read: false,
         };
 
-        // Push to the user who created it
         await usersCollection.updateOne(
           {email: newRequest.userEmail},
           {$push: {notifications: {$each: [notificationDoc], $position: 0}}}
         );
 
-        // Push to all mechanics & admins
         await usersCollection.updateMany(
           {role: {$in: ["mechanic", "admin"]}},
           {$push: {notifications: {$each: [notificationDoc], $position: 0}}}
@@ -59,7 +60,7 @@ async function start() {
     });
 
     // -----------------------------
-    // Watch for assignment updates
+    // Watch: Assignment Updates
     // -----------------------------
     serviceRequests.watch().on("change", async (change) => {
       if (change.operationType === "update") {
@@ -69,24 +70,15 @@ async function start() {
           const serviceId = change.documentKey._id;
           const updatedDoc = await serviceRequests.findOne({_id: serviceId});
 
-          // Fetch assigned shop details
           const shopDoc = await mechanicShopsCollection.findOne({
             _id: new ObjectId(updatedFields.assignedShopId),
           });
-          console.log(shopDoc);
 
           const shopName = shopDoc?.shop?.shopName || "Assigned Shop";
 
-          console.log(
-            "📢 Service Request Assigned:",
-            updatedDoc,
-            "Shop:",
-            shopName
-          );
-
           const notificationDoc = {
             _id: new ObjectId().toString(),
-            userEmail: updatedDoc?.userEmail, // notify the user who created the request
+            userEmail: updatedDoc?.userEmail,
             message: `Service request has been assigned to "${shopName}"`,
             type: "assignment",
             data: {
@@ -98,29 +90,27 @@ async function start() {
             read: false,
           };
 
-          // Push to the user who created it
           await usersCollection.updateOne(
             {email: updatedDoc.userEmail},
             {$push: {notifications: {$each: [notificationDoc], $position: 0}}}
           );
 
-          // Push to all mechanics & admins
           await usersCollection.updateMany(
             {role: {$in: ["admin"]}},
             {$push: {notifications: {$each: [notificationDoc], $position: 0}}}
           );
+
           io.emit("assignmentNotification", notificationDoc);
         }
       }
     });
 
     // -----------------------------
-    // Watch for new mechanic shops
+    // Watch: New Mechanic Shops
     // -----------------------------
     mechanicShopsCollection.watch().on("change", async (change) => {
       if (change.operationType === "insert") {
         const newMechanic = change.fullDocument;
-        console.log("📢 New Mechanic Shop Added:", newMechanic);
 
         const notificationDoc = {
           _id: new ObjectId().toString(),
@@ -132,22 +122,21 @@ async function start() {
           read: false,
         };
 
-        // Push to all mechanics & admins
         await usersCollection.updateMany(
           {role: {$in: ["admin"]}},
           {$push: {notifications: {$each: [notificationDoc], $position: 0}}}
         );
+
         io.emit("mechanicShopNotification", notificationDoc);
       }
     });
 
     // -----------------------------
-    // Watch for new announcements
+    // Watch: New Announcements
     // -----------------------------
     announcementsCollection.watch().on("change", async (change) => {
       if (change.operationType === "insert") {
         const newAnnouncement = change.fullDocument;
-        console.log("📢 New Announcement Added:", newAnnouncement);
 
         const notificationDoc = {
           _id: new ObjectId().toString(),
@@ -159,26 +148,25 @@ async function start() {
           read: false,
         };
 
-        // Push to all mechanics & admins
         await usersCollection.updateMany(
           {role: {$in: ["mechanic", "user"]}},
           {$push: {notifications: {$each: [notificationDoc], $position: 0}}}
         );
+
         io.emit("announcementNotification", notificationDoc);
       }
     });
 
     // -----------------------------
-    // Watch for new coupons
+    // Watch: New Coupons
     // -----------------------------
     couponsCollection.watch().on("change", async (change) => {
       if (change.operationType === "insert") {
         const newCoupon = change.fullDocument;
-        console.log("📢 New Coupon Added:", newCoupon);
 
         const notificationDoc = {
           _id: new ObjectId().toString(),
-          userEmail: "all", // broadcast to all users and mechanics
+          userEmail: "all",
           message: `New coupon available: ${newCoupon.code}`,
           type: "coupon",
           data: newCoupon,
@@ -186,45 +174,63 @@ async function start() {
           read: false,
         };
 
-        // Push to all mechanics & admins
         await usersCollection.updateMany(
           {role: {$in: ["user", "mechanic"]}},
           {$push: {notifications: {$each: [notificationDoc], $position: 0}}}
         );
+
         io.emit("couponNotification", notificationDoc);
       }
     });
 
     // -----------------------------
-    // Socket.io connection events
+    // Socket.io: Chat + Events
     // -----------------------------
     io.on("connection", (socket) => {
-      console.log("socket", socket);
       console.log("⚡ User connected:", socket.id);
 
+      // Join Chat
       socket.on("joinChat", (chatId) => {
         socket.join(chatId);
         console.log(`${socket.id} joined room: ${chatId}`);
       });
 
+      // Send Message
       socket.on("sendMessage", (msg) => {
         io.to(msg.chatId).emit("newMessage", msg);
       });
 
+      // Typing
+      socket.on("typing", (chatId, senderId) => {
+        socket.to(chatId).emit("typing", chatId, senderId);
+      });
+
+      // Stop Typing
+      socket.on("stopTyping", (chatId, senderId) => {
+        socket.to(chatId).emit("stopTyping", chatId, senderId);
+      });
+
+      // Disconnect
       socket.on("disconnect", () => {
         console.log("❌ User disconnected:", socket.id);
       });
     });
 
+    // -----------------------------
+    // Root Route
+    // -----------------------------
     app.get("/", (req, res) => {
-      res.send("Socket.IO server is running!");
+      res.send("🚀 Socket.IO server with Notifications + Chat is running!");
     });
 
+    // -----------------------------
+    // Server Listen
+    // -----------------------------
     server.listen(PORT, () => {
       const host = process.env.PORT
         ? `https://mechalink-socket-server.onrender.com/`
         : `http://localhost:${PORT}`;
-      console.log(`🚀 Socket.IO server running on ${host}`);
+      console.log(`✅ Socket.IO server running on ${host}`);
     });
   } catch (err) {
     console.error("❌ Server error:", err);
