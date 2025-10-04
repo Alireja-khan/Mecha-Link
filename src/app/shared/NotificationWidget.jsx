@@ -11,23 +11,36 @@ const NotificationWidget = ({loggedInUser}) => {
   const [showCanvas, setShowCanvas] = useState(false);
 
   // Load notifications from loggedInUser object
-  useEffect(() => {
-    if (!loggedInUser) return;
-    setNotifications(loggedInUser.notifications || []);
-  }, [loggedInUser]);
+ useEffect(() => {
+  if (!loggedInUser) return;
+  const uniqueNotifs = Array.from(
+    new Map((loggedInUser.notifications || []).map(n => [n._id, n])).values()
+  );
+  setNotifications(uniqueNotifs);
+}, [loggedInUser]);
+
 
   // Handle real-time notifications from socket
   const handleNewNotification = (notif) => {
     if (!loggedInUser) return;
 
-    // Push new notification to local state if relevant
-    if (
-      loggedInUser.role === "admin" ||
-      loggedInUser.role === "mechanic" ||
-      (loggedInUser.role === "user" && notif.userEmail === loggedInUser.email)
-    ) {
-      setNotifications((prev) => [notif, ...prev]);
-    }
+    // Only add if not already in state
+    setNotifications((prev) => {
+      const exists = prev.some((n) => n._id === notif._id);
+if (exists) return prev;
+
+      // Check if this notification is relevant for this user
+      if (
+        loggedInUser.role === "admin" ||
+        loggedInUser.role === "mechanic" ||
+        (loggedInUser.role === "user" &&
+          notif.userEmail === loggedInUser.email) ||
+        notif.userEmail === "all"
+      ) {
+        return [notif, ...prev];
+      }
+      return prev;
+    });
   };
 
   // Mark all notifications as read
