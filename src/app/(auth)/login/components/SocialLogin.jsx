@@ -11,14 +11,14 @@ export default function SocialLogin() {
         <button
           type="button"
           onClick={() => userSocialLogin("google")}
-          className=" p-3 rounded-full cursor-pointer"
+          className="bg-primary text-white p-3 rounded-full cursor-pointer"
         >
           <FaGoogle />
         </button>
         <button
           type="button"
           onClick={() => userSocialLogin("github")}
-          className=" p-3 rounded-full cursor-pointer"
+          className="bg-primary text-white p-3 rounded-full cursor-pointer"
         >
           <FaGithub />
         </button>
