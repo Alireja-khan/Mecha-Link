@@ -49,6 +49,7 @@
     "daisyui": "^5.1.12",
     "eslint": "^9",
     "eslint-config-next": "15.5.3",
+    "fast-glob": "^3.3.3",
     "tailwindcss": "^4.1.13"
   }
 }
