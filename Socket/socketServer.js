@@ -210,7 +210,7 @@ async function start() {
     // -----------------------------
     server.listen(PORT, () => {
       const host = process.env.PORT
-        ? `https://mechalink-socket-server.onrender.com/`
+        ? `https://mechalink-socket-server-production.up.railway.app/`
         : `http://localhost:${PORT}`;
       console.log(`✅ Socket.IO server running on ${host}`);
     });

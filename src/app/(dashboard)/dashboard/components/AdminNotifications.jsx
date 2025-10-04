@@ -3,7 +3,7 @@
 import { useEffect } from "react";
 import { io } from "socket.io-client";
 
-const socket = io("https://mechalink-socket-server.onrender.com", { transports: ["websocket"] });
+const socket = io("https://mechalink-socket-server-production.up.railway.app", { transports: ["websocket"] });
 
 export default function AdminNotifications({ onNewNotification }) {
   useEffect(() => {
