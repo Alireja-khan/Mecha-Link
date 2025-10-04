@@ -168,15 +168,17 @@ const ManageShops = () => {
     };
 
     const handleActionSubmit = async () => {
-        // Validate required fields
-        if (!actionData.latitude || !actionData.longitude) {
-            showErrorAlert('Validation Error', 'Please provide both latitude and longitude');
-            return;
-        }
+    // Validate required fields - only require location when approving
+    if (actionData.status === "approved" && (!actionData.latitude || !actionData.longitude)) {
+        showErrorAlert('Validation Error', 'Please provide both latitude and longitude for approval');
+        return;
+    }
 
-        // Validate numeric values
-        const lat = parseFloat(actionData.latitude);
-        const lng = parseFloat(actionData.longitude);
+    // Validate numeric values only if provided
+    let lat, lng;
+    if (actionData.latitude && actionData.longitude) {
+        lat = parseFloat(actionData.latitude);
+        lng = parseFloat(actionData.longitude);
         
         if (isNaN(lat) || isNaN(lng)) {
             showErrorAlert('Validation Error', 'Latitude and longitude must be valid numbers');
@@ -192,61 +194,72 @@ const ManageShops = () => {
             showErrorAlert('Validation Error', 'Longitude must be between -180 and 180');
             return;
         }
+    }
 
-        const result = await showConfirmDialog(
-            'Update Shop Status',
-            `Are you sure you want to update this shop status to ${actionData.status} and set the location?`,
-            'Yes, Update'
-        );
+    const result = await showConfirmDialog(
+        'Update Shop Status',
+        `Are you sure you want to update this shop status to ${actionData.status}${actionData.status === 'approved' ? ' and set the location' : ''}?`,
+        'Yes, Update'
+    );
 
-        if (result.isConfirmed) {
-            try {
-                showLoadingAlert('Updating...', 'Please wait while we update the shop');
+    if (result.isConfirmed) {
+        try {
+            showLoadingAlert('Updating...', 'Please wait while we update the shop');
 
-                const response = await fetch(`/api/shops/${shopToAction._id}/status`, {
-                    method: "PATCH",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({
-                        status: actionData.status,
-                        location: {
+            const updateData = {
+                status: actionData.status,
+            };
+
+            // Only include location data if coordinates are provided
+            if (actionData.latitude && actionData.longitude) {
+                updateData.location = {
+                    latitude: lat,
+                    longitude: lng
+                };
+            }
+
+            // Add rejection reason for rejected status
+            if (actionData.status === "rejected") {
+                updateData.rejectionReason = "Status updated via admin panel";
+            }
+
+            const response = await fetch(`/api/shops/${shopToAction._id}/status`, {
+                method: "PATCH",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(updateData),
+            });
+
+            if (!response.ok) throw new Error('Failed to update shop');
+
+            Swal.close();
+            setActionModalOpen(false);
+            setActionData({ latitude: "", longitude: "", status: "pending" });
+            setShopToAction(null);
+
+            // Update the selected shop status if the detail modal is open
+            if (selectedShop?._id === shopToAction._id) {
+                setSelectedShop(prev => ({ 
+                    ...prev, 
+                    status: actionData.status,
+                    shop: {
+                        ...prev.shop,
+                        location: actionData.latitude && actionData.longitude ? {
                             latitude: lat,
                             longitude: lng
-                        },
-                        ...(actionData.status === "rejected" && { rejectionReason: "Status updated via admin panel" })
-                    }),
-                });
-
-                if (!response.ok) throw new Error('Failed to update shop');
-
-                Swal.close();
-                setActionModalOpen(false);
-                setActionData({ latitude: "", longitude: "", status: "pending" });
-                setShopToAction(null);
-
-                // Update the selected shop status if the detail modal is open
-                if (selectedShop?._id === shopToAction._id) {
-                    setSelectedShop(prev => ({ 
-                        ...prev, 
-                        status: actionData.status,
-                        shop: {
-                            ...prev.shop,
-                            location: {
-                                latitude: lat,
-                                longitude: lng
-                            }
-                        }
-                    }));
-                }
-
-                await fetchShops();
-                showSuccessAlert('Updated!', 'Shop status and location have been updated successfully');
-            } catch (error) {
-                console.error('Update failed:', error);
-                Swal.close();
-                showErrorAlert('Error', 'Failed to update shop');
+                        } : prev.shop?.location
+                    }
+                }));
             }
+
+            await fetchShops();
+            showSuccessAlert('Updated!', `Shop has been ${actionData.status} successfully`);
+        } catch (error) {
+            console.error('Update failed:', error);
+            Swal.close();
+            showErrorAlert('Error', 'Failed to update shop');
         }
-    };
+    }
+};
 
     // Delete shop function
     const handleDeleteShop = async (shop) => {
@@ -702,90 +715,103 @@ const ManageShops = () => {
             )}
 
             {/* Action Modal for Status & Location Update */}
-            {actionModalOpen && shopToAction && (
-                <div className="fixed inset-0 flex items-center justify-center backdrop-blur-md z-50 p-4">
-                    <div className="bg-white rounded-3xl p-6 sm:p-8 w-full max-w-md border border-orange-100 shadow-2xl">
-                        <div className="flex justify-between items-center mb-6">
-                            <h2 className="text-xl sm:text-2xl font-bold text-gray-900">Update Shop</h2>
-                            <button
-                                onClick={() => {
-                                    setActionModalOpen(false);
-                                    setActionData({ latitude: "", longitude: "", status: "pending" });
-                                    setShopToAction(null);
-                                }}
-                                className="p-2 bg-orange-50 text-orange-600 rounded-xl border border-orange-200 hover:bg-orange-100 transition-colors duration-200"
-                            >
-                                <X size={20} />
-                            </button>
-                        </div>
+{actionModalOpen && shopToAction && (
+    <div className="fixed inset-0 flex items-center justify-center backdrop-blur-md z-50 p-4">
+        <div className="bg-white rounded-3xl p-6 sm:p-8 w-full max-w-md border border-orange-100 shadow-2xl">
+            <div className="flex justify-between items-center mb-6">
+                <h2 className="text-xl sm:text-2xl font-bold text-gray-900">Update Shop</h2>
+                <button
+                    onClick={() => {
+                        setActionModalOpen(false);
+                        setActionData({ latitude: "", longitude: "", status: "pending" });
+                        setShopToAction(null);
+                    }}
+                    className="p-2 bg-orange-50 text-orange-600 rounded-xl border border-orange-200 hover:bg-orange-100 transition-colors duration-200"
+                >
+                    <X size={20} />
+                </button>
+            </div>
 
-                        <div className="space-y-4">
-                            <p className="text-gray-700 text-sm sm:text-base">
-                                Update status and location for <strong>{shopToAction.shop?.shopName}</strong>:
-                            </p>
+            <div className="space-y-4">
+                <p className="text-gray-700 text-sm sm:text-base">
+                    Update status and location for <strong>{shopToAction.shop?.shopName}</strong>:
+                </p>
 
-                            {/* Status Selection */}
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-2">Status</label>
-                                <select
-                                    value={actionData.status}
-                                    onChange={(e) => setActionData(prev => ({ ...prev, status: e.target.value }))}
-                                    className="w-full p-3 border border-orange-200 rounded-xl bg-orange-50/50 focus:bg-white focus:border-orange-300 focus:outline-none transition-all duration-300 text-sm"
-                                >
-                                    <option value="pending">Pending</option>
-                                    <option value="approved">Approved</option>
-                                    <option value="rejected">Rejected</option>
-                                </select>
-                            </div>
-
-                            {/* Latitude Field */}
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-2">Latitude</label>
-                                <input
-                                    type="text"
-                                    placeholder="Enter latitude (e.g., 40.7128)"
-                                    value={actionData.latitude}
-                                    onChange={(e) => setActionData(prev => ({ ...prev, latitude: e.target.value }))}
-                                    className="w-full p-3 border border-orange-200 rounded-xl bg-orange-50/50 focus:bg-white focus:border-orange-300 focus:outline-none transition-all duration-300 text-sm"
-                                />
-                                <p className="text-xs text-gray-500 mt-1">Must be between -90 and 90</p>
-                            </div>
-
-                            {/* Longitude Field */}
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-2">Longitude</label>
-                                <input
-                                    type="text"
-                                    placeholder="Enter longitude (e.g., -74.0060)"
-                                    value={actionData.longitude}
-                                    onChange={(e) => setActionData(prev => ({ ...prev, longitude: e.target.value }))}
-                                    className="w-full p-3 border border-orange-200 rounded-xl bg-orange-50/50 focus:bg-white focus:border-orange-300 focus:outline-none transition-all duration-300 text-sm"
-                                />
-                                <p className="text-xs text-gray-500 mt-1">Must be between -180 and 180</p>
-                            </div>
-
-                            <div className="flex justify-end gap-3 pt-4 flex-wrap">
-                                <button
-                                    onClick={() => {
-                                        setActionModalOpen(false);
-                                        setActionData({ latitude: "", longitude: "", status: "pending" });
-                                        setShopToAction(null);
-                                    }}
-                                    className="px-6 py-3 bg-white text-gray-700 rounded-xl font-semibold border border-orange-200 hover:bg-orange-50 transition-all duration-300"
-                                >
-                                    Cancel
-                                </button>
-                                <button
-                                    onClick={handleActionSubmit}
-                                    className="px-6 py-3 bg-green-500 text-white rounded-xl font-semibold transition-all duration-300 hover:bg-green-600 hover:scale-105 shadow-lg hover:shadow-xl"
-                                >
-                                    Submit
-                                </button>
-                            </div>
-                        </div>
-                    </div>
+                {/* Status Selection */}
+                <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Status</label>
+                    <select
+                        value={actionData.status}
+                        onChange={(e) => setActionData(prev => ({ ...prev, status: e.target.value }))}
+                        className="w-full p-3 border border-orange-200 rounded-xl bg-orange-50/50 focus:bg-white focus:border-orange-300 focus:outline-none transition-all duration-300 text-sm"
+                    >
+                        <option value="pending">Pending</option>
+                        <option value="approved">Approved</option>
+                        <option value="rejected">Rejected</option>
+                    </select>
                 </div>
-            )}
+
+                {/* === PUT THE CONDITIONAL LOCATION FIELDS RIGHT HERE === */}
+                {actionData.status === "approved" && (
+                    <>
+                        {/* Latitude Field */}
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                                Latitude *
+                            </label>
+                            <input
+                                type="text"
+                                placeholder="Enter latitude (e.g., 40.7128)"
+                                value={actionData.latitude}
+                                onChange={(e) => setActionData(prev => ({ ...prev, latitude: e.target.value }))}
+                                className="w-full p-3 border border-orange-200 rounded-xl bg-orange-50/50 focus:bg-white focus:border-orange-300 focus:outline-none transition-all duration-300 text-sm"
+                                required={actionData.status === "approved"}
+                            />
+                            <p className="text-xs text-gray-500 mt-1">Must be between -90 and 90</p>
+                        </div>
+
+                        {/* Longitude Field */}
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                                Longitude *
+                            </label>
+                            <input
+                                type="text"
+                                placeholder="Enter longitude (e.g., -74.0060)"
+                                value={actionData.longitude}
+                                onChange={(e) => setActionData(prev => ({ ...prev, longitude: e.target.value }))}
+                                className="w-full p-3 border border-orange-200 rounded-xl bg-orange-50/50 focus:bg-white focus:border-orange-300 focus:outline-none transition-all duration-300 text-sm"
+                                required={actionData.status === "approved"}
+                            />
+                            <p className="text-xs text-gray-500 mt-1">Must be between -180 and 180</p>
+                        </div>
+                    </>
+                )}
+                {/* === END OF CONDITIONAL LOCATION FIELDS === */}
+
+                {/* Action Buttons */}
+                <div className="flex justify-end gap-3 pt-4 flex-wrap">
+                    <button
+                        onClick={() => {
+                            setActionModalOpen(false);
+                            setActionData({ latitude: "", longitude: "", status: "pending" });
+                            setShopToAction(null);
+                        }}
+                        className="px-6 py-3 bg-white text-gray-700 rounded-xl font-semibold border border-orange-200 hover:bg-orange-50 transition-all duration-300"
+                    >
+                        Cancel
+                    </button>
+                    <button
+                        onClick={handleActionSubmit}
+                        className="px-6 py-3 bg-green-500 text-white rounded-xl font-semibold transition-all duration-300 hover:bg-green-600 hover:scale-105 shadow-lg hover:shadow-xl"
+                    >
+                        Submit
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+)}
         </div>
     );
 };
