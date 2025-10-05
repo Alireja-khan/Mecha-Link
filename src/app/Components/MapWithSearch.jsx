@@ -15,87 +15,109 @@ L.Icon.Default.mergeOptions({
   iconUrl: markerIcon,
   shadowUrl: markerShadow,
 });
-
-const mechanicShops = [
-  { id: 1, name: "Faruk Auto Service", latitude: 22.9487, longitude: 91.1849, location: "Chittagong" },
-  { id: 2, name: "Omar Car Repair", latitude: 22.9495, longitude: 91.1857, location: "Chittagong" },
-  { id: 3, name: "Chittagong Garage", latitude: 22.9502, longitude: 91.1839, location: "Chittagong" },
-  { id: 4, name: "Speedy Motors", latitude: 22.9479, longitude: 91.1862, location: "Chittagong" },
-  { id: 5, name: "City Auto Works", latitude: 22.951, longitude: 91.185, location: "Chittagong" },
-  { id: 6, name: "Pro Mechanic Center", latitude: 22.9492, longitude: 91.1835, location: "Chittagong" },
-  { id: 7, name: "Elite Car Service", latitude: 22.948, longitude: 91.1842, location: "Chittagong" },
-  { id: 8, name: "Rapid Garage", latitude: 22.9507, longitude: 91.1845, location: "Chittagong" },
-  { id: 9, name: "Top Gear Auto", latitude: 22.9498, longitude: 91.186, location: "Chittagong" },
-  { id: 10, name: "Mega Motors Hub", latitude: 22.9515, longitude: 91.1838, location: "Chittagong" },
-  { id: 11, name: "Home Service Kushtia", latitude: 23.9103, longitude: 89.1339, location: "Kushtia" },
-  { id: 12, name: "Desh Travels, Rajshahi Garage", latitude: 24.3858, longitude: 88.5489, location: "Rajshahi" },
-  { id: 13, name: "M/S RATUL AUTO", latitude: 22.6947, longitude: 90.3571, location: "Chittagong" },
-  { id: 14, name: "Rana Auto Care", latitude: 25.7526, longitude: 89.2299, location: "Dinajpur" },
-  { id: 15, name: "Moti Garage", latitude: 25.6302, longitude: 88.6308, location: "Pabna" },
-  { id: 16, name: "M/S Hammad Motors", latitude: 24.8953, longitude: 91.8661, location: "Sylhet" },
-  { id: 17, name: "Combat Care MT Garage", latitude: 23.8375, longitude: 90.4144, location: "Dhaka" },
-];
-
-function FlyToLocation({ query }) {
+function FitBounds({ mechanicShops }) {
   const map = useMap();
 
   useEffect(() => {
-    if (!query) return;
+    if (!mechanicShops || mechanicShops.length === 0) return;
 
-    fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}`, {
-      headers: { "User-Agent": "mechanic-map-app/1.0" },
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        if (data && data.length > 0) {
-          const { lat, lon } = data[0];
-          map.flyTo([parseFloat(lat), parseFloat(lon)], 15, { duration: 1.5 });
-        }
-      })
-      .catch((err) => console.error(err));
-  }, [query, map]);
+    const bounds = L.latLngBounds(
+      mechanicShops.map((shop) => [shop.latitude, shop.longitude])
+    );
+    map.fitBounds(bounds, { padding: [50, 50] }); // smooth zoom and padding
+  }, [mechanicShops, map]);
 
   return null;
 }
 
+const shopCategories = [
+  "Car Service & Repair",
+  "Motorcycle Service & Repair",
+  "Truck/Commercial Vehicle Service",
+  "Home Appliance Repair",
+  "HVAC & Cooling Specialist",
+  "Car Detailing & Accessories",
+];
+
+
 export default function MapWithSearch() {
   const [search, setSearch] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("all");
+  const [mechanicShops, setMechanicShops] = useState([]);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    setLoading(true);
+    fetch(`/api/maps?category=${encodeURIComponent(selectedCategory)}&search=${search}`)
+      .then(res => res.json())
+      .then(data => {
+        setMechanicShops(data);
+        setLoading(false);
+      })
+  }, [search, selectedCategory])
 
   return (
     <section className="py-20">
-      <div className="container mx-auto">
-        <div className="max-w-lg mx-auto mb-5">
-          <input
-            type="search"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search place or city..."
-            className="w-full px-5 py-2 rounded-lg border border-gray-300"
-          />
+      <div className="container">
+        <div className="flex justify-between">
+          <div className="max-w-lg mb-5">
+            <input
+              type="search"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Search place or city..."
+              className="w-full px-5 py-2 rounded-lg border border-gray-300"
+            />
+          </div>
+          <div className="flex gap-2">
+            <label htmlFor="category" className="font-medium text-gray-700">
+              Select Category
+            </label>
+            <select
+              id="category"
+              value={selectedCategory}
+              onChange={(e) => setSelectedCategory(e.target.value)}
+              className="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-gray-800 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+            >
+              <option value="all">All Categories</option>
+              {shopCategories.map((category) => (
+                <option key={category} value={category}>
+                  {category}
+                </option>
+              ))}
+            </select>
+          </div>
         </div>
 
         <div className="h-[500px] w-full">
-          <MapContainer
-            center={[23.8121, 90.4134]}
-            zoom={8}
-            scrollWheelZoom={true}
-            className="h-full w-full rounded-lg z-0"
-          >
-            <TileLayer
-              attribution='&copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a>'
-              url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-            />
-            {mechanicShops.map((shop) => (
-              <Marker key={shop.id} position={[shop.latitude, shop.longitude]}>
-                <Popup>
-                  <strong>{shop.name}</strong>
-                  <br />
-                  {shop.location}
-                </Popup>
-              </Marker>
-            ))}
-            <FlyToLocation query={search} />
-          </MapContainer>
+          {
+            loading && (
+              <div className="flex items-center justify-center h-screen w-full">
+                <span className="loading loading-bars loading-xl text-orange-500"></span>
+              </div>
+            )
+          }
+          {!loading &&
+            <MapContainer
+              center={[23.8121, 90.4134]}
+              zoom={8}
+              scrollWheelZoom={false}
+              className="h-full w-full rounded-lg z-0"
+            >
+              <TileLayer
+                attribution='&copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a>'
+                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+              />
+              {mechanicShops && mechanicShops?.map((shop) => (
+                <Marker key={shop._id} position={[shop.latitude, shop.longitude]}>
+                  <Popup>
+                    <strong>{shop.shopName}</strong>
+                  </Popup>
+                </Marker>
+              ))}
+              <FitBounds mechanicShops={mechanicShops} />
+            </MapContainer>
+          }
         </div>
       </div>
     </section>
