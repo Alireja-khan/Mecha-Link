@@ -5,7 +5,7 @@ import { NextResponse } from "next/server";
 export async function PATCH(request, { params }) {
   try {
     const { id } = await params;
-    const { status, rejectionReason } = await request.json();
+    const { status, rejectionReason, location } = await request.json();
     
     if (!status || !["approved", "rejected", "pending"].includes(status)) {
       return NextResponse.json({ error: "Invalid status" }, { status: 400 });
@@ -23,9 +23,18 @@ export async function PATCH(request, { params }) {
       updateData.rejectionReason = rejectionReason;
     }
     
-    // If approving, set approvedAt timestamp
+    // If approving, set approvedAt timestamp and location
     if (status === "approved") {
       updateData.approvedAt = new Date();
+      
+      // Add location data if provided
+      if (location && location.latitude && location.longitude) {
+        // Update the shop's location
+        updateData["shop.location"] = {
+          latitude: parseFloat(location.latitude),
+          longitude: parseFloat(location.longitude)
+        };
+      }
     }
 
     const result = await collection.updateOne(
