@@ -18,7 +18,6 @@ export default function Header() {
 
   const {user: loggedInUser, status} = useUser();
 
-  console.log(loggedInUser, status);
   // drawer states
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [rotating, setRotating] = useState(false);
