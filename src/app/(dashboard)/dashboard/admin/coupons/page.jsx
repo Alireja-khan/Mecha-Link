@@ -8,41 +8,53 @@ import {
 } from "lucide-react";
 import Swal from 'sweetalert2';
 
-const StatCard = ({ icon: Icon, value, label, color = "orange" }) => {
+// --- Utility Components ---
+
+const StatCard = ({ icon: Icon, value, label, color = "primary" }) => {
+  // Use DaisyUI color-based classes
   const colorClasses = {
-    orange: {
-      bg: "bg-orange-500/10",
-      bgHover: "group-hover:bg-orange-500/20",
-      text: "text-orange-600"
+    primary: {
+      bg: "bg-primary/10",
+      bgHover: "group-hover:bg-primary/20",
+      text: "text-primary"
     },
-    green: {
-      bg: "bg-green-500/10",
-      bgHover: "group-hover:bg-green-500/20",
-      text: "text-green-600"
+    success: {
+      bg: "bg-success/10",
+      bgHover: "group-hover:bg-success/20",
+      text: "text-success"
     },
-    red: {
-      bg: "bg-red-500/10",
-      bgHover: "group-hover:bg-red-500/20",
-      text: "text-red-600"
+    error: {
+      bg: "bg-error/10",
+      bgHover: "group-hover:bg-error/20",
+      text: "text-error"
     },
-    blue: {
-      bg: "bg-blue-500/10",
-      bgHover: "group-hover:bg-blue-500/20",
-      text: "text-blue-600"
+    info: {
+      bg: "bg-info/10",
+      bgHover: "group-hover:bg-info/20",
+      text: "text-info"
     }
   };
 
-  const classes = colorClasses[color] || colorClasses.orange;
+  // Map requested colors to DaisyUI context
+  const mappedColor = {
+    orange: 'primary',
+    green: 'success',
+    red: 'error',
+    blue: 'info',
+  }[color] || 'primary';
+
+  const classes = colorClasses[mappedColor];
 
   return (
-    <div className="bg-base-200 rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-neutral shadow-lg hover:shadow-xl transition-all duration-300 group">
+    // Corrected background for StatCard to bg-base-100 for contrast against bg-base-200 page background
+    <div className="bg-base-100 rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-base-300 shadow-lg hover:shadow-xl transition-all duration-300 group">
       <div className="flex items-center justify-between mb-3 sm:mb-4">
         <div className={`p-2 sm:p-3 rounded-xl ${classes.bg} ${classes.bgHover} transition-colors duration-300`}>
           <Icon className={classes.text} size={20} />
         </div>
       </div>
       <p className="text-2xl sm:text-3xl font-bold text-base-content mb-1">{value}</p>
-      <p className="text-gray-600 text-xs sm:text-sm font-medium">{label}</p>
+      <p className="text-base-content/70 text-xs sm:text-sm font-medium">{label}</p>
     </div>
   );
 };
@@ -64,9 +76,23 @@ const formatDateShort = (dateString) => {
 };
 
 const isExpired = (expiryDate) => {
+  if (!expiryDate) return false;
   return new Date(expiryDate) < new Date();
 };
 
+const getStatusBadge = (status) => {
+  const base = "px-2 sm:px-3 py-1 text-xs font-semibold rounded-full border whitespace-nowrap";
+  switch (status) {
+    case "active":
+      return <span className={`${base} bg-success/10 text-success border-success/30`}>Active</span>;
+    case "inactive":
+      return <span className={`${base} bg-error/10 text-error border-error/30`}>Inactive</span>;
+    default:
+      return <span className={`${base} bg-base-300/50 text-base-content/70 border-base-300`}>Unknown</span>;
+  }
+};
+
+// --- Main Component ---
 
 const ManageCoupons = () => {
   const { user: loggedInUser, loading: userLoading } = useUser();
@@ -86,16 +112,18 @@ const ManageCoupons = () => {
     status: "active"
   });
 
+  // --- Swal Utility Functions (Updated to use CSS variables for theme) ---
+
   const showSuccessAlert = (title, message) => {
     Swal.fire({
       title: title,
       text: message,
       icon: 'success',
-      confirmButtonColor: '#f97316',
+      confirmButtonColor: 'var(--color-primary)',
       confirmButtonText: 'OK',
-      background: '#fff',
-      color: '#1f2937',
-      iconColor: '#22c55e'
+      background: 'var(--color-base-100)',
+      color: 'var(--color-base-content)',
+      iconColor: 'var(--color-success)'
     });
   };
 
@@ -104,11 +132,11 @@ const ManageCoupons = () => {
       title: title,
       text: message,
       icon: 'error',
-      confirmButtonColor: '#f97316',
+      confirmButtonColor: 'var(--color-primary)',
       confirmButtonText: 'OK',
-      background: '#fff',
-      color: '#1f2937',
-      iconColor: '#ef4444'
+      background: 'var(--color-base-100)',
+      color: 'var(--color-base-content)',
+      iconColor: 'var(--color-error)'
     });
   };
 
@@ -118,13 +146,13 @@ const ManageCoupons = () => {
       text: text,
       icon: 'warning',
       showCancelButton: true,
-      confirmButtonColor: '#f97316',
-      cancelButtonColor: '#6b7280',
+      confirmButtonColor: 'var(--color-primary)',
+      cancelButtonColor: 'var(--color-neutral)',
       confirmButtonText: confirmButtonText,
       cancelButtonText: 'Cancel',
-      background: '#fff',
-      color: '#1f2937',
-      iconColor: '#eab308',
+      background: 'var(--color-base-100)',
+      color: 'var(--color-base-content)',
+      iconColor: 'var(--color-warning)',
       reverseButtons: true
     });
   };
@@ -137,10 +165,12 @@ const ManageCoupons = () => {
       didOpen: () => {
         Swal.showLoading();
       },
-      background: '#fff',
-      color: '#1f2937'
+      background: 'var(--color-base-100)',
+      color: 'var(--color-base-content)'
     });
   };
+
+  // --- API/Data Logic (Kept the same) ---
 
   const fetchCoupons = async () => {
     setLoading(true);
@@ -284,18 +314,6 @@ const ManageCoupons = () => {
     setFormData({ code: "", discount: "", expiryDate: "", usageLimit: "", status: "active" });
   };
 
-  const getStatusBadge = (status) => {
-    const base = "px-2 sm:px-3 py-1 text-xs font-semibold rounded-full border whitespace-nowrap";
-    switch (status) {
-      case "active":
-        return <span className={`${base} bg-success/25 text-success border-success/50`}>Active</span>;
-      case "inactive":
-        return <span className={`${base} bg-error/25 text-error border-error/50`}>Inactive</span>;
-      default:
-        return <span className={`${base} bg-base-300/25 text-base-content border-neutral`}>Unknown</span>;
-    }
-  };
-
   const filteredCoupons = coupons.filter((c) => {
     const matchesSearch = c.code?.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesStatus = statusFilter === 'all' || c.status === statusFilter;
@@ -312,16 +330,17 @@ const ManageCoupons = () => {
   const CouponMobileCard = ({ coupon }) => {
     const expired = isExpired(coupon.expiryDate);
     return (
-      <div className="bg-white p-4 rounded-xl border border-orange-100 shadow-sm hover:shadow-md transition-all duration-200">
-        <div className="flex items-start gap-3 mb-3 border-b border-gray-100 pb-3">
-          <div className="w-10 h-10 bg-gradient-to-br from-orange-400 to-orange-600 rounded-lg flex items-center justify-center text-white font-bold text-sm flex-shrink-0">
+      <div className="bg-base-100 p-4 rounded-xl border border-base-300 shadow-sm hover:shadow-md transition-all duration-200">
+        <div className="flex items-start gap-3 mb-3 border-b border-base-300 pb-3">
+          <div className="w-10 h-10 bg-gradient-to-br from-primary/80 to-primary rounded-lg flex items-center justify-center text-primary-content font-bold text-sm flex-shrink-0">
             <Tag size={16} />
           </div>
           <div className="flex-1 min-w-0">
-            <p className="font-semibold text-gray-900 truncate">{coupon.code || 'N/A'}</p>
-            <p className="text-xs text-orange-600 truncate flex items-center gap-1"><Percent size={12} className="text-orange-400" />{coupon.discount}% Discount</p>
-            <p className={`text-xs truncate flex items-center gap-1 ${expired ? 'text-red-600' : 'text-gray-600'}`}>
-              <Calendar size={12} className={expired ? 'text-red-400' : 'text-gray-400'} />
+            <p className="font-semibold text-base-content truncate">{coupon.code || 'N/A'}</p>
+            {/* Fixed hardcoded text-orange-400 to text-primary */}
+            <p className="text-xs text-primary truncate flex items-center gap-1"><Percent size={12} className="text-primary" />{coupon.discount}% Discount</p>
+            <p className={`text-xs truncate flex items-center gap-1 ${expired ? 'text-error' : 'text-base-content/80'}`}>
+              <Calendar size={12} className={expired ? 'text-error' : 'text-base-content/60'} />
               {formatDateShort(coupon.expiryDate)} {expired && '(Expired)'}
             </p>
           </div>
@@ -330,13 +349,13 @@ const ManageCoupons = () => {
         <div className="flex items-center justify-between pt-3 flex-wrap gap-2">
           <div className="flex items-center gap-2 flex-wrap">
             {getStatusBadge(coupon.status)}
-            <span className="text-xs text-gray-500 flex items-center gap-1"><Users size={12} />{coupon.usageLimit > 0 ? `${coupon.usageLimit} uses` : "Unlimited"}</span>
+            <span className="text-xs text-base-content/80 flex items-center gap-1"><Users size={12} />{coupon.usageLimit > 0 ? `${coupon.usageLimit} uses` : "Unlimited"}</span>
           </div>
           <div className="flex gap-2">
             {coupon.status === "inactive" && (
               <button
                 onClick={() => handleUpdateStatus(coupon._id, "active")}
-                className="p-2 bg-green-500/10 text-green-600 rounded-lg border border-green-200 hover:bg-green-500/20 transition-colors"
+                className="p-2 bg-success/10 text-success rounded-lg border border-success/30 hover:bg-success/20 transition-colors"
                 title="Activate"
               >
                 <Check size={16} />
@@ -345,7 +364,7 @@ const ManageCoupons = () => {
             {coupon.status === "active" && (
               <button
                 onClick={() => handleUpdateStatus(coupon._id, "inactive")}
-                className="p-2 bg-red-500/10 text-red-600 rounded-lg border border-red-200 hover:bg-red-500/20 transition-colors"
+                className="p-2 bg-error/10 text-error rounded-lg border border-error/30 hover:bg-error/20 transition-colors"
                 title="Deactivate"
               >
                 <X size={16} />
@@ -353,14 +372,14 @@ const ManageCoupons = () => {
             )}
             <button
               onClick={() => openEditModal(coupon)}
-              className="p-2 bg-orange-500/10 text-orange-600 rounded-lg border border-orange-200 hover:bg-orange-500/20 transition-colors"
+              className="p-2 bg-primary/10 text-primary rounded-lg border border-primary/30 hover:bg-primary/20 transition-colors"
               title="Edit"
             >
               <Edit size={16} />
             </button>
             <button
               onClick={() => handleDelete(coupon._id)}
-              className="p-2 bg-red-500/10 text-red-600 rounded-lg border border-red-200 hover:bg-red-500/20 transition-colors"
+              className="p-2 bg-error/10 text-error rounded-lg border border-error/30 hover:bg-error/20 transition-colors"
               title="Delete"
             >
               <Trash size={16} />
@@ -372,13 +391,15 @@ const ManageCoupons = () => {
   };
 
   if (loading || userLoading) return (
-    <div className="flex items-center justify-center h-screen w-full">
-      <span className="loading loading-bars loading-xl text-orange-500"></span>
+    // Fixed hardcoded text-orange-500 to text-primary
+    <div className="flex items-center justify-center h-screen w-full bg-base-200">
+      <span className="loading loading-bars loading-xl text-primary"></span>
     </div>
   );
 
   return (
-    <div className="min-h-screen w-full p-3 sm:p-4 lg:p-6 mx-auto bg-base-100">
+    // Fixed page background to bg-base-200
+    <div className="min-h-screen w-full p-3 sm:p-4 lg:p-6 mx-auto bg-base-200">
       <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-4 sm:mb-6 lg:mb-8">
         <div>
           <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-base-content mb-1 sm:mb-2">Coupon Management</h1>
@@ -394,29 +415,31 @@ const ManageCoupons = () => {
       </div>
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-6 mb-4 sm:mb-6 lg:mb-8">
-        {/* StatCard needs to be updated internally to use daisyui colors like primary, success, info, error */}
         <StatCard icon={Tag} value={stats.total} label="Total Coupons" color="orange" />
         <StatCard icon={Check} value={stats.active} label="Active Coupons" color="green" />
         <StatCard icon={Ban} value={stats.inactive} label="Inactive Coupons" color="blue" />
         <StatCard icon={Calendar} value={stats.expired} label="Expired Coupons" color="red" />
       </div>
 
-      <div className="bg-base-200 rounded-2xl sm:rounded-3xl p-4 sm:p-6 lg:p-8 border border-base-300 shadow-xl">
+      {/* Fixed main content card background to bg-base-100 for contrast */}
+      <div className="bg-base-100 rounded-2xl sm:rounded-3xl p-4 sm:p-6 lg:p-8 border border-base-300 shadow-xl">
         <div className="flex flex-col md:flex-row gap-3 w-full mb-6">
           <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-base-content/50" size={18} />
+            {/* Input background changed to bg-base-200 for better contrast on bg-base-100 card */}
             <input
               type="text"
               placeholder="Search by code..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10 pr-4 py-2.5 sm:py-3 border border-base-300 rounded-xl bg-base-100/50 focus:bg-base-100 focus:border-primary/50 w-full text-sm text-base-content focus:outline-none"
+              className="pl-10 pr-4 py-2.5 sm:py-3 border border-base-300 rounded-xl bg-base-200 focus:bg-base-100 focus:border-primary/50 w-full text-sm text-base-content focus:outline-none"
             />
           </div>
+          {/* Select background changed to bg-base-200 for better contrast on bg-base-100 card */}
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
-            className="px-3 sm:px-4 py-2.5 sm:py-3 border border-base-300 rounded-xl bg-base-100/50 focus:bg-base-100 focus:border-primary/50 text-sm text-base-content focus:outline-none"
+            className="px-3 sm:px-4 py-2.5 sm:py-3 border border-base-300 rounded-xl bg-base-200 focus:bg-base-100 focus:border-primary/50 text-sm text-base-content focus:outline-none w-full md:w-auto"
           >
             <option value="all">All Statuses</option>
             <option value="active">Active</option>
@@ -424,7 +447,8 @@ const ManageCoupons = () => {
           </select>
           <button
             onClick={() => showSuccessAlert('Coming Soon!', 'Download functionality will be implemented soon.')}
-            className="flex items-center gap-2 px-3 sm:px-4 py-2.5 sm:py-3 bg-base-100 text-primary rounded-xl border border-base-300 hover:bg-base-300/50 transition-colors duration-200 text-sm justify-center"
+            // Button background changed to bg-base-200 for contrast on bg-base-100 card
+            className="flex items-center gap-2 px-3 sm:px-4 py-2.5 sm:py-3 bg-base-200 text-primary rounded-xl border border-base-300 hover:bg-base-300/50 transition-colors duration-200 text-sm justify-center w-full md:w-auto"
             title="Export Data"
           >
             <Download size={16} />
@@ -438,7 +462,8 @@ const ManageCoupons = () => {
 
         <div className="hidden xl:block rounded-2xl border border-base-300 overflow-x-auto">
           <table className="min-w-full divide-y divide-base-300">
-            <thead className="bg-base-300/50">
+            {/* Table header background changed to bg-base-200 for contrast */}
+            <thead className="bg-base-300">
               <tr>
                 <th className="px-6 py-4 text-left text-sm font-semibold text-base-content">Coupon Code</th>
                 <th className="px-6 py-4 text-left text-sm font-semibold text-base-content">Discount</th>
@@ -448,12 +473,13 @@ const ManageCoupons = () => {
                 <th className="px-6 py-4 text-center text-sm font-semibold text-base-content">Actions</th>
               </tr>
             </thead>
+            {/* Table body background changed to bg-base-100 for contrast */}
             <tbody className="bg-base-100 divide-y divide-base-300">
               {filteredCoupons.length > 0 ? (
                 filteredCoupons.map((coupon) => {
                   const expired = isExpired(coupon.expiryDate);
                   return (
-                    <tr key={coupon._id} className="hover:bg-base-300/30 transition-colors duration-200">
+                    <tr key={coupon._id} className="hover:bg-base-200 transition-colors duration-200">
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex items-center gap-3">
                           <div className="w-10 h-10 bg-primary rounded-xl flex items-center justify-center text-primary-content font-bold text-sm flex-shrink-0">
@@ -551,6 +577,7 @@ const ManageCoupons = () => {
         </div>
       </div>
 
+      {/* Create/Edit Modal */}
       {modalOpen && (
         <div className="fixed inset-0 flex items-center justify-center backdrop-blur-md z-50 p-4">
           <div className="bg-base-100 rounded-3xl p-6 sm:p-8 w-full max-w-2xl border border-base-300 shadow-2xl max-h-[90vh] overflow-y-auto">
@@ -630,7 +657,7 @@ const ManageCoupons = () => {
                 <button
                   type="button"
                   onClick={handleModalClose}
-                  className="px-4 sm:px-6 py-2 sm:py-3 bg-base-100 text-base-content rounded-xl font-semibold border border-base-300 hover:bg-base-200 transition-all duration-300 text-sm"
+                  className="px-4 sm:px-6 py-2 sm:py-3 bg-base-200 text-base-content rounded-xl font-semibold border border-base-300 hover:bg-base-300 transition-all duration-300 text-sm"
                 >
                   Cancel
                 </button>
@@ -646,6 +673,7 @@ const ManageCoupons = () => {
         </div>
       )}
 
+      {/* Detail View Modal */}
       {detailModalOpen && selectedCoupon && (
         <div className="fixed inset-0 flex items-center justify-center backdrop-blur-md z-50 p-4">
           <div className="bg-base-100 rounded-3xl p-6 sm:p-8 w-full max-w-4xl border border-base-300 shadow-2xl max-h-[90vh] overflow-y-auto">
@@ -680,36 +708,39 @@ const ManageCoupons = () => {
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
-                {/* Replaced specific blues/greens/purples with info, success, and a primary/base combination to stay within the theme */}
                 <div className="p-4 bg-info/10 rounded-xl border border-info/30">
-                  <h5 className="font-semibold text-info-content mb-2">Discount Information</h5>
+                  {/* Fixed h5 text color to info-content */}
+                  <h5 className="font-semibold text-info mb-2">Discount Information</h5>
                   <div className="space-y-2 text-sm">
-                    <p className="text-info-content/90 flex items-center gap-2">
-                      <Percent size={16} className='text-info' /><strong>Percentage:</strong> <span className="text-lg font-bold">{selectedCoupon.discount}% OFF</span>
+                    {/* Used text-info for icon/span color, info-content for surrounding text */}
+                    <p className="text-base-content/90 flex items-center gap-2">
+                      <Percent size={16} className='text-info' /><strong>Percentage:</strong> <span className="text-lg font-bold text-info">{selectedCoupon.discount}% OFF</span>
                     </p>
-                    <p className="text-info-content/90"><strong>Minimum Purchase:</strong> N/A (Field not in schema)</p>
-                    <p className="text-info-content/90"><strong>Applicable Products:</strong> All (Placeholder)</p>
+                    <p className="text-base-content/90"><strong>Minimum Purchase:</strong> N/A (Field not in schema)</p>
+                    <p className="text-base-content/90"><strong>Applicable Products:</strong> All (Placeholder)</p>
                   </div>
                 </div>
 
                 <div className="p-4 bg-success/10 rounded-xl border border-success/30">
-                  <h5 className="font-semibold text-success-content mb-2">Usage Information</h5>
+                  {/* Fixed h5 text color to success-content */}
+                  <h5 className="font-semibold text-success mb-2">Usage Information</h5>
                   <div className="space-y-2 text-sm">
-                    <p className="text-success-content/90 flex items-center gap-2">
+                    <p className="text-base-content/90 flex items-center gap-2">
                       <Users size={16} className='text-success' /><strong>Usage Limit:</strong> {selectedCoupon.usageLimit && selectedCoupon.usageLimit > 0 ? selectedCoupon.usageLimit : "Unlimited"}
                     </p>
-                    <p className="text-success-content/90"><strong>Times Used:</strong> N/A (Placeholder)</p>
+                    <p className="text-base-content/90"><strong>Times Used:</strong> N/A (Placeholder)</p>
                   </div>
                 </div>
 
-                <div className="p-4 bg-accent/30 rounded-xl border border-accent/50">
-                  <h5 className="font-semibold text-base-content mb-2">Validity Period</h5>
+                {/* Changed to bg-info/10 for better visual grouping with Discount Info */}
+                <div className="p-4 bg-info/10 rounded-xl border border-info/30">
+                  <h5 className="font-semibold text-info mb-2">Validity Period</h5>
                   <div className="space-y-2 text-sm">
                     <p className="text-base-content/90 flex items-center gap-2">
                       <Calendar size={16} className='text-primary' /><strong>Expiry Date:</strong> <span className={`${isExpired(selectedCoupon.expiryDate) ? 'text-error font-semibold' : 'text-base-content/90'}`}>{formatDate(selectedCoupon.expiryDate)}</span>
                     </p>
                     <p className="text-base-content/90">
-                      <strong>Status:</strong> {isExpired(selectedCoupon.expiryDate) ? <span className="text-error font-semibold">Expired</span> : <span className="text-base-content/90">Valid</span>}
+                      <strong>Status:</strong> {isExpired(selectedCoupon.expiryDate) ? <span className="text-error font-semibold">Expired</span> : <span className="text-success font-semibold">Valid</span>}
                     </p>
                   </div>
                 </div>
@@ -717,7 +748,7 @@ const ManageCoupons = () => {
                 <div className="p-4 bg-base-200 rounded-xl border border-base-300">
                   <h5 className="font-semibold text-base-content mb-2">Management Status</h5>
                   <div className="space-y-2 text-sm">
-                    <p className="text-base-content/90"><strong>Current Status:</strong> {getStatusBadge(selectedCoupon.status)}</p>
+                    <p className="text-base-content/90 flex items-center gap-2"><strong>Current Status:</strong> {getStatusBadge(selectedCoupon.status)}</p>
                     <p className="text-base-content/90"><strong>Last Updated:</strong> {selectedCoupon.updatedAt ? formatDate(selectedCoupon.updatedAt) : 'N/A'}</p>
                     <p className="text-base-content/70 italic mt-2">
                       {selectedCoupon.status === 'active' ? 'Coupon is live and available for use.' : 'Coupon is currently deactivated.'}
@@ -729,7 +760,8 @@ const ManageCoupons = () => {
               <div className="flex justify-end gap-3 pt-4">
                 <button
                   onClick={() => setDetailModalOpen(false)}
-                  className="px-4 sm:px-6 py-2 sm:py-3 bg-base-100 text-base-content rounded-xl font-semibold border border-base-300 hover:bg-base-200 transition-all duration-300 text-sm"
+                  // Changed button background to bg-base-200 for better contrast on base-100 modal
+                  className="px-4 sm:px-6 py-2 sm:py-3 bg-base-200 text-base-content rounded-xl font-semibold border border-base-300 hover:bg-base-300 transition-all duration-300 text-sm"
                 >
                   Close
                 </button>

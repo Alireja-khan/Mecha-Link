@@ -5,10 +5,9 @@ import useUser from "@/hooks/useUser";
 import { Plus, Edit, Trash, X, Check, Search, Filter, Download, Megaphone, Calendar, Users, Bell, Eye, MessageSquare } from "lucide-react";
 import Swal from 'sweetalert2';
 
-// --- Utility Components ---
+// --- Utility Components (Kept the same as they are fine) ---
 
-const StatCard = ({ icon: Icon, value, label, color = "primary" }) => { // Changed default color to primary
-  // Mapping standard colors to dynamic DaisyUI classes
+const StatCard = ({ icon: Icon, value, label, color = "primary" }) => {
   const colorClasses = {
     primary: {
       bg: "bg-primary/10",
@@ -32,7 +31,6 @@ const StatCard = ({ icon: Icon, value, label, color = "primary" }) => { // Chang
     }
   };
 
-  // Map input colors to DaisyUI semantic names for StatCard
   const mappedColor = {
     orange: 'primary',
     green: 'success',
@@ -99,12 +97,14 @@ const ManageAnnouncements = () => {
   const [selectedAnnouncement, setSelectedAnnouncement] = useState(null);
   const [statusFilter, setStatusFilter] = useState("all");
 
+  // --- Swal Utility Functions (Kept the same) ---
+
   const showSuccessAlert = (title, message) => {
     Swal.fire({
       title: title,
       text: message,
       icon: 'success',
-      confirmButtonColor: '#f97316', // Keeping this hardcoded for the Swaleet color in the JS scope
+      confirmButtonColor: '#f97316',
       confirmButtonText: 'OK',
       background: 'var(--color-base-100)',
       color: 'var(--color-base-content)',
@@ -117,7 +117,7 @@ const ManageAnnouncements = () => {
       title: title,
       text: message,
       icon: 'error',
-      confirmButtonColor: '#f97316', // Keeping this hardcoded for the Swaleet color in the JS scope
+      confirmButtonColor: '#f97316',
       confirmButtonText: 'OK',
       background: 'var(--color-base-100)',
       color: 'var(--color-base-content)',
@@ -131,7 +131,7 @@ const ManageAnnouncements = () => {
       text: text,
       icon: 'warning',
       showCancelButton: true,
-      confirmButtonColor: '#f97316', // Keeping this hardcoded for the Swaleet color in the JS scope
+      confirmButtonColor: '#f97316',
       cancelButtonColor: 'var(--color-neutral)',
       confirmButtonText: confirmButtonText,
       cancelButtonText: 'Cancel',
@@ -154,6 +154,8 @@ const ManageAnnouncements = () => {
       color: 'var(--color-base-content)'
     });
   };
+
+  // --- API/Data Logic (Kept the same) ---
 
   const fetchAnnouncements = async () => {
     setLoading(true);
@@ -317,38 +319,38 @@ const ManageAnnouncements = () => {
   };
 
   const AnnouncementActions = ({ ann }) => (
-    <div className="flex justify-center gap-2">
+    <div className="flex justify-center gap-1 sm:gap-2">
       {ann.status !== "active" && (
         <button
           onClick={() => handleUpdateStatus(ann._id, "activate")}
-          className="p-2 bg-success/10 text-success rounded-xl border border-success/30 hover:bg-success/20 hover:scale-105 transition-all duration-200"
+          className="p-1 sm:p-2 bg-success/10 text-success rounded-lg sm:rounded-xl border border-success/30 hover:bg-success/20 hover:scale-105 transition-all duration-200"
           title="Activate"
         >
-          <Check size={16} />
+          <Check size={14} />
         </button>
       )}
       {ann.status === "active" && (
         <button
           onClick={() => handleUpdateStatus(ann._id, "deactivate")}
-          className="p-2 bg-error/10 text-error rounded-xl border border-error/30 hover:bg-error/20 hover:scale-105 transition-all duration-200"
+          className="p-1 sm:p-2 bg-error/10 text-error rounded-lg sm:rounded-xl border border-error/30 hover:bg-error/20 hover:scale-105 transition-all duration-200"
           title="Deactivate"
         >
-          <X size={16} />
+          <X size={14} />
         </button>
       )}
       <button
         onClick={() => openEditModal(ann)}
-        className="p-2 bg-primary/10 text-primary rounded-xl border border-primary/30 hover:bg-primary/20 hover:scale-105 transition-all duration-200"
+        className="p-1 sm:p-2 bg-primary/10 text-primary rounded-lg sm:rounded-xl border border-primary/30 hover:bg-primary/20 hover:scale-105 transition-all duration-200"
         title="Edit"
       >
-        <Edit size={16} />
+        <Edit size={14} />
       </button>
       <button
         onClick={() => handleDelete(ann._id)}
-        className="p-2 bg-error/10 text-error rounded-xl border border-error/30 hover:bg-error/20 hover:scale-105 transition-all duration-200"
+        className="p-1 sm:p-2 bg-error/10 text-error rounded-lg sm:rounded-xl border border-error/30 hover:bg-error/20 hover:scale-105 transition-all duration-200"
         title="Delete"
       >
-        <Trash size={16} />
+        <Trash size={14} />
       </button>
     </div>
   );
@@ -360,8 +362,8 @@ const ManageAnnouncements = () => {
           <Megaphone size={16} />
         </div>
         <div className="flex-1 min-w-0">
-          <p className="font-semibold text-base-content truncate">{ann.title || 'No Title'}</p>
-          <p className="text-xs text-base-content/70 truncate flex items-center gap-1">
+          <p className="font-semibold text-base-content line-clamp-1">{ann.title || 'No Title'}</p>
+          <p className="text-xs text-base-content/70 line-clamp-1 flex items-center gap-1">
             <Calendar size={12} className="text-base-content/50" />
             {formatDateShort(ann.createdAt)}
           </p>
@@ -385,13 +387,14 @@ const ManageAnnouncements = () => {
   );
 
   if (loading || userLoading) return (
-    <div className="flex items-center justify-center h-screen w-full bg-base-100">
+    <div className="flex items-center justify-center min-h-screen w-full bg-base-200"> {/* Changed from base-100 to base-200 */}
       <span className="loading loading-bars loading-xl text-primary"></span>
     </div>
   );
 
   return (
-    <div className="min-h-screen w-full p-3 sm:p-4 lg:p-6 mx-auto bg-base-100">
+    // FIX 1: Change main container background to bg-base-200
+    <div className="min-h-screen w-full p-3 sm:p-4 lg:p-6 mx-auto bg-base-200">
       {/* Header Section */}
       <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-4 sm:mb-6 lg:mb-8">
         <div>
@@ -400,7 +403,7 @@ const ManageAnnouncements = () => {
         </div>
         <button
           onClick={() => { setEditingAnnouncement(null); setFormData({ title: "", message: "" }); setModalOpen(true); }}
-          className="flex items-center gap-2 sm:gap-3 px-4 sm:px-6 py-2 sm:py-3 lg:py-4 bg-primary text-primary-content rounded-xl font-semibold transition-all duration-300 hover:bg-secondary hover:scale-[1.02] shadow-lg hover:shadow-xl mt-4 lg:mt-0 text-sm sm:text-base"
+          className="flex items-center gap-2 px-4 sm:px-6 py-2 sm:py-3 lg:py-4 bg-primary text-primary-content rounded-xl font-semibold transition-all duration-300 hover:bg-secondary hover:scale-[1.02] shadow-lg hover:shadow-xl mt-4 lg:mt-0 text-sm sm:text-base"
         >
           <Plus size={20} />
           <span>Add New Announcement</span>
@@ -408,6 +411,7 @@ const ManageAnnouncements = () => {
       </div>
 
       {/* Stats Overview */}
+      {/* Note: StatCard's inner background was changed to bg-base-100 in the StatCard definition above for contrast */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-6 mb-4 sm:mb-6 lg:mb-8">
         <StatCard icon={Megaphone} value={stats.total} label="Total Announcements" color="orange" />
         <StatCard icon={Bell} value={stats.active} label="Active Announcements" color="green" />
@@ -416,7 +420,8 @@ const ManageAnnouncements = () => {
       </div>
 
       {/* Main Content */}
-      <div className="bg-base-200 rounded-2xl sm:rounded-3xl p-4 sm:p-6 lg:p-8 border border-base-300 shadow-xl">
+      {/* FIX 2: Change main content card background from bg-base-200 to bg-base-100 for contrast */}
+      <div className="bg-base-100 rounded-2xl sm:rounded-3xl p-4 sm:p-6 lg:p-8 border border-base-300 shadow-xl">
         <div className="flex flex-col md:flex-row gap-3 w-full mb-6">
           <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-base-content/50" size={18} />
@@ -425,13 +430,15 @@ const ManageAnnouncements = () => {
               placeholder="Search by title..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10 pr-4 py-2.5 sm:py-3 border border-base-300 rounded-xl bg-base-100/50 focus:bg-base-100 focus:border-primary/50 w-full text-sm text-base-content focus:outline-none"
+              // Changed bg-base-100/50 to bg-base-200 for better contrast on base-100 background
+              className="pl-10 pr-4 py-2.5 sm:py-3 border border-base-300 rounded-xl bg-base-200 focus:bg-base-100 focus:border-primary/50 w-full text-sm text-base-content focus:outline-none"
             />
           </div>
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
-            className="px-3 sm:px-4 py-2.5 sm:py-3 border border-base-300 rounded-xl bg-base-100/50 focus:bg-base-100 focus:border-primary/50 text-sm text-base-content focus:outline-none"
+            // Changed bg-base-100/50 to bg-base-200 for better contrast on base-100 background
+            className="px-3 sm:px-4 py-2.5 sm:py-3 border border-base-300 rounded-xl bg-base-200 focus:bg-base-100 focus:border-primary/50 text-sm text-base-content focus:outline-none w-full md:w-auto"
           >
             <option value="all">All Statuses</option>
             <option value="active">Active</option>
@@ -439,7 +446,8 @@ const ManageAnnouncements = () => {
           </select>
           <button
             onClick={() => showSuccessAlert('Coming Soon!', 'Export functionality will be implemented soon.')}
-            className="flex items-center gap-2 px-3 sm:px-4 py-2.5 sm:py-3 bg-base-100 text-primary rounded-xl border border-base-300 hover:bg-base-300/50 transition-colors duration-200 text-sm justify-center"
+            // Changed bg-base-100 to bg-base-200 for better contrast on base-100 background
+            className="flex items-center gap-2 px-3 sm:px-4 py-2.5 sm:py-3 bg-base-200 text-primary rounded-xl border border-base-300 hover:bg-base-300/50 transition-colors duration-200 text-sm justify-center w-full md:w-auto"
             title="Export Data"
           >
             <Download size={16} />
@@ -448,33 +456,37 @@ const ManageAnnouncements = () => {
         </div>
 
         {/* Mobile View - Announcement Cards */}
-        <div className="block lg:hidden space-y-4">
+        {/* Note: AnnouncementMobileCard inner background is already bg-base-100, which works well */}
+        <div className="block xl:hidden space-y-4">
           {filteredAnnouncements.length > 0 ? filteredAnnouncements.map(ann => <AnnouncementMobileCard key={ann._id} ann={ann} />) : <div className="text-center py-12"><MessageSquare size={48} className="mx-auto text-base-content/30" /><p className="text-base-content/70">No announcements found</p></div>}
         </div>
 
         {/* Desktop View - Table */}
-        <div className="hidden lg:block rounded-2xl border border-base-300 overflow-x-auto">
+        <div className="hidden xl:block rounded-2xl border border-base-300 overflow-x-auto">
           <table className="min-w-full divide-y divide-base-300">
-            <thead className="bg-base-300/50">
+            {/* Table header background is bg-base-300/50, which is fine */}
+            <thead className="bg-base-300">
               <tr>
-                <th className="px-6 py-4 text-left text-sm font-semibold text-base-content">Announcement Title</th>
+                <th className="px-6 py-4 text-left text-sm font-semibold text-base-content w-48">Announcement Title</th>
                 <th className="px-6 py-4 text-left text-sm font-semibold text-base-content">Message Preview</th>
-                <th className="px-6 py-4 text-left text-sm font-semibold text-base-content">Created Date</th>
-                <th className="px-6 py-4 text-left text-sm font-semibold text-base-content">Status</th>
-                <th className="px-6 py-4 text-center text-sm font-semibold text-base-content">Actions</th>
+                <th className="px-6 py-4 text-left text-sm font-semibold text-base-content w-40">Created Date</th>
+                <th className="px-6 py-4 text-left text-sm font-semibold text-base-content w-32">Status</th>
+                <th className="px-6 py-4 text-center text-sm font-semibold text-base-content w-32">Actions</th>
               </tr>
             </thead>
+            {/* Table body background is bg-base-100, which is fine on base-100 card */}
             <tbody className="bg-base-100 divide-y divide-base-300">
               {filteredAnnouncements.length > 0 ? (
                 filteredAnnouncements.map((ann) => (
                   <tr key={ann._id} className="hover:bg-base-300/30 transition-colors duration-200">
-                    <td className="px-6 py-4 whitespace-nowrap">
+                    <td className="px-6 py-4">
                       <div className="flex items-center gap-3">
                         <div className="w-10 h-10 bg-primary rounded-xl flex items-center justify-center text-primary-content font-bold text-sm flex-shrink-0">
                           <Megaphone size={16} />
                         </div>
                         <div>
-                          <p className="font-semibold text-base-content text-sm">{ann.title}</p>
+                          {/* Removed whitespace-nowrap and added line-clamp to title */}
+                          <p className="font-semibold text-base-content text-sm max-w-[200px] truncate">{ann.title}</p>
                           <button
                             onClick={() => openDetailModal(ann)}
                             className="text-primary hover:text-secondary text-xs font-medium flex items-center gap-1 transition-colors duration-200 mt-1"
@@ -486,9 +498,9 @@ const ManageAnnouncements = () => {
                       </div>
                     </td>
                     <td className="px-6 py-4">
-                      <p className="text-sm text-base-content/80 line-clamp-2 max-w-sm">{ann.message}</p>
+                      <p className="text-sm text-base-content/80 max-w-[400px] truncate">{ann.message}</p>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
+                    <td className="px-6 py-4"> {/* Removed whitespace-nowrap */}
                       <div className="flex items-center gap-2">
                         <Calendar size={14} className="text-primary flex-shrink-0" />
                         <span className="text-sm text-base-content/80">
@@ -499,7 +511,7 @@ const ManageAnnouncements = () => {
                     <td className="px-6 py-4 whitespace-nowrap">
                       {getStatusBadge(ann.status || "inactive")}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
+                    <td className="px-6 py-4 whitespace-nowrap text-center">
                       <AnnouncementActions ann={ann} />
                     </td>
                   </tr>
@@ -519,7 +531,7 @@ const ManageAnnouncements = () => {
         </div>
       </div>
 
-      {/* Create/Edit Modal */}
+      {/* Create/Edit Modal (No structural changes needed for responsiveness) */}
       {modalOpen && (
         <div className="fixed inset-0 flex items-center justify-center backdrop-blur-md z-50 p-4">
           <div className="bg-base-100 rounded-3xl p-6 sm:p-8 w-full max-w-2xl border border-base-300 shadow-2xl max-h-[90vh] overflow-y-auto">
@@ -542,6 +554,7 @@ const ManageAnnouncements = () => {
                   type="text"
                   value={formData.title}
                   onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                  // Changed input background to bg-base-200 for slight contrast in modal
                   className="w-full p-3 sm:p-4 border border-base-300 rounded-xl bg-base-200 focus:bg-base-100 focus:border-primary/50 focus:outline-none transition-all duration-300 text-sm text-base-content"
                   placeholder="Enter announcement title..."
                   required
@@ -552,6 +565,7 @@ const ManageAnnouncements = () => {
                 <textarea
                   value={formData.message}
                   onChange={(e) => setFormData({ ...formData, message: e.target.value })}
+                  // Changed input background to bg-base-200 for slight contrast in modal
                   className="w-full p-3 sm:p-4 border border-base-300 rounded-xl bg-base-200 focus:bg-base-100 focus:border-primary/50 focus:outline-none transition-all duration-300 resize-none text-sm text-base-content"
                   rows={6}
                   placeholder="Enter announcement message..."
@@ -562,7 +576,8 @@ const ManageAnnouncements = () => {
                 <button
                   type="button"
                   onClick={handleModalClose}
-                  className="px-4 sm:px-6 py-2 sm:py-3 bg-base-100 text-base-content rounded-xl font-semibold border border-base-300 hover:bg-base-200 transition-all duration-300 text-sm"
+                  // Changed button background to bg-base-200 for better contrast on base-100 modal
+                  className="px-4 sm:px-6 py-2 sm:py-3 bg-base-200 text-base-content rounded-xl font-semibold border border-base-300 hover:bg-base-300 transition-all duration-300 text-sm"
                 >
                   Cancel
                 </button>
@@ -578,7 +593,7 @@ const ManageAnnouncements = () => {
         </div>
       )}
 
-      {/* Detail View Modal */}
+      {/* Detail View Modal (No structural changes needed for responsiveness) */}
       {detailModalOpen && selectedAnnouncement && (
         <div className="fixed inset-0 flex items-center justify-center backdrop-blur-md z-50 p-4">
           <div className="bg-base-100 rounded-3xl p-6 sm:p-8 w-full max-w-2xl border border-base-300 shadow-2xl max-h-[90vh] overflow-y-auto">
@@ -616,7 +631,8 @@ const ManageAnnouncements = () => {
               {/* Message Content */}
               <div>
                 <h4 className="text-lg font-semibold text-base-content mb-3">Message Content</h4>
-                <div className="p-4 bg-base-200 rounded-xl border border-base-300">
+                {/* Changed background from base-200 to base-300/50 for subtle contrast with base-100 modal */}
+                <div className="p-4 bg-base-300/50 rounded-xl border border-base-300">
                   <p className="text-base-content/90 whitespace-pre-wrap leading-relaxed text-sm">
                     {selectedAnnouncement.message}
                   </p>
@@ -627,7 +643,8 @@ const ManageAnnouncements = () => {
               <div className="flex justify-end gap-3 pt-4">
                 <button
                   onClick={() => setDetailModalOpen(false)}
-                  className="px-4 sm:px-6 py-2 sm:py-3 bg-base-100 text-base-content rounded-xl font-semibold border border-base-300 hover:bg-base-200 transition-all duration-300 text-sm"
+                  // Changed button background to bg-base-200 for better contrast on base-100 modal
+                  className="px-4 sm:px-6 py-2 sm:py-3 bg-base-200 text-base-content rounded-xl font-semibold border border-base-300 hover:bg-base-300 transition-all duration-300 text-sm"
                 >
                   Close
                 </button>

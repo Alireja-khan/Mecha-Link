@@ -387,7 +387,7 @@ const Page = () => {
                 {/* Desktop Table View */}
                 <div className="hidden xl:block rounded-2xl border border-base-300 overflow-x-auto">
                     <table className="min-w-full divide-y divide-base-300">
-                        <thead className="bg-base-200">
+                        <thead className="bg-base-300">
                             <tr>
                                 <th className="px-6 py-4 text-left text-sm font-semibold text-base-content">Review & User</th>
                                 <th className="px-6 py-4 text-left text-sm font-semibold text-base-content">Shop Details</th>

@@ -1,23 +1,24 @@
 "use client";
 
+
 import React, { useState, useEffect, useRef } from "react";
 import {
-  Bell,
   Users,
   Wrench,
   ClipboardList,
   Menu,
 } from "lucide-react";
 import useUser from "@/hooks/useUser";
-import AdminNotifications from "./AdminNotifications";
-import NotificationCanvas from "./NotificationCanvas";
-import axios from "axios";
-import ToggleTheme from "./ToggleTheme";
-import Link from "next/link";
+import NotificationWidget from "@/app/shared/NotificationWidget";
+import ToggleTheme from "../../../shared/ToggleTheme";
+
+
+const transitionClasses = "transition duration-200 ease-in-out";
+
 
 // ✅ User Dropdown Component
 const UserDropdown = ({ loggedInUser, roleConfig }) => {
-  const [dropdownOpen, setDropdownOpen] = useState(true);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
 
   useEffect(() => {
@@ -80,219 +81,85 @@ const UserDropdown = ({ loggedInUser, roleConfig }) => {
   );
 };
 
-// ✅ Topbar Component
+// ✅ Updated Topbar with increased size
 const Topbar = ({ pageTitle = "Dashboard", setIsMobileOpen }) => {
   const { user: loggedInUser } = useUser();
-  const [notifications, setNotifications] = useState([]);
-  const [showCanvas, setShowCanvas] = useState(false);
-
-  useEffect(() => {
-    const fetchNotifications = async () => {
-      try {
-        const res = await axios.get("/api/notifications");
-        if (res.data) {
-          let filtered = res.data;
-          if (loggedInUser?.role === "mechanic") {
-            filtered = res.data.filter((n) =>
-              ["serviceRequest", "coupon", "announcement"].includes(n.type)
-            );
-          } else if (loggedInUser?.role === "user") {
-            filtered = res.data.filter((n) =>
-              ["coupon", "announcement"].includes(n.type)
-            );
-          }
-          setNotifications(filtered);
-        }
-      } catch (err) {
-        console.error("Failed to fetch notifications:", err);
-      }
-    };
-
-    if (loggedInUser) fetchNotifications();
-  }, [loggedInUser]);
-
-  const handleDeleteNotification = async (id) => {
-    try {
-      await axios.delete(`/api/notifications/${id}`);
-      setNotifications((prev) => prev.filter((notif) => notif._id !== id));
-    } catch (error) {
-      console.error("Failed to delete notification:", error);
-    }
-  };
-
-  const handleMarkAsRead = async () => {
-    try {
-      const unreadNotifications = notifications.filter((n) => !n.read);
-      for (const notif of unreadNotifications) {
-        await axios.patch(`/api/notifications/${notif._id}`, { read: true });
-      }
-      setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
-    } catch (err) {
-      console.error("Failed to mark notifications as read:", err);
-    }
-  };
 
   const getRoleStyles = (role) => {
     switch (role) {
       case "admin":
         return {
-          badgeColor: "bg-red-500 text-white border-red-600",
+          badgeColor: "bg-red-100 text-red-600 border-red-400",
           actionText: "Manage Users",
           actionIcon: <Users size={18} />,
-          gradient: "from-red-500 to-red-600",
-          Route: "/dashboard/admin/manageUsers",
+          btnBg: "bg-red-600 hover:bg-red-700 shadow-red-300/50",
         };
       case "mechanic":
         return {
-          badgeColor: "bg-blue-500 text-white border-blue-600",
+          badgeColor: "bg-blue-100 text-blue-600 border-blue-400",
           actionText: "Service Requests",
           actionIcon: <Wrench size={18} />,
-          gradient: "from-blue-500 to-blue-600",
+          btnBg: "bg-blue-600 hover:bg-blue-700 shadow-blue-300/50",
         };
       default:
         return {
-          badgeColor: "bg-orange-500 text-white border-orange-600",
+          badgeColor: "bg-orange-100 text-orange-600 border-orange-400",
           actionText: "New Booking",
           actionIcon: <ClipboardList size={18} />,
-          gradient: "from-orange-500 to-orange-600",
+          btnBg: "bg-orange-600 hover:bg-orange-700 shadow-orange-300/50",
         };
     }
   };
 
+
   const roleConfig = loggedInUser ? getRoleStyles(loggedInUser.role) : null;
-  const unreadCount = notifications.filter((n) => !n.read).length;
+
 
   return (
-    <>
-      {/* Topbar Header */}
-      <header className="sticky top-0 z-40 backdrop-blur-md bg-base-100/80 border-b border-neutral transition-all duration-300 w-full px-2">
-        <div className="flex items-center justify-between px-4 sm:px-6 py-2.5 w-full">
-          {/* Left Section */}
-          <div className="flex items-center gap-3 sm:gap-4 min-w-0">
-            <button
-              className="p-2 rounded-xl text-base-content hover:bg-base-300 hover-lift transition-all duration-200 2xl:hidden flex-shrink-0"
-              onClick={() => setIsMobileOpen(true)}
-            >
-              <Menu size={22} className="sm:w-6 sm:h-6" />
-            </button>
-            <h1 className="text-xl sm:text-2xl lg:text-4xl font-bold text-base-content truncate flex-shrink min-w-0">
-              {pageTitle}
-            </h1>
-          </div>
-
-          {/* Right Section */}
-          <div className="flex items-center gap-2 sm:gap-3 md:gap-4 flex-shrink-0 min-w-0 z-50">
-            <AdminNotifications />
-            <ToggleTheme />
-
-            {/* Notification Button */}
-            <div className="relative flex-shrink-0">
-              <button
-                title="Notifications"
-                className="relative p-2 sm:p-2.5 rounded-xl text-base-content hover:bg-base-300 hover-lift transition-all duration-200"
-                onClick={() => {
-                  setShowCanvas(true);
-                  handleMarkAsRead();
-                }}
-              >
-                <Bell size={20} className="sm:w-[22px] sm:h-[22px]" />
-                {unreadCount > 0 && (
-                  <span className="absolute -top-1 -right-1 min-w-[1.25rem] h-auto px-1.5 text-xs font-bold text-white bg-gradient-to-r from-red-500 to-red-600 rounded-full flex items-center justify-center shadow-lg animate-pulse">
-                    {unreadCount > 9 ? "9+" : unreadCount}
-                  </span>
-                )}
-              </button>
-            </div>
-
-            {/* Role Button */}
-            {roleConfig && (
-              <Link href={roleConfig.Route || "#"}>
-                <button
-                  className={`hidden sm:flex items-center gap-2 px-3 sm:px-4 py-3 rounded-xl text-white text-sm font-semibold bg-gradient-to-r ${roleConfig.gradient} hover-lift shadow-lg hover:shadow-xl transition-all duration-200 flex-shrink`}
-                >
-                  {roleConfig.actionIcon}
-                  <span className="hidden md:inline">
-                    {roleConfig.actionText}
-                  </span>
-                </button>
-              </Link>
-            )}
-
-            {loggedInUser && (
-              <UserDropdown
-                loggedInUser={loggedInUser}
-                roleConfig={roleConfig}
-              />
-            )}
-          </div>
-        </div>
-      </header>
-
-      {/* ✅ Fixed Notification Canvas (placed outside header for z-index isolation) */}
-      <div className="fixed top-0 right-0 z-[100]">
-        <NotificationCanvas
-          isOpen={showCanvas}
-          title="Notifications"
-          onClose={() => setShowCanvas(false)}
+    <header className="sticky top-0 z-15 flex items-center justify-between px-4 sm:px-8 md:px-10 py-3 sm:py-2.5 border-b border-neutral bg-base-100">
+      <div className="flex items-center gap-4">
+        {/* ✅ Hamburger Button */}
+        <button
+          className="p-1 rounded-lg text-base-content hover:bg-base-200 hover:text-primary transition duration-150 2xl:hidden"
+          onClick={() => setIsMobileOpen(true)}
         >
-          {notifications.length === 0 ? (
-            <div className="flex flex-col items-center justify-center p-8 text-center">
-              <div className="rounded-full bg-base-300 flex items-center justify-center mb-4 p-4">
-                <Bell size={28} className="text-base-content/70" />
-              </div>
-              <p className="text-sm font-medium text-base-content mb-1">
-                No notifications
-              </p>
-              <p className="text-xs text-base-content/60">
-                You're all caught up!
-              </p>
-            </div>
-          ) : (
-            notifications.map((notif) => {
-              const createdAt = notif.createdAt
-                ? new Date(notif.createdAt).toLocaleString()
-                : "Date not available";
-
-              return (
-                <div
-                  key={notif._id}
-                  className="group relative flex flex-col gap-2 px-5 py-3 border-b border-neutral hover:bg-base-200 transition-all duration-150"
-                >
-                  {!notif.read && (
-                    <div className="absolute top-6 left-2 w-2 h-2 rounded-full bg-primary" />
-                  )}
-                  <div className="flex justify-between items-start gap-3 min-w-0">
-                    <p
-                      className={`text-sm truncate ${!notif.read
-                        ? "font-semibold text-base-content"
-                        : "text-base-content/70"
-                        }`}
-                    >
-                      {notif.message || "Notification"}
-                    </p>
-                    <button
-                      className="opacity-0 group-hover:opacity-100 text-base-content/60 hover:text-red-500 text-xs font-bold transition-all duration-150"
-                      onClick={() => handleDeleteNotification(notif._id)}
-                    >
-                      ✕
-                    </button>
-                  </div>
-                  {notif.data && (
-                    <p className="text-xs text-base-content/70 break-all">
-                      {JSON.stringify(notif.data)}
-                    </p>
-                  )}
-                  <p className="text-[11px] text-base-content/60 self-end">
-                    {createdAt}
-                  </p>
-                </div>
-              );
-            })
-          )}
-        </NotificationCanvas>
+          <Menu size={26} />
+        </button>
+        <h1 className="text-2xl md:text-3xl font-extrabold text-base-content truncate">
+          {pageTitle}
+        </h1>
       </div>
-    </>
+
+
+
+      <div className="flex items-center gap-5">
+        <ToggleTheme />
+        {/* Notification Widget */}
+        {loggedInUser && <NotificationWidget loggedInUser={loggedInUser} />}
+
+
+        {roleConfig && (
+          <button
+            className={`hidden md:flex px-4 py-2 sm:py-2.5 rounded-lg sm:rounded-xl text-white text-sm sm:text-base font-semibold transition items-center gap-2 shadow-md ${roleConfig.btnBg}`}
+            title={roleConfig.actionText}
+          >
+            {roleConfig.actionIcon}
+            <span className="hidden md:block">{roleConfig.actionText}</span>
+          </button>
+        )}
+
+
+        {loggedInUser && (
+          <UserDropdown
+            loggedInUser={loggedInUser}
+            roleConfig={roleConfig}
+          />
+        )}
+      </div>
+    </header>
   );
 };
 
+
 export default Topbar;
+

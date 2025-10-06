@@ -42,13 +42,13 @@ const getStatusBadge = (status) => {
   switch (status) {
     case "pending":
       // Uses DaisyUI warning color
-      return <span className={`${base} bg-warning/30 text-warning dark:text-warning/80 border-warning/30`}>Pending</span>;
+      return <span className={`${base} bg-warning/30 text-base-content dark:text-warning/80 border-warning/30`}>Pending</span>;
     case "in-progress":
       // Uses DaisyUI info color (Blue)
       return <span className={`${base} bg-info/10 text-info border-info/30`}>In Progress</span>;
     case "completed":
       // Uses DaisyUI success color (Green)
-      return <span className={`${base} bg-success/10 text-base-content border-success/30`}>Completed</span>;
+      return <span className={`${base} bg-success/10 text-success border-success/30`}>Completed</span>;
     case "cancelled":
       // Uses DaisyUI error color (Red)
       return <span className={`${base} bg-error/10 text-error border-error/30`}>Cancelled</span>;
@@ -70,7 +70,7 @@ const StatCard = ({ icon: Icon, value, label, color = "primary" }) => {
     success: { // Green
       bg: "bg-success/10",
       bgHover: "group-hover:bg-success/20",
-      text: "text-base-content"
+      text: "text-success" // Use success text for completed counts
     },
     error: { // Red
       bg: "bg-error/10",
@@ -80,7 +80,7 @@ const StatCard = ({ icon: Icon, value, label, color = "primary" }) => {
     warning: { // Yellow
       bg: "bg-warning/20",
       bgHover: "group-hover:bg-warning/30",
-      text: "text-warning-content" // Use content color for visibility on light bg
+      text: "text-warning" // Use warning text for pending counts
     },
     info: { // Blue
       bg: "bg-info/10",
@@ -92,7 +92,7 @@ const StatCard = ({ icon: Icon, value, label, color = "primary" }) => {
   const classes = colorClasses[color] || colorClasses.primary;
 
   return (
-    <div className="bg-base-100 rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-primary/20 shadow-lg hover:shadow-xl transition-all duration-300 group">
+    <div className="bg-base-100 rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-neutral shadow-lg hover:shadow-xl transition-all duration-300 group">
       <div className="flex items-center justify-between mb-3 sm:mb-4">
         <div className={`p-2 sm:p-3 rounded-xl ${classes.bg} ${classes.bgHover} transition-colors duration-300`}>
           <Icon className={classes.text} size={20} />
@@ -113,13 +113,13 @@ const ModalContainer = React.memo(({ children, onClose, title, saving }) => {
     <div className="fixed inset-0 flex items-center justify-center backdrop-blur-md z-50 p-4">
       <div
         ref={modalRef}
-        className="bg-base-100 rounded-3xl p-6 sm:p-8 w-full max-w-lg md:max-w-4xl border border-primary/20 shadow-2xl max-h-[90vh] overflow-y-auto"
+        className="bg-base-100 rounded-3xl p-6 sm:p-8 w-full max-w-lg md:max-w-4xl border border-neutral shadow-2xl max-h-[90vh] overflow-y-auto"
       >
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-xl sm:text-2xl font-bold text-base-content">{title}</h2>
           <button
             onClick={onClose}
-            className="p-2 bg-base-200 text-primary rounded-xl border border-primary/20 hover:bg-base-200/70 transition-colors duration-200"
+            className="p-2 bg-base-200 text-primary rounded-xl border border-neutral hover:bg-base-200/70 transition-colors duration-200"
             disabled={saving}
           >
             <X size={20} />
@@ -152,6 +152,11 @@ const ManageServiceRequests = () => {
       text: message,
       icon: 'success',
       confirmButtonText: 'OK',
+      // Using generic DaisyUI themed settings for Swal
+      confirmButtonColor: 'var(--fallback-p, oklch(var(--p)/1))',
+      background: 'var(--fallback-b1, oklch(var(--b1)/1))',
+      color: 'var(--fallback-bc, oklch(var(--bc)/1))',
+      iconColor: 'var(--fallback-su, oklch(var(--su)/1))'
     });
   };
 
@@ -161,6 +166,10 @@ const ManageServiceRequests = () => {
       text: message,
       icon: 'error',
       confirmButtonText: 'OK',
+      confirmButtonColor: 'var(--fallback-p, oklch(var(--p)/1))',
+      background: 'var(--fallback-b1, oklch(var(--b1)/1))',
+      color: 'var(--fallback-bc, oklch(var(--bc)/1))',
+      iconColor: 'var(--fallback-er, oklch(var(--er)/1))'
     });
   };
 
@@ -172,7 +181,12 @@ const ManageServiceRequests = () => {
       showCancelButton: true,
       confirmButtonText: confirmButtonText,
       cancelButtonText: 'Cancel',
-      reverseButtons: true
+      reverseButtons: true,
+      confirmButtonColor: 'var(--fallback-p, oklch(var(--p)/1))',
+      cancelButtonColor: 'var(--fallback-nc, oklch(var(--nc)/1))',
+      background: 'var(--fallback-b1, oklch(var(--b1)/1))',
+      color: 'var(--fallback-bc, oklch(var(--bc)/1))',
+      iconColor: 'var(--fallback-wa, oklch(var(--wa)/1))'
     });
   };
 
@@ -184,6 +198,8 @@ const ManageServiceRequests = () => {
       didOpen: () => {
         Swal.showLoading();
       },
+      background: 'var(--fallback-b1, oklch(var(--b1)/1))',
+      color: 'var(--fallback-bc, oklch(var(--bc)/1))'
     });
   };
 
@@ -221,7 +237,7 @@ const ManageServiceRequests = () => {
     fetchShops();
   }, []);
 
-  // --- Handlers (Kept logic the same) ---
+  // --- Handlers ---
 
   const handleDeleteRequest = async (id) => {
     const requestToDelete = requests.find(r => r._id === id);
@@ -285,6 +301,8 @@ const ManageServiceRequests = () => {
         assignedShop: editingRequest.assignedShop || null,
         status: editingRequest.status,
         adminNotes: editingRequest.adminNotes,
+        // The user object needs special handling to ensure it only updates mutable fields if necessary, or just sends the required info.
+        // Assuming we only allow editing user name here, and other user info via email/phone fields:
         userName: editingRequest.user?.name,
         location: editingRequest.location,
         serviceDetails: editingRequest.serviceDetails
@@ -331,6 +349,7 @@ const ManageServiceRequests = () => {
   };
 
   const openEditModal = (request) => {
+    // Deep copy the request to prevent accidental mutation of the original state
     setEditingRequest(JSON.parse(JSON.stringify(request)));
     setEditModalOpen(true);
     setDetailModalOpen(false);
@@ -365,7 +384,7 @@ const ManageServiceRequests = () => {
 
   // Request Header Component
   const RequestHeader = React.memo(({ request, isEditing = false }) => (
-    <div className="flex items-start sm:items-center gap-4 p-4 bg-base-200/50 rounded-xl border border-primary/20">
+    <div className="flex items-start sm:items-center gap-4 p-4 bg-base-200 rounded-xl border border-neutral">
       <div className="w-12 h-12 bg-primary rounded-xl flex items-center justify-center text-primary-content flex-shrink-0">
         <Wrench size={20} />
       </div>
@@ -374,9 +393,9 @@ const ManageServiceRequests = () => {
           {isEditing ? (
             <input
               type="text"
-              value={editingRequest?.deviceType || ""}
+              value={request?.deviceType || ""}
               onChange={(e) => handleInputChange('deviceType', e.target.value)}
-              className="bg-base-100 border border-primary/30 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary w-full text-base font-semibold text-base-content"
+              className="bg-base-100 border border-neutral rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary w-full text-base font-semibold text-base-content"
               placeholder="Device Type"
             />
           ) : (
@@ -404,7 +423,7 @@ const ManageServiceRequests = () => {
           {isEditing ? (
             <input
               type="text"
-              value={editingRequest?.deviceType || ""}
+              value={request?.deviceType || ""}
               onChange={(e) => handleInputChange('deviceType', e.target.value)}
               className="w-full bg-base-100 border border-info/30 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-info text-base-content"
             />
@@ -418,7 +437,7 @@ const ManageServiceRequests = () => {
           {isEditing ? (
             <input
               type="text"
-              value={editingRequest?.problemCategory || ""}
+              value={request?.problemCategory || ""}
               onChange={(e) => handleInputChange('problemCategory', e.target.value)}
               className="w-full bg-base-100 border border-info/30 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-info text-base-content"
             />
@@ -431,7 +450,7 @@ const ManageServiceRequests = () => {
           <label className="block font-medium text-base-content/80 mb-1">Problem Description</label>
           {isEditing ? (
             <textarea
-              value={editingRequest?.problemDescription || ""}
+              value={request?.problemDescription || ""}
               onChange={(e) => handleInputChange('problemDescription', e.target.value)}
               className="w-full bg-base-100 border border-info/30 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-info text-base-content"
               rows="3"
@@ -445,10 +464,10 @@ const ManageServiceRequests = () => {
         {/* Conditional Urgency Field */}
         {(request.serviceDetails?.urgency || isEditing) && (
           <div>
-            <label className="block font-medium base-content/80 mb-1">Urgency</label>
+            <label className="block font-medium text-base-content/80 mb-1">Urgency</label>
             {isEditing ? (
               <select
-                value={editingRequest?.serviceDetails?.urgency || "low"}
+                value={request?.serviceDetails?.urgency || "low"}
                 onChange={(e) => handleNestedInputChange('serviceDetails', 'urgency', e.target.value)}
                 className="w-full bg-base-100 border border-info/30 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-info text-base-content"
               >
@@ -476,7 +495,7 @@ const ManageServiceRequests = () => {
           {isEditing ? (
             <input
               type="text"
-              value={editingRequest?.user?.name || ""}
+              value={request?.user?.name || ""}
               onChange={(e) => handleNestedInputChange('user', 'name', e.target.value)}
               className="w-full bg-base-100 border border-success/30 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-success text-base-content"
             />
@@ -490,7 +509,7 @@ const ManageServiceRequests = () => {
           {isEditing ? (
             <input
               type="email"
-              value={editingRequest?.userEmail || ""}
+              value={request?.userEmail || ""}
               onChange={(e) => handleInputChange('userEmail', e.target.value)}
               className="w-full bg-base-100 border border-base-content/30 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-success text-base-content"
             />
@@ -504,7 +523,7 @@ const ManageServiceRequests = () => {
           {isEditing ? (
             <input
               type="tel"
-              value={editingRequest?.userPhone || ""}
+              value={request?.userPhone || ""}
               onChange={(e) => handleInputChange('userPhone', e.target.value)}
               className="w-full bg-base-100 border border-success/30 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-success text-base-content"
             />
@@ -520,7 +539,7 @@ const ManageServiceRequests = () => {
             {isEditing ? (
               <input
                 type="text"
-                value={editingRequest?.location?.address || ""}
+                value={request?.location?.address || ""}
                 onChange={(e) => handleNestedInputChange('location', 'address', e.target.value)}
                 className="w-full bg-base-100 border border-success/30 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-success text-base-content"
                 placeholder="Customer address..."
@@ -543,7 +562,7 @@ const ManageServiceRequests = () => {
           <label className="block font-medium text-base-content/80 mb-1">Assigned Shop</label>
           {isEditing ? (
             <select
-              value={editingRequest?.assignedShop || ""}
+              value={request?.assignedShop || ""}
               onChange={(e) => handleInputChange('assignedShop', e.target.value)}
               className="w-full bg-base-100 border border-secondary/30 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-secondary text-base-content"
             >
@@ -563,7 +582,7 @@ const ManageServiceRequests = () => {
           <label className="block font-medium text-base-content/80 mb-1">Status</label>
           {isEditing ? (
             <select
-              value={editingRequest?.status || "pending"}
+              value={request?.status || "pending"}
               onChange={(e) => handleInputChange('status', e.target.value)}
               className="w-full bg-base-100 border border-secondary/30 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-secondary text-base-content"
             >
@@ -598,7 +617,7 @@ const ManageServiceRequests = () => {
       <h5 className="font-semibold text-base-content mb-3">Admin Notes</h5>
       {isEditing ? (
         <textarea
-          value={editingRequest?.adminNotes || ""}
+          value={request?.adminNotes || ""}
           onChange={(e) => handleInputChange('adminNotes', e.target.value)}
           className="w-full bg-base-100 border border-warning/30 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-warning text-base-content"
           rows="3"
@@ -612,7 +631,7 @@ const ManageServiceRequests = () => {
 
   // --- Mobile Card Component (Refactored Colors) ---
   const RequestMobileCard = ({ req }) => (
-    <div className="bg-base-100 p-4 rounded-xl border border-primary/20 shadow-sm hover:shadow-md transition-all duration-200">
+    <div className="bg-base-100 p-4 rounded-xl border border-neutral shadow-sm hover:shadow-md transition-all duration-200">
       <div className="flex items-start gap-3 mb-3 border-b border-base-300 pb-3">
         <div className="w-10 h-10 bg-primary rounded-lg flex items-center justify-center text-primary-content font-bold text-sm flex-shrink-0">
           <Wrench size={18} />
@@ -633,14 +652,14 @@ const ManageServiceRequests = () => {
       <div className="flex items-center justify-between pt-3 flex-wrap gap-2">
         <div className="flex items-center gap-2 flex-wrap">
           {getStatusBadge(req.status)}
-          <span className="px-3 py-1 text-xs bg-base-200 text-primary rounded-lg border border-primary/20">
+          <span className="px-3 py-1 text-xs bg-base-200 text-primary rounded-lg border border-neutral">
             {req.problemCategory}
           </span>
         </div>
         <div className="flex gap-1.5">
           <button
             onClick={() => openEditModal(req)}
-            className="p-1.5 bg-primary/10 text-primary rounded-lg border border-primary/30 hover:bg-primary/20 transition-colors"
+            className="p-1.5 bg-primary/10 text-primary rounded-lg border border-neutral hover:bg-primary/20 transition-colors"
             title="Edit"
           >
             <Edit size={16} />
@@ -669,16 +688,17 @@ const ManageServiceRequests = () => {
 
   if (loading || userLoading) {
     return (
-      <div className="flex items-center justify-center h-screen w-full">
+      <div className="flex items-center justify-center h-screen w-full bg-base-200">
         <span className="loading loading-bars loading-xl text-primary"></span>
       </div>
     );
   }
 
   if (!loggedInUser) {
+    // Should typically redirect or show a login prompt in a real app
     return (
-      <div className="flex items-center justify-center h-screen w-full">
-        <span className="loading loading-bars loading-xl text-primary"></span>
+      <div className="flex items-center justify-center h-screen w-full bg-base-200">
+        <p className="text-lg text-error">Access Denied. Please log in.</p>
       </div>
     );
   }
@@ -703,7 +723,7 @@ const ManageServiceRequests = () => {
   // --- Main JSX Return ---
 
   return (
-    <div className="min-h-screen p-3 sm:p-4 lg:p-6 mx-auto">
+    <div className="min-h-screen p-3 sm:p-4 lg:p-6 mx-auto bg-base-200">
       {/* Header Section */}
       <div className="mb-4 sm:mb-6 lg:mb-8">
         <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-base-content mb-1 sm:mb-2">Service Request Management</h1>
@@ -719,7 +739,7 @@ const ManageServiceRequests = () => {
       </div>
 
       {/* Main Content */}
-      <div className="bg-base-100 rounded-2xl sm:rounded-3xl p-4 sm:p-6 lg:p-8 border border-primary/20 shadow-xl">
+      <div className="bg-base-100 rounded-2xl sm:rounded-3xl p-4 sm:p-6 lg:p-8 border border-neutral shadow-xl">
         {/* Header with Search and Actions */}
         <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 mb-6">
           <div>
@@ -736,7 +756,7 @@ const ManageServiceRequests = () => {
                 placeholder="Search by user, device, or problem..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10 pr-4 py-2.5 sm:py-3 border border-primary/30 rounded-xl bg-base-200/50 focus:bg-base-100 focus:border-primary focus:outline-none transition-all duration-300 w-full text-sm text-base-content"
+                className="pl-10 pr-4 py-2.5 sm:py-3 border border-neutral rounded-xl bg-base-200/50 focus:bg-base-100 focus:border-neutral focus:outline-none transition-all duration-300 w-full text-sm text-base-content"
               />
             </div>
 
@@ -744,14 +764,14 @@ const ManageServiceRequests = () => {
             <div className="flex gap-3 w-full sm:w-auto">
               <button
                 onClick={() => showSuccessAlert('Coming Soon!', 'Filter functionality will be implemented soon.')}
-                className="flex items-center gap-2 px-4 py-2.5 sm:py-3 bg-base-200 text-primary rounded-xl border border-primary/20 hover:bg-base-200/70 transition-colors duration-200 text-sm flex-1"
+                className="flex items-center gap-2 px-4 py-2.5 sm:py-3 bg-base-200 text-primary rounded-xl border border-neutral hover:bg-base-200/70 transition-colors duration-200 text-sm flex-1"
               >
                 <Filter size={16} />
                 Filter
               </button>
               <button
                 onClick={() => showSuccessAlert('Coming Soon!', 'Export functionality will be implemented soon.')}
-                className="flex items-center gap-2 px-4 py-2.5 sm:py-3 bg-base-200 text-primary rounded-xl border border-primary/20 hover:bg-base-200/70 transition-colors duration-200 text-sm flex-1"
+                className="flex items-center gap-2 px-4 py-2.5 sm:py-3 bg-base-200 text-primary rounded-xl border border-neutral hover:bg-base-200/70 transition-colors duration-200 text-sm flex-1"
               >
                 <Download size={16} />
                 Export
@@ -775,21 +795,21 @@ const ManageServiceRequests = () => {
           )}
         </div>
 
-        {/* Desktop Table (Visible on screens >= xl) - REFACTORED */}
-        <div className="hidden xl:block rounded-2xl border border-primary/20 overflow-x-auto">
-          <table className="min-w-full divide-y divide-primary/20">
-            <thead className="bg-base-200">
+        {/* Desktop Table (Visible on screens >= xl) */}
+        <div className="hidden xl:block rounded-2xl border border-neutral overflow-x-auto">
+          <table className="min-w-full divide-y divide-neutral">
+            <thead className="bg-base-300">
               <tr>
-                <th className="px-6 py-4 text-left text-sm font-semibold text-primary uppercase tracking-wider whitespace-nowrap">Request Details</th>
-                <th className="px-6 py-4 text-left text-sm font-semibold text-primary uppercase tracking-wider whitespace-nowrap">User Info</th>
-                <th className="px-6 py-4 text-left text-sm font-semibold text-primary uppercase tracking-wider whitespace-nowrap">Problem</th>
-                <th className="px-6 py-4 text-left text-sm font-semibold text-primary uppercase tracking-wider whitespace-nowrap">Shop</th>
-                <th className="px-6 py-4 text-left text-sm font-semibold text-primary uppercase tracking-wider whitespace-nowrap">Requested</th>
-                <th className="px-6 py-4 text-left text-sm font-semibold text-primary uppercase tracking-wider whitespace-nowrap">Status</th>
-                <th className="px-6 py-4 text-center text-sm font-semibold text-primary uppercase tracking-wider whitespace-nowrap">Actions</th>
+                <th className="px-6 py-4 text-left text-sm font-semibold text-base-content uppercase tracking-wider whitespace-nowrap">Request Details</th>
+                <th className="px-6 py-4 text-left text-sm font-semibold text-base-content uppercase tracking-wider whitespace-nowrap">User Info</th>
+                <th className="px-6 py-4 text-left text-sm font-semibold text-base-content uppercase tracking-wider whitespace-nowrap">Problem</th>
+                <th className="px-6 py-4 text-left text-sm font-semibold text-base-content uppercase tracking-wider whitespace-nowrap">Shop</th>
+                <th className="px-6 py-4 text-left text-sm font-semibold text-base-content uppercase tracking-wider whitespace-nowrap">Requested</th>
+                <th className="px-6 py-4 text-left text-sm font-semibold text-base-content uppercase tracking-wider whitespace-nowrap">Status</th>
+                <th className="px-6 py-4 text-center text-sm font-semibold text-base-content uppercase tracking-wider whitespace-nowrap">Actions</th>
               </tr>
             </thead>
-            <tbody className="bg-base-100 divide-y divide-primary/20">
+            <tbody className="bg-base-100 divide-y divide-neutral">
               {loading ? (
                 <tr>
                   <td colSpan="7" className="text-center py-12">
@@ -834,7 +854,7 @@ const ManageServiceRequests = () => {
                       </div>
                     </td>
                     <td className="px-6 py-4">
-                      <span className="px-3 py-1 bg-base-200 text-primary text-sm rounded-lg border border-primary/20 whitespace-nowrap">
+                      <span className="px-3 py-1 bg-base-200 text-primary text-sm rounded-lg border border-neutral whitespace-nowrap">
                         {req.problemCategory || "Other"}
                       </span>
                     </td>
@@ -860,7 +880,7 @@ const ManageServiceRequests = () => {
                       <div className="flex justify-center gap-2">
                         <button
                           onClick={() => openEditModal(req)}
-                          className="p-2 bg-primary/10 text-primary rounded-xl border border-primary/30 hover:bg-primary/20 hover:scale-105 transition-all duration-200"
+                          className="p-2 bg-primary/10 text-primary rounded-xl border border-neutral hover:bg-primary/20 hover:scale-105 transition-all duration-200"
                           title="Edit"
                         >
                           <Edit size={16} />
@@ -918,7 +938,7 @@ const ManageServiceRequests = () => {
             <div className="flex justify-end gap-3 pt-4 flex-wrap">
               <button
                 onClick={closeModals}
-                className="px-6 py-3 bg-base-100 text-base-content/90 rounded-xl font-semibold border border-primary/20 hover:bg-base-200 transition-all duration-300 text-sm"
+                className="px-6 py-3 bg-base-100 text-base-content/90 rounded-xl font-semibold border border-neutral hover:bg-base-200 transition-all duration-300 text-sm"
               >
                 Close
               </button>
@@ -930,7 +950,7 @@ const ManageServiceRequests = () => {
               </button>
               <button
                 onClick={() => handleDeleteRequest(selectedRequest._id)}
-                className="px-6 py-3 bg-error text-primary-content rounded-xl font-semibold transition-all duration-300 hover:bg-error/80 hover:scale-105 shadow-lg hover:shadow-xl text-sm"
+                className="px-6 py-3 bg-error text-error-content rounded-xl font-semibold transition-all duration-300 hover:bg-error/80 hover:scale-105 shadow-lg hover:shadow-xl text-sm"
               >
                 Delete Request
               </button>
@@ -957,7 +977,7 @@ const ManageServiceRequests = () => {
               <button
                 onClick={closeModals}
                 disabled={saving}
-                className="px-6 py-3 bg-base-100 text-base-content/90 rounded-xl font-semibold border border-primary/20 hover:bg-base-200 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed text-sm"
+                className="px-6 py-3 bg-base-100 text-base-content/90 rounded-xl font-semibold border border-neutral hover:bg-base-200 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed text-sm"
               >
                 Cancel
               </button>

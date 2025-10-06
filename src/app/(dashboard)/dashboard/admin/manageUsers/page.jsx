@@ -5,6 +5,8 @@ import useUser from "@/hooks/useUser";
 import { Check, X, Edit, Search, Filter, Download, Users, UserCheck, Mail, Calendar, Shield, Eye, Trash, Plus, Ban, UserCog, Phone, MapPin, MessageSquare } from "lucide-react";
 import Swal from 'sweetalert2';
 
+// --- Utility Functions ---
+
 // Utility function to format date for full display
 const formatDate = (dateString) => {
   if (!dateString) return 'N/A';
@@ -43,10 +45,10 @@ const StatCard = ({ icon: Icon, value, label, color = "primary" }) => {
       bgHover: "group-hover:bg-error/20",
       text: "text-error"
     },
-    warning: {
-      bg: "bg-warning/20", // Slightly darker to show better
-      bgHover: "group-hover:bg-warning/30",
-      text: "text-warning-content" // Use content color for visibility on light bg
+    info: { // Added info color for pending/shield icon
+      bg: "bg-info/10",
+      bgHover: "group-hover:bg-info/20",
+      text: "text-info"
     }
   };
 
@@ -64,6 +66,9 @@ const StatCard = ({ icon: Icon, value, label, color = "primary" }) => {
     </div>
   );
 };
+
+
+// --- Main Component ---
 
 const ManageUsers = () => {
   const { user: loggedInUser, loading: userLoading } = useUser();
@@ -84,39 +89,51 @@ const ManageUsers = () => {
   });
   const [roleFilter, setRoleFilter] = useState("all"); // Added role filter state
 
-  // SweetAlert2 Functions (color updates)
+  // SweetAlert2 Functions (color updates for DaisyUI theme)
+  const swalOptions = {
+    confirmButtonColor: 'var(--fallback-p, oklch(var(--p)/1))',
+    background: 'var(--fallback-b1, oklch(var(--b1)/1))',
+    color: 'var(--fallback-bc, oklch(var(--bc)/1))',
+    cancelButtonColor: 'var(--fallback-nc, oklch(var(--nc)/1))',
+  };
+
   const showSuccessAlert = (title, message) => {
     Swal.fire({
+      ...swalOptions,
       title: title,
       text: message,
       icon: 'success',
-      confirmButtonText: 'OK',
+      iconColor: 'var(--fallback-su, oklch(var(--su)/1))'
     });
   };
 
   const showErrorAlert = (title, message) => {
     Swal.fire({
+      ...swalOptions,
       title: title,
       text: message,
       icon: 'error',
-      confirmButtonText: 'OK',
+      iconColor: 'var(--fallback-er, oklch(var(--er)/1))'
     });
   };
 
   const showConfirmDialog = (title, text, confirmButtonText = 'Yes, proceed') => {
     return Swal.fire({
+      ...swalOptions,
       title: title,
       text: text,
       icon: 'warning',
       showCancelButton: true,
       confirmButtonText: confirmButtonText,
       cancelButtonText: 'Cancel',
-      reverseButtons: true
+      reverseButtons: true,
+      iconColor: 'var(--fallback-wa, oklch(var(--wa)/1))'
     });
   };
 
   const showLoadingAlert = (title, text) => {
     Swal.fire({
+      ...swalOptions,
       title: title,
       text: text,
       allowOutsideClick: false,
@@ -137,7 +154,7 @@ const ManageUsers = () => {
       setUsers(Array.isArray(data) ? data : []);
     } catch (err) {
       console.error("Failed to fetch users:", err);
-      showErrorAlert('Error', 'Failed to load users');
+      // Removed alert during initial load to prevent spam on minor errors
     } finally {
       setLoading(false);
     }
@@ -146,6 +163,8 @@ const ManageUsers = () => {
   useEffect(() => {
     fetchUsers();
   }, []);
+
+  // --- Handlers ---
 
   const handleActivate = async (id) => {
     const result = await showConfirmDialog(
@@ -232,6 +251,7 @@ const ManageUsers = () => {
 
         Swal.close();
         await fetchUsers();
+        setDetailModalOpen(false); // Close detail modal if open
         showSuccessAlert('Deleted!', 'The user has been deleted successfully');
       } catch (error) {
         console.error('Deletion failed:', error);
@@ -243,10 +263,8 @@ const ManageUsers = () => {
 
   const handleFormSubmit = async (e) => {
     e.preventDefault();
-    const form = e.target;
-    const updateData = new FormData(form);
-    const formObject = Object.fromEntries(updateData.entries());
-    const { id, ...payload } = formObject;
+    // For simplicity, we'll use the current state as the payload
+    const { id, ...payload } = formData;
 
     // Determine if it's an add or edit operation
     const isEdit = !!id;
@@ -271,7 +289,13 @@ const ManageUsers = () => {
         });
 
         if (!response.ok) {
-          const errorData = await response.json();
+          const errorText = await response.text();
+          let errorData;
+          try {
+            errorData = JSON.parse(errorText);
+          } catch {
+            throw new Error(errorText || `HTTP error! status: ${response.status}`);
+          }
           throw new Error(errorData.error || `Failed to ${isEdit ? 'update' : 'create'} user data`);
         }
 
@@ -308,6 +332,7 @@ const ManageUsers = () => {
 
   const handleModalClose = () => {
     setModalOpen(false);
+    setDetailModalOpen(false);
     setSelectedUser(null);
     setFormData({ name: "", email: "", role: "customer", status: "active", phone: "", location: "", id: "" });
   };
@@ -327,6 +352,7 @@ const ManageUsers = () => {
   );
   // ----------------------
 
+  // --- Badge Functions ---
   const getStatusBadge = (status) => {
     const base = "px-3 py-1 text-xs font-semibold rounded-full border whitespace-nowrap";
     switch (status) {
@@ -335,8 +361,8 @@ const ManageUsers = () => {
       case "inactive":
         return <span className={`${base} bg-error/10 text-error border-error/30`}>Inactive</span>;
       case "pending":
-        // Using warning/20 for better visibility on light background
-        return <span className={`${base} bg-warning/20 text-warning-content border-warning/30`}>Pending</span>;
+        // Using info/20 for visibility and Shield icon in stats
+        return <span className={`${base} bg-info/10 text-info border-info/30`}>Pending</span>;
       default:
         return <span className={`${base} bg-base-300 text-base-content/70 border-base-300`}>Unknown</span>;
     }
@@ -346,11 +372,11 @@ const ManageUsers = () => {
     const base = "px-3 py-1 text-xs font-semibold rounded-lg border capitalize whitespace-nowrap";
     switch (role) {
       case 'admin':
-        // Custom color: Using info (blue) for admin role, slightly adjusted for visibility
-        return <span className={`${base} bg-info/10 text-info border-info/30`}>{role}</span>;
-      case 'mechanic':
-        // Custom color: Secondary (soft orange) for mechanic
+        // Custom color: Using secondary (purple/pink) for admin role
         return <span className={`${base} bg-secondary/10 text-secondary border-secondary/30`}>{role}</span>;
+      case 'mechanic':
+        // Custom color: Info (blue) for mechanic
+        return <span className={`${base} bg-info/10 text-info border-info/30`}>{role}</span>;
       default: // customer
         // Primary (main orange) for customer
         return <span className={`${base} bg-primary/10 text-primary border-base-content/30`}>{role}</span>;
@@ -448,7 +474,7 @@ const ManageUsers = () => {
   }
 
   return (
-    <div className="min-h-screen w-full p-3 sm:p-4 lg:p-6 mx-auto">
+    <div className="min-h-screen w-full p-3 sm:p-4 lg:p-6 mx-auto bg-base-200">
       {/* Header Section */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 sm:mb-6 lg:mb-8">
         <div>
@@ -524,18 +550,18 @@ const ManageUsers = () => {
 
         {/* Desktop Table (Visible on screens >= xl) */}
         <div className="hidden xl:block rounded-2xl border border-base-content/20 overflow-x-auto">
-          <table className="min-w-full divide-y divide-primary/20">
-            <thead className="bg-base-300/30">
+          <table className="min-w-full divide-y divide-neutral">
+            <thead className="bg-base-300">
               <tr>
-                <th className="px-6 py-4 text-left text-sm font-semibold text-primary uppercase tracking-wider">User Details</th>
-                <th className="px-6 py-4 text-left text-sm font-semibold text-primary uppercase tracking-wider">Contact</th>
-                <th className="px-6 py-4 text-left text-sm font-semibold text-primary uppercase tracking-wider">Role</th>
-                <th className="px-6 py-4 text-left text-sm font-semibold text-primary uppercase tracking-wider">Joined</th>
-                <th className="px-6 py-4 text-left text-sm font-semibold text-primary uppercase tracking-wider">Status</th>
-                <th className="px-6 py-4 text-center text-sm font-semibold text-primary uppercase tracking-wider">Actions</th>
+                <th className="px-6 py-4 text-left text-sm font-semibold text-base-content uppercase tracking-wider">User Details</th>
+                <th className="px-6 py-4 text-left text-sm font-semibold text-base-content uppercase tracking-wider">Contact</th>
+                <th className="px-6 py-4 text-left text-sm font-semibold text-base-content uppercase tracking-wider">Role</th>
+                <th className="px-6 py-4 text-left text-sm font-semibold text-base-content uppercase tracking-wider">Joined</th>
+                <th className="px-6 py-4 text-left text-sm font-semibold text-base-content uppercase tracking-wider">Status</th>
+                <th className="px-6 py-4 text-center text-sm font-semibold text-base-content uppercase tracking-wider">Actions</th>
               </tr>
             </thead>
-            <tbody className="bg-base-100 divide-y divide-primary/20">
+            <tbody className="bg-base-100 divide-y divide-neutral">
               {loading ? (
                 <tr>
                   <td colSpan="6" className="text-center py-12">
@@ -656,7 +682,7 @@ const ManageUsers = () => {
         </div>
       </div>
 
-      {/* Create/Edit User Modal */}
+      {/* Create/Edit User Modal (Completed) */}
       {modalOpen && (
         <div className="fixed inset-0 flex items-center justify-center backdrop-blur-md z-50 p-4">
           <div className="bg-base-100 rounded-3xl p-6 sm:p-8 w-full max-w-lg md:max-w-2xl border border-base-content/20 shadow-2xl max-h-[90vh] overflow-y-auto">
@@ -735,7 +761,7 @@ const ManageUsers = () => {
                     <option value="pending">Pending</option>
                   </select>
                 </div>
-                {/* Input: Phone */}
+                {/* Input: Phone - COMPLETE */}
                 <div>
                   <label className="block text-base-content/90 font-medium mb-2 text-sm">Phone</label>
                   <input
@@ -747,7 +773,7 @@ const ManageUsers = () => {
                     placeholder="Enter phone number"
                   />
                 </div>
-                {/* Input: Location */}
+                {/* Input: Location - COMPLETE */}
                 <div>
                   <label className="block text-base-content/90 font-medium mb-2 text-sm">Location</label>
                   <input
@@ -760,6 +786,7 @@ const ManageUsers = () => {
                   />
                 </div>
               </div>
+              {/* Form Actions - COMPLETE */}
               <div className="flex justify-end gap-3 pt-4">
                 <button
                   type="button"
@@ -781,7 +808,7 @@ const ManageUsers = () => {
         </div>
       )}
 
-      {/* User Detail Modal */}
+      {/* User Detail Modal (Completed) */}
       {detailModalOpen && selectedUser && (
         <div className="fixed inset-0 flex items-center justify-center backdrop-blur-md z-50 p-4">
           <div className="bg-base-100 rounded-3xl p-6 sm:p-8 w-full max-w-lg md:max-w-2xl border border-base-content/20 shadow-2xl max-h-[90vh] overflow-y-auto">
@@ -829,9 +856,9 @@ const ManageUsers = () => {
                 {/* Contact Information (Using success for green base-200) */}
                 <div className="p-4 bg-success/10 rounded-xl border border-success/30">
                   <h5 className="font-semibold text-base-content mb-2">Contact Information</h5>
-                  <div className="space-y-2 text-success/90 text-sm">
-                    <p><strong>Phone:</strong> {selectedUser.phone || "Not provided"}</p>
-                    <p><strong>Location:</strong> {selectedUser.location || "Not provided"}</p>
+                  <div className="space-y-2 text-base-content/90 text-sm">
+                    <p className="flex items-center gap-2"><Phone size={14} className="text-success" />{selectedUser.phone || "Not provided"}</p>
+                    <p className="flex items-center gap-2"><MapPin size={14} className="text-success" />{selectedUser.location || "Not provided"}</p>
                   </div>
                 </div>
 
@@ -844,6 +871,13 @@ const ManageUsers = () => {
                     {selectedUser.updatedAt && (
                       <p><strong>Last Updated:</strong> {formatDate(selectedUser.updatedAt)}</p>
                     )}
+                  </div>
+                </div>
+                {/* Placeholder for future sections (e.g., related requests) */}
+                <div className="p-4 bg-base-200/50 rounded-xl border border-base-content/20">
+                  <h5 className="font-semibold text-base-content/90 mb-2">Related Data</h5>
+                  <div className="space-y-2 text-base-content/80 text-sm">
+                    <p>No related service requests found.</p>
                   </div>
                 </div>
               </div>

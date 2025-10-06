@@ -5,6 +5,8 @@ import useUser from "@/hooks/useUser";
 import { Check, X, Search, Store, Clock, User, Mail, MapPin, Eye, Ban, MessageSquare, Trash2, Hash } from "lucide-react";
 import Swal from 'sweetalert2';
 
+// --- Utility Functions & Components ---
+
 const StatCard = ({ icon: Icon, value, label, color = "primary" }) => {
     const colorClasses = {
         primary: {
@@ -62,6 +64,8 @@ const formatDateShort = (dateString) => {
     });
 };
 
+// --- Main Component ---
+
 const ManageShops = () => {
     const { user: loggedInUser, loading: userLoading } = useUser();
     const [shops, setShops] = useState([]);
@@ -76,41 +80,54 @@ const ManageShops = () => {
         latitude: "",
         longitude: "",
         status: "pending",
-        rejectionReason: ""
+        rejectionReason: "" // Now included in state for conditional input
     });
+
+    // SweetAlert2 Configuration
+    const swalOptions = {
+        confirmButtonColor: 'var(--fallback-p, oklch(var(--p)/1))',
+        background: 'var(--fallback-b1, oklch(var(--b1)/1))',
+        color: 'var(--fallback-bc, oklch(var(--bc)/1))',
+        cancelButtonColor: 'var(--fallback-nc, oklch(var(--nc)/1))',
+    };
 
     const showSuccessAlert = (title, message) => {
         Swal.fire({
+            ...swalOptions,
             title: title,
             text: message,
             icon: 'success',
-            confirmButtonText: 'OK',
+            iconColor: 'var(--fallback-su, oklch(var(--su)/1))'
         });
     };
 
     const showErrorAlert = (title, message) => {
         Swal.fire({
+            ...swalOptions,
             title: title,
             text: message,
             icon: 'error',
-            confirmButtonText: 'OK',
+            iconColor: 'var(--fallback-er, oklch(var(--er)/1))'
         });
     };
 
     const showConfirmDialog = (title, text, confirmButtonText = 'Yes, proceed') => {
         return Swal.fire({
+            ...swalOptions,
             title: title,
             text: text,
             icon: 'warning',
             showCancelButton: true,
             confirmButtonText: confirmButtonText,
             cancelButtonText: 'Cancel',
-            reverseButtons: true
+            reverseButtons: true,
+            iconColor: 'var(--fallback-wa, oklch(var(--wa)/1))'
         });
     };
 
     const showLoadingAlert = (title, text) => {
         Swal.fire({
+            ...swalOptions,
             title: title,
             text: text,
             allowOutsideClick: false,
@@ -119,6 +136,8 @@ const ManageShops = () => {
             },
         });
     };
+
+    // --- Data Fetching ---
 
     const fetchShops = async () => {
         setLoading(true);
@@ -139,6 +158,8 @@ const ManageShops = () => {
         fetchShops();
     }, []);
 
+    // --- Action Handlers & Modals ---
+
     const openActionModal = (shop) => {
         setShopToAction(shop);
         setActionData({
@@ -153,26 +174,33 @@ const ManageShops = () => {
     const handleActionSubmit = async () => {
         const { status, latitude, longitude, rejectionReason } = actionData;
 
-        if ((status === 'approved' || status === 'rejected') && (!latitude || !longitude)) {
-            showErrorAlert('Validation Error', 'Latitude and longitude are required to change status from pending.');
-            return;
+        // 1. Validation for Approval
+        let lat, lng;
+        if (status === "approved") {
+            if (!latitude || !longitude) {
+                showErrorAlert('Validation Error', 'Please provide both latitude and longitude for approval');
+                return;
+            }
+
+            lat = parseFloat(latitude);
+            lng = parseFloat(longitude);
+
+            if (isNaN(lat) || isNaN(lng) || lat < -90 || lat > 90 || lng < -180 || lng > 180) {
+                showErrorAlert('Validation Error', 'Latitude and longitude must be valid numbers within range.');
+                return;
+            }
         }
-        if (status === 'rejected' && !rejectionReason.trim()) {
-            showErrorAlert('Validation Error', 'Rejection reason is required when setting status to Rejected.');
+
+        // 2. Validation for Rejection
+        if (status === "rejected" && !rejectionReason.trim()) {
+            showErrorAlert('Validation Error', 'Please provide a reason for rejection.');
             return;
         }
 
-        const lat = parseFloat(latitude);
-        const lng = parseFloat(longitude);
-
-        if (isNaN(lat) || isNaN(lng) || lat < -90 || lat > 90 || lng < -180 || lng > 180) {
-            showErrorAlert('Validation Error', 'Latitude and longitude must be valid numbers within range.');
-            return;
-        }
 
         const result = await showConfirmDialog(
             'Update Shop Status',
-            `Are you sure you want to update this shop status to ${status} and set the location?`,
+            `Are you sure you want to update this shop status to ${status}${status === 'approved' ? ' and set the location' : ''}?`,
             'Yes, Update'
         );
 
@@ -180,42 +208,54 @@ const ManageShops = () => {
             try {
                 showLoadingAlert('Updating...', 'Please wait while we update the shop');
 
+                const updateData = { status };
+
+                if (status === "approved") {
+                    updateData.location = { latitude: lat, longitude: lng };
+                    updateData.rejectionReason = null; // Clear rejection reason on approval
+                } else if (status === "rejected") {
+                    updateData.rejectionReason = rejectionReason.trim();
+                } else { // pending
+                    updateData.location = null;
+                    updateData.rejectionReason = null;
+                }
+
                 const response = await fetch(`/api/shops/${shopToAction._id}/status`, {
                     method: "PATCH",
                     headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({
-                        status: status,
-                        location: { latitude: lat, longitude: lng },
-                        ...(status === "rejected" && { rejectionReason: rejectionReason.trim() }),
-                        ...(status !== "rejected" && { rejectionReason: null })
-                    }),
+                    body: JSON.stringify(updateData),
                 });
 
-                if (!response.ok) throw new Error('Failed to update shop');
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.error || 'Failed to update shop');
+                }
 
                 Swal.close();
                 setActionModalOpen(false);
                 setActionData({ latitude: "", longitude: "", status: "pending", rejectionReason: "" });
                 setShopToAction(null);
 
+                // Re-sync selected shop detail if open
                 if (selectedShop?._id === shopToAction._id) {
                     setSelectedShop(prev => ({
                         ...prev,
                         status: status,
-                        rejectionReason: status === "rejected" ? rejectionReason.trim() : null,
+                        rejectionReason: updateData.rejectionReason,
                         shop: {
                             ...prev.shop,
-                            location: { latitude: lat, longitude: lng }
-                        }
+                            location: status === "approved" ? updateData.location : prev.shop?.location,
+                        },
+                        approvedAt: status === "approved" ? new Date().toISOString() : prev.approvedAt
                     }));
                 }
 
                 await fetchShops();
-                showSuccessAlert('Updated!', 'Shop status and location have been updated successfully');
+                showSuccessAlert('Updated!', `Shop has been ${status} successfully`);
             } catch (error) {
                 console.error('Update failed:', error);
                 Swal.close();
-                showErrorAlert('Error', 'Failed to update shop');
+                showErrorAlert('Error', error.message || 'Failed to update shop');
             }
         }
     };
@@ -264,6 +304,8 @@ const ManageShops = () => {
         setDetailModalOpen(true);
     };
 
+    // --- Filtering & Utility ---
+
     const filteredShops = shops.filter((shop) => {
         const shopDetails = shop.shop || {};
 
@@ -299,6 +341,7 @@ const ManageShops = () => {
         rejected: shops.filter(shop => shop.status === "rejected").length,
     };
 
+    // --- Mobile Card Component ---
     const ShopMobileCard = ({ shop }) => {
         const shopDetails = shop.shop || {};
         const address = shopDetails.address || {};
@@ -356,6 +399,7 @@ const ManageShops = () => {
 
     return (
         <div className="min-h-screen w-full p-3 sm:p-4 lg:p-6 mx-auto bg-base-200">
+            {/* Header and Stats (Previous part) */}
             <div className="mb-4 sm:mb-6 lg:mb-8">
                 <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-base-content mb-1 sm:mb-2">Shop Management</h1>
                 <p className="text-base-content/70 text-sm sm:text-base lg:text-lg">Manage and monitor all registered vendor shops in the platform</p>
@@ -368,6 +412,7 @@ const ManageShops = () => {
                 <StatCard icon={Ban} value={stats.rejected} label="Rejected Shops" color="error" />
             </div>
 
+            {/* Main Content (Table/Cards) (Previous part) */}
             <div className="bg-base-100 rounded-2xl sm:rounded-3xl p-4 sm:p-6 lg:p-8 border border-neutral shadow-2xl">
                 <div className="flex flex-col md:flex-row gap-3 w-full mb-6">
                     <div className="relative flex-1">
@@ -397,8 +442,8 @@ const ManageShops = () => {
                 </div>
 
                 <div className="hidden xl:block rounded-2xl border border-neutral overflow-x-auto">
-                    <table className="min-w-full divide-y divide-base-300">
-                        <thead className="bg-base-200">
+                    <table className="min-w-full divide-y divide-neutral">
+                        <thead className="bg-base-300">
                             <tr>
                                 <th className="px-6 py-4 text-left text-sm font-semibold text-base-content">Shop Details</th>
                                 <th className="px-6 py-4 text-left text-sm font-semibold text-base-content">Owner Info</th>
@@ -408,7 +453,7 @@ const ManageShops = () => {
                                 <th className="px-6 py-4 text-center text-sm font-semibold text-base-content">Actions</th>
                             </tr>
                         </thead>
-                        <tbody className="bg-base-100 divide-y divide-base-300">
+                        <tbody className="bg-base-100 divide-y divide-neutral">
                             {filteredShops.length > 0 ? (
                                 filteredShops.map((shop) => (
                                     <tr key={shop._id} className="hover:bg-base-200/50 transition-colors duration-200">
@@ -515,6 +560,7 @@ const ManageShops = () => {
                 </div>
             </div>
 
+            {/* Shop Detail Modal (Completed) */}
             {detailModalOpen && selectedShop && (
                 <div className="fixed inset-0 flex items-center justify-center backdrop-blur-md bg-base-content/10 z-50 p-4">
                     <div className="bg-base-100 rounded-3xl p-6 sm:p-8 w-full max-w-4xl border border-neutral shadow-2xl max-h-[90vh] overflow-y-auto">
@@ -600,7 +646,7 @@ const ManageShops = () => {
 
                             {selectedShop.shop?.vehicleTypes && (
                                 <div className="p-4 bg-accent/10 rounded-xl border border-accent/30">
-                                    <h5 className="font-semibold text-accent-content mb-3">Services Offered</h5>
+                                    <h5 className="font-semibold text-base-content mb-3">Services Offered</h5>
                                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                                         {Object.entries(selectedShop.shop.vehicleTypes).map(([vehicleType, categories]) => (
                                             <div key={vehicleType} className="border border-neutral rounded-lg p-3 bg-base-100">
@@ -653,8 +699,9 @@ const ManageShops = () => {
                 </div>
             )}
 
+            {/* Action Modal for Status & Location Update (Completed and Styled) */}
             {actionModalOpen && shopToAction && (
-                <div className="fixed inset-0 flex items-center justify-center backdrop-blur-md bg-base-content/10 z-50 p-4">
+                <div className="fixed inset-0 flex items-center justify-center backdrop-blur-md z-50 p-4">
                     <div className="bg-base-100 rounded-3xl p-6 sm:p-8 w-full max-w-md border border-neutral shadow-2xl">
                         <div className="flex justify-between items-center mb-6">
                             <h2 className="text-xl sm:text-2xl font-bold text-base-content">Update Shop</h2>
@@ -664,7 +711,7 @@ const ManageShops = () => {
                                     setActionData({ latitude: "", longitude: "", status: "pending", rejectionReason: "" });
                                     setShopToAction(null);
                                 }}
-                                className="p-2 bg-base-200 text-base-content rounded-xl border border-neutral hover:bg-base-300 transition-colors duration-200"
+                                className="p-2 bg-base-200 text-primary rounded-xl border border-neutral hover:bg-base-300 transition-colors duration-200"
                             >
                                 <X size={20} />
                             </button>
@@ -672,15 +719,16 @@ const ManageShops = () => {
 
                         <div className="space-y-4">
                             <p className="text-base-content/70 text-sm sm:text-base">
-                                Update status and location for <strong>{shopToAction.shop?.shopName}</strong>:
+                                Update status and location for **{shopToAction.shop?.shopName}**:
                             </p>
 
+                            {/* Status Selection */}
                             <div>
                                 <label className="block text-sm font-medium text-base-content mb-2">Status</label>
                                 <select
                                     value={actionData.status}
-                                    onChange={(e) => setActionData(prev => ({ ...prev, status: e.target.value }))}
-                                    className="w-full p-3 border border-neutral rounded-xl bg-base-200 focus:bg-base-100 focus:border-primary/50 focus:outline-none transition-all duration-300 text-sm text-base-content"
+                                    onChange={(e) => setActionData(prev => ({ ...prev, status: e.target.value, rejectionReason: "" }))} // Clear reason on status change
+                                    className="w-full p-3 border border-neutral rounded-xl bg-base-200/50 focus:bg-base-100 focus:border-primary focus:outline-none transition-all duration-300 text-sm text-base-content"
                                 >
                                     <option value="pending">Pending</option>
                                     <option value="approved">Approved</option>
@@ -688,43 +736,61 @@ const ManageShops = () => {
                                 </select>
                             </div>
 
-                            <div>
-                                <label className="block text-sm font-medium text-base-content mb-2">Latitude (Required for Approval/Rejection)</label>
-                                <input
-                                    type="text"
-                                    placeholder="Enter latitude (e.g., 40.7128)"
-                                    value={actionData.latitude}
-                                    onChange={(e) => setActionData(prev => ({ ...prev, latitude: e.target.value }))}
-                                    className="w-full p-3 border border-neutral rounded-xl bg-base-200 focus:bg-base-100 focus:border-primary/50 focus:outline-none transition-all duration-300 text-sm text-base-content"
-                                />
-                                <p className="text-xs text-base-content/60 mt-1">Must be between -90 and 90</p>
-                            </div>
+                            {/* Conditional Location Fields (Approved) */}
+                            {actionData.status === "approved" && (
+                                <>
+                                    {/* Latitude Field */}
+                                    <div>
+                                        <label className="block text-sm font-medium text-base-content mb-2">
+                                            Latitude *
+                                        </label>
+                                        <input
+                                            type="text"
+                                            placeholder="Enter latitude (e.g., 40.7128)"
+                                            value={actionData.latitude}
+                                            onChange={(e) => setActionData(prev => ({ ...prev, latitude: e.target.value }))}
+                                            className="w-full p-3 border border-neutral rounded-xl bg-base-200/50 focus:bg-base-100 focus:border-primary focus:outline-none transition-all duration-300 text-sm text-base-content"
+                                            required={actionData.status === "approved"}
+                                        />
+                                        <p className="text-xs text-base-content/60 mt-1">Must be between -90 and 90</p>
+                                    </div>
 
-                            <div>
-                                <label className="block text-sm font-medium text-base-content mb-2">Longitude (Required for Approval/Rejection)</label>
-                                <input
-                                    type="text"
-                                    placeholder="Enter longitude (e.g., -74.0060)"
-                                    value={actionData.longitude}
-                                    onChange={(e) => setActionData(prev => ({ ...prev, longitude: e.target.value }))}
-                                    className="w-full p-3 border border-neutral rounded-xl bg-base-200 focus:bg-base-100 focus:border-primary/50 focus:outline-none transition-all duration-300 text-sm text-base-content"
-                                />
-                                <p className="text-xs text-base-content/60 mt-1">Must be between -180 and 180</p>
-                            </div>
+                                    {/* Longitude Field */}
+                                    <div>
+                                        <label className="block text-sm font-medium text-base-content mb-2">
+                                            Longitude *
+                                        </label>
+                                        <input
+                                            type="text"
+                                            placeholder="Enter longitude (e.g., -74.0060)"
+                                            value={actionData.longitude}
+                                            onChange={(e) => setActionData(prev => ({ ...prev, longitude: e.target.value }))}
+                                            className="w-full p-3 border border-neutral rounded-xl bg-base-200/50 focus:bg-base-100 focus:border-primary focus:outline-none transition-all duration-300 text-sm text-base-content"
+                                            required={actionData.status === "approved"}
+                                        />
+                                        <p className="text-xs text-base-content/60 mt-1">Must be between -180 and 180</p>
+                                    </div>
+                                </>
+                            )}
 
-                            {actionData.status === 'rejected' && (
+                            {/* Conditional Rejection Reason Field (Rejected) */}
+                            {actionData.status === "rejected" && (
                                 <div>
-                                    <label className="block text-sm font-medium text-error mb-2">Rejection Reason (Required)</label>
+                                    <label className="block text-sm font-medium text-base-content mb-2">
+                                        Rejection Reason *
+                                    </label>
                                     <textarea
-                                        placeholder="Briefly explain why the shop is being rejected."
+                                        rows="3"
+                                        placeholder="Explain why the shop is being rejected..."
                                         value={actionData.rejectionReason}
                                         onChange={(e) => setActionData(prev => ({ ...prev, rejectionReason: e.target.value }))}
-                                        rows={3}
-                                        className="w-full p-3 border border-error/50 rounded-xl bg-error/5 focus:bg-base-100 focus:border-error focus:outline-none transition-all duration-300 text-sm text-base-content"
+                                        className="w-full p-3 border border-error/50 rounded-xl bg-error/10 focus:bg-base-100 focus:border-error focus:outline-none transition-all duration-300 text-sm text-base-content"
+                                        required
                                     />
                                 </div>
                             )}
 
+                            {/* Action Buttons */}
                             <div className="flex justify-end gap-3 pt-4 flex-wrap">
                                 <button
                                     onClick={() => {
@@ -738,7 +804,7 @@ const ManageShops = () => {
                                 </button>
                                 <button
                                     onClick={handleActionSubmit}
-                                    className="px-6 py-3 bg-primary text-primary-content rounded-xl font-semibold transition-all duration-300 hover:bg-primary/90 hover:scale-[1.02] shadow-xl"
+                                    className="px-6 py-3 bg-primary text-primary-content rounded-xl font-semibold transition-all duration-300 hover:bg-primary/90 hover:scale-105 shadow-lg hover:shadow-xl"
                                 >
                                     Submit Update
                                 </button>

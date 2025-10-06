@@ -686,7 +686,7 @@ export default function AdminMessagesPage() {
         : { name: "", image: null };
 
     return (
-        <div className="flex w-full overflow-x-hidden h-[calc(100vh-75px)] sm:h-[calc(100vh-77px)] lg:h-[calc(100vh-80px)]  mx-auto p-4">
+        <div className="flex w-full overflow-x-hidden h-[calc(100vh-75px)] sm:h-[calc(100vh-77px)] lg:h-[calc(100vh-80px)] bg-base-200 mx-auto p-4">
             <style jsx global>{`
                     @keyframes typing-dot {
                         0%, 100% { transform: translateY(0); opacity: 0.5; }
