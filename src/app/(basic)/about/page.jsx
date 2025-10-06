@@ -1,25 +1,11 @@
 "use client";
 import React from "react";
-import {
-  Users,
-  Rocket,
-  Target,
-  Star,
-  Heart,
-  Wrench,
-  MapPin,
-  Shield,
-  MessageCircle,
-  Clock,
-  TrendingUp,
-  Award,
-  Zap,
-  Calendar,
-  CreditCard,
-  Globe,
+import { Users, Rocket, Target, Star, Heart, Wrench, MapPin, Shield, MessageCircle, Clock, TrendingUp, Award, Zap, Calendar, CreditCard, Globe,
 } from "lucide-react";
 import CountUp from "react-countup";
 import Image from "next/image";
+import Lottie from "lottie-react";
+import storyAnimation from "../../../../public/assets/ourStory/Welcome.json";
 
 const AboutPage = () => {
   return (
@@ -109,12 +95,11 @@ const AboutPage = () => {
         </div>
 
         <div className="grid md:grid-cols-2 gap-16 items-center">
-          <div className="relative">
-            <div className="absolute -inset-4 bg-gradient-to-r from-primary/5 to-secondary/10 rounded-2xl transform -skew-y-3"></div>
-            <img
-              src="https://img.freepik.com/free-vector/car-repair-concept-illustration_114360-1530.jpg"
-              alt="MechaLink Illustration"
-              className="relative rounded-2xl shadow-lg w-full"
+          <div className="w-full lg:w-full lg:flex items-center justify-center hidden">
+            <Lottie
+              animationData={storyAnimation}
+              loop={true}
+              className="h-80 md:h-[400px] lg:h-[500px] w-auto"
             />
           </div>
           <div>
@@ -494,7 +479,7 @@ const AboutPage = () => {
                 name: "Omar Faruk",
                 role: "Full Stack Developer",
                 image:
-                  "https://i.ibb.co.com/ym8mNNbg/Gemini-Generated-Image-i0r1rti0r1rti0r1.png",
+                  "https://i.ibb.co.com/bMP4QbVX/Gemini-Generated-Image-i0r1rti0r1rti0r1.png",
                 facebook_profile: "https://www.facebook.com/omarfaruk56305",
                 github_profile: "https://github.com/omarfaruk-pro",
                 linkedin_profile: "https://www.linkedin.com/in/omarfaruk56305",
@@ -551,10 +536,10 @@ const AboutPage = () => {
               >
                 {person.featured && (
                   <div className="absolute top-4 right-4 bg-orange-500 text-white text-xs font-bold px-2 py-1 rounded-full">
-                    Team Lead
+                    Team Leader
                   </div>
                 )}
-                <div className="h-88 overflow-hidden">
+                <div className="h-118 overflow-hidden">
                   <img
                     src={person.image}
                     alt={person.name}
