@@ -1,7 +1,7 @@
 "use client";
 
 import { useContext, useState, useEffect } from "react";
-import { UserContext } from "../UserContext";
+
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
