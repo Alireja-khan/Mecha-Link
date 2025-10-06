@@ -63,10 +63,11 @@ const DEVICE_TYPES = {
 };
 
 const URGENCY_LEVELS = [
-  { value: "low", label: "Low (Within 1 week)", color: "text-green-600" },
-  { value: "medium", label: "Medium (Within 3 days)", color: "text-yellow-600" },
-  { value: "high", label: "High (Within 24 hours)", color: "text-orange-600" },
-  { value: "emergency", label: "Emergency (Immediate)", color: "text-red-600" }
+  // Updated colors to match your theme standards (success, warning, error)
+  { value: "low", label: "Low (Within 1 week)", color: "text-success" },
+  { value: "medium", label: "Medium (Within 3 days)", color: "text-warning" },
+  { value: "high", label: "High (Within 24 hours)", color: "text-error" },
+  { value: "emergency", label: "Emergency (Immediate)", color: "text-error" }
 ];
 
 const ServiceRequest = () => {
@@ -104,22 +105,11 @@ const ServiceRequest = () => {
   const loggedInUser = useUser(session?.user?.email)
 
   // ------------------------------------------
-  // LOG USER ID, NAME, AND EMAIL ON PAGE LOAD
+  // LOG USER ID, NAME, AND EMAIL ON PAGE LOAD (unchanged)
   // ------------------------------------------
   useEffect(() => {
-    // Attempt to get the most complete user data
-    // const userId = session?._id || session?.user?.id || loggedInUser?._id || "N/A";
-    // const userName = session?.user?.name || loggedInUser?.name || "Guest User";
-    // const userEmail = session?.user?.email || loggedInUser?.email || "guest@example.com";
-
-    // console.log("--- ServiceRequest Page Loaded ---");
-    // console.log(`User ID: ${userId}`);
-    // console.log(`User Name: ${userName}`);
-    // console.log(`User Email: ${userEmail}`);
-    // console.log("----------------------------------");
-
-    console.log(loggedInUser?.user?._id);
-  }, [session, loggedInUser]); // Depend on session and loggedInUser to catch asynchronous loading
+    // console.log(loggedInUser?.user?._id);
+  }, [session, loggedInUser]);
   // ------------------------------------------
 
   useEffect(() => {
@@ -173,7 +163,7 @@ const ServiceRequest = () => {
     }
   };
 
-  console.log(loggedInUser);
+  // console.log(loggedInUser); // Kept for debugging, though not ideal in production
 
   const onSubmit = async (data) => {
     if (!location.address || !location.latitude || !location.longitude) {
@@ -244,7 +234,7 @@ const ServiceRequest = () => {
         completedDate: null,
       };
 
-      console.log("Submitting data:", formData);
+      // console.log("Submitting data:", formData);
 
       const res = await fetch("/api/service-request", {
         method: "POST",
@@ -280,24 +270,29 @@ const ServiceRequest = () => {
 
 
   const getUrgencyIcon = (urgency) => {
+    const level = URGENCY_LEVELS.find(l => l.value === urgency);
+    const colorClass = level ? level.color : "";
+
     switch (urgency) {
-      case "low": return <Clock className="h-4 w-4 text-green-600" />;
-      case "medium": return <AlertTriangle className="h-4 w-4 text-yellow-600" />;
-      case "high": return <AlertTriangle className="h-4 w-4 text-orange-600" />;
-      case "emergency": return <AlertTriangle className="h-4 w-4 text-red-600" />;
-      default: return <Clock className="h-4 w-4" />;
+      case "low": return <Clock className={`h-4 w-4 ${colorClass}`} />;
+      case "medium": return <AlertTriangle className={`h-4 w-4 ${colorClass}`} />;
+      case "high": return <AlertTriangle className={`h-4 w-4 ${colorClass}`} />;
+      case "emergency": return <AlertTriangle className={`h-4 w-4 ${colorClass}`} />;
+      default: return <Clock className="h-4 w-4 text-base-content" />;
     }
   };
 
 
   return (
-    <div className="min-h-screen bg-gradient-subtle py-8 px-4">
+    // Updated background to base-200, matching common page background
+    <div className="min-h-screen bg-base-200 py-8 px-4 text-base-content">
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-8">
           <h1 className="text-4xl font-bold text-primary mb-2">
             Service Request Form
           </h1>
-          <p className="text-lg text-gray-600">
+          {/* Updated text color to neutral-content */}
+          <p className="text-lg text-neutral-content">
             Get professional help for your vehicle or appliance repair needs
           </p>
         </div>
@@ -305,17 +300,20 @@ const ServiceRequest = () => {
         <form onSubmit={handleSubmit(onSubmit)} className="grid xl:grid-cols-3 lg:grid-cols-2 gap-6">
 
           <div className="xl:col-span-1 space-y-6">
-            <div className="bg-white p-6 rounded-xl shadow-sm border border-neutral h-fit">
+            {/* Card Background, Shadow, and Border */}
+            <div className="bg-base-100 p-6 rounded-xl shadow-lg border border-neutral h-fit">
               <h2 className="flex items-center gap-2 text-primary mb-4 text-xl font-semibold">
                 <User className="h-5 w-5" /> Device/Vehicle Information
               </h2>
 
               <div className="grid gap-4">
                 <div>
-                  <label className="block text-sm font-medium mb-2">Device Type *</label>
+                  {/* Updated label color */}
+                  <label className="block text-sm font-medium mb-2 text-base-content">Device Type *</label>
                   <select
                     {...register("deviceType", { required: "Device type is required" })}
-                    className="w-full p-3 border border-neutral rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                    // Updated input styles
+                    className="w-full p-3 border border-neutral rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent bg-base-100 text-base-content"
                   >
                     <option value="">Select what needs service</option>
                     {Object.entries(DEVICE_TYPES).map(([key, { label }]) => (
@@ -323,19 +321,21 @@ const ServiceRequest = () => {
                     ))}
                   </select>
                   {errors.deviceType && (
-                    <p className="text-sm text-red-500 mt-1">{errors.deviceType.message}</p>
+                    <p className="text-sm text-error mt-1">{errors.deviceType.message}</p>
                   )}
                 </div>
 
                 {watchDeviceType && ["car", "bike", "truck"].includes(watchDeviceType) && (
-                  <div className="grid gap-4 p-4 bg-gray-50 rounded-lg">
+                  // Updated background to accent/base-200
+                  <div className="grid gap-4 p-4 bg-accent/20 rounded-lg">
                     <div>
-                      <label className="block text-sm font-medium mb-2">Brand *</label>
+                      <label className="block text-sm font-medium mb-2 text-base-content">Brand *</label>
                       <select
                         {...register("brand", {
                           required: "Brand is required for vehicles"
                         })}
-                        className="w-full p-3 border border-neutral rounded-lg"
+                        // Updated input styles
+                        className="w-full p-3 border border-neutral rounded-lg bg-base-100 text-base-content"
                       >
                         <option value="">Select brand</option>
                         {availableBrands.map((brand) => (
@@ -343,17 +343,18 @@ const ServiceRequest = () => {
                         ))}
                       </select>
                       {errors.brand && (
-                        <p className="text-sm text-red-500 mt-1">{errors.brand.message}</p>
+                        <p className="text-sm text-error mt-1">{errors.brand.message}</p>
                       )}
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium mb-2">Model *</label>
+                      <label className="block text-sm font-medium mb-2 text-base-content">Model *</label>
                       <select
                         {...register("model", {
                           required: "Model is required for vehicles"
                         })}
-                        className="w-full p-3 border border-neutral rounded-lg"
+                        // Updated input styles
+                        className="w-full p-3 border border-neutral rounded-lg bg-base-100 text-base-content"
                         disabled={!watchBrand}
                       >
                         <option value="">{watchBrand ? "Select model" : "Select brand first"}</option>
@@ -362,13 +363,13 @@ const ServiceRequest = () => {
                         ))}
                       </select>
                       {errors.model && (
-                        <p className="text-sm text-red-500 mt-1">{errors.model.message}</p>
+                        <p className="text-sm text-error mt-1">{errors.model.message}</p>
                       )}
                     </div>
 
                     <div className="grid grid-cols-2 gap-4">
                       <div>
-                        <label className="block text-sm font-medium mb-2">Year</label>
+                        <label className="block text-sm font-medium mb-2 text-base-content">Year</label>
                         <input
                           type="number"
                           {...register("year", {
@@ -378,16 +379,17 @@ const ServiceRequest = () => {
                               message: `Year cannot be in the future`
                             }
                           })}
-                          className="w-full p-3 border border-neutral rounded-lg"
+                          // Updated input styles
+                          className="w-full p-3 border border-neutral rounded-lg bg-base-100 text-base-content"
                           placeholder="e.g., 2020"
                         />
                         {errors.year && (
-                          <p className="text-sm text-red-500 mt-1">{errors.year.message}</p>
+                          <p className="text-sm text-error mt-1">{errors.year.message}</p>
                         )}
                       </div>
 
                       <div>
-                        <label className="block text-sm font-medium mb-2">VIN (Optional)</label>
+                        <label className="block text-sm font-medium mb-2 text-base-content">VIN (Optional)</label>
                         <input
                           {...register("vin", {
                             pattern: {
@@ -395,12 +397,13 @@ const ServiceRequest = () => {
                               message: "VIN must be 17 characters (letters and numbers)"
                             }
                           })}
-                          className="w-full p-3 border border-neutral rounded-lg"
+                          // Updated input styles
+                          className="w-full p-3 border border-neutral rounded-lg bg-base-100 text-base-content"
                           placeholder="Vehicle Identification Number"
                           maxLength={17}
                         />
                         {errors.vin && (
-                          <p className="text-sm text-red-500 mt-1">{errors.vin.message}</p>
+                          <p className="text-sm text-error mt-1">{errors.vin.message}</p>
                         )}
                       </div>
                     </div>
@@ -409,10 +412,11 @@ const ServiceRequest = () => {
 
                 {watchDeviceType && !["car", "bike", "truck"].includes(watchDeviceType) && watchDeviceType !== "other" && (
                   <div>
-                    <label className="block text-sm font-medium mb-2">Brand (Optional)</label>
+                    <label className="block text-sm font-medium mb-2 text-base-content">Brand (Optional)</label>
                     <input
                       {...register("brand")}
-                      className="w-full p-3 border border-neutral rounded-lg"
+                      // Updated input styles
+                      className="w-full p-3 border border-neutral rounded-lg bg-base-100 text-base-content"
                       placeholder={`e.g., Samsung, LG, General, etc.`}
                     />
                   </div>
@@ -420,10 +424,11 @@ const ServiceRequest = () => {
 
                 {watchDeviceType && (
                   <div>
-                    <label className="block text-sm font-medium mb-2">Problem Category *</label>
+                    <label className="block text-sm font-medium mb-2 text-base-content">Problem Category *</label>
                     <select
                       {...register("problemCategory", { required: "Problem category is required" })}
-                      className="w-full p-3 border border-neutral rounded-lg"
+                      // Updated input styles
+                      className="w-full p-3 border border-neutral rounded-lg bg-base-100 text-base-content"
                     >
                       <option value="">Select problem category</option>
                       {DEVICE_TYPES[watchDeviceType]?.categories.map(category => (
@@ -431,60 +436,64 @@ const ServiceRequest = () => {
                       ))}
                     </select>
                     {errors.problemCategory && (
-                      <p className="text-sm text-red-500 mt-1">{errors.problemCategory.message}</p>
+                      <p className="text-sm text-error mt-1">{errors.problemCategory.message}</p>
                     )}
                   </div>
                 )}
               </div>
             </div>
 
-            <div className="bg-white p-6 rounded-xl shadow-sm border border-neutral h-fit">
+            {/* Card Background, Shadow, and Border */}
+            <div className="bg-base-100 p-6 rounded-xl shadow-lg border border-neutral h-fit">
               <h2 className="flex items-center gap-2 text-primary mb-4 text-xl font-semibold">
                 <AlertTriangle className="h-5 w-5" /> Service Details
               </h2>
 
               <div className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium mb-2">Problem Title *</label>
+                  <label className="block text-sm font-medium mb-2 text-base-content">Problem Title *</label>
                   <input
                     {...register("problemTitle", { required: "Problem title is required" })}
-                    className="w-full p-3 border border-neutral rounded-lg"
+                    // Updated input styles
+                    className="w-full p-3 border border-neutral rounded-lg bg-base-100 text-base-content"
                     placeholder="Brief description of the problem"
                   />
                   {errors.problemTitle && (
-                    <p className="text-sm text-red-500 mt-1">{errors.problemTitle.message}</p>
+                    <p className="text-sm text-error mt-1">{errors.problemTitle.message}</p>
                   )}
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium mb-2">Detailed Description *</label>
+                  <label className="block text-sm font-medium mb-2 text-base-content">Detailed Description *</label>
                   <textarea
                     {...register("description", {
                       required: "Description is required",
                       minLength: { value: 20, message: "Description should be at least 20 characters" }
                     })}
-                    className="w-full p-3 border border-neutral rounded-lg"
+                    // Updated input styles
+                    className="w-full p-3 border border-neutral rounded-lg bg-base-100 text-base-content"
                     placeholder="Describe the problem in detail, including any symptoms, when it started, and what you've tried..."
                     rows={4}
                   />
                   {errors.description && (
-                    <p className="text-sm text-red-500 mt-1">{errors.description.message}</p>
+                    <p className="text-sm text-error mt-1">{errors.description.message}</p>
                   )}
                 </div>
               </div>
             </div>
 
-            <div className="bg-white p-6 rounded-xl shadow-sm border border-neutral h-fit">
+            {/* Card Background, Shadow, and Border */}
+            <div className="bg-base-100 p-6 rounded-xl shadow-lg border border-neutral h-fit">
               <h2 className="flex items-center gap-2 text-primary mb-4 text-xl font-semibold">
                 ⚡ Urgency & Budget
               </h2>
 
               <div className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium mb-2">Urgency Level</label>
+                  <label className="block text-sm font-medium mb-2 text-base-content">Urgency Level</label>
                   <div className="grid grid-cols-2 gap-2">
                     {URGENCY_LEVELS.map((level) => (
-                      <label key={level.value} className={`flex items-center p-3 border rounded-lg cursor-pointer ${watchUrgency === level.value ? 'border-primary bg-blue-50' : 'border-gray-300'
+                      <label key={level.value} className={`flex items-center p-3 border rounded-lg cursor-pointer transition-colors ${watchUrgency === level.value ? 'border-primary bg-primary/10' : 'border-neutral bg-base-100 hover:bg-base-200'
                         }`}>
                         <input
                           type="radio"
@@ -492,7 +501,7 @@ const ServiceRequest = () => {
                           {...register("urgency")}
                           className="hidden"
                         />
-                        <span className={`flex items-center gap-1 text-sm ${level.color}`}>
+                        <span className={`flex items-center gap-1 text-sm font-medium ${level.color}`}>
                           {getUrgencyIcon(level.value)}
                           {level.label.split(' ')[0]}
                         </span>
@@ -502,10 +511,11 @@ const ServiceRequest = () => {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium mb-2">Expected Budget Range (BDT)</label>
+                  <label className="block text-sm font-medium mb-2 text-base-content">Expected Budget Range (BDT)</label>
                   <select
                     {...register("budgetRange")}
-                    className="w-full p-3 border border-neutral rounded-lg"
+                    // Updated input styles
+                    className="w-full p-3 border border-neutral rounded-lg bg-base-100 text-base-content"
                   >
                     <option value="">Not sure</option>
                     <option value="0-1000">0 - 1,000 BDT</option>
@@ -515,7 +525,8 @@ const ServiceRequest = () => {
                     <option value="20000-50000">20,000 - 50,000 BDT</option>
                     <option value="50000+">50,000+ BDT</option>
                   </select>
-                  <p className="text-sm text-gray-600 mt-2">
+                  {/* Updated text color */}
+                  <p className="text-sm text-neutral-content mt-2">
                     This helps mechanics provide appropriate quotes
                   </p>
                 </div>
@@ -524,32 +535,38 @@ const ServiceRequest = () => {
           </div>
 
           <div className="xl:col-span-1 space-y-6">
-            <div className="bg-white p-6 rounded-xl shadow-sm border border-neutral h-fit">
+            {/* Card Background, Shadow, and Border */}
+            <div className="bg-base-100 p-6 rounded-xl shadow-lg border border-neutral h-fit">
               <h2 className="flex items-center gap-2 text-primary mb-4 text-xl font-semibold">
                 <MapPin className="h-5 w-5" /> Service Location
               </h2>
 
               <div className="space-y-4">
-                <label className="block text-sm font-medium">Select your location *</label>
+                <label className="block text-sm font-medium text-base-content">Select your location *</label>
                 <AddressSelector location={location} setLocation={setLocation} />
 
                 {!location.address && (
-                  <p className="text-sm text-yellow-600">Please select your location on the map</p>
+                  <p className="text-sm text-warning mt-1">
+                    <AlertTriangle className="h-4 w-4 inline mr-1" /> Please select your location on the map
+                  </p>
                 )}
                 {location.address && (
-                  <p className="text-sm text-green-600">✅ Location selected: {location.address}</p>
+                  <p className="text-sm text-success mt-1">
+                    <span className="font-semibold">✅ Location selected:</span> {location.address}
+                  </p>
                 )}
               </div>
             </div>
 
-            <div className="bg-white p-6 rounded-xl shadow-sm border border-neutral h-fit">
+            {/* Card Background, Shadow, and Border */}
+            <div className="bg-base-100 p-6 rounded-xl shadow-lg border border-neutral h-fit">
               <h2 className="flex items-center gap-2 text-primary mb-4 text-xl font-semibold">
                 📸 Problem Images
               </h2>
 
               <div className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium mb-2">
+                  <label className="block text-sm font-medium mb-2 text-base-content">
                     Upload Images ({watchImages?.length || 0}/5)
                   </label>
                   <input
@@ -571,22 +588,23 @@ const ServiceRequest = () => {
                         }
                       }
                     })}
-                    className="w-full border border-neutral rounded-lg p-3"
+                    // Updated input styles
+                    className="w-full border border-neutral rounded-lg p-3 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-primary file:text-primary-content hover:file:bg-primary/90 file:cursor-pointer"
                   />
                   {errors.images && (
-                    <p className="text-sm text-red-500 mt-1">{errors.images.message}</p>
+                    <p className="text-sm text-error mt-1">{errors.images.message}</p>
                   )}
 
                   {watchImages && watchImages.length > 0 && (
                     <div className="mt-4">
-                      <p className="text-sm text-gray-600 mb-2">Image Previews:</p>
+                      <p className="text-sm text-neutral-content mb-2">Image Previews:</p>
                       <div className="grid grid-cols-3 gap-2">
                         {Array.from(watchImages).map((file, i) => (
                           <div key={i} className="relative">
                             <img
                               src={URL.createObjectURL(file)}
                               alt={`preview-${i}`}
-                              className="w-full h-20 object-cover rounded-lg border"
+                              className="w-full h-20 object-cover rounded-lg border border-neutral"
                             />
                             <button
                               type="button"
@@ -595,7 +613,8 @@ const ServiceRequest = () => {
                                 newImages.splice(i, 1);
                                 setValue("images", newImages);
                               }}
-                              className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-5 h-5 text-xs flex items-center justify-center"
+                              // Updated button colors to error
+                              className="absolute -top-2 -right-2 bg-error text-error-content rounded-full w-5 h-5 text-xs flex items-center justify-center transition-colors hover:bg-error/80"
                             >
                               ×
                             </button>
@@ -610,27 +629,30 @@ const ServiceRequest = () => {
           </div>
 
           <div className="xl:col-span-1 space-y-6">
-            <div className="bg-white p-6 rounded-xl shadow-sm border border-neutral h-fit">
+            {/* Card Background, Shadow, and Border */}
+            <div className="bg-base-100 p-6 rounded-xl shadow-lg border border-neutral h-fit">
               <h2 className="flex items-center gap-2 text-primary mb-4 text-xl font-semibold">
                 <Clock className="h-5 w-5" /> Scheduling Preferences
               </h2>
 
               <div className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium mb-2">Preferred Date</label>
+                  <label className="block text-sm font-medium mb-2 text-base-content">Preferred Date</label>
                   <input
                     type="date"
                     {...register("scheduledDate")}
                     min={new Date().toISOString().split('T')[0]}
-                    className="w-full p-3 border border-neutral rounded-lg"
+                    // Updated input styles
+                    className="w-full p-3 border border-neutral rounded-lg bg-base-100 text-base-content"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium mb-2">Preferred Time Slot</label>
+                  <label className="block text-sm font-medium mb-2 text-base-content">Preferred Time Slot</label>
                   <select
                     {...register("timeSlot")}
-                    className="w-full p-3 border border-neutral rounded-lg"
+                    // Updated input styles
+                    className="w-full p-3 border border-neutral rounded-lg bg-base-100 text-base-content"
                   >
                     <option value="">Any time</option>
                     <option value="morning">Morning (8AM - 12PM)</option>
@@ -640,10 +662,11 @@ const ServiceRequest = () => {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium mb-2">Schedule Flexibility</label>
+                  <label className="block text-sm font-medium mb-2 text-base-content">Schedule Flexibility</label>
                   <select
                     {...register("flexibility")}
-                    className="w-full p-3 border border-neutral rounded-lg"
+                    // Updated input styles
+                    className="w-full p-3 border border-neutral rounded-lg bg-base-100 text-base-content"
                   >
                     <option value="flexible">Flexible (±2 days)</option>
                     <option value="moderate">Moderate (±1 day)</option>
@@ -653,14 +676,15 @@ const ServiceRequest = () => {
               </div>
             </div>
 
-            <div className="bg-white p-6 rounded-xl shadow-sm border border-neutral h-fit">
+            {/* Card Background, Shadow, and Border */}
+            <div className="bg-base-100 p-6 rounded-xl shadow-lg border border-neutral h-fit">
               <h2 className="flex items-center gap-2 text-primary mb-4 text-xl font-semibold">
                 <User className="h-5 w-5" /> Contact Information
               </h2>
 
               <div className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium mb-2">Emergency Contact Number *</label>
+                  <label className="block text-sm font-medium mb-2 text-base-content">Emergency Contact Number *</label>
                   <input
                     type="tel"
                     {...register("phoneNumber", {
@@ -670,29 +694,32 @@ const ServiceRequest = () => {
                         message: "Please enter a valid Bangladeshi phone number (+8801XXXXXXXXX)"
                       }
                     })}
-                    className="w-full p-3 border border-neutral rounded-lg"
+                    // Updated input styles
+                    className="w-full p-3 border border-neutral rounded-lg bg-base-100 text-base-content"
                     placeholder="+8801XXXXXXXXX"
                   />
                   {errors.phoneNumber && (
-                    <p className="text-sm text-red-500 mt-1">{errors.phoneNumber.message}</p>
+                    <p className="text-sm text-error mt-1">{errors.phoneNumber.message}</p>
                   )}
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium mb-2">Alternate Phone Number</label>
+                  <label className="block text-sm font-medium mb-2 text-base-content">Alternate Phone Number</label>
                   <input
                     type="tel"
                     {...register("alternatePhone")}
-                    className="w-full p-3 border border-neutral rounded-lg"
+                    // Updated input styles
+                    className="w-full p-3 border border-neutral rounded-lg bg-base-100 text-base-content"
                     placeholder="Optional alternate number"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium mb-2">Special Instructions</label>
+                  <label className="block text-sm font-medium mb-2 text-base-content">Special Instructions</label>
                   <textarea
                     {...register("specialInstructions")}
-                    className="w-full p-3 border border-neutral rounded-lg"
+                    // Updated input styles
+                    className="w-full p-3 border border-neutral rounded-lg bg-base-100 text-base-content"
                     placeholder="Any special instructions for the mechanic..."
                     rows={3}
                   />
@@ -705,11 +732,13 @@ const ServiceRequest = () => {
             <Button
               type="submit"
               disabled={isSubmitting}
+              // Button component should handle primary/disabled styles internally, but we ensure proper classes for min-width and size are passed.
               className="px-12 py-4 text-lg font-semibold min-w-[250px] rounded-lg"
             >
               {isSubmitting ? (
+                // Updated spinner color to primary-content
                 <span className="flex items-center gap-2">
-                  <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                  <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-primary-content"></div>
                   Submitting Request...
                 </span>
               ) : (
@@ -720,14 +749,16 @@ const ServiceRequest = () => {
 
           {isSubmitting && uploadProgress > 0 && (
             <div className="xl:col-span-3">
-              <div className="bg-blue-50 p-4 rounded-lg">
+              {/* Updated background to info/accent */}
+              <div className="bg-info/10 p-4 rounded-lg">
                 <div className="flex justify-between mb-2">
-                  <span className="text-sm font-medium">Uploading Images</span>
-                  <span className="text-sm">{Math.round(uploadProgress)}%</span>
+                  <span className="text-sm font-medium text-base-content">Uploading Images</span>
+                  <span className="text-sm text-base-content">{Math.round(uploadProgress)}%</span>
                 </div>
-                <div className="w-full bg-gray-200 rounded-full h-2">
+                {/* Updated progress bar background and progress color */}
+                <div className="w-full bg-base-300 rounded-full h-2">
                   <div
-                    className="bg-blue-600 h-2 rounded-full transition-all duration-300"
+                    className="bg-info h-2 rounded-full transition-all duration-300"
                     style={{ width: `${uploadProgress}%` }}
                   ></div>
                 </div>

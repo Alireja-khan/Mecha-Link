@@ -17,16 +17,14 @@ const Page = () => {
     const [detailModalOpen, setDetailModalOpen] = useState(false);
     const [selectedReview, setSelectedReview] = useState(null);
 
+    // --- Swal Alert Functions Updated for DaisyUI/Theme Colors ---
+
     const showSuccessAlert = (title, message) => {
         Swal.fire({
             title,
             text: message,
             icon: 'success',
-            confirmButtonColor: '#f97316',
             confirmButtonText: 'OK',
-            background: '#fff',
-            color: '#1f2937',
-            iconColor: '#22c55e'
         });
     };
 
@@ -35,11 +33,7 @@ const Page = () => {
             title,
             text: message,
             icon: 'error',
-            confirmButtonColor: '#f97316',
             confirmButtonText: 'OK',
-            background: '#fff',
-            color: '#1f2937',
-            iconColor: '#ef4444'
         });
     };
 
@@ -49,13 +43,8 @@ const Page = () => {
             text,
             icon: 'warning',
             showCancelButton: true,
-            confirmButtonColor: '#f97316',
-            cancelButtonColor: '#6b7280',
             confirmButtonText,
             cancelButtonText: 'Cancel',
-            background: '#fff',
-            color: '#1f2937',
-            iconColor: '#eab308',
             reverseButtons: true
         });
     };
@@ -66,10 +55,10 @@ const Page = () => {
             text,
             allowOutsideClick: false,
             didOpen: () => Swal.showLoading(),
-            background: '#fff',
-            color: '#1f2937'
         });
     };
+
+    // --- End of Swal Alert Functions ---
 
     useEffect(() => {
         const fetchData = async () => {
@@ -189,13 +178,17 @@ const Page = () => {
         const base = "px-2 sm:px-3 py-1 text-xs font-semibold rounded-full border whitespace-nowrap";
         switch (status) {
             case "approved":
-                return <span className={`${base} bg-green-100 text-green-700 border-green-200`}>Approved</span>;
+                // DaisyUI success colors
+                return <span className={`${base} bg-success/20 text-success border-success/40`}>Approved</span>;
             case "pending":
-                return <span className={`${base} bg-yellow-100 text-yellow-700 border-yellow-200`}>Pending</span>;
+                // DaisyUI warning colors
+                return <span className={`${base} bg-warning/20 text-warning border-warning/40`}>Pending</span>;
             case "rejected":
-                return <span className={`${base} bg-red-100 text-red-700 border-red-200`}>Rejected</span>;
+                // DaisyUI error colors
+                return <span className={`${base} bg-error/20 text-error border-error/40`}>Rejected</span>;
             default:
-                return <span className={`${base} bg-gray-100 text-gray-700 border-gray-200`}>Unknown</span>;
+                // DaisyUI neutral colors
+                return <span className={`${base} bg-base-300/50 text-base-content border-neutral/40`}>Unknown</span>;
         }
     };
 
@@ -205,10 +198,11 @@ const Page = () => {
                 <Star
                     key={star}
                     size={16}
-                    className={star <= rating ? "text-yellow-400 fill-yellow-400" : "text-gray-300"}
+                    // Use a fixed yellow for rating stars (often desired regardless of theme)
+                    className={star <= rating ? "text-yellow-400 fill-yellow-400" : "text-base-300"}
                 />
             ))}
-            <span className="ml-1 text-sm font-medium text-gray-600">({rating}.0)</span>
+            <span className="ml-1 text-sm font-medium text-base-content/70">({rating}.0)</span>
         </div>
     );
 
@@ -236,25 +230,25 @@ const Page = () => {
         threeStar: totalReviews.filter(r => r.rating === 3).length,
     };
 
-    const StatCard = ({ icon: Icon, value, label, color = "orange" }) => {
+    const StatCard = ({ icon: Icon, value, label, color = "primary" }) => {
         const colorClasses = {
-            orange: { bg: "bg-orange-500/10", bgHover: "group-hover:bg-orange-500/20", text: "text-orange-600" },
-            green: { bg: "bg-green-500/10", bgHover: "group-hover:bg-green-500/20", text: "text-green-600" },
-            blue: { bg: "bg-blue-500/10", bgHover: "group-hover:bg-blue-500/20", text: "text-blue-600" },
-            purple: { bg: "bg-purple-500/10", bgHover: "group-hover:bg-purple-500/20", text: "text-purple-600" },
-            yellow: { bg: "bg-yellow-500/10", bgHover: "group-hover:bg-yellow-500/20", text: "text-yellow-600" }
+            primary: { bg: "bg-primary/10", bgHover: "group-hover:bg-primary/20", text: "text-primary", border: "border-primary/20" },
+            green: { bg: "bg-success/10", bgHover: "group-hover:bg-success/20", text: "text-success", border: "border-success/20" },
+            blue: { bg: "bg-info/10", bgHover: "group-hover:bg-info/20", text: "text-info", border: "border-info/20" },
+            purple: { bg: "bg-accent/10", bgHover: "group-hover:bg-accent/20", text: "text-accent", border: "border-accent/20" },
+            yellow: { bg: "bg-warning/10", bgHover: "group-hover:bg-warning/20", text: "text-warning", border: "border-warning/20" }
         };
-        const classes = colorClasses[color] || colorClasses.orange;
+        const classes = colorClasses[color] || colorClasses.primary;
 
         return (
-            <div className="bg-white rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-orange-100 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 group">
+            <div className={`bg-base-100 rounded-xl sm:rounded-2xl p-4 sm:p-6 border ${classes.border} shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-[1.02] group`}>
                 <div className="flex items-center justify-between mb-3 sm:mb-4">
                     <div className={`p-2 sm:p-3 rounded-xl ${classes.bg} ${classes.bgHover} transition-colors duration-300`}>
                         <Icon className={classes.text} size={20} />
                     </div>
                 </div>
-                <p className="text-2xl sm:text-3xl font-bold text-gray-900 mb-1">{value}</p>
-                <p className="text-gray-600 text-xs sm:text-sm font-medium">{label}</p>
+                <p className="text-2xl sm:text-3xl font-bold text-base-content mb-1">{value}</p>
+                <p className="text-base-content/70 text-xs sm:text-sm font-medium">{label}</p>
             </div>
         );
     };
@@ -263,45 +257,46 @@ const Page = () => {
         const userData = getUserData(review);
         const shopData = shops[review.shopId];
         return (
-            <div className="bg-white p-4 rounded-xl border border-orange-100 shadow-sm hover:shadow-md transition-all duration-200">
+            <div className="bg-base-100 p-4 rounded-xl border border-base-300 shadow-lg hover:shadow-xl transition-all duration-200">
                 <div className="flex items-start gap-3 mb-3">
                     <img
                         src={userData.profileImage}
                         alt={userData.name}
-                        className="w-12 h-12 rounded-lg object-cover border-2 border-orange-200 flex-shrink-0"
+                        className="w-12 h-12 rounded-lg object-cover border-2 border-primary/40 flex-shrink-0"
                     />
                     <div className="flex-1 min-w-0">
-                        <p className="font-semibold text-gray-900 truncate">{userData.name}</p>
-                        <p className="text-xs text-gray-600 truncate">{userData.email}</p>
+                        <p className="font-semibold text-base-content truncate">{userData.name}</p>
+                        <p className="text-xs text-base-content/70 truncate">{userData.email}</p>
                         <div className="mt-1">{renderStars(review.rating)}</div>
                     </div>
                 </div>
-                <div className="bg-green-50 rounded-lg p-3 mb-3">
+                {/* Shop info container uses a success background for visibility */}
+                <div className="bg-success/10 rounded-lg p-3 mb-3 border border-success/20">
                     <div className="flex items-center gap-2 mb-1">
-                        <Store size={14} className="text-green-600 flex-shrink-0" />
-                        <p className="text-sm font-semibold text-gray-900 truncate">{shopData?.shop?.shopName || 'Unknown Shop'}</p>
+                        <Store size={14} className="text-success flex-shrink-0" />
+                        <p className="text-sm font-semibold text-base-content truncate">{shopData?.shop?.shopName || 'Unknown Shop'}</p>
                     </div>
-                    <p className="text-xs text-gray-600 ml-6 truncate">{shopData?.shop?.address?.city || 'Location not available'}</p>
+                    <p className="text-xs text-base-content/70 ml-6 truncate">{shopData?.shop?.address?.city || 'Location not available'}</p>
                 </div>
-                <p className="text-sm text-gray-700 mb-3 line-clamp-2">{review.feedback || "No feedback provided"}</p>
-                <div className="flex items-center justify-between pt-3 border-t border-gray-100 flex-wrap gap-2">
+                <p className="text-sm text-base-content/90 mb-3 line-clamp-2">{review.feedback || "No feedback provided"}</p>
+                <div className="flex items-center justify-between pt-3 border-t border-base-300 flex-wrap gap-2">
                     <div className="flex items-center gap-2 flex-wrap">
                         {getStatusBadge(review.status)}
-                        <span className="text-xs text-gray-500">{formatDateShort(review.createdAt || Date.now())}</span>
+                        <span className="text-xs text-base-content/60">{formatDateShort(review.createdAt || Date.now())}</span>
                     </div>
                     <div className="flex gap-2">
                         {review.status === "pending" && (
                             <>
                                 <button
                                     onClick={() => updateReviewStatus(review._id, "approved")}
-                                    className="p-2 bg-green-500/10 text-green-600 rounded-lg border border-green-200 hover:bg-green-500/20 transition-colors"
+                                    className="p-2 bg-success/10 text-success rounded-lg border border-success/30 hover:bg-success/20 transition-colors"
                                     title="Approve"
                                 >
                                     <Check size={14} />
                                 </button>
                                 <button
                                     onClick={() => updateReviewStatus(review._id, "rejected")}
-                                    className="p-2 bg-red-500/10 text-red-600 rounded-lg border border-red-200 hover:bg-red-500/20 transition-colors"
+                                    className="p-2 bg-error/10 text-error rounded-lg border border-error/30 hover:bg-error/20 transition-colors"
                                     title="Reject"
                                 >
                                     <X size={14} />
@@ -311,7 +306,7 @@ const Page = () => {
                         {(review.status === "approved" || review.status === "rejected") && (
                             <button
                                 onClick={() => updateReviewStatus(review._id, "pending")}
-                                className="p-2 bg-yellow-500/10 text-yellow-600 rounded-lg border border-yellow-200 hover:bg-yellow-500/20 transition-colors"
+                                className="p-2 bg-warning/10 text-warning rounded-lg border border-warning/30 hover:bg-warning/20 transition-colors"
                                 title="Set Pending"
                             >
                                 <Clock size={14} />
@@ -319,7 +314,7 @@ const Page = () => {
                         )}
                         <button
                             onClick={() => openDetailModal(review)}
-                            className="p-2 bg-orange-500/10 text-orange-600 rounded-lg border border-orange-200 hover:bg-orange-500/20 transition-colors"
+                            className="p-2 bg-primary/10 text-primary rounded-lg border border-primary/30 hover:bg-primary/20 transition-colors"
                             title="View Details"
                         >
                             <Eye size={14} />
@@ -331,41 +326,49 @@ const Page = () => {
     };
 
     if (loading) return (
-        <div className="flex items-center justify-center h-screen w-full">
-            <span className="loading loading-bars loading-xl text-orange-500"></span>
+        // Loading uses primary color and base background
+        <div className="flex items-center justify-center h-screen w-full bg-base-200">
+            <span className="loading loading-bars loading-xl text-primary"></span>
         </div>
     );
 
     return (
-        <div className="min-h-screen w-full p-3 sm:p-4 lg:p-6 mx-auto">
+        // Main container uses base-200 background
+        <div className="min-h-screen w-full p-3 sm:p-4 lg:p-6 mx-auto bg-base-200">
             <div className="mb-4 sm:mb-6 lg:mb-8">
-                <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 mb-1 sm:mb-2">Reviews Management</h1>
-                <p className="text-gray-600 text-sm sm:text-base lg:text-lg">Manage and moderate all customer reviews in the platform</p>
+                <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-base-content mb-1 sm:mb-2">Reviews Management</h1>
+                <p className="text-base-content/70 text-sm sm:text-base lg:text-lg">Manage and moderate all customer reviews in the platform</p>
             </div>
 
+            {/* Stat Cards - Colors updated to use DaisyUI semantic colors */}
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-6 mb-4 sm:mb-6 lg:mb-8">
-                <StatCard icon={MessageSquare} value={stats.total} label="Total Reviews" color="orange" />
-                <StatCard icon={Star} value={stats.fiveStar} label="5 Star Reviews" color="yellow" />
-                <StatCard icon={Star} value={stats.fourStar} label="4 Star Reviews" color="blue" />
-                <StatCard icon={Star} value={stats.threeStar} label="3 Star Reviews" color="purple" />
+                <StatCard icon={MessageSquare} value={stats.total} label="Total Reviews" color="primary" />
+                <StatCard icon={Star} value={stats.fiveStar} label="5 Star Reviews" color="yellow" /> {/* warning */}
+                <StatCard icon={Star} value={stats.fourStar} label="4 Star Reviews" color="blue" />  {/* info */}
+                <StatCard icon={Star} value={stats.threeStar} label="3 Star Reviews" color="purple" /> {/* accent */}
             </div>
 
-            <div className="bg-white rounded-2xl sm:rounded-3xl p-4 sm:p-6 lg:p-8 border border-orange-100 shadow-xl">
+            {/* Main Content Card - uses base-100 background */}
+            <div className="bg-base-100 rounded-2xl sm:rounded-3xl p-4 sm:p-6 lg:p-8 border border-base-300 shadow-xl">
                 <div className="flex flex-col sm:flex-row gap-3 w-full mb-6">
+                    {/* Search Input */}
                     <div className="relative flex-1">
-                        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
+                        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-base-content/60" size={18} />
                         <input
                             type="text"
                             placeholder="Search reviews, users, shops..."
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
-                            className="pl-10 pr-4 py-2.5 sm:py-3 border border-orange-200 rounded-xl bg-orange-50/50 focus:bg-white focus:border-orange-300 w-full text-sm"
+                            // Input styling updated
+                            className="pl-10 pr-4 py-2.5 sm:py-3 border border-base-300 rounded-xl bg-base-200 focus:bg-base-100 focus:border-primary focus:ring-1 focus:ring-primary w-full text-sm text-base-content"
                         />
                     </div>
+                    {/* Rating Filter Select */}
                     <select
                         value={ratingFilter}
                         onChange={(e) => setRatingFilter(e.target.value)}
-                        className="px-3 sm:px-4 py-2.5 sm:py-3 border border-orange-200 rounded-xl bg-orange-50/50 focus:bg-white focus:border-orange-300 text-sm"
+                        // Select styling updated
+                        className="px-3 sm:px-4 py-2.5 sm:py-3 border border-base-300 rounded-xl bg-base-200 focus:bg-base-100 focus:border-primary focus:ring-1 focus:ring-primary text-sm text-base-content"
                     >
                         <option value="all">All Ratings</option>
                         <option value="5">5 Stars</option>
@@ -376,109 +379,121 @@ const Page = () => {
                     </select>
                 </div>
 
+                {/* Mobile View */}
                 <div className="block xl:hidden space-y-4">
-                    {filteredReviews.length > 0 ? filteredReviews.map(r => <ReviewMobileCard key={r._id} review={r} />) : <div className="text-center py-12"><MessageSquare size={48} className="mx-auto text-gray-300" /><p className="text-gray-500">No reviews</p></div>}
+                    {filteredReviews.length > 0 ? filteredReviews.map(r => <ReviewMobileCard key={r._id} review={r} />) : <div className="text-center py-12"><MessageSquare size={48} className="mx-auto text-base-content/30" /><p className="text-base-content/70">No reviews</p></div>}
                 </div>
 
-                <div className="hidden xl:block rounded-2xl border border-orange-100 overflow-x-auto">
-                    <table className="min-w-full divide-y divide-orange-100">
-                        <thead className="bg-orange-50">
+                {/* Desktop Table View */}
+                <div className="hidden xl:block rounded-2xl border border-base-300 overflow-x-auto">
+                    <table className="min-w-full divide-y divide-base-300">
+                        <thead className="bg-base-200">
                             <tr>
-                                <th className="px-6 py-4 text-left text-sm font-semibold text-orange-900">Review & User</th>
-                                <th className="px-6 py-4 text-left text-sm font-semibold text-orange-900">Shop Details</th>
-                                <th className="px-6 py-4 text-left text-sm font-semibold text-orange-900">Rating</th>
-                                <th className="px-6 py-4 text-left text-sm font-semibold text-orange-900">Created</th>
-                                <th className="px-6 py-4 text-left text-sm font-semibold text-orange-900">Status</th>
-                                <th className="px-6 py-4 text-center text-sm font-semibold text-orange-900">Actions</th>
+                                <th className="px-6 py-4 text-left text-sm font-semibold text-base-content">Review & User</th>
+                                <th className="px-6 py-4 text-left text-sm font-semibold text-base-content">Shop Details</th>
+                                <th className="px-6 py-4 text-left text-sm font-semibold text-base-content">Rating</th>
+                                <th className="px-6 py-4 text-left text-sm font-semibold text-base-content">Created</th>
+                                <th className="px-6 py-4 text-left text-sm font-semibold text-base-content">Status</th>
+                                <th className="px-6 py-4 text-center text-sm font-semibold text-base-content">Actions</th>
                             </tr>
                         </thead>
-                        <tbody className="bg-white divide-y divide-orange-100">
+                        <tbody className="bg-base-100 divide-y divide-base-300">
                             {filteredReviews.length > 0 ? filteredReviews.map(review => {
                                 const userData = getUserData(review); const shopData = shops[review.shopId];
                                 return (
-                                    <tr key={review._id} className="hover:bg-orange-50/30 transition-colors">
+                                    <tr key={review._id} className="hover:bg-base-200 transition-colors">
                                         <td className="px-6 py-4 flex items-start gap-3">
-                                            <img src={userData.profileImage} className="w-12 h-12 rounded-xl border-2 border-orange-200" />
+                                            <img src={userData.profileImage} className="w-12 h-12 rounded-xl border-2 border-primary/40" />
                                             <div>
-                                                <p className="text-sm font-semibold">{userData.name}</p>
-                                                <p className="text-sm text-gray-700">
+                                                <p className="text-sm font-semibold text-base-content">{userData.name}</p>
+                                                <p className="text-sm text-base-content/90">
                                                     {(review.feedback?.length > 50
                                                         ? review.feedback.substring(0, 50) + '...'
                                                         : review.feedback) || 'No feedback'}
                                                 </p>
-                                                <button onClick={() => { setSelectedReview(review); setDetailModalOpen(true) }} className="text-orange-500 flex items-center gap-1 text-sm"><Eye size={14} />View</button>
+                                                <button onClick={() => { setSelectedReview(review); setDetailModalOpen(true) }} className="text-primary flex items-center gap-1 text-sm hover:text-secondary transition-colors"><Eye size={14} />View</button>
                                             </div>
                                         </td>
                                         <td className="px-6 py-4 space-y-2">
-                                            <div className="flex items-center gap-3 p-3 bg-orange-50 rounded-xl border border-orange-200 w-50">
-                                                <Store size={30} className="text-green-600" />
+                                            {/* Shop info card uses primary/secondary background */}
+                                            <div className="flex items-center gap-3 p-3 bg-primary/10 rounded-xl border border-primary/20 w-50">
+                                                <Store size={30} className="text-success" />
                                                 <div className="overflow-hidden">
-                                                    <p className="text-sm font-semibold truncate w-40 line-clamp-2">{shopData?.shop?.shopName || 'Unknown Shop'}</p>
-                                                    <p className="text-xs text-gray-600 truncate w-40">{shopData?.shop?.address?.city || 'N/A'}</p>
+                                                    <p className="text-sm font-semibold truncate w-40 line-clamp-2 text-base-content">{shopData?.shop?.shopName || 'Unknown Shop'}</p>
+                                                    <p className="text-xs text-base-content/70 truncate w-40">{shopData?.shop?.address?.city || 'N/A'}</p>
                                                 </div>
                                             </div>
                                         </td>
                                         <td className="px-6 py-4">{renderStars(review.rating)}</td>
-                                        <td className="px-6 py-4">{formatDate(review.createdAt)}</td>
+                                        <td className="px-6 py-4 text-base-content/90">{formatDate(review.createdAt)}</td>
                                         <td className="px-6 py-4">{getStatusBadge(review.status)}</td>
                                         <td className="px-6 py-4 flex justify-center gap-2">
                                             {review.status === "pending" && <>
-                                                <button onClick={() => updateReviewStatus(review._id, "approved")} className="p-2 bg-green-500/10 text-green-600 rounded-xl border border-green-200"><Check size={16} /></button>
-                                                <button onClick={() => updateReviewStatus(review._id, "rejected")} className="p-2 bg-red-500/10 text-red-600 rounded-xl border border-red-200"><X size={16} /></button>
+                                                <button onClick={() => updateReviewStatus(review._id, "approved")} className="p-2 bg-success/10 text-success rounded-xl border border-success/30 hover:bg-success/20 transition-colors" title="Approve"><Check size={16} /></button>
+                                                <button onClick={() => updateReviewStatus(review._id, "rejected")} className="p-2 bg-error/10 text-error rounded-xl border border-error/30 hover:bg-error/20 transition-colors" title="Reject"><X size={16} /></button>
                                             </>}
-                                            {(review.status === "approved" || review.status === "rejected") && <button onClick={() => updateReviewStatus(review._id, "pending")} className="p-2 bg-yellow-500/10 text-yellow-600 rounded-xl border border-yellow-200"><Clock size={16} /></button>}
-                                            <button onClick={() => { setSelectedReview(review); setDetailModalOpen(true) }} className="p-2 bg-orange-500/10 text-orange-600 rounded-xl border border-orange-200"><Eye size={16} /></button>
+                                            {(review.status === "approved" || review.status === "rejected") && <button onClick={() => updateReviewStatus(review._id, "pending")} className="p-2 bg-warning/10 text-warning rounded-xl border border-warning/30 hover:bg-warning/20 transition-colors" title="Set Pending"><Clock size={16} /></button>}
+                                            <button onClick={() => { setSelectedReview(review); setDetailModalOpen(true) }} className="p-2 bg-primary/10 text-primary rounded-xl border border-primary/30 hover:bg-primary/20 transition-colors" title="View Details"><Eye size={16} /></button>
                                         </td>
                                     </tr>
                                 );
-                            }) : <tr><td colSpan={6} className="text-center py-12"><MessageSquare size={48} className="mx-auto text-gray-300" /><p className="text-gray-500">No reviews found</p></td></tr>}
+                            }) : <tr><td colSpan={6} className="text-center py-12"><MessageSquare size={48} className="mx-auto text-base-content/30" /><p className="text-base-content/70">No reviews found</p></td></tr>}
                         </tbody>
                     </table>
                 </div>
 
+                {/* Detail Modal */}
                 {detailModalOpen && selectedReview && (
-                    <div className="fixed inset-0 flex items-center justify-center backdrop-blur-md z-50 p-4">
-                        <div className="bg-white rounded-3xl p-8 w-full max-w-4xl border border-orange-100 shadow-2xl max-h-[90vh] overflow-y-auto">
+                    <div className="fixed inset-0 flex items-center justify-center backdrop-blur-md bg-base-content/20 z-50 p-4">
+                        <div className="bg-base-100 rounded-3xl p-8 w-full max-w-4xl border border-base-300 shadow-2xl max-h-[90vh] overflow-y-auto">
                             <div className="flex justify-between items-center mb-6">
-                                <h2 className="text-2xl font-bold text-gray-900">Review Details</h2>
-                                <button onClick={() => setDetailModalOpen(false)} className="p-2 bg-orange-50 text-orange-600 rounded-xl border border-orange-200"><X size={20} /></button>
+                                <h2 className="text-2xl font-bold text-base-content">Review Details</h2>
+                                <button onClick={() => setDetailModalOpen(false)} className="p-2 bg-base-200 text-base-content rounded-xl border border-base-300 hover:bg-base-300 transition-colors"><X size={20} /></button>
                             </div>
                             <div className="space-y-6">
-                                <div className="flex items-center gap-4 p-4 bg-orange-50 rounded-xl border border-orange-200">
-                                    <img src={getUserData(selectedReview).profileImage} className="w-16 h-16 rounded-xl border-2 border-white" />
+                                {/* User Info Header Card */}
+                                <div className="flex items-center gap-4 p-4 bg-primary/10 rounded-xl border border-primary/20">
+                                    <img src={getUserData(selectedReview).profileImage} className="w-16 h-16 rounded-xl border-2 border-base-100" />
                                     <div>
-                                        <h3 className="text-xl font-bold">{getUserData(selectedReview).name}</h3>
-                                        <div className="flex items-center gap-4 mt-1">{getStatusBadge(selectedReview.status)}<span className="text-sm text-gray-500">Created: {formatDate(selectedReview.createdAt)}</span></div>
+                                        <h3 className="text-xl font-bold text-base-content">{getUserData(selectedReview).name}</h3>
+                                        <div className="flex items-center gap-4 mt-1">{getStatusBadge(selectedReview.status)}<span className="text-sm text-base-content/70">Created: {formatDate(selectedReview.createdAt)}</span></div>
                                     </div>
                                 </div>
                                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                                    <div className="p-4 bg-blue-50 rounded-xl border border-blue-200">
-                                        <p className="font-semibold text-blue-900 mb-1">User Info</p>
-                                        <p>{getUserData(selectedReview).email}</p>
-                                        <p>{getUserData(selectedReview).phone}</p>
+                                    {/* User Info Card (Info Color) */}
+                                    <div className="p-4 bg-info/10 rounded-xl border border-info/20 text-base-content">
+                                        <p className="font-semibold text-info mb-1">User Info</p>
+                                        <div className='text-base-content/90'>
+                                            <p><Mail size={14} className='inline mr-1 text-info' />{getUserData(selectedReview).email}</p>
+                                            <p><Phone size={14} className='inline mr-1 text-info' />{getUserData(selectedReview).phone}</p>
+                                        </div>
                                     </div>
-                                    <div className="p-4 bg-green-50 rounded-xl border border-green-200">
-                                        <p className="font-semibold text-green-900 mb-1">Shop Info</p>
-                                        <p>{shops[selectedReview.shopId]?.shop?.shopName || 'Unknown Shop'}</p>
+                                    {/* Shop Info Card (Success Color) */}
+                                    <div className="p-4 bg-success/10 rounded-xl border border-success/20 text-base-content">
+                                        <p className="font-semibold text-success mb-1">Shop Info</p>
+                                        <p className='text-base-content/90'><Store size={14} className='inline mr-1 text-success' />{shops[selectedReview.shopId]?.shop?.shopName || 'Unknown Shop'}</p>
                                     </div>
-                                    <div className="p-4 bg-purple-50 rounded-xl border border-purple-200">
-                                        <p className="font-semibold text-purple-900 mb-1">Rating & Feedback</p>
+                                    {/* Rating & Feedback Card (Accent Color) */}
+                                    <div className="p-4 bg-accent/10 rounded-xl border border-accent/20 text-base-content">
+                                        <p className="font-semibold text-accent mb-1">Rating & Feedback</p>
                                         {renderStars(selectedReview.rating)}
-                                        <p className='bg-white rounded-lg border-2 border-gray-200 p-2 mt-1'>{selectedReview.feedback || 'No feedback'}</p>
+                                        <p className='bg-base-200 text-base-content rounded-lg border-2 border-base-300 p-2 mt-2'>{selectedReview.feedback || 'No feedback'}</p>
                                     </div>
-                                    <div className="p-4 bg-gray-50 rounded-xl border border-gray-200">
-                                        <p className="font-semibold text-gray-900 mb-1">Metadata</p>
-                                        <p>Status: {selectedReview.status}</p>
-                                        <p>Created: {formatDate(selectedReview.createdAt)}</p>
+                                    {/* Metadata Card (Neutral Color) */}
+                                    <div className="p-4 bg-base-200 rounded-xl border border-base-300 text-base-content">
+                                        <p className="font-semibold text-base-content/90 mb-1">Metadata</p>
+                                        <p className='text-base-content/70'>Status: {selectedReview.status}</p>
+                                        <p className='text-base-content/70'>Created: {formatDate(selectedReview.createdAt)}</p>
                                     </div>
                                 </div>
+                                {/* Modal Action Buttons */}
                                 <div className="flex justify-end gap-3 pt-4">
-                                    <button onClick={() => setDetailModalOpen(false)} className="px-6 py-2 bg-white border border-gray-200 rounded-xl hover:bg-orange-50">Close</button>
+                                    <button onClick={() => setDetailModalOpen(false)} className="px-6 py-2 bg-base-100 border border-base-300 text-base-content rounded-xl hover:bg-base-200 transition-colors">Close</button>
                                     {selectedReview.status === "pending" && <>
-                                        <button onClick={() => updateReviewStatus(selectedReview._id, "approved")} className="px-6 py-3 bg-green-500 text-white rounded-xl">Approve</button>
-                                        <button onClick={() => updateReviewStatus(selectedReview._id, "rejected")} className="px-6 py-3 bg-red-500 text-white rounded-xl">Reject</button>
+                                        <button onClick={() => updateReviewStatus(selectedReview._id, "approved")} className="px-6 py-3 bg-success text-success-content rounded-xl hover:bg-success/80 transition-colors">Approve</button>
+                                        <button onClick={() => updateReviewStatus(selectedReview._id, "rejected")} className="px-6 py-3 bg-error text-error-content rounded-xl hover:bg-error/80 transition-colors">Reject</button>
                                     </>}
-                                    {(selectedReview.status === "approved" || selectedReview.status === "rejected") && <button onClick={() => updateReviewStatus(selectedReview._id, "pending")} className="px-6 py-3 bg-yellow-500 text-white rounded-xl">Set Pending</button>}
+                                    {(selectedReview.status === "approved" || selectedReview.status === "rejected") && <button onClick={() => updateReviewStatus(selectedReview._id, "pending")} className="px-6 py-3 bg-warning text-warning-content rounded-xl hover:bg-warning/80 transition-colors">Set Pending</button>}
                                 </div>
                             </div>
                         </div>

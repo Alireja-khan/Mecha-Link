@@ -1,7 +1,8 @@
+// AdminSettings.jsx
 "use client";
 import React, { useState, useEffect } from "react";
 import useUser from "@/hooks/useUser";
-import { User, Shield, Globe, Lock, Save } from "lucide-react";
+import { User, Shield, Globe, Save } from "lucide-react";
 import ProfileSettings from "./ProfileSettings";
 import SecuritySettings from "./SecuritySettings";
 import PreferencesSettings from "./PreferencesSettings";
@@ -10,7 +11,6 @@ export default function AdminSettings() {
   const { user: loggedInUser, loading: userLoading } = useUser();
   const [activeTab, setActiveTab] = useState("profile");
 
-  // State for all settings tabs
   const [profile, setProfile] = useState({
     name: "",
     email: "",
@@ -48,9 +48,7 @@ export default function AdminSettings() {
     activityStatus: true,
     dataSharing: false,
   });
-  // End of State for all settings tabs
 
-  // Effect to load user data into state
   useEffect(() => {
     if (loggedInUser) {
       setProfile({
@@ -90,19 +88,15 @@ export default function AdminSettings() {
     }
   }, [loggedInUser]);
 
-  // Loading/No User UI
   if (userLoading || !loggedInUser) {
     return (
-      <div className="flex items-center justify-center min-h-screen w-full bg-gray-50">
-        <span className="loading loading-bars loading-xl text-orange-500"></span>
+      <div className="flex items-center justify-center min-h-screen w-full bg-base-200">
+        <span className="loading loading-bars loading-xl text-primary"></span>
       </div>
     );
   }
-  // End of Loading/No User UI
 
-  // Handle Save (only for Profile tab in this example)
   const handleSave = async () => {
-    // Only attempt to save the active tab's data
     let body = {};
     let endpoint = "";
     let successMessage = "";
@@ -118,15 +112,13 @@ export default function AdminSettings() {
         bio: profile.bio,
         profileImage: profile.photoURL,
       };
-      endpoint = "/api/users/dashboardUser"; // Assuming this handles PUT for profile
+      endpoint = "/api/users/dashboardUser";
       successMessage = "Profile updated successfully!";
     } else if (activeTab === "preferences") {
-      // You'll need a different endpoint and body for preferences
       body = preferences;
       endpoint = "/api/users/preferences";
       successMessage = "Preferences updated successfully!";
     } else {
-      // Security is handled by its own internal form, so we'll skip the main save for it.
       alert("Please use the 'Change Password' button on the Security tab or switch to a different tab to save.");
       return;
     }
@@ -156,34 +148,31 @@ export default function AdminSettings() {
     { id: "profile", label: "Profile", icon: User },
     { id: "security", label: "Security", icon: Shield },
     { id: "preferences", label: "Preferences", icon: Globe },
-    // { id: "privacy", label: "Privacy", icon: Lock }, // You can add Privacy settings later
   ];
 
   return (
-    <div className="p-4 sm:p-8 space-y-8 bg-gray-50 mx-auto">
+    <div className="p-4 sm:p-8 space-y-8 bg-base-200 mx-auto text-base-content">
 
-      {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center">
-        <h1 className="text-3xl font-extrabold text-gray-800">Admin Settings</h1>
-        <div className="text-sm text-gray-500 mt-2 sm:mt-0">
+        <h1 className="text-3xl font-extrabold text-base-content">Admin Settings</h1>
+        <div className="text-sm text-base-content/70 mt-2 sm:mt-0">
           Last updated: {new Date().toLocaleDateString()}
         </div>
       </div>
 
-      {/* Settings Panel (Tabs + Content) */}
-      <div className="bg-white rounded-2xl shadow-xl border border-gray-100">
+      <div className="bg-base-100 rounded-2xl shadow-xl border border-neutral/40">
 
-        {/* Tab Navigation */}
-        <div className="flex border-b border-gray-200 overflow-x-auto whitespace-nowrap">
+        <div className="flex border-b border-base-300 overflow-x-auto whitespace-nowrap">
           {tabs.map((tab) => {
             const Icon = tab.icon;
             return (
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`flex items-center gap-2 px-4 sm:px-6 py-4 border-b-2 transition-colors duration-300 flex-shrink-0 ${activeTab === tab.id
-                  ? "border-orange-500 text-orange-600 font-semibold"
-                  : "border-transparent text-gray-600 hover:text-orange-600/70"
+                className={`flex items-center gap-2 px-4 sm:px-6 py-4 border-b-2 transition-colors duration-300 flex-shrink-0 
+                  ${activeTab === tab.id
+                    ? "border-primary text-primary font-semibold"
+                    : "border-transparent text-base-content/70 hover:text-primary/80"
                   }`}
               >
                 <Icon size={18} />
@@ -193,7 +182,6 @@ export default function AdminSettings() {
           })}
         </div>
 
-        {/* Tab Content */}
         <div className="p-4 sm:p-8">
           {activeTab === "profile" && (
             <ProfileSettings profile={profile} setProfile={setProfile} />
@@ -210,14 +198,13 @@ export default function AdminSettings() {
         </div>
       </div>
 
-      {/* Save/Cancel Buttons */}
-      <div className="flex justify-end gap-3 pt-4"> {/* Changed justify-between to justify-end */}
-        <button className="px-6 py-3 border border-gray-300 text-gray-700 rounded-xl hover:bg-gray-100 transition duration-200 font-medium">
+      <div className="flex justify-end gap-3 pt-4">
+        <button className="px-6 py-3 border border-base-300 text-base-content rounded-xl hover:bg-base-300 transition duration-200 font-medium">
           Cancel
         </button>
         <button
           onClick={handleSave}
-          className="px-6 py-3 bg-orange-500 text-white rounded-xl hover:bg-orange-600 transition duration-200 flex items-center gap-2 font-medium shadow-md shadow-orange-200"
+          className="px-6 py-3 bg-primary text-primary-content rounded-xl hover:bg-secondary transition duration-200 flex items-center gap-2 font-medium shadow-md shadow-primary/30"
         >
           <Save size={18} /> Save Changes
         </button>

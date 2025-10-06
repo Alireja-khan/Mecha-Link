@@ -36,50 +36,75 @@ const getShopName = (shopId, shops) => {
   return shop?.shop?.shopName || shop?.shopName || "Unknown shop";
 };
 
-// Utility function to get status badge
+// Utility function to get status badge (Refactored Colors)
 const getStatusBadge = (status) => {
   const base = "px-3 py-1 text-xs font-semibold rounded-full border whitespace-nowrap";
   switch (status) {
     case "pending":
-      return <span className={`${base} bg-yellow-100 text-yellow-700 border-yellow-200`}>Pending</span>;
+      // Uses DaisyUI warning color
+      return <span className={`${base} bg-warning/30 text-warning dark:text-warning/80 border-warning/30`}>Pending</span>;
     case "in-progress":
-      return <span className={`${base} bg-blue-100 text-blue-700 border-blue-200`}>In Progress</span>;
+      // Uses DaisyUI info color (Blue)
+      return <span className={`${base} bg-info/10 text-info border-info/30`}>In Progress</span>;
     case "completed":
-      return <span className={`${base} bg-green-100 text-green-700 border-green-200`}>Completed</span>;
+      // Uses DaisyUI success color (Green)
+      return <span className={`${base} bg-success/10 text-base-content border-success/30`}>Completed</span>;
     case "cancelled":
-      return <span className={`${base} bg-red-100 text-red-700 border-red-200`}>Cancelled</span>;
+      // Uses DaisyUI error color (Red)
+      return <span className={`${base} bg-error/10 text-error border-error/30`}>Cancelled</span>;
     default:
-      return <span className={`${base} bg-gray-100 text-gray-700 border-gray-200`}>Unknown</span>;
+      // Uses DaisyUI base color
+      return <span className={`${base} bg-base-300 text-base-content/70 border-base-300`}>Unknown</span>;
   }
 };
 
-// --- Stat Card Component (Responsive) ---
+// --- Stat Card Component (Refactored Colors) ---
 
-const StatCard = ({ icon: Icon, value, label, color = "orange" }) => {
+const StatCard = ({ icon: Icon, value, label, color = "primary" }) => {
   const colorClasses = {
-    orange: { bg: "bg-orange-500/10", bgHover: "group-hover:bg-orange-500/20", text: "text-orange-600" },
-    green: { bg: "bg-green-500/10", bgHover: "group-hover:bg-green-500/20", text: "text-green-600" },
-    red: { bg: "bg-red-500/10", bgHover: "group-hover:bg-red-500/20", text: "text-red-600" },
-    yellow: { bg: "bg-yellow-500/10", bgHover: "group-hover:bg-yellow-500/20", text: "text-yellow-600" },
-    blue: { bg: "bg-blue-500/10", bgHover: "group-hover:bg-blue-500/20", text: "text-blue-600" }
+    primary: { // Orange
+      bg: "bg-primary/10",
+      bgHover: "group-hover:bg-primary/20",
+      text: "text-primary"
+    },
+    success: { // Green
+      bg: "bg-success/10",
+      bgHover: "group-hover:bg-success/20",
+      text: "text-base-content"
+    },
+    error: { // Red
+      bg: "bg-error/10",
+      bgHover: "group-hover:bg-error/20",
+      text: "text-error"
+    },
+    warning: { // Yellow
+      bg: "bg-warning/20",
+      bgHover: "group-hover:bg-warning/30",
+      text: "text-warning-content" // Use content color for visibility on light bg
+    },
+    info: { // Blue
+      bg: "bg-info/10",
+      bgHover: "group-hover:bg-info/20",
+      text: "text-info"
+    }
   };
 
-  const classes = colorClasses[color] || colorClasses.orange;
+  const classes = colorClasses[color] || colorClasses.primary;
 
   return (
-    <div className="bg-white rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-orange-100 shadow-lg hover:shadow-xl transition-all duration-300 group">
+    <div className="bg-base-100 rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-primary/20 shadow-lg hover:shadow-xl transition-all duration-300 group">
       <div className="flex items-center justify-between mb-3 sm:mb-4">
         <div className={`p-2 sm:p-3 rounded-xl ${classes.bg} ${classes.bgHover} transition-colors duration-300`}>
           <Icon className={classes.text} size={20} />
         </div>
       </div>
-      <p className="text-2xl sm:text-3xl font-bold text-gray-900 mb-1">{value}</p>
-      <p className="text-gray-600 text-xs sm:text-sm font-medium">{label}</p>
+      <p className="text-2xl sm:text-3xl font-bold text-base-content mb-1">{value}</p>
+      <p className="text-base-content/60 text-xs sm:text-sm font-medium">{label}</p>
     </div>
   );
 };
 
-// --- Memoized Modal Sub-Components (For Edit/Detail Modals) ---
+// --- Memoized Modal Sub-Components (Refactored Colors) ---
 
 const ModalContainer = React.memo(({ children, onClose, title, saving }) => {
   const modalRef = useRef(null);
@@ -88,13 +113,13 @@ const ModalContainer = React.memo(({ children, onClose, title, saving }) => {
     <div className="fixed inset-0 flex items-center justify-center backdrop-blur-md z-50 p-4">
       <div
         ref={modalRef}
-        className="bg-white rounded-3xl p-6 sm:p-8 w-full max-w-lg md:max-w-4xl border border-orange-100 shadow-2xl max-h-[90vh] overflow-y-auto"
+        className="bg-base-100 rounded-3xl p-6 sm:p-8 w-full max-w-lg md:max-w-4xl border border-primary/20 shadow-2xl max-h-[90vh] overflow-y-auto"
       >
         <div className="flex justify-between items-center mb-6">
-          <h2 className="text-xl sm:text-2xl font-bold text-gray-900">{title}</h2>
+          <h2 className="text-xl sm:text-2xl font-bold text-base-content">{title}</h2>
           <button
             onClick={onClose}
-            className="p-2 bg-orange-50 text-orange-600 rounded-xl border border-orange-200 hover:bg-orange-100 transition-colors duration-200"
+            className="p-2 bg-base-200 text-primary rounded-xl border border-primary/20 hover:bg-base-200/70 transition-colors duration-200"
             disabled={saving}
           >
             <X size={20} />
@@ -105,13 +130,6 @@ const ModalContainer = React.memo(({ children, onClose, title, saving }) => {
     </div>
   );
 });
-
-// NOTE: RequestHeader, ServiceDetailsSection, CustomerInfoSection, AssignmentInfoSection, and AdminNotesSection
-// depend on external state (editingRequest) and handlers (handleInputChange, handleNestedInputChange).
-// They were defined outside the main component in the prompt's first part, but for a single file structure,
-// they should ideally be nested inside or passed all necessary data as props.
-// I will keep them defined inside the main component function (where they have access to state/handlers)
-// and apply React.memo for optimization.
 
 // --- Main Component ---
 
@@ -127,17 +145,13 @@ const ManageServiceRequests = () => {
   const [shops, setShops] = useState([]);
   const [saving, setSaving] = useState(false);
 
-  // SweetAlert2 Functions (unchanged for brevity, assuming they are defined as in the prompt)
+  // SweetAlert2 Functions (Refactored to use CSS variables for dynamic colors)
   const showSuccessAlert = (title, message) => {
     Swal.fire({
       title: title,
       text: message,
       icon: 'success',
-      confirmButtonColor: '#f97316',
       confirmButtonText: 'OK',
-      background: '#fff',
-      color: '#1f2937',
-      iconColor: '#22c55e'
     });
   };
 
@@ -146,11 +160,7 @@ const ManageServiceRequests = () => {
       title: title,
       text: message,
       icon: 'error',
-      confirmButtonColor: '#f97316',
       confirmButtonText: 'OK',
-      background: '#fff',
-      color: '#1f2937',
-      iconColor: '#ef4444'
     });
   };
 
@@ -160,13 +170,8 @@ const ManageServiceRequests = () => {
       text: text,
       icon: 'warning',
       showCancelButton: true,
-      confirmButtonColor: '#f97316',
-      cancelButtonColor: '#6b7280',
       confirmButtonText: confirmButtonText,
       cancelButtonText: 'Cancel',
-      background: '#fff',
-      color: '#1f2937',
-      iconColor: '#eab308',
       reverseButtons: true
     });
   };
@@ -179,8 +184,6 @@ const ManageServiceRequests = () => {
       didOpen: () => {
         Swal.showLoading();
       },
-      background: '#fff',
-      color: '#1f2937'
     });
   };
 
@@ -203,7 +206,6 @@ const ManageServiceRequests = () => {
 
   const fetchShops = async () => {
     try {
-      // Using a query parameter that might indicate admin access for comprehensive shop list
       const res = await fetch("/api/shops?admin=true");
       if (res.ok) {
         const data = await res.json();
@@ -219,7 +221,7 @@ const ManageServiceRequests = () => {
     fetchShops();
   }, []);
 
-  // --- Handlers ---
+  // --- Handlers (Kept logic the same) ---
 
   const handleDeleteRequest = async (id) => {
     const requestToDelete = requests.find(r => r._id === id);
@@ -283,8 +285,6 @@ const ManageServiceRequests = () => {
         assignedShop: editingRequest.assignedShop || null,
         status: editingRequest.status,
         adminNotes: editingRequest.adminNotes,
-        // These fields might not be directly updatable via this API route
-        // but are included as per the original component structure
         userName: editingRequest.user?.name,
         location: editingRequest.location,
         serviceDetails: editingRequest.serviceDetails
@@ -313,7 +313,7 @@ const ManageServiceRequests = () => {
       await fetchRequests();
       setEditModalOpen(false);
       setEditingRequest(null);
-      setDetailModalOpen(false); // Ensure both are closed/reset
+      setDetailModalOpen(false);
       setSelectedRequest(null);
       showSuccessAlert('Updated!', 'Service request has been updated successfully');
     } catch (error) {
@@ -331,10 +331,9 @@ const ManageServiceRequests = () => {
   };
 
   const openEditModal = (request) => {
-    // Deep copy the request to prevent accidental mutation of the original state
     setEditingRequest(JSON.parse(JSON.stringify(request)));
     setEditModalOpen(true);
-    setDetailModalOpen(false); // Close detail modal when opening edit
+    setDetailModalOpen(false);
   };
 
   const closeModals = () => {
@@ -362,22 +361,22 @@ const ManageServiceRequests = () => {
     }));
   }, []);
 
-  // --- Component Sub-Definitions (for memoized components) ---
+  // --- Component Sub-Definitions (Refactored Colors) ---
 
-  // FIXED: Request Header Component
+  // Request Header Component
   const RequestHeader = React.memo(({ request, isEditing = false }) => (
-    <div className="flex items-start sm:items-center gap-4 p-4 bg-orange-50 rounded-xl border border-orange-200">
-      <div className="w-12 h-12 bg-gradient-to-br from-orange-400 to-orange-600 rounded-xl flex items-center justify-center text-white flex-shrink-0">
+    <div className="flex items-start sm:items-center gap-4 p-4 bg-base-200/50 rounded-xl border border-primary/20">
+      <div className="w-12 h-12 bg-primary rounded-xl flex items-center justify-center text-primary-content flex-shrink-0">
         <Wrench size={20} />
       </div>
       <div className="flex-1 min-w-0">
-        <h3 className="text-lg sm:text-xl font-bold text-gray-900 truncate mb-1">
+        <h3 className="text-lg sm:text-xl font-bold text-base-content truncate mb-1">
           {isEditing ? (
             <input
               type="text"
               value={editingRequest?.deviceType || ""}
               onChange={(e) => handleInputChange('deviceType', e.target.value)}
-              className="bg-white border border-orange-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-orange-500 w-full text-base font-semibold"
+              className="bg-base-100 border border-primary/30 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary w-full text-base font-semibold text-base-content"
               placeholder="Device Type"
             />
           ) : (
@@ -386,8 +385,8 @@ const ManageServiceRequests = () => {
         </h3>
         <div className="flex items-center gap-4 flex-wrap">
           {getStatusBadge(request.status)}
-          <span className="text-sm text-gray-500 flex items-center gap-1">
-            <Calendar size={14} />
+          <span className="text-sm text-base-content/70 flex items-center gap-1">
+            <Calendar size={14} className="text-base-content/50" />
             Requested: {formatDate(request.requestedDate || request.createdAt)}
           </span>
         </div>
@@ -395,63 +394,63 @@ const ManageServiceRequests = () => {
     </div>
   ));
 
-  // FIXED: Service Details Section
+  // Service Details Section
   const ServiceDetailsSection = React.memo(({ request, isEditing = false }) => (
-    <div className="p-4 bg-blue-50 rounded-xl border border-blue-200">
-      <h5 className="font-semibold text-blue-900 mb-3">Service Details</h5>
+    <div className="p-4 bg-info/10 rounded-xl border border-info/30">
+      <h5 className="font-semibold text-base-content/90 mb-3">Service Details</h5>
       <div className="space-y-3 text-sm">
         <div>
-          <label className="block font-medium text-blue-700 mb-1">Device Type</label>
+          <label className="block font-medium text-base-content/80 mb-1">Device Type</label>
           {isEditing ? (
             <input
               type="text"
               value={editingRequest?.deviceType || ""}
               onChange={(e) => handleInputChange('deviceType', e.target.value)}
-              className="w-full bg-white border border-blue-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full bg-base-100 border border-info/30 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-info text-base-content"
             />
           ) : (
-            <p className="text-blue-700">{request.deviceType || "Not specified"}</p>
+            <p className="text-base-content/90">{request.deviceType || "Not specified"}</p>
           )}
         </div>
 
         <div>
-          <label className="block font-medium text-blue-700 mb-1">Problem Category</label>
+          <label className="block font-medium text-base-content/80 mb-1">Problem Category</label>
           {isEditing ? (
             <input
               type="text"
               value={editingRequest?.problemCategory || ""}
               onChange={(e) => handleInputChange('problemCategory', e.target.value)}
-              className="w-full bg-white border border-blue-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full bg-base-100 border border-info/30 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-info text-base-content"
             />
           ) : (
-            <p className="text-blue-700">{request.problemCategory || "Not specified"}</p>
+            <p className="text-base-content/90">{request.problemCategory || "Not specified"}</p>
           )}
         </div>
 
         <div>
-          <label className="block font-medium text-blue-700 mb-1">Problem Description</label>
+          <label className="block font-medium text-base-content/80 mb-1">Problem Description</label>
           {isEditing ? (
             <textarea
               value={editingRequest?.problemDescription || ""}
               onChange={(e) => handleInputChange('problemDescription', e.target.value)}
-              className="w-full bg-white border border-blue-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full bg-base-100 border border-info/30 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-info text-base-content"
               rows="3"
               placeholder="Describe the problem..."
             />
           ) : (
-            <p className="text-blue-700 whitespace-pre-wrap">{request.problemDescription || "Not provided"}</p>
+            <p className="text-base-content/90 whitespace-pre-wrap">{request.problemDescription || "Not provided"}</p>
           )}
         </div>
 
         {/* Conditional Urgency Field */}
         {(request.serviceDetails?.urgency || isEditing) && (
           <div>
-            <label className="block font-medium text-blue-700 mb-1">Urgency</label>
+            <label className="block font-medium base-content/80 mb-1">Urgency</label>
             {isEditing ? (
               <select
                 value={editingRequest?.serviceDetails?.urgency || "low"}
                 onChange={(e) => handleNestedInputChange('serviceDetails', 'urgency', e.target.value)}
-                className="w-full bg-white border border-blue-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full bg-base-100 border border-info/30 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-info text-base-content"
               >
                 <option value="low">Low</option>
                 <option value="medium">Medium</option>
@@ -459,7 +458,7 @@ const ManageServiceRequests = () => {
                 <option value="emergency">Emergency</option>
               </select>
             ) : (
-              <p className="text-blue-700 capitalize">{request.serviceDetails?.urgency || "Not specified"}</p>
+              <p className="text-base-content/90 capitalize">{request.serviceDetails?.urgency || "Not specified"}</p>
             )}
           </div>
         )}
@@ -467,68 +466,67 @@ const ManageServiceRequests = () => {
     </div>
   ));
 
-  // FIXED: Customer Info Section
+  // Customer Info Section
   const CustomerInfoSection = React.memo(({ request, isEditing = false }) => (
-    <div className="p-4 bg-green-50 rounded-xl border border-green-200">
-      <h5 className="font-semibold text-green-900 mb-3">Customer Information</h5>
+    <div className="p-4 bg-success/10 rounded-xl border border-success/30">
+      <h5 className="font-semibold text-base-content mb-3">Customer Information</h5>
       <div className="space-y-3 text-sm">
         <div>
-          <label className="block font-medium text-green-700 mb-1">Name</label>
+          <label className="block font-medium text-base-content/90 mb-1">Name</label>
           {isEditing ? (
             <input
               type="text"
               value={editingRequest?.user?.name || ""}
-              // This change won't update the user object on the backend unless the API supports it
               onChange={(e) => handleNestedInputChange('user', 'name', e.target.value)}
-              className="w-full bg-white border border-green-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500"
+              className="w-full bg-base-100 border border-success/30 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-success text-base-content"
             />
           ) : (
-            <p className="text-green-700">{request.user?.name || "Not provided"}</p>
+            <p className="text-base-content/90">{request.user?.name || "Not provided"}</p>
           )}
         </div>
 
         <div>
-          <label className="block font-medium text-green-700 mb-1">Email</label>
+          <label className="block font-medium text-base-content/90 mb-1">Email</label>
           {isEditing ? (
             <input
               type="email"
               value={editingRequest?.userEmail || ""}
               onChange={(e) => handleInputChange('userEmail', e.target.value)}
-              className="w-full bg-white border border-green-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500"
+              className="w-full bg-base-100 border border-base-content/30 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-success text-base-content"
             />
           ) : (
-            <p className="text-green-700">{request.userEmail}</p>
+            <p className="text-base-content/90">{request.userEmail}</p>
           )}
         </div>
 
         <div>
-          <label className="block font-medium text-green-700 mb-1">Phone</label>
+          <label className="block font-medium text-base-content/90 mb-1">Phone</label>
           {isEditing ? (
             <input
               type="tel"
               value={editingRequest?.userPhone || ""}
               onChange={(e) => handleInputChange('userPhone', e.target.value)}
-              className="w-full bg-white border border-green-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500"
+              className="w-full bg-base-100 border border-success/30 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-success text-base-content"
             />
           ) : (
-            <p className="text-green-700">{request.userPhone || "Not provided"}</p>
+            <p className="text-base-content/90">{request.userPhone || "Not provided"}</p>
           )}
         </div>
 
         {/* Conditional Location Field */}
         {(request.location?.address || isEditing) && (
           <div>
-            <label className="block font-medium text-green-700 mb-1">Address</label>
+            <label className="block font-medium text-base-content/90 mb-1">Address</label>
             {isEditing ? (
               <input
                 type="text"
                 value={editingRequest?.location?.address || ""}
                 onChange={(e) => handleNestedInputChange('location', 'address', e.target.value)}
-                className="w-full bg-white border border-green-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500"
+                className="w-full bg-base-100 border border-success/30 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-success text-base-content"
                 placeholder="Customer address..."
               />
             ) : (
-              <p className="text-green-700">{request.location?.address || "Not provided"}</p>
+              <p className="text-base-content/90">{request.location?.address || "Not provided"}</p>
             )}
           </div>
         )}
@@ -536,18 +534,18 @@ const ManageServiceRequests = () => {
     </div>
   ));
 
-  // FIXED: Assignment Info Section
+  // Assignment Info Section
   const AssignmentInfoSection = React.memo(({ request, isEditing = false }) => (
-    <div className="p-4 bg-purple-50 rounded-xl border border-purple-200">
-      <h5 className="font-semibold text-purple-900 mb-3">Assignment Information</h5>
+    <div className="p-4 bg-secondary/10 rounded-xl border border-secondary/30">
+      <h5 className="font-semibold text-base-content/90 mb-3">Assignment Information</h5>
       <div className="space-y-3 text-sm">
         <div>
-          <label className="block font-medium text-purple-700 mb-1">Assigned Shop</label>
+          <label className="block font-medium text-base-content/80 mb-1">Assigned Shop</label>
           {isEditing ? (
             <select
               value={editingRequest?.assignedShop || ""}
               onChange={(e) => handleInputChange('assignedShop', e.target.value)}
-              className="w-full bg-white border border-purple-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500"
+              className="w-full bg-base-100 border border-secondary/30 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-secondary text-base-content"
             >
               <option value="">Not assigned</option>
               {shops.map(shop => (
@@ -557,17 +555,17 @@ const ManageServiceRequests = () => {
               ))}
             </select>
           ) : (
-            <p className="text-purple-700">{request.assignedShop ? getShopName(request.assignedShop, shops) : "Not assigned"}</p>
+            <p className="text-base-content/90">{request.assignedShop ? getShopName(request.assignedShop, shops) : "Not assigned"}</p>
           )}
         </div>
 
         <div>
-          <label className="block font-medium text-purple-700 mb-1">Status</label>
+          <label className="block font-medium text-base-content/80 mb-1">Status</label>
           {isEditing ? (
             <select
               value={editingRequest?.status || "pending"}
               onChange={(e) => handleInputChange('status', e.target.value)}
-              className="w-full bg-white border border-purple-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500"
+              className="w-full bg-base-100 border border-secondary/30 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-secondary text-base-content"
             >
               <option value="pending">Pending</option>
               <option value="in-progress">In Progress</option>
@@ -580,53 +578,53 @@ const ManageServiceRequests = () => {
         </div>
 
         <div>
-          <label className="block font-medium text-purple-700 mb-1">Created</label>
-          <p className="text-purple-700">{formatDate(request.createdAt)}</p>
+          <label className="block font-medium text-base-content/80 mb-1">Created</label>
+          <p className="text-base-content/90">{formatDate(request.createdAt)}</p>
         </div>
 
         {request.updatedAt && (
           <div>
-            <label className="block font-medium text-purple-700 mb-1">Last Updated</label>
-            <p className="text-purple-700">{formatDate(request.updatedAt)}</p>
+            <label className="block font-medium text-base-content/80 mb-1">Last Updated</label>
+            <p className="text-base-content/90">{formatDate(request.updatedAt)}</p>
           </div>
         )}
       </div>
     </div>
   ));
 
-  // FIXED: Admin Notes Section
+  // Admin Notes Section
   const AdminNotesSection = React.memo(({ request, isEditing = false }) => (
-    <div className="p-4 bg-yellow-50 rounded-xl border border-yellow-200 md:col-span-2">
-      <h5 className="font-semibold text-yellow-900 mb-3">Admin Notes</h5>
+    <div className="p-4 bg-warning/20 rounded-xl border border-warning/30 md:col-span-2">
+      <h5 className="font-semibold text-base-content mb-3">Admin Notes</h5>
       {isEditing ? (
         <textarea
           value={editingRequest?.adminNotes || ""}
           onChange={(e) => handleInputChange('adminNotes', e.target.value)}
-          className="w-full bg-white border border-yellow-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-500"
+          className="w-full bg-base-100 border border-warning/30 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-warning text-base-content"
           rows="3"
           placeholder="Add internal notes for tracking or reference here..."
         />
       ) : (
-        <p className="text-yellow-700 whitespace-pre-wrap">{request.adminNotes || "No admin notes"}</p>
+        <p className="text-base-content/90 whitespace-pre-wrap">{request.adminNotes || "No admin notes"}</p>
       )}
     </div>
   ));
 
-  // --- Mobile Card Component ---
+  // --- Mobile Card Component (Refactored Colors) ---
   const RequestMobileCard = ({ req }) => (
-    <div className="bg-white p-4 rounded-xl border border-orange-100 shadow-sm hover:shadow-md transition-all duration-200">
-      <div className="flex items-start gap-3 mb-3 border-b border-gray-100 pb-3">
-        <div className="w-10 h-10 bg-gradient-to-br from-orange-400 to-orange-600 rounded-lg flex items-center justify-center text-white font-bold text-sm flex-shrink-0">
+    <div className="bg-base-100 p-4 rounded-xl border border-primary/20 shadow-sm hover:shadow-md transition-all duration-200">
+      <div className="flex items-start gap-3 mb-3 border-b border-base-300 pb-3">
+        <div className="w-10 h-10 bg-primary rounded-lg flex items-center justify-center text-primary-content font-bold text-sm flex-shrink-0">
           <Wrench size={18} />
         </div>
         <div className="flex-1 min-w-0">
-          <p className="font-semibold text-gray-900 truncate">{req.deviceType || 'Service Request'}</p>
-          <p className="text-xs text-gray-600 truncate flex items-center gap-1">
-            <User size={12} className="text-gray-400" />
+          <p className="font-semibold text-base-content truncate">{req.deviceType || 'Service Request'}</p>
+          <p className="text-xs text-base-content/70 truncate flex items-center gap-1">
+            <User size={12} className="text-base-content/40" />
             {req.user?.name || req.userEmail}
           </p>
-          <p className="text-xs text-gray-600 truncate flex items-center gap-1">
-            <Clock size={12} className="text-gray-400" />
+          <p className="text-xs text-base-content/70 truncate flex items-center gap-1">
+            <Clock size={12} className="text-base-content/40" />
             {formatDateShort(req.createdAt)}
           </p>
         </div>
@@ -635,28 +633,28 @@ const ManageServiceRequests = () => {
       <div className="flex items-center justify-between pt-3 flex-wrap gap-2">
         <div className="flex items-center gap-2 flex-wrap">
           {getStatusBadge(req.status)}
-          <span className="px-3 py-1 text-xs bg-orange-100 text-orange-700 rounded-lg border border-orange-200">
+          <span className="px-3 py-1 text-xs bg-base-200 text-primary rounded-lg border border-primary/20">
             {req.problemCategory}
           </span>
         </div>
         <div className="flex gap-1.5">
           <button
             onClick={() => openEditModal(req)}
-            className="p-1.5 bg-orange-500/10 text-orange-600 rounded-lg border border-orange-200 hover:bg-orange-500/20 transition-colors"
+            className="p-1.5 bg-primary/10 text-primary rounded-lg border border-primary/30 hover:bg-primary/20 transition-colors"
             title="Edit"
           >
             <Edit size={16} />
           </button>
           <button
             onClick={() => openDetailModal(req)}
-            className="p-1.5 bg-blue-500/10 text-blue-600 rounded-lg border border-blue-200 hover:bg-blue-500/20 transition-colors"
+            className="p-1.5 bg-info/10 text-info rounded-lg border border-info/30 hover:bg-info/20 transition-colors"
             title="View Details"
           >
             <Eye size={16} />
           </button>
           <button
             onClick={() => handleDeleteRequest(req._id)}
-            className="p-1.5 bg-red-500/10 text-red-600 rounded-lg border border-red-200 hover:bg-red-500/20 transition-colors"
+            className="p-1.5 bg-error/10 text-error rounded-lg border border-error/30 hover:bg-error/20 transition-colors"
             title="Delete"
           >
             <Trash2 size={16} />
@@ -672,7 +670,7 @@ const ManageServiceRequests = () => {
   if (loading || userLoading) {
     return (
       <div className="flex items-center justify-center h-screen w-full">
-        <span className="loading loading-bars loading-xl text-orange-500"></span>
+        <span className="loading loading-bars loading-xl text-primary"></span>
       </div>
     );
   }
@@ -680,7 +678,7 @@ const ManageServiceRequests = () => {
   if (!loggedInUser) {
     return (
       <div className="flex items-center justify-center h-screen w-full">
-        <span className="loading loading-bars loading-xl text-orange-500"></span>
+        <span className="loading loading-bars loading-xl text-primary"></span>
       </div>
     );
   }
@@ -708,37 +706,37 @@ const ManageServiceRequests = () => {
     <div className="min-h-screen p-3 sm:p-4 lg:p-6 mx-auto">
       {/* Header Section */}
       <div className="mb-4 sm:mb-6 lg:mb-8">
-        <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 mb-1 sm:mb-2">Service Request Management</h1>
-        <p className="text-gray-600 text-sm sm:text-base lg:text-lg">Manage and track all service requests</p>
+        <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-base-content mb-1 sm:mb-2">Service Request Management</h1>
+        <p className="text-base-content/60 text-sm sm:text-base lg:text-lg">Manage and track all service requests</p>
       </div>
 
       {/* Stats Overview */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-6 mb-4 sm:mb-6 lg:mb-8">
-        <StatCard icon={Wrench} value={stats.total} label="Total Requests" color="orange" />
-        <StatCard icon={Clock} value={stats.pending} label="Pending" color="yellow" />
-        <StatCard icon={AlertCircle} value={stats.inProgress} label="In Progress" color="blue" />
-        <StatCard icon={Check} value={stats.completed} label="Completed" color="green" />
+        <StatCard icon={Wrench} value={stats.total} label="Total Requests" color="primary" />
+        <StatCard icon={Clock} value={stats.pending} label="Pending" color="warning" />
+        <StatCard icon={AlertCircle} value={stats.inProgress} label="In Progress" color="info" />
+        <StatCard icon={Check} value={stats.completed} label="Completed" color="success" />
       </div>
 
       {/* Main Content */}
-      <div className="bg-white rounded-2xl sm:rounded-3xl p-4 sm:p-6 lg:p-8 border border-orange-100 shadow-xl">
+      <div className="bg-base-100 rounded-2xl sm:rounded-3xl p-4 sm:p-6 lg:p-8 border border-primary/20 shadow-xl">
         {/* Header with Search and Actions */}
         <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 mb-6">
           <div>
-            <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-1">All Service Requests</h2>
-            <p className="text-gray-600 text-sm">Manage service requests and assign shops</p>
+            <h2 className="text-xl sm:text-2xl font-bold text-base-content mb-1">All Service Requests</h2>
+            <p className="text-base-content/60 text-sm">Manage service requests and assign shops</p>
           </div>
 
           <div className="flex flex-col sm:flex-row gap-3 w-full lg:w-auto">
             {/* Search */}
             <div className="relative flex-1 w-full lg:w-80">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-base-content/40" size={18} />
               <input
                 type="text"
                 placeholder="Search by user, device, or problem..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10 pr-4 py-2.5 sm:py-3 border border-orange-200 rounded-xl bg-orange-50/50 focus:bg-white focus:border-orange-300 focus:outline-none transition-all duration-300 w-full text-sm"
+                className="pl-10 pr-4 py-2.5 sm:py-3 border border-primary/30 rounded-xl bg-base-200/50 focus:bg-base-100 focus:border-primary focus:outline-none transition-all duration-300 w-full text-sm text-base-content"
               />
             </div>
 
@@ -746,14 +744,14 @@ const ManageServiceRequests = () => {
             <div className="flex gap-3 w-full sm:w-auto">
               <button
                 onClick={() => showSuccessAlert('Coming Soon!', 'Filter functionality will be implemented soon.')}
-                className="flex items-center gap-2 px-4 py-2.5 sm:py-3 bg-orange-50 text-orange-700 rounded-xl border border-orange-200 hover:bg-orange-100 transition-colors duration-200 text-sm flex-1"
+                className="flex items-center gap-2 px-4 py-2.5 sm:py-3 bg-base-200 text-primary rounded-xl border border-primary/20 hover:bg-base-200/70 transition-colors duration-200 text-sm flex-1"
               >
                 <Filter size={16} />
                 Filter
               </button>
               <button
                 onClick={() => showSuccessAlert('Coming Soon!', 'Export functionality will be implemented soon.')}
-                className="flex items-center gap-2 px-4 py-2.5 sm:py-3 bg-orange-50 text-orange-700 rounded-xl border border-orange-200 hover:bg-orange-100 transition-colors duration-200 text-sm flex-1"
+                className="flex items-center gap-2 px-4 py-2.5 sm:py-3 bg-base-200 text-primary rounded-xl border border-primary/20 hover:bg-base-200/70 transition-colors duration-200 text-sm flex-1"
               >
                 <Download size={16} />
                 Export
@@ -768,52 +766,52 @@ const ManageServiceRequests = () => {
             filteredRequests.map(req => <RequestMobileCard key={req._id} req={req} />)
           ) : (
             <div className="text-center py-12">
-              <MessageSquare size={48} className="mx-auto text-gray-300" />
-              <p className="text-gray-500 mt-2">No service requests found</p>
-              <p className="text-gray-400 text-sm">
+              <MessageSquare size={48} className="mx-auto text-base-content/30" />
+              <p className="text-base-content/70 mt-2">No service requests found</p>
+              <p className="text-base-content/50 text-sm">
                 {searchTerm ? "Try adjusting your search terms" : "No service requests yet"}
               </p>
             </div>
           )}
         </div>
 
-        {/* Desktop Table (Visible on screens >= xl) */}
-        <div className="hidden xl:block rounded-2xl border border-orange-100 overflow-x-auto">
-          <table className="min-w-full divide-y divide-orange-100">
-            <thead className="bg-orange-50">
+        {/* Desktop Table (Visible on screens >= xl) - REFACTORED */}
+        <div className="hidden xl:block rounded-2xl border border-primary/20 overflow-x-auto">
+          <table className="min-w-full divide-y divide-primary/20">
+            <thead className="bg-base-200">
               <tr>
-                <th className="px-6 py-4 text-left text-sm font-semibold text-orange-900 uppercase tracking-wider whitespace-nowrap">Request Details</th>
-                <th className="px-6 py-4 text-left text-sm font-semibold text-orange-900 uppercase tracking-wider whitespace-nowrap">User Info</th>
-                <th className="px-6 py-4 text-left text-sm font-semibold text-orange-900 uppercase tracking-wider whitespace-nowrap">Problem</th>
-                <th className="px-6 py-4 text-left text-sm font-semibold text-orange-900 uppercase tracking-wider whitespace-nowrap">Shop</th>
-                <th className="px-6 py-4 text-left text-sm font-semibold text-orange-900 uppercase tracking-wider whitespace-nowrap">Requested</th>
-                <th className="px-6 py-4 text-left text-sm font-semibold text-orange-900 uppercase tracking-wider whitespace-nowrap">Status</th>
-                <th className="px-6 py-4 text-center text-sm font-semibold text-orange-900 uppercase tracking-wider whitespace-nowrap">Actions</th>
+                <th className="px-6 py-4 text-left text-sm font-semibold text-primary uppercase tracking-wider whitespace-nowrap">Request Details</th>
+                <th className="px-6 py-4 text-left text-sm font-semibold text-primary uppercase tracking-wider whitespace-nowrap">User Info</th>
+                <th className="px-6 py-4 text-left text-sm font-semibold text-primary uppercase tracking-wider whitespace-nowrap">Problem</th>
+                <th className="px-6 py-4 text-left text-sm font-semibold text-primary uppercase tracking-wider whitespace-nowrap">Shop</th>
+                <th className="px-6 py-4 text-left text-sm font-semibold text-primary uppercase tracking-wider whitespace-nowrap">Requested</th>
+                <th className="px-6 py-4 text-left text-sm font-semibold text-primary uppercase tracking-wider whitespace-nowrap">Status</th>
+                <th className="px-6 py-4 text-center text-sm font-semibold text-primary uppercase tracking-wider whitespace-nowrap">Actions</th>
               </tr>
             </thead>
-            <tbody className="bg-white divide-y divide-orange-100">
+            <tbody className="bg-base-100 divide-y divide-primary/20">
               {loading ? (
                 <tr>
                   <td colSpan="7" className="text-center py-12">
                     <div className="flex justify-center">
-                      <span className="loading loading-bars loading-lg text-orange-500"></span>
+                      <span className="loading loading-bars loading-lg text-primary"></span>
                     </div>
-                    <p className="text-gray-500 mt-2">Loading service requests...</p>
+                    <p className="text-base-content/70 mt-2">Loading service requests...</p>
                   </td>
                 </tr>
               ) : filteredRequests.length > 0 ? (
                 filteredRequests.map((req) => (
-                  <tr key={req._id} className="hover:bg-orange-50/30 transition-colors duration-200">
+                  <tr key={req._id} className="hover:bg-base-200/30 transition-colors duration-200">
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 bg-gradient-to-br from-orange-400 to-orange-600 rounded-xl flex items-center justify-center text-white font-bold text-sm flex-shrink-0">
+                        <div className="w-10 h-10 bg-primary rounded-xl flex items-center justify-center text-primary-content font-bold text-sm flex-shrink-0">
                           <Wrench size={16} />
                         </div>
                         <div>
-                          <p className="font-semibold text-gray-900">{req.deviceType || "Other"}</p>
+                          <p className="font-semibold text-base-content">{req.deviceType || "Other"}</p>
                           <button
                             onClick={() => openDetailModal(req)}
-                            className="text-orange-500 hover:text-orange-600 text-sm font-medium flex items-center gap-1 transition-colors duration-200 mt-1"
+                            className="text-primary hover:text-secondary text-sm font-medium flex items-center gap-1 transition-colors duration-200 mt-1"
                           >
                             <Eye size={14} />
                             View details
@@ -824,33 +822,33 @@ const ManageServiceRequests = () => {
                     <td className="px-6 py-4">
                       <div className="space-y-1">
                         <div className="flex items-center gap-2">
-                          <Mail size={14} className="text-orange-500" />
-                          <span className="text-sm text-gray-500">{req.userEmail || "N/A"}</span>
+                          <Mail size={14} className="text-primary" />
+                          <span className="text-sm text-base-content/70">{req.userEmail || "N/A"}</span>
                         </div>
                         {req.userPhone && (
                           <div className="flex items-center gap-2">
-                            <Phone size={14} className="text-orange-500" />
-                            <span className="text-sm text-gray-500">{req.userPhone}</span>
+                            <Phone size={14} className="text-primary" />
+                            <span className="text-sm text-base-content/70">{req.userPhone}</span>
                           </div>
                         )}
                       </div>
                     </td>
                     <td className="px-6 py-4">
-                      <span className="px-3 py-1 bg-orange-100 text-orange-700 text-sm rounded-lg border border-orange-200 whitespace-nowrap">
+                      <span className="px-3 py-1 bg-base-200 text-primary text-sm rounded-lg border border-primary/20 whitespace-nowrap">
                         {req.problemCategory || "Other"}
                       </span>
                     </td>
                     <td className="px-6 py-4">
                       <div className="flex flex-col gap-1">
-                        <span className="text-sm text-gray-700">
+                        <span className="text-sm text-base-content/90">
                           {req.assignedShop ? getShopName(req.assignedShop, shops) : "Not assigned"}
                         </span>
                       </div>
                     </td>
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-2">
-                        <Calendar size={14} className="text-orange-500" />
-                        <span className="text-sm text-gray-700 whitespace-nowrap">
+                        <Calendar size={14} className="text-primary" />
+                        <span className="text-sm text-base-content/90 whitespace-nowrap">
                           {formatDateShort(req.requestedDate || req.createdAt)}
                         </span>
                       </div>
@@ -862,21 +860,21 @@ const ManageServiceRequests = () => {
                       <div className="flex justify-center gap-2">
                         <button
                           onClick={() => openEditModal(req)}
-                          className="p-2 bg-orange-500/10 text-orange-600 rounded-xl border border-orange-200 hover:bg-orange-500/20 hover:scale-105 transition-all duration-200"
+                          className="p-2 bg-primary/10 text-primary rounded-xl border border-primary/30 hover:bg-primary/20 hover:scale-105 transition-all duration-200"
                           title="Edit"
                         >
                           <Edit size={16} />
                         </button>
                         <button
                           onClick={() => openDetailModal(req)}
-                          className="p-2 bg-blue-500/10 text-blue-600 rounded-xl border border-blue-200 hover:bg-blue-500/20 hover:scale-105 transition-all duration-200"
+                          className="p-2 bg-info/10 text-info rounded-xl border border-info/30 hover:bg-info/20 hover:scale-105 transition-all duration-200"
                           title="View Details"
                         >
                           <Eye size={16} />
                         </button>
                         <button
                           onClick={() => handleDeleteRequest(req._id)}
-                          className="p-2 bg-red-500/10 text-red-600 rounded-xl border border-red-200 hover:bg-red-500/20 hover:scale-105 transition-all duration-200"
+                          className="p-2 bg-error/10 text-error rounded-xl border border-error/30 hover:bg-error/20 hover:scale-105 transition-all duration-200"
                           title="Delete"
                         >
                           <Trash2 size={16} />
@@ -889,9 +887,9 @@ const ManageServiceRequests = () => {
                 <tr>
                   <td colSpan="7" className="text-center py-12">
                     <div className="flex flex-col items-center gap-3">
-                      <Wrench className="text-gray-300" size={48} />
-                      <p className="text-gray-500 text-lg">No service requests found</p>
-                      <p className="text-gray-400 text-sm">
+                      <Wrench className="text-base-content/30" size={48} />
+                      <p className="text-base-content/70 text-lg">No service requests found</p>
+                      <p className="text-base-content/50 text-sm">
                         {searchTerm ? "Try adjusting your search terms" : "No service requests yet"}
                       </p>
                     </div>
@@ -903,7 +901,7 @@ const ManageServiceRequests = () => {
         </div>
       </div>
 
-      {/* View Detail Modal */}
+      {/* View Detail Modal - REFACTORED */}
       {detailModalOpen && selectedRequest && (
         <ModalContainer onClose={closeModals} title="Service Request Details" saving={saving}>
           <div className="space-y-6">
@@ -920,19 +918,19 @@ const ManageServiceRequests = () => {
             <div className="flex justify-end gap-3 pt-4 flex-wrap">
               <button
                 onClick={closeModals}
-                className="px-6 py-3 bg-white text-gray-700 rounded-xl font-semibold border border-orange-200 hover:bg-orange-50 transition-all duration-300 text-sm"
+                className="px-6 py-3 bg-base-100 text-base-content/90 rounded-xl font-semibold border border-primary/20 hover:bg-base-200 transition-all duration-300 text-sm"
               >
                 Close
               </button>
               <button
                 onClick={() => openEditModal(selectedRequest)}
-                className="px-6 py-3 bg-orange-500 text-white rounded-xl font-semibold transition-all duration-300 hover:bg-orange-600 hover:scale-105 shadow-lg hover:shadow-xl text-sm"
+                className="px-6 py-3 bg-primary text-primary-content rounded-xl font-semibold transition-all duration-300 hover:bg-secondary hover:scale-105 shadow-lg hover:shadow-xl text-sm"
               >
                 Edit Request
               </button>
               <button
                 onClick={() => handleDeleteRequest(selectedRequest._id)}
-                className="px-6 py-3 bg-red-500 text-white rounded-xl font-semibold transition-all duration-300 hover:bg-red-600 hover:scale-105 shadow-lg hover:shadow-xl text-sm"
+                className="px-6 py-3 bg-error text-primary-content rounded-xl font-semibold transition-all duration-300 hover:bg-error/80 hover:scale-105 shadow-lg hover:shadow-xl text-sm"
               >
                 Delete Request
               </button>
@@ -941,7 +939,7 @@ const ManageServiceRequests = () => {
         </ModalContainer>
       )}
 
-      {/* Edit Modal */}
+      {/* Edit Modal - REFACTORED */}
       {editModalOpen && editingRequest && (
         <ModalContainer onClose={closeModals} title="Edit Service Request" saving={saving}>
           <div className="space-y-6">
@@ -959,14 +957,14 @@ const ManageServiceRequests = () => {
               <button
                 onClick={closeModals}
                 disabled={saving}
-                className="px-6 py-3 bg-white text-gray-700 rounded-xl font-semibold border border-orange-200 hover:bg-orange-50 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed text-sm"
+                className="px-6 py-3 bg-base-100 text-base-content/90 rounded-xl font-semibold border border-primary/20 hover:bg-base-200 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed text-sm"
               >
                 Cancel
               </button>
               <button
                 onClick={handleSaveEdit}
                 disabled={saving}
-                className="px-6 py-3 bg-orange-500 text-white rounded-xl font-semibold transition-all duration-300 hover:bg-orange-600 hover:scale-105 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 text-sm"
+                className="px-6 py-3 bg-primary text-primary-content rounded-xl font-semibold transition-all duration-300 hover:bg-secondary hover:scale-105 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 text-sm"
               >
                 {saving ? (
                   <>

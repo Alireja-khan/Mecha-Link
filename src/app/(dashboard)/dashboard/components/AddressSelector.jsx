@@ -1,48 +1,51 @@
 "use client";
-import {useEffect, useState} from "react";
+import { useEffect, useState } from "react";
 
-export default function AddressSelector({location, setLocation}) {
+export default function AddressSelector({ location, setLocation }) {
   const [locationData, setLocationData] = useState([]);
   const [selectedRegion, setSelectedRegion] = useState("");
   const [selectedDistrict, setSelectedDistrict] = useState("");
   const [selectedCity, setSelectedCity] = useState("");
   const [selectedArea, setSelectedArea] = useState("");
+
   useEffect(() => {
     fetch("/location.json")
       .then((res) => res.json())
       .then((data) => setLocationData(data))
       .catch((err) => console.error("Failed to load locations:", err));
   }, []);
+
   // Get unique regions
   const regions = [...new Set(locationData.map((item) => item.region))];
 
   // Filter districts by region
   const districts = selectedRegion
     ? [
-        ...new Set(
-          locationData
-            .filter((item) => item.region === selectedRegion)
-            .map((i) => i.district)
-        ),
-      ]
+      ...new Set(
+        locationData
+          .filter((item) => item.region === selectedRegion)
+          .map((i) => i.district)
+      ),
+    ]
     : [];
 
   // Filter cities by district
   const cities = selectedDistrict
     ? [
-        ...new Set(
-          locationData
-            .filter((item) => item.district === selectedDistrict)
-            .map((i) => i.city)
-        ),
-      ]
+      ...new Set(
+        locationData
+          .filter((item) => item.district === selectedDistrict)
+          .map((i) => i.city)
+      ),
+    ]
     : [];
 
   // Filter covered areas by city
   const areas = selectedCity
     ? locationData.find((item) => item.city === selectedCity)?.covered_area ||
-      []
+    []
     : [];
+
   useEffect(() => {
     if (selectedArea && selectedCity && selectedDistrict && selectedRegion) {
       const selected = locationData.find((item) => item.city === selectedCity);
@@ -52,21 +55,34 @@ export default function AddressSelector({location, setLocation}) {
         longitude: selected?.longitude || null,
       });
     }
+    // If any selection is cleared, ensure the address is also cleared partially or fully
+    if (!selectedArea) {
+      setLocation((prev) => ({
+        ...prev,
+        address: selectedCity
+          ? `[Select Area], ${selectedCity}, ${selectedDistrict}, ${selectedRegion}`
+          : "",
+      }));
+    }
   }, [
     selectedArea,
     selectedCity,
     selectedDistrict,
     selectedRegion,
     locationData,
+    setLocation,
   ]);
 
   return (
-    <div className="mt-2 space-y-4  rounded-lg">
+    // Updated container background to base-200 for subtle contrast against base-100 cards
+    <div className="mt-2 space-y-4">
       {/* Region Selector */}
       <div>
-        <label className="block mb-1 ">Division</label>
+        {/* Updated label color */}
+        <label className="block mb-1 text-sm font-medium text-base-content">Division</label>
         <select
-          className="w-full p-2 border border-neutral rounded"
+          // Updated color classes and focus styles
+          className="w-full p-3 border border-neutral rounded-lg focus:ring-2 focus:ring-primary focus:border-primary bg-base-100 text-base-content transition-colors"
           value={selectedRegion}
           onChange={(e) => {
             setSelectedRegion(e.target.value);
@@ -86,9 +102,10 @@ export default function AddressSelector({location, setLocation}) {
 
       {/* District Selector */}
       <div>
-        <label className="block mb-1 ">District</label>
+        <label className="block mb-1 text-sm font-medium text-base-content">District</label>
         <select
-          className="w-full p-2 border border-neutral rounded"
+          // Updated color classes and focus styles
+          className="w-full p-3 border border-neutral rounded-lg focus:ring-2 focus:ring-primary focus:border-primary bg-base-100 text-base-content transition-colors disabled:bg-base-200 disabled:opacity-70 disabled:cursor-not-allowed"
           value={selectedDistrict}
           onChange={(e) => {
             setSelectedDistrict(e.target.value);
@@ -108,9 +125,10 @@ export default function AddressSelector({location, setLocation}) {
 
       {/* City Selector */}
       <div>
-        <label className="block mb-1 ">City</label>
+        <label className="block mb-1 text-sm font-medium text-base-content">City</label>
         <select
-          className="w-full p-2 border border-neutral rounded"
+          // Updated color classes and focus styles
+          className="w-full p-3 border border-neutral rounded-lg focus:ring-2 focus:ring-primary focus:border-primary bg-base-100 text-base-content transition-colors disabled:bg-base-200 disabled:opacity-70 disabled:cursor-not-allowed"
           value={selectedCity}
           onChange={(e) => {
             setSelectedCity(e.target.value);
@@ -129,9 +147,10 @@ export default function AddressSelector({location, setLocation}) {
 
       {/* Covered Area Selector */}
       <div>
-        <label className="block mb-1 "> Area</label>
+        <label className="block mb-1 text-sm font-medium text-base-content">Area</label>
         <select
-          className="w-full p-2 border border-neutral rounded"
+          // Updated color classes and focus styles
+          className="w-full p-3 border border-neutral rounded-lg focus:ring-2 focus:ring-primary focus:border-primary bg-base-100 text-base-content transition-colors disabled:bg-base-200 disabled:opacity-70 disabled:cursor-not-allowed"
           value={selectedArea}
           onChange={(e) => setSelectedArea(e.target.value)}
           disabled={!selectedCity}
@@ -145,13 +164,14 @@ export default function AddressSelector({location, setLocation}) {
         </select>
       </div>
 
-      {/* Final Selection Preview */}
-      <div className="p-3 bg-white rounded border border-neutral mt-4">
-        <p>
-          <strong>Selected Address:</strong>
+      {/* Final Selection Preview - Added base-200 background for emphasis */}
+      <div className="p-3 bg-base-200 rounded-lg border border-neutral mt-4 text-base-content text-sm">
+        <p className="font-semibold mb-1">
+          Final Address (Editable):
         </p>
         <input
-          className="w-full"
+          // Updated input styles to match form theme
+          className="w-full p-2 border border-neutral rounded-lg focus:ring-1 focus:ring-primary bg-base-100 text-base-content text-sm"
           type="text"
           required
           onChange={(e) =>

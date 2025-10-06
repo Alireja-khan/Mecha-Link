@@ -35,13 +35,13 @@ const StatCard = ({ icon: Icon, value, label, color = "orange" }) => {
   const classes = colorClasses[color] || colorClasses.orange;
 
   return (
-    <div className="bg-white rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-orange-100 shadow-lg hover:shadow-xl transition-all duration-300 group">
+    <div className="bg-base-200 rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-neutral shadow-lg hover:shadow-xl transition-all duration-300 group">
       <div className="flex items-center justify-between mb-3 sm:mb-4">
         <div className={`p-2 sm:p-3 rounded-xl ${classes.bg} ${classes.bgHover} transition-colors duration-300`}>
           <Icon className={classes.text} size={20} />
         </div>
       </div>
-      <p className="text-2xl sm:text-3xl font-bold text-gray-900 mb-1">{value}</p>
+      <p className="text-2xl sm:text-3xl font-bold text-base-content mb-1">{value}</p>
       <p className="text-gray-600 text-xs sm:text-sm font-medium">{label}</p>
     </div>
   );
@@ -288,11 +288,11 @@ const ManageCoupons = () => {
     const base = "px-2 sm:px-3 py-1 text-xs font-semibold rounded-full border whitespace-nowrap";
     switch (status) {
       case "active":
-        return <span className={`${base} bg-green-100 text-green-700 border-green-200`}>Active</span>;
+        return <span className={`${base} bg-success/25 text-success border-success/50`}>Active</span>;
       case "inactive":
-        return <span className={`${base} bg-red-100 text-red-700 border-red-200`}>Inactive</span>;
+        return <span className={`${base} bg-error/25 text-error border-error/50`}>Inactive</span>;
       default:
-        return <span className={`${base} bg-gray-100 text-gray-700 border-gray-200`}>Unknown</span>;
+        return <span className={`${base} bg-base-300/25 text-base-content border-neutral`}>Unknown</span>;
     }
   };
 
@@ -378,15 +378,15 @@ const ManageCoupons = () => {
   );
 
   return (
-    <div className="min-h-screen w-full p-3 sm:p-4 lg:p-6 mx-auto">
+    <div className="min-h-screen w-full p-3 sm:p-4 lg:p-6 mx-auto bg-base-100">
       <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-4 sm:mb-6 lg:mb-8">
         <div>
-          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 mb-1 sm:mb-2">Coupon Management</h1>
-          <p className="text-gray-600 text-sm sm:text-base lg:text-lg">Manage discount coupons and promotions</p>
+          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-base-content mb-1 sm:mb-2">Coupon Management</h1>
+          <p className="text-base-content/70 text-sm sm:text-base lg:text-lg">Manage discount coupons and promotions</p>
         </div>
         <button
           onClick={() => { setEditingCoupon(null); setFormData({ code: "", discount: "", expiryDate: "", usageLimit: "", status: "active" }); setModalOpen(true); }}
-          className="flex items-center gap-2 sm:gap-3 px-4 sm:px-6 py-2 sm:py-3 lg:py-4 bg-orange-500 text-white rounded-xl font-semibold transition-all duration-300 hover:bg-orange-600 hover:scale-[1.02] shadow-lg hover:shadow-xl mt-4 lg:mt-0 text-sm sm:text-base"
+          className="flex items-center gap-2 sm:gap-3 px-4 sm:px-6 py-2 sm:py-3 lg:py-4 bg-primary text-primary-content rounded-xl font-semibold transition-all duration-300 hover:bg-secondary hover:scale-[1.02] shadow-lg hover:shadow-xl mt-4 lg:mt-0 text-sm sm:text-base"
         >
           <Plus size={20} />
           <span>Add New Coupon</span>
@@ -394,28 +394,29 @@ const ManageCoupons = () => {
       </div>
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-6 mb-4 sm:mb-6 lg:mb-8">
+        {/* StatCard needs to be updated internally to use daisyui colors like primary, success, info, error */}
         <StatCard icon={Tag} value={stats.total} label="Total Coupons" color="orange" />
         <StatCard icon={Check} value={stats.active} label="Active Coupons" color="green" />
         <StatCard icon={Ban} value={stats.inactive} label="Inactive Coupons" color="blue" />
         <StatCard icon={Calendar} value={stats.expired} label="Expired Coupons" color="red" />
       </div>
 
-      <div className="bg-white rounded-2xl sm:rounded-3xl p-4 sm:p-6 lg:p-8 border border-orange-100 shadow-xl">
+      <div className="bg-base-200 rounded-2xl sm:rounded-3xl p-4 sm:p-6 lg:p-8 border border-base-300 shadow-xl">
         <div className="flex flex-col md:flex-row gap-3 w-full mb-6">
           <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-base-content/50" size={18} />
             <input
               type="text"
               placeholder="Search by code..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10 pr-4 py-2.5 sm:py-3 border border-orange-200 rounded-xl bg-orange-50/50 focus:bg-white focus:border-orange-300 w-full text-sm focus:outline-none"
+              className="pl-10 pr-4 py-2.5 sm:py-3 border border-base-300 rounded-xl bg-base-100/50 focus:bg-base-100 focus:border-primary/50 w-full text-sm text-base-content focus:outline-none"
             />
           </div>
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
-            className="px-3 sm:px-4 py-2.5 sm:py-3 border border-orange-200 rounded-xl bg-orange-50/50 focus:bg-white focus:border-orange-300 text-sm focus:outline-none"
+            className="px-3 sm:px-4 py-2.5 sm:py-3 border border-base-300 rounded-xl bg-base-100/50 focus:bg-base-100 focus:border-primary/50 text-sm text-base-content focus:outline-none"
           >
             <option value="all">All Statuses</option>
             <option value="active">Active</option>
@@ -423,7 +424,7 @@ const ManageCoupons = () => {
           </select>
           <button
             onClick={() => showSuccessAlert('Coming Soon!', 'Download functionality will be implemented soon.')}
-            className="flex items-center gap-2 px-3 sm:px-4 py-2.5 sm:py-3 bg-orange-50 text-orange-700 rounded-xl border border-orange-200 hover:bg-orange-100 transition-colors duration-200 text-sm justify-center"
+            className="flex items-center gap-2 px-3 sm:px-4 py-2.5 sm:py-3 bg-base-100 text-primary rounded-xl border border-base-300 hover:bg-base-300/50 transition-colors duration-200 text-sm justify-center"
             title="Export Data"
           >
             <Download size={16} />
@@ -432,37 +433,37 @@ const ManageCoupons = () => {
         </div>
 
         <div className="block xl:hidden space-y-4">
-          {filteredCoupons.length > 0 ? filteredCoupons.map(c => <CouponMobileCard key={c._id} coupon={c} />) : <div className="text-center py-12"><MessageSquare size={48} className="mx-auto text-gray-300" /><p className="text-gray-500">No coupons found</p></div>}
+          {filteredCoupons.length > 0 ? filteredCoupons.map(c => <CouponMobileCard key={c._id} coupon={c} />) : <div className="text-center py-12"><MessageSquare size={48} className="mx-auto text-base-content/30" /><p className="text-base-content/70">No coupons found</p></div>}
         </div>
 
-        <div className="hidden xl:block rounded-2xl border border-orange-100 overflow-x-auto">
-          <table className="min-w-full divide-y divide-orange-100">
-            <thead className="bg-orange-50">
+        <div className="hidden xl:block rounded-2xl border border-base-300 overflow-x-auto">
+          <table className="min-w-full divide-y divide-base-300">
+            <thead className="bg-base-300/50">
               <tr>
-                <th className="px-6 py-4 text-left text-sm font-semibold text-orange-900">Coupon Code</th>
-                <th className="px-6 py-4 text-left text-sm font-semibold text-orange-900">Discount</th>
-                <th className="px-6 py-4 text-left text-sm font-semibold text-orange-900">Expiry Date</th>
-                <th className="px-6 py-4 text-left text-sm font-semibold text-orange-900">Usage Limit</th>
-                <th className="px-6 py-4 text-left text-sm font-semibold text-orange-900">Status</th>
-                <th className="px-6 py-4 text-center text-sm font-semibold text-orange-900">Actions</th>
+                <th className="px-6 py-4 text-left text-sm font-semibold text-base-content">Coupon Code</th>
+                <th className="px-6 py-4 text-left text-sm font-semibold text-base-content">Discount</th>
+                <th className="px-6 py-4 text-left text-sm font-semibold text-base-content">Expiry Date</th>
+                <th className="px-6 py-4 text-left text-sm font-semibold text-base-content">Usage Limit</th>
+                <th className="px-6 py-4 text-left text-sm font-semibold text-base-content">Status</th>
+                <th className="px-6 py-4 text-center text-sm font-semibold text-base-content">Actions</th>
               </tr>
             </thead>
-            <tbody className="bg-white divide-y divide-orange-100">
+            <tbody className="bg-base-100 divide-y divide-base-300">
               {filteredCoupons.length > 0 ? (
                 filteredCoupons.map((coupon) => {
                   const expired = isExpired(coupon.expiryDate);
                   return (
-                    <tr key={coupon._id} className="hover:bg-orange-50/30 transition-colors duration-200">
+                    <tr key={coupon._id} className="hover:bg-base-300/30 transition-colors duration-200">
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 bg-gradient-to-br from-orange-400 to-orange-600 rounded-xl flex items-center justify-center text-white font-bold text-sm flex-shrink-0">
+                          <div className="w-10 h-10 bg-primary rounded-xl flex items-center justify-center text-primary-content font-bold text-sm flex-shrink-0">
                             <Tag size={16} />
                           </div>
                           <div>
-                            <p className="font-semibold text-gray-900 text-sm">{coupon.code}</p>
+                            <p className="font-semibold text-base-content text-sm">{coupon.code}</p>
                             <button
                               onClick={() => openDetailModal(coupon)}
-                              className="text-orange-500 hover:text-orange-600 text-xs font-medium flex items-center gap-1 transition-colors duration-200 mt-1"
+                              className="text-primary hover:text-secondary text-xs font-medium flex items-center gap-1 transition-colors duration-200 mt-1"
                             >
                               <Eye size={12} />
                               View details
@@ -472,14 +473,14 @@ const ManageCoupons = () => {
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex items-center gap-2">
-                          <Percent size={14} className="text-orange-500 flex-shrink-0" />
-                          <span className="text-sm sm:text-lg font-bold text-gray-900">{coupon.discount}%</span>
+                          <Percent size={14} className="text-primary flex-shrink-0" />
+                          <span className="text-sm sm:text-lg font-bold text-base-content">{coupon.discount}%</span>
                         </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex items-center gap-2">
-                          <Calendar size={14} className="text-orange-500 flex-shrink-0" />
-                          <span className={`text-sm ${expired ? 'text-red-600 font-semibold' : 'text-gray-700'}`}>
+                          <Calendar size={14} className="text-primary flex-shrink-0" />
+                          <span className={`text-sm ${expired ? 'text-error font-semibold' : 'text-base-content/80'}`}>
                             {formatDate(coupon.expiryDate)}
                             {expired && ' (Expired)'}
                           </span>
@@ -487,8 +488,8 @@ const ManageCoupons = () => {
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex items-center gap-2">
-                          <Users size={14} className="text-orange-500 flex-shrink-0" />
-                          <span className="text-sm text-gray-700">
+                          <Users size={14} className="text-primary flex-shrink-0" />
+                          <span className="text-sm text-base-content/80">
                             {coupon.usageLimit && coupon.usageLimit > 0 ? coupon.usageLimit : "Unlimited"}
                           </span>
                         </div>
@@ -501,7 +502,7 @@ const ManageCoupons = () => {
                           {coupon.status !== "active" && (
                             <button
                               onClick={() => handleUpdateStatus(coupon._id, "active")}
-                              className="p-2 bg-green-500/10 text-green-600 rounded-xl border border-green-200 hover:bg-green-500/20 hover:scale-105 transition-all duration-200"
+                              className="p-2 bg-success/10 text-success rounded-xl border border-success/30 hover:bg-success/20 hover:scale-105 transition-all duration-200"
                               title="Activate"
                             >
                               <Check size={16} />
@@ -510,7 +511,7 @@ const ManageCoupons = () => {
                           {coupon.status === "active" && (
                             <button
                               onClick={() => handleUpdateStatus(coupon._id, "inactive")}
-                              className="p-2 bg-red-500/10 text-red-600 rounded-xl border border-red-200 hover:bg-red-500/20 hover:scale-105 transition-all duration-200"
+                              className="p-2 bg-error/10 text-error rounded-xl border border-error/30 hover:bg-error/20 hover:scale-105 transition-all duration-200"
                               title="Deactivate"
                             >
                               <X size={16} />
@@ -518,14 +519,14 @@ const ManageCoupons = () => {
                           )}
                           <button
                             onClick={() => openEditModal(coupon)}
-                            className="p-2 bg-orange-500/10 text-orange-600 rounded-xl border border-orange-200 hover:bg-orange-500/20 hover:scale-105 transition-all duration-200"
+                            className="p-2 bg-primary/10 text-primary rounded-xl border border-primary/30 hover:bg-primary/20 hover:scale-105 transition-all duration-200"
                             title="Edit"
                           >
                             <Edit size={16} />
                           </button>
                           <button
                             onClick={() => handleDelete(coupon._id)}
-                            className="p-2 bg-red-500/10 text-red-600 rounded-xl border border-red-200 hover:bg-red-500/20 hover:scale-105 transition-all duration-200"
+                            className="p-2 bg-error/10 text-error rounded-xl border border-error/30 hover:bg-error/20 hover:scale-105 transition-all duration-200"
                             title="Delete"
                           >
                             <Trash size={16} />
@@ -539,8 +540,8 @@ const ManageCoupons = () => {
                 <tr>
                   <td colSpan="6" className="text-center py-12">
                     <div className="flex flex-col items-center gap-3">
-                      <Tag className="text-gray-300" size={48} />
-                      <p className="text-gray-500 text-lg">No coupons found</p>
+                      <Tag className="text-base-content/30" size={48} />
+                      <p className="text-base-content/70 text-lg">No coupons found</p>
                     </div>
                   </td>
                 </tr>
@@ -552,14 +553,14 @@ const ManageCoupons = () => {
 
       {modalOpen && (
         <div className="fixed inset-0 flex items-center justify-center backdrop-blur-md z-50 p-4">
-          <div className="bg-white rounded-3xl p-6 sm:p-8 w-full max-w-2xl border border-orange-100 shadow-2xl max-h-[90vh] overflow-y-auto">
+          <div className="bg-base-100 rounded-3xl p-6 sm:p-8 w-full max-w-2xl border border-base-300 shadow-2xl max-h-[90vh] overflow-y-auto">
             <div className="flex justify-between items-center mb-6">
-              <h2 className="text-xl sm:text-2xl font-bold text-gray-900">
+              <h2 className="text-xl sm:text-2xl font-bold text-base-content">
                 {editingCoupon ? "Edit Coupon" : "Add New Coupon"}
               </h2>
               <button
                 onClick={handleModalClose}
-                className="p-2 bg-orange-50 text-orange-600 rounded-xl border border-orange-200 hover:bg-orange-100 transition-colors duration-200"
+                className="p-2 bg-base-300/50 text-base-content rounded-xl border border-base-300 hover:bg-base-300 transition-colors duration-200"
                 title="Close"
               >
                 <X size={20} />
@@ -568,58 +569,58 @@ const ManageCoupons = () => {
             <form onSubmit={handleFormSubmit} className="space-y-4 sm:space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
                 <div>
-                  <label className="block text-gray-700 font-medium mb-2 sm:mb-3 text-sm">Coupon Code *</label>
+                  <label className="block text-base-content/90 font-medium mb-2 sm:mb-3 text-sm">Coupon Code *</label>
                   <input
                     type="text"
                     value={formData.code}
                     onChange={(e) => setFormData({ ...formData, code: e.target.value.toUpperCase() })}
-                    className="w-full p-3 sm:p-4 border border-orange-200 rounded-xl bg-orange-50/50 focus:bg-white focus:border-orange-300 focus:outline-none transition-all duration-300 text-sm"
+                    className="w-full p-3 sm:p-4 border border-base-300 rounded-xl bg-base-200 focus:bg-base-100 focus:border-primary/50 focus:outline-none transition-all duration-300 text-sm text-base-content"
                     placeholder="e.g., SUMMER25"
                     required
                   />
                 </div>
                 <div>
-                  <label className="block text-gray-700 font-medium mb-2 sm:mb-3 text-sm">Discount (%) *</label>
+                  <label className="block text-base-content/90 font-medium mb-2 sm:mb-3 text-sm">Discount (%) *</label>
                   <input
                     type="number"
                     min="1"
                     max="100"
                     value={formData.discount}
                     onChange={(e) => setFormData({ ...formData, discount: e.target.value })}
-                    className="w-full p-3 sm:p-4 border border-orange-200 rounded-xl bg-orange-50/50 focus:bg-white focus:border-orange-300 focus:outline-none transition-all duration-300 text-sm"
+                    className="w-full p-3 sm:p-4 border border-base-300 rounded-xl bg-base-200 focus:bg-base-100 focus:border-primary/50 focus:outline-none transition-all duration-300 text-sm text-base-content"
                     placeholder="e.g., 25"
                     required
                   />
                 </div>
                 <div>
-                  <label className="block text-gray-700 font-medium mb-2 sm:mb-3 text-sm">Expiry Date *</label>
+                  <label className="block text-base-content/90 font-medium mb-2 sm:mb-3 text-sm">Expiry Date *</label>
                   <input
                     type="date"
                     value={formData.expiryDate}
                     onChange={(e) => setFormData({ ...formData, expiryDate: e.target.value })}
-                    className="w-full p-3 sm:p-4 border border-orange-200 rounded-xl bg-orange-50/50 focus:bg-white focus:border-orange-300 focus:outline-none transition-all duration-300 text-sm"
+                    className="w-full p-3 sm:p-4 border border-base-300 rounded-xl bg-base-200 focus:bg-base-100 focus:border-primary/50 focus:outline-none transition-all duration-300 text-sm text-base-content"
                     required
                   />
                 </div>
                 <div>
-                  <label className="block text-gray-700 font-medium mb-2 sm:mb-3 text-sm">Usage Limit</label>
+                  <label className="block text-base-content/90 font-medium mb-2 sm:mb-3 text-sm">Usage Limit</label>
                   <input
                     type="number"
                     min="1"
                     value={formData.usageLimit}
                     onChange={(e) => setFormData({ ...formData, usageLimit: e.target.value })}
-                    className="w-full p-3 sm:p-4 border border-orange-200 rounded-xl bg-orange-50/50 focus:bg-white focus:border-orange-300 focus:outline-none transition-all duration-300 text-sm"
+                    className="w-full p-3 sm:p-4 border border-base-300 rounded-xl bg-base-200 focus:bg-base-100 focus:border-primary/50 focus:outline-none transition-all duration-300 text-sm text-base-content"
                     placeholder="Leave empty for unlimited"
                   />
-                  <p className="text-xs text-gray-500 mt-2">Leave empty for unlimited usage</p>
+                  <p className="text-xs text-base-content/60 mt-2">Leave empty for unlimited usage</p>
                 </div>
               </div>
               <div>
-                <label className="block text-gray-700 font-medium mb-2 sm:mb-3 text-sm">Status</label>
+                <label className="block text-base-content/90 font-medium mb-2 sm:mb-3 text-sm">Status</label>
                 <select
                   value={formData.status}
                   onChange={(e) => setFormData({ ...formData, status: e.target.value })}
-                  className="w-full p-3 sm:p-4 border border-orange-200 rounded-xl bg-orange-50/50 focus:bg-white focus:border-orange-300 focus:outline-none transition-all duration-300 text-sm"
+                  className="w-full p-3 sm:p-4 border border-base-300 rounded-xl bg-base-200 focus:bg-base-100 focus:border-primary/50 focus:outline-none transition-all duration-300 text-sm text-base-content"
                 >
                   <option value="active">Active</option>
                   <option value="inactive">Inactive</option>
@@ -629,13 +630,13 @@ const ManageCoupons = () => {
                 <button
                   type="button"
                   onClick={handleModalClose}
-                  className="px-4 sm:px-6 py-2 sm:py-3 bg-white text-gray-700 rounded-xl font-semibold border border-orange-200 hover:bg-orange-50 transition-all duration-300 text-sm"
+                  className="px-4 sm:px-6 py-2 sm:py-3 bg-base-100 text-base-content rounded-xl font-semibold border border-base-300 hover:bg-base-200 transition-all duration-300 text-sm"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-4 sm:px-6 py-2 sm:py-3 bg-orange-500 text-white rounded-xl font-semibold transition-all duration-300 hover:bg-orange-600 hover:scale-[1.02] shadow-lg hover:shadow-xl text-sm"
+                  className="px-4 sm:px-6 py-2 sm:py-3 bg-primary text-primary-content rounded-xl font-semibold transition-all duration-300 hover:bg-secondary hover:scale-[1.02] shadow-lg hover:shadow-xl text-sm"
                 >
                   {editingCoupon ? "Update Coupon" : "Create Coupon"}
                 </button>
@@ -647,12 +648,12 @@ const ManageCoupons = () => {
 
       {detailModalOpen && selectedCoupon && (
         <div className="fixed inset-0 flex items-center justify-center backdrop-blur-md z-50 p-4">
-          <div className="bg-white rounded-3xl p-6 sm:p-8 w-full max-w-4xl border border-orange-100 shadow-2xl max-h-[90vh] overflow-y-auto">
+          <div className="bg-base-100 rounded-3xl p-6 sm:p-8 w-full max-w-4xl border border-base-300 shadow-2xl max-h-[90vh] overflow-y-auto">
             <div className="flex justify-between items-center mb-6">
-              <h2 className="text-xl sm:text-2xl font-bold text-gray-900">Coupon Details</h2>
+              <h2 className="text-xl sm:text-2xl font-bold text-base-content">Coupon Details</h2>
               <button
                 onClick={() => setDetailModalOpen(false)}
-                className="p-2 bg-orange-50 text-orange-600 rounded-xl border border-orange-200 hover:bg-orange-100 transition-colors duration-200"
+                className="p-2 bg-base-300/50 text-base-content rounded-xl border border-base-300 hover:bg-base-300 transition-colors duration-200"
                 title="Close"
               >
                 <X size={20} />
@@ -660,17 +661,17 @@ const ManageCoupons = () => {
             </div>
 
             <div className="space-y-6">
-              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 p-4 bg-orange-50 rounded-xl border border-orange-200">
-                <div className="w-12 h-12 bg-gradient-to-br from-orange-400 to-orange-600 rounded-xl flex items-center justify-center text-white font-bold text-lg flex-shrink-0">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 p-4 bg-primary/10 rounded-xl border border-primary/30">
+                <div className="w-12 h-12 bg-primary rounded-xl flex items-center justify-center text-primary-content font-bold text-lg flex-shrink-0">
                   <Tag size={20} />
                 </div>
                 <div>
-                  <h3 className="text-lg sm:text-xl font-bold text-gray-900">{selectedCoupon.code}</h3>
+                  <h3 className="text-lg sm:text-xl font-bold text-base-content">{selectedCoupon.code}</h3>
                   <div className="flex items-center flex-wrap gap-x-4 gap-y-1 mt-1">
-                    <span className="text-sm text-gray-600">
+                    <span className="text-sm text-base-content/80">
                       {getStatusBadge(selectedCoupon.status)}
                     </span>
-                    <span className="text-sm text-gray-500 flex items-center gap-1">
+                    <span className="text-sm text-base-content/60 flex items-center gap-1">
                       <Clock size={12} />
                       Created: {formatDate(selectedCoupon.createdAt)}
                     </span>
@@ -679,45 +680,46 @@ const ManageCoupons = () => {
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
-                <div className="p-4 bg-blue-50 rounded-xl border border-blue-200">
-                  <h5 className="font-semibold text-blue-900 mb-2">Discount Information</h5>
+                {/* Replaced specific blues/greens/purples with info, success, and a primary/base combination to stay within the theme */}
+                <div className="p-4 bg-info/10 rounded-xl border border-info/30">
+                  <h5 className="font-semibold text-info-content mb-2">Discount Information</h5>
                   <div className="space-y-2 text-sm">
-                    <p className="text-blue-700 flex items-center gap-2">
-                      <Percent size={16} /><strong>Percentage:</strong> <span className="text-lg font-bold">{selectedCoupon.discount}% OFF</span>
+                    <p className="text-info-content/90 flex items-center gap-2">
+                      <Percent size={16} className='text-info' /><strong>Percentage:</strong> <span className="text-lg font-bold">{selectedCoupon.discount}% OFF</span>
                     </p>
-                    <p className="text-blue-700"><strong>Minimum Purchase:</strong> N/A (Field not in schema)</p>
-                    <p className="text-blue-700"><strong>Applicable Products:</strong> All (Placeholder)</p>
+                    <p className="text-info-content/90"><strong>Minimum Purchase:</strong> N/A (Field not in schema)</p>
+                    <p className="text-info-content/90"><strong>Applicable Products:</strong> All (Placeholder)</p>
                   </div>
                 </div>
 
-                <div className="p-4 bg-green-50 rounded-xl border border-green-200">
-                  <h5 className="font-semibold text-green-900 mb-2">Usage Information</h5>
+                <div className="p-4 bg-success/10 rounded-xl border border-success/30">
+                  <h5 className="font-semibold text-success-content mb-2">Usage Information</h5>
                   <div className="space-y-2 text-sm">
-                    <p className="text-green-700 flex items-center gap-2">
-                      <Users size={16} /><strong>Usage Limit:</strong> {selectedCoupon.usageLimit && selectedCoupon.usageLimit > 0 ? selectedCoupon.usageLimit : "Unlimited"}
+                    <p className="text-success-content/90 flex items-center gap-2">
+                      <Users size={16} className='text-success' /><strong>Usage Limit:</strong> {selectedCoupon.usageLimit && selectedCoupon.usageLimit > 0 ? selectedCoupon.usageLimit : "Unlimited"}
                     </p>
-                    <p className="text-green-700"><strong>Times Used:</strong> N/A (Placeholder)</p>
+                    <p className="text-success-content/90"><strong>Times Used:</strong> N/A (Placeholder)</p>
                   </div>
                 </div>
 
-                <div className="p-4 bg-purple-50 rounded-xl border border-purple-200">
-                  <h5 className="font-semibold text-purple-900 mb-2">Validity Period</h5>
+                <div className="p-4 bg-accent/30 rounded-xl border border-accent/50">
+                  <h5 className="font-semibold text-base-content mb-2">Validity Period</h5>
                   <div className="space-y-2 text-sm">
-                    <p className="text-purple-700 flex items-center gap-2">
-                      <Calendar size={16} /><strong>Expiry Date:</strong> <span className={`${isExpired(selectedCoupon.expiryDate) ? 'text-red-600 font-semibold' : 'text-purple-700'}`}>{formatDate(selectedCoupon.expiryDate)}</span>
+                    <p className="text-base-content/90 flex items-center gap-2">
+                      <Calendar size={16} className='text-primary' /><strong>Expiry Date:</strong> <span className={`${isExpired(selectedCoupon.expiryDate) ? 'text-error font-semibold' : 'text-base-content/90'}`}>{formatDate(selectedCoupon.expiryDate)}</span>
                     </p>
-                    <p className="text-purple-700">
-                      <strong>Status:</strong> {isExpired(selectedCoupon.expiryDate) ? <span className="text-red-600 font-semibold">Expired</span> : <span className="text-purple-700">Valid</span>}
+                    <p className="text-base-content/90">
+                      <strong>Status:</strong> {isExpired(selectedCoupon.expiryDate) ? <span className="text-error font-semibold">Expired</span> : <span className="text-base-content/90">Valid</span>}
                     </p>
                   </div>
                 </div>
 
-                <div className="p-4 bg-gray-50 rounded-xl border border-gray-200">
-                  <h5 className="font-semibold text-gray-900 mb-2">Management Status</h5>
+                <div className="p-4 bg-base-200 rounded-xl border border-base-300">
+                  <h5 className="font-semibold text-base-content mb-2">Management Status</h5>
                   <div className="space-y-2 text-sm">
-                    <p className="text-gray-700"><strong>Current Status:</strong> {getStatusBadge(selectedCoupon.status)}</p>
-                    <p className="text-gray-700"><strong>Last Updated:</strong> {selectedCoupon.updatedAt ? formatDate(selectedCoupon.updatedAt) : 'N/A'}</p>
-                    <p className="text-gray-600 italic mt-2">
+                    <p className="text-base-content/90"><strong>Current Status:</strong> {getStatusBadge(selectedCoupon.status)}</p>
+                    <p className="text-base-content/90"><strong>Last Updated:</strong> {selectedCoupon.updatedAt ? formatDate(selectedCoupon.updatedAt) : 'N/A'}</p>
+                    <p className="text-base-content/70 italic mt-2">
                       {selectedCoupon.status === 'active' ? 'Coupon is live and available for use.' : 'Coupon is currently deactivated.'}
                     </p>
                   </div>
@@ -727,7 +729,7 @@ const ManageCoupons = () => {
               <div className="flex justify-end gap-3 pt-4">
                 <button
                   onClick={() => setDetailModalOpen(false)}
-                  className="px-4 sm:px-6 py-2 sm:py-3 bg-white text-gray-700 rounded-xl font-semibold border border-orange-200 hover:bg-orange-50 transition-all duration-300 text-sm"
+                  className="px-4 sm:px-6 py-2 sm:py-3 bg-base-100 text-base-content rounded-xl font-semibold border border-base-300 hover:bg-base-200 transition-all duration-300 text-sm"
                 >
                   Close
                 </button>
@@ -736,7 +738,7 @@ const ManageCoupons = () => {
                     setDetailModalOpen(false);
                     openEditModal(selectedCoupon);
                   }}
-                  className="px-4 sm:px-6 py-2 sm:py-3 bg-orange-500 text-white rounded-xl font-semibold transition-all duration-300 hover:bg-orange-600 shadow-lg text-sm"
+                  className="px-4 sm:px-6 py-2 sm:py-3 bg-primary text-primary-content rounded-xl font-semibold transition-all duration-300 hover:bg-secondary shadow-lg text-sm"
                 >
                   <Edit size={16} className="inline mr-2" />Edit Coupon
                 </button>

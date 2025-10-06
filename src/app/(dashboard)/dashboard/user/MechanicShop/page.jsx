@@ -104,7 +104,7 @@ const shopCategories = [
     "Motorcycle Service & Repair",
     "Truck/Commercial Vehicle Service",
     "Home Appliance Repair",
-    "HV/AC & Cooling Specialist",
+    "HVAC & Cooling Specialist",
     "Car Detailing & Accessories",
 ];
 
@@ -198,16 +198,19 @@ const CustomDropdown = forwardRef(({ options, name, onChange, onBlur, isMulti = 
     return (
         <div className="relative w-full" ref={dropdownRef}>
             <div
-                className={`flex items-center justify-between w-full p-2 border rounded-lg cursor-pointer transition-colors ${options.length === 0 ? 'bg-gray-100 text-gray-400 cursor-not-allowed' : 'bg-white border-gray-300 hover:border-orange-500 focus-within:border-orange-500'}`}
+                className={`flex items-center justify-between w-full p-2 border rounded-lg cursor-pointer transition-colors text-base-content 
+                    ${options.length === 0
+                        ? 'bg-base-100 text-base-content cursor-not-allowed'
+                        : 'bg-base-200 border-neutral hover:border-primary focus-within:border-primary'}`}
                 onClick={handleToggle}
                 onBlur={onBlur}
                 tabIndex={0}
             >
-                <span className={`truncate ${selectedItems.length > 0 ? 'text-gray-700' : 'text-gray-400'}`}>
+                <span className={`truncate ${selectedItems.length > 0 ? 'text-base-content' : 'text-base-300'}`}>
                     {displayValue}
                 </span>
                 <svg
-                    className={`w-4 h-4 text-gray-500 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`}
+                    className={`w-4 h-4 text-base-300 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`}
                     xmlns="http://www.w3.org/2000/svg"
                     viewBox="0 0 20 20"
                     fill="currentColor"
@@ -220,12 +223,15 @@ const CustomDropdown = forwardRef(({ options, name, onChange, onBlur, isMulti = 
                 </svg>
             </div>
             {isOpen && options.length > 0 && (
-                <ul className="absolute z-20 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-xl overflow-y-auto">
+                <ul className="absolute z-20 w-full mt-1 bg-base-200 border border-neutral rounded-lg shadow-xl overflow-y-auto max-h-60">
                     {options.map((option) => (
                         <li
                             key={option}
                             onClick={() => handleSelect(option)}
-                            className={`p-2 cursor-pointer hover:bg-orange-50 transition-colors ${selectedItems.includes(option) ? 'bg-orange-100 font-semibold text-orange-700' : 'text-gray-700'}`}
+                            className={`p-2 cursor-pointer hover:bg-accent transition-colors 
+                                ${selectedItems.includes(option)
+                                    ? 'bg-accent font-semibold text-primary'
+                                    : 'text-base-content'}`}
                         >
                             {option}
                         </li>
@@ -263,15 +269,21 @@ const CertificationsInput = ({ onChange, value }) => {
                 value={inputValue}
                 onChange={(e) => setInputValue(e.target.value)}
                 onKeyDown={handleAddTag}
-                className="mt-1 block w-full p-2 border border-gray-300 rounded-md focus:ring-orange-500 focus:border-orange-500"
+                className="mt-1 block w-full p-2 border border-neutral rounded-md focus:ring-primary focus:border-primary text-base-content"
                 placeholder="Bosch Certified, Honda AutoCare"
             />
             {tags.length > 0 && (
                 <div className="flex flex-wrap gap-2 mt-2">
                     {tags.map((tag) => (
-                        <div key={tag} className="flex items-center bg-orange-100 text-orange-700 px-3 py-1 rounded-full text-sm font-medium animate-fade-in">
+                        <div key={tag} className="flex items-center bg-accent text-primary px-3 py-1 rounded-full text-sm font-medium animate-fade-in">
                             <span>{tag}</span>
-                            <button type="button" onClick={() => handleRemoveTag(tag)} className="ml-2 text-orange-500 hover:text-orange-800 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 rounded-full">&times;</button>
+                            <button
+                                type="button"
+                                onClick={() => handleRemoveTag(tag)}
+                                className="ml-2 text-primary hover:text-primary-focus focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 rounded-full"
+                            >
+                                &times;
+                            </button>
                         </div>
                     ))}
                 </div>
@@ -280,14 +292,16 @@ const CertificationsInput = ({ onChange, value }) => {
     );
 };
 
-const uploadImageToImgbb = async (imageFile) => {
+export const uploadImageToImgbb = async (imageFile) => {
     const formData = new FormData();
     formData.append('image', imageFile);
 
-    const apiKey = "";
+    if (!process.env.NEXT_PUBLIC_ImgBB_API_KEY) {
+        throw new Error("ImgBB API key is not configured.");
+    }
 
     try {
-        const response = await fetch(`https://api.imgbb.com/1/upload?key=${apiKey}`, {
+        const response = await fetch(`https://api.imgbb.com/1/upload?key=${process.env.NEXT_PUBLIC_ImgBB_API_KEY}`, {
             method: 'POST',
             body: formData
         });
@@ -299,6 +313,7 @@ const uploadImageToImgbb = async (imageFile) => {
         const data = await response.json();
         return data?.data?.url;
     } catch (error) {
+        console.error("Error uploading to ImgBB:", error);
         throw error;
     }
 };
@@ -315,9 +330,10 @@ export default function MechanicShop() {
     });
     const [isLoading, setIsLoading] = useState(false);
     const [logoUrl, setLogoUrl] = useState('');
+    const { data: session } = useSession();
+    const loggedInUser = useUser(session?.user?.email);
 
     const selectedCategory = watch('shop.categories');
-
     const selectedDivision = watch('shop.address.division');
     const selectedDistrict = watch('shop.address.district');
 
@@ -337,7 +353,6 @@ export default function MechanicShop() {
         }
     }, [selectedDistrict, setValue]);
 
-
     const handleFileUpload = async (e) => {
         const file = e.target.files[0];
         if (file) {
@@ -347,6 +362,7 @@ export default function MechanicShop() {
                 setValue('shop.logo', url);
                 toast.success("Logo uploaded successfully!");
             } catch (err) {
+                console.error(err);
                 toast.error("Failed to upload logo! Check console for details.");
             }
         }
@@ -359,7 +375,8 @@ export default function MechanicShop() {
     };
 
     const onInvalid = (errors) => {
-        toast.error("Please fill in all required fields and correct errors.");
+        console.error("Form Errors:", errors);
+        toast.error("Please fill in all required fields.");
     };
 
     const onSubmit = async (data) => {
@@ -412,19 +429,21 @@ export default function MechanicShop() {
             updatedAt: new Date().toISOString(),
         };
 
+        console.log("Submitting Payload:", payload);
+
         try {
             const res = await axios.post("/api/shops", payload);
 
             if (res.status === 200 || res.status === 201) {
                 toast.success("Shop submitted for approval! It will be visible after admin approval. ✅");
                 reset();
-                setLogoUrl("");
+                setLogoUrl('');
             } else {
                 toast.error(res.data.message || "Failed to add shop");
             }
         } catch (error) {
-            const errorMessage = error.response?.data?.message || "Submission failed. Please check your network and form fields.";
-            console.error("Submission Error:", error);
+            console.error("Axios request failed:", error);
+            const errorMessage = error.response?.data?.message || "Something went wrong!";
             toast.error(errorMessage);
         } finally {
             setIsLoading(false);
@@ -434,47 +453,49 @@ export default function MechanicShop() {
     const selectedCategoriesArray = selectedCategory ? [selectedCategory] : [];
 
     return (
-        <div className="md:container mx-auto py-10 bg-gray-50 min-h-screen">
+        <div className="md:container mx-auto py-10 bg-base-100 min-h-screen">
             <Toaster />
             <div className="mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="text-center mb-10">
-                    <h1 className="text-4xl font-extrabold text-orange-500 mb-2">Add Mechanic Shop</h1>
-                    <p className="text-lg text-gray-600">Create your professional profile and manage your services</p>
+                    <h1 className="text-4xl font-extrabold text-primary mb-2">Add Mechanic Shop</h1>
+                    <p className="text-lg text-base-content/80">Create your professional profile and manage your services</p>
                 </div>
 
                 <form onSubmit={handleSubmit(onSubmit, onInvalid)} className="grid md:grid-cols-2 gap-8">
                     <div className="space-y-8">
-                        <div className="p-6 bg-white rounded-xl shadow-lg space-y-4 border border-gray-200">
-                            <h2 className="flex items-center gap-2 text-xl font-semibold text-orange-600 mb-4">
-                                <Wrench className="h-6 w-6 text-orange-500" /> Shop Details
+                        {/* Card: bg-white -> bg-base-200, border-gray-200 -> border-neutral */}
+                        <div className="p-6 bg-base-200 rounded-xl shadow-lg space-y-4 border border-neutral">
+                            <h2 className="flex items-center gap-2 text-xl font-semibold text-primary mb-4">
+                                <Wrench className="h-6 w-6 text-primary" /> Shop Details
                             </h2>
                             <div className="space-y-4">
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700">Shop Name</label>
+                                    <label className="block text-sm font-medium text-base-content">Shop Name</label>
                                     <input
                                         type="text"
                                         {...register('shop.shopName', { required: "Shop name is required" })}
-                                        className="mt-1 block w-full p-2 border border-gray-300 rounded-md focus:ring-orange-500 focus:border-orange-500"
+                                        className="mt-1 block w-full p-2 border border-neutral rounded-md focus:ring-primary focus:border-primary text-base-content"
                                         placeholder="AutoFix Garage"
                                     />
-                                    {errors.shop?.shopName && <p className="text-sm text-red-500 mt-1">{errors.shop.shopName.message}</p>}
+                                    {errors.shop?.shopName && <p className="text-sm text-error mt-1">{errors.shop.shopName.message}</p>}
                                 </div>
 
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">Shop Logo (Optional)</label>
+                                    <label className="block text-sm font-medium text-base-content mb-2">Shop Logo (Optional)</label>
                                     <input
                                         type="file"
                                         accept="image/*"
                                         onChange={handleFileUpload}
-                                        className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:bg-orange-600 file:text-white hover:file:bg-orange-700 cursor-pointer"
+                                        className="block w-full text-sm text-base-content/60 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:bg-primary file:text-primary-content hover:file:bg-primary-focus cursor-pointer"
                                     />
                                     {logoUrl && (
                                         <div className="relative mt-4 inline-block">
-                                            <img src={logoUrl} alt="Shop Logo" className="h-20 object-contain border border-gray-200 p-1 rounded-md" />
+                                            {/* border-gray-200 -> border-neutral */}
+                                            <img src={logoUrl} alt="Shop Logo" className="h-20 object-contain border border-neutral p-1 rounded-md" />
                                             <button
                                                 type="button"
                                                 onClick={handleRemoveLogo}
-                                                className="absolute -top-2 -right-2 h-5 w-5 bg-red-500 text-white rounded-full text-sm leading-none hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 flex items-center justify-center"
+                                                className="absolute -top-2 -right-2 h-5 w-5 bg-error text-error-content rounded-full text-sm leading-none hover:bg-error-focus focus:outline-none focus:ring-2 focus:ring-error focus:ring-offset-2 flex items-center justify-center"
                                                 aria-label="Remove logo"
                                             >
                                                 <X size={14} />
@@ -484,11 +505,11 @@ export default function MechanicShop() {
                                 </div>
 
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700">Category</label>
+                                    <label className="block text-sm font-medium text-base-content">Category</label>
                                     <Controller
                                         name="shop.categories"
                                         control={control}
-                                        defaultValue={""}
+                                        defaultValue=""
                                         rules={{ required: "Please select your primary category" }}
                                         render={({ field }) => (
                                             <CustomDropdown
@@ -501,11 +522,11 @@ export default function MechanicShop() {
                                             />
                                         )}
                                     />
-                                    {errors.shop?.categories && <p className="text-sm text-red-500 mt-1">{errors.shop.categories.message}</p>}
+                                    {errors.shop?.categories && <p className="text-sm text-error mt-1">{errors.shop.categories.message}</p>}
                                 </div>
 
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700">Certifications (separate with commas)</label>
+                                    <label className="block text-sm font-medium text-base-content">Certifications (separate with commas)</label>
                                     <Controller
                                         name="certifications"
                                         control={control}
@@ -514,41 +535,43 @@ export default function MechanicShop() {
                                     />
                                 </div>
 
-                                <fieldset className="border border-gray-200 p-4 rounded-lg space-y-2">
-                                    <legend className="px-2 text-md font-medium text-orange-600">Shop Description & Staff</legend>
+                                {/* border-gray-200 -> border-neutral */}
+                                <fieldset className="border border-neutral p-4 rounded-lg space-y-2">
+                                    <legend className="px-2 text-md font-medium text-primary">Shop Description & Staff</legend>
 
                                     <div>
-                                        <label className="block text-sm font-medium text-gray-700">Shop Details</label>
+                                        <label className="block text-sm font-medium text-base-content">Shop Details</label>
                                         <textarea
                                             {...register('shop.details')}
                                             rows={4}
-                                            className="mt-1 block w-full p-2 border border-gray-300 rounded-md focus:ring-orange-500 focus:border-orange-500"
+                                            className="mt-1 block w-full p-2 border border-neutral rounded-md focus:ring-primary focus:border-primary text-base-content"
                                             placeholder="Add detailed description of your shop, services, or specialties..."
                                         ></textarea>
                                     </div>
 
                                     <div>
-                                        <label className="block text-sm font-medium text-gray-700">Number of Mechanics</label>
+                                        <label className="block text-sm font-medium text-base-content">Number of Mechanics</label>
                                         <input
                                             type="number"
                                             {...register('shop.mechanicCount', {
                                                 valueAsNumber: true,
                                                 min: { value: 0, message: "Count cannot be negative" },
                                             })}
-                                            className="mt-1 block w-full p-2 border border-gray-300 rounded-md focus:ring-orange-500 focus:border-orange-500"
+                                            className="mt-1 block w-full p-2 border border-neutral rounded-md focus:ring-primary focus:border-primary text-base-content"
                                             placeholder="E.g., 5"
                                         />
-                                        {errors.shop?.mechanicCount && <p className="text-sm text-red-500 mt-1">{errors.shop.mechanicCount.message}</p>}
+                                        {errors.shop?.mechanicCount && <p className="text-sm text-error mt-1">{errors.shop.mechanicCount.message}</p>}
                                     </div>
                                 </fieldset>
                             </div>
                         </div>
 
-                        <div className="p-6 bg-white rounded-xl shadow-lg space-y-4 border border-gray-200">
-                            <h2 className="flex items-center gap-2 text-xl font-semibold text-orange-600 mb-4">Address</h2>
+                        {/* Card: bg-white -> bg-base-200, border-gray-200 -> border-neutral */}
+                        <div className="p-6 bg-base-200 rounded-xl shadow-lg space-y-4 border border-neutral">
+                            <h2 className="flex items-center gap-2 text-xl font-semibold text-primary mb-4">Address</h2>
                             <div className="space-y-4">
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700">Division</label>
+                                    <label className="block text-sm font-medium text-base-content">Division</label>
                                     <Controller
                                         name="shop.address.division"
                                         control={control}
@@ -566,11 +589,11 @@ export default function MechanicShop() {
                                             />
                                         )}
                                     />
-                                    {errors.shop?.address?.division && <p className="text-sm text-red-500 mt-1">{errors.shop.address.division.message}</p>}
+                                    {errors.shop?.address?.division && <p className="text-sm text-error mt-1">{errors.shop.address.division.message}</p>}
                                 </div>
 
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700">District</label>
+                                    <label className="block text-sm font-medium text-base-content">District</label>
                                     <Controller
                                         name="shop.address.district"
                                         control={control}
@@ -588,11 +611,11 @@ export default function MechanicShop() {
                                             />
                                         )}
                                     />
-                                    {errors.shop?.address?.district && <p className="text-sm text-red-500 mt-1">{errors.shop.address.district.message}</p>}
+                                    {errors.shop?.address?.district && <p className="text-sm text-error mt-1">{errors.shop.address.district.message}</p>}
                                 </div>
 
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700">City / Upazila</label>
+                                    <label className="block text-sm font-medium text-base-content">City / Upazila</label>
                                     <Controller
                                         name="shop.address.city"
                                         control={control}
@@ -610,101 +633,114 @@ export default function MechanicShop() {
                                             />
                                         )}
                                     />
-                                    {errors.shop?.address?.city && <p className="text-sm text-red-500 mt-1">{errors.shop.address.city.message}</p>}
+                                    {errors.shop?.address?.city && <p className="text-sm text-error mt-1">{errors.shop.address.city.message}</p>}
                                 </div>
 
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700">Street Address</label>
-                                    <input type="text" {...register('shop.address.street', { required: "Street is required" })} className="mt-1 block w-full p-2 border border-gray-300 rounded-md focus:ring-orange-500 focus:border-orange-500" placeholder="Road/Area/Plot Number" />
-                                    {errors.shop?.address?.street && <p className="text-sm text-red-500 mt-1">{errors.shop.address.street.message}</p>}
+                                    <label className="block text-sm font-medium text-base-content">Street Address</label>
+                                    <input
+                                        type="text"
+                                        {...register('shop.address.street', { required: "Street is required" })}
+                                        className="mt-1 block w-full p-2 border border-neutral rounded-md focus:ring-primary focus:border-primary text-base-content"
+                                        placeholder="Road/Area/Plot Number"
+                                    />
+                                    {errors.shop?.address?.street && <p className="text-sm text-error mt-1">{errors.shop.address.street.message}</p>}
                                 </div>
 
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700">Country</label>
-                                    <input type="text" {...register('shop.address.country', { required: "Country is required" })} className="mt-1 block w-full p-2 border border-gray-300 rounded-md focus:ring-orange-500 focus:border-orange-500" readOnly />
-                                    {errors.shop?.address?.country && <p className="text-sm text-red-500 mt-1">{errors.shop.address.country.message}</p>}
+                                    <label className="block text-sm font-medium text-base-content">Country</label>
+                                    <input
+                                        type="text"
+                                        {...register('shop.address.country', { required: "Country is required" })}
+                                        className="mt-1 block w-full p-2 border border-neutral rounded-md focus:ring-primary focus:border-primary bg-base-300/50 text-base-content"
+                                    />
+                                    {errors.shop?.address?.country && <p className="text-sm text-error mt-1">{errors.shop.address.country.message}</p>}
                                 </div>
 
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700">Postal Code</label>
-                                    <input type="text" {...register('shop.address.postalCode')} className="mt-1 block w-full p-2 border border-gray-300 rounded-md focus:ring-orange-500 focus:border-orange-500" />
+                                    <label className="block text-sm font-medium text-base-content">Postal Code</label>
+                                    <input type="text" {...register('shop.address.postalCode')} className="mt-1 block w-full p-2 border border-neutral rounded-md focus:ring-primary focus:border-primary text-base-content" />
                                 </div>
+
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700">Google Maps URL</label>
+                                    <label className="block text-sm font-medium text-base-content">Google Maps URL</label>
                                     <input
                                         type="url"
                                         {...register('shop.address.mapUrl', { required: "Google Maps URL is required" })}
-                                        className="mt-1 block w-full p-2 border border-gray-300 rounded-md focus:ring-orange-500 focus:border-orange-500"
+                                        className="mt-1 block w-full p-2 border border-neutral rounded-md focus:ring-primary focus:border-primary text-base-content"
                                         placeholder="Paste the Google Maps 'Share' link or Embed URL"
                                     />
-                                    {errors.shop?.address?.mapUrl && <p className="text-sm text-red-500 mt-1">{errors.shop.address.mapUrl.message}</p>}
+                                    {errors.shop?.address?.mapUrl && <p className="text-sm text-error mt-1">{errors.shop.address.mapUrl.message}</p>}
                                 </div>
                             </div>
                         </div>
                     </div>
 
                     <div className="space-y-8">
-                        <div className="p-6 bg-white rounded-xl shadow-lg space-y-4 border border-gray-200">
-                            <h2 className="flex items-center gap-2 text-xl font-semibold text-orange-600 mb-4">Contact & Social Links</h2>
+                        {/* Card: bg-white -> bg-base-200, border-gray-200 -> border-neutral */}
+                        <div className="p-6 bg-base-200 rounded-xl shadow-lg space-y-4 border border-neutral">
+                            <h2 className="flex items-center gap-2 text-xl font-semibold text-primary mb-4">Contact & Social Links</h2>
                             <div className="space-y-4">
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700">Phone</label>
-                                    <input type="tel" {...register('shop.contact.phone', { required: "Phone number is required" })} className="mt-1 block w-full p-2 border border-gray-300 rounded-md focus:ring-orange-500 focus:border-orange-500" />
-                                    {errors.shop?.contact?.phone && <p className="text-sm text-red-500 mt-1">{errors.shop.contact.phone.message}</p>}
+                                    <label className="block text-sm font-medium text-base-content">Phone</label>
+                                    <input type="tel" {...register('shop.contact.phone', { required: "Phone number is required" })} className="mt-1 text-base-content block w-full p-2 border border-neutral rounded-md focus:ring-primary focus:border-primary" />
+                                    {errors.shop?.contact?.phone && <p className="text-sm text-error mt-1">{errors.shop.contact.phone.message}</p>}
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700">Business Email (optional)</label>
+                                    <label className="block text-sm font-medium text-base-content">Business Email (optional)</label>
                                     <input
                                         type="email"
                                         {...register('businessEmail')}
-                                        className="mt-1 block w-full p-2 border border-gray-300 rounded-md focus:ring-orange-500 focus:border-orange-500"
+                                        className="mt-1 block w-full p-2 border border-neutral rounded-md focus:ring-primary focus:border-primary "
                                         placeholder="you@business.com"
                                     />
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700">WhatsApp (optional)</label>
-                                    <input type="tel" {...register('shop.contact.whatsapp')} className="mt-1 block w-full p-2 border border-gray-300 rounded-md focus:ring-orange-500 focus:border-orange-500" />
+                                    <label className="block text-sm font-medium text-base-content">WhatsApp (optional)</label>
+                                    <input type="tel" {...register('shop.contact.whatsapp')} className="mt-1 text-base-content block w-full p-2 border border-neutral rounded-md focus:ring-primary focus:border-primary" />
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700">Facebook URL (optional)</label>
-                                    <input type="url" {...register('socialLinks.facebook')} className="mt-1 block w-full p-2 border border-gray-300 rounded-md focus:ring-orange-500 focus:border-orange-500" />
+                                    <label className="block text-sm font-medium text-base-content">Facebook URL (optional)</label>
+                                    <input type="url" {...register('socialLinks.facebook')} className="mt-1 text-base-content block w-full p-2 border border-neutral rounded-md focus:ring-primary focus:border-primary" />
                                 </div>
                             </div>
                         </div>
 
-                        <div className="p-6 bg-white rounded-xl shadow-lg space-y-4 border border-gray-200">
-                            <h2 className="flex items-center gap-2 text-xl font-semibold text-orange-600 mb-4">Working Hours</h2>
+                        {/* Card: bg-white -> bg-base-200, border-gray-200 -> border-neutral */}
+                        <div className="p-6 bg-base-200 rounded-xl shadow-lg space-y-4 border border-neutral">
+                            <h2 className="flex items-center gap-2 text-xl font-semibold text-primary mb-4">Working Hours</h2>
                             <div className="grid grid-cols-3 gap-4">
                                 <div className="col-span-1">
-                                    <label className="block text-sm font-medium text-gray-700">Open</label>
-                                    <input type="time" {...register('shop.workingHours.open', { required: "Opening time is required" })} className="mt-1 block w-full p-2 border border-gray-300 rounded-md focus:ring-orange-500 focus:border-orange-500" />
-                                    {errors.shop?.workingHours?.open && <p className="text-sm text-red-500 mt-1">{errors.shop.workingHours.open.message}</p>}
+                                    <label className="block text-sm font-medium text-base-content">Open</label>
+                                    <input type="time" {...register('shop.workingHours.open', { required: "Opening time is required" })} className="mt-1 text-base-content block w-full p-2 border border-neutral rounded-md focus:ring-primary focus:border-primary" />
+                                    {errors.shop?.workingHours?.open && <p className="text-sm text-error mt-1">{errors.shop.workingHours.open.message}</p>}
                                 </div>
                                 <div className="col-span-1">
-                                    <label className="block text-sm font-medium text-gray-700">Close</label>
-                                    <input type="time" {...register('shop.workingHours.close', { required: "Closing time is required" })} className="mt-1 block w-full p-2 border border-gray-300 rounded-md focus:ring-orange-500 focus:border-orange-500" />
-                                    {errors.shop?.workingHours?.close && <p className="text-sm text-red-500 mt-1">{errors.shop.workingHours.close.message}</p>}
+                                    <label className="block text-sm font-medium text-base-content">Close</label>
+                                    <input type="time" {...register('shop.workingHours.close', { required: "Closing time is required" })} className="mt-1 text-base-content block w-full p-2 border border-neutral rounded-md focus:ring-primary focus:border-primary" />
+                                    {errors.shop?.workingHours?.close && <p className="text-sm text-error mt-1">{errors.shop.workingHours.close.message}</p>}
                                 </div>
                                 <div className="col-span-1">
-                                    <label className="block text-sm font-medium text-gray-700">Weekend</label>
+                                    <label className="block text-sm font-medium text-base-content">Weekend</label>
                                     <Controller
                                         name="shop.workingHours.weekend"
                                         control={control}
                                         rules={{ required: "Weekend is required" }}
                                         render={({ field }) => <CustomDropdown options={weekendOptions} name="Weekend" isMulti={false} onChange={field.onChange} onBlur={field.onBlur} value={field.value} />}
                                     />
-                                    {errors.shop?.workingHours?.weekend && <p className="text-sm text-red-500 mt-1">{errors.shop.workingHours.weekend.message}</p>}
+                                    {errors.shop?.workingHours?.weekend && <p className="text-sm text-error mt-1">{errors.shop.workingHours.weekend.message}</p>}
                                 </div>
                             </div>
                         </div>
 
-                        <div className="p-6 bg-white rounded-xl shadow-lg space-y-4 border border-gray-200">
-                            <h2 className="flex items-center gap-2 text-xl font-semibold text-orange-600 mb-4">
-                                <Wrench className="h-6 w-6 text-orange-500" /> Services Offered
+                        {/* Card: bg-white -> bg-base-200, border-gray-200 -> border-neutral */}
+                        <div className="p-6 bg-base-200 rounded-xl shadow-lg space-y-4 border border-neutral">
+                            <h2 className="flex items-center gap-2 text-xl font-semibold text-primary mb-4">
+                                <Wrench className="h-6 w-6 text-primary" /> Services Offered
                             </h2>
 
                             {selectedCategoriesArray.length === 0 && (
-                                <p className="text-gray-500 italic p-4 bg-gray-50 rounded-md">
+                                < p className="italic p-4 bg-base-100 rounded-md text-base-content">
                                     Please select your primary Category from the Shop Details section (left column) to list your services here.
                                 </p>
                             )}
@@ -714,12 +750,13 @@ export default function MechanicShop() {
                                 if (!categoryServices) return null;
 
                                 return (
-                                    <div key={category} className="border-b border-gray-200 pb-4 mb-4 last:border-b-0">
-                                        <h3 className="text-lg font-bold text-gray-800 mb-3">{category}</h3>
+                                    <div key={category} className="border-b border-neutral pb-4 mb-4 last:border-b-0">
+                                        {/* text-gray-800 -> text-base-content */}
+                                        <h3 className="text-lg font-bold text-base-content mb-3">{category}</h3>
                                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                             {Object.entries(categoryServices).map(([subCategory, services]) => (
                                                 <div key={subCategory} className="space-y-2">
-                                                    <h4 className="text-md font-medium text-orange-700">{subCategory}</h4>
+                                                    <h4 className="text-lg font-bold text-base-content">{subCategory}</h4>
                                                     {services.map((service) => (
                                                         <div key={service} className="flex items-start">
                                                             <input
@@ -727,11 +764,11 @@ export default function MechanicShop() {
                                                                 id={`${category}-${subCategory}-${service}`}
                                                                 value={service}
                                                                 {...register(`shop.vehicleTypes.${category}.categories.${subCategory}`)}
-                                                                className="h-4 w-4 text-orange-600 border-gray-300 rounded focus:ring-orange-500 mt-1"
+                                                                className="h-4 w-4 text-primary border-neutral rounded focus:ring-primary mt-1"
                                                             />
                                                             <label
                                                                 htmlFor={`${category}-${subCategory}-${service}`}
-                                                                className="ml-3 text-sm font-medium text-gray-700 cursor-pointer select-none"
+                                                                className="ml-3 text-sm font-medium text-base-content cursor-pointer select-none"
                                                             >
                                                                 {service}
                                                             </label>
@@ -746,17 +783,29 @@ export default function MechanicShop() {
                         </div>
                     </div>
 
-                    <div className="md:col-span-2 mt-8 w-full flex items-center justify-center">
+                    <div className="md:col-span-2 flex justify-center mt-6">
                         <button
                             type="submit"
                             disabled={isLoading}
-                            className="w-fit text-center py-3 px-4 border border-transparent rounded-md shadow-sm text-lg font-medium text-white bg-orange-600 hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                            className="w-full sm:w-auto px-8 py-3 bg-primary text-primary-content font-bold rounded-lg shadow-md hover:bg-primary-focus focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 transition-colors disabled:bg-primary disabled:opacity-70 disabled:cursor-not-allowed"
                         >
-                            {isLoading ? 'Submitting...' : 'Submit Shop for Approval'}
+                            {isLoading ? (
+                                <>
+                                    <span className="flex items-center">
+                                        Adding...
+                                        <svg className="animate-spin h-5 w-5 ml-2 text-primary-content" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                        </svg>
+                                    </span>
+                                </>
+                            ) : (
+                                "Add Shop"
+                            )}
                         </button>
                     </div>
                 </form>
-            </div>
-        </div>
+            </div >
+        </div >
     );
 }

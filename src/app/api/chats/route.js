@@ -1,24 +1,7 @@
 import dbConnect from '@/lib/dbConnect';
 import { ObjectId } from 'mongodb';
 
-async function getUserName(userId) {
-  if (!userId) return { name: "Unknown User", profileImage: null };
-  try {
-    const usersCollection = await dbConnect('users');
-    const user = await usersCollection.findOne(
-      { _id: new ObjectId(userId) },
-      { projection: { name: 1, profileImage: 1 } }
-    );
-    return user
-      ? { name: user.name || "Not provided", profileImage: user.profileImage || null }
-      : { name: "Not provided", profileImage: null };
-  } catch (error) {
-    console.error("Error fetching user:", error);
-    return { name: "Fetch Error", profileImage: null };
-  }
-}
-
-// **UPDATED** GET chats (filters by userId in customerId OR mechanicId field)
+// GET chats filtered by userId (either customer or mechanic)
 export async function GET(req) {
   try {
     const url = new URL(req.url);
@@ -28,15 +11,7 @@ export async function GET(req) {
 
     let query = {};
     if (userId) {
-      // Find chats where the logged-in user is either the customer OR the mechanic
       query = { $or: [{ customerId: userId }, { mechanicId: userId }] };
-    } else {
-      // If no userId is provided, return all chats (or handle as an error/access denied)
-      // For security, you might prefer to throw an error or return an empty array if userId is missing.
-      // return new Response(JSON.stringify({ error: 'Authentication required' }), {
-      //   headers: { 'Content-Type': 'application/json' },
-      //   status: 401,
-      // });
     }
 
     const chats = await chatsCollection.find(query).sort({ lastMessageAt: -1 }).toArray();
@@ -54,89 +29,24 @@ export async function GET(req) {
   }
 }
 
-// **UPDATED** POST create a new chat
+// POST: directly insert whatever data the frontend sends
 export async function POST(req) {
   try {
     const body = await req.json();
-    // shopId is optional for direct user-to-user chats, but still expected for shop-initiated chats
-    const { shopId, customerId, mechanicId, mechanicName, mechanicLogo } = body;
 
-    // 1. Basic Validation
-    if (!customerId || !mechanicId) {
+    if (!body || Object.keys(body).length === 0) {
       return new Response(
-        JSON.stringify({ error: 'Missing required IDs (customerId, mechanicId).' }),
+        JSON.stringify({ error: 'No data provided' }),
         { headers: { 'Content-Type': 'application/json' }, status: 400 }
       );
     }
 
     const chatsCollection = await dbConnect('chats');
 
-    // 2. Check for an existing chat between these two IDs.
-    // Use $all to check that both IDs exist in the chat document, regardless of which field they land in.
-    const existingChat = await chatsCollection.findOne({
-      $or: [
-        { customerId: customerId, mechanicId: mechanicId },
-        { customerId: mechanicId, mechanicId: customerId }
-      ]
-    });
-
-    // 3. If chat exists, return the existing chat ID
-    if (existingChat) {
-      return new Response(
-        JSON.stringify({
-          chatId: existingChat._id.toString(),
-          message: "Chat already exists",
-        }),
-        { headers: { 'Content-Type': 'application/json' }, status: 200 }
-      );
-    }
-
-    // 4. Fetch User Info for both sides
-    const [customerInfo, mechanicInfo] = await Promise.all([
-      getUserName(customerId),
-      getUserName(mechanicId),
-    ]);
-
-    // Safety check for user ID format
-    try {
-      new ObjectId(customerId);
-      new ObjectId(mechanicId);
-    } catch (e) {
-      return new Response(
-        JSON.stringify({ error: 'Invalid ID format for customerId or mechanicId.' }),
-        { headers: { 'Content-Type': 'application/json' }, status: 400 }
-      );
-    }
-
-    const now = new Date();
-
-    // 5. Create the new chat object
-    const newChat = {
-      // shopId is included but may be null/undefined for general user-to-user chats
-      shopId: shopId || null,
-
-      // Store the roles based on who initiated the chat (or simply as User A and User B)
-      // We will stick to the existing field names (customer/mechanic) but treat them as User A/User B
-      customerId: customerId,
-      mechanicId: mechanicId,
-
-      // User info for display (use fetched names if body names are missing)
-      customerName: customerInfo.name,
-      customerProfileImage: customerInfo.profileImage,
-      mechanicName: mechanicName || mechanicInfo.name, // Use body name if provided (from shop data), otherwise use fetched name
-      mechanicProfileImage: mechanicLogo || mechanicInfo.profileImage || null,
-
-      // Chat state
-      messages: [],
-      createdAt: now,
-      updatedAt: now,
-      lastMessageAt: now,
-    };
-
-    const result = await chatsCollection.insertOne(newChat);
+    const result = await chatsCollection.insertOne(body);
 
     return new Response(
-      JSON.stringify({ chatId: result.insertedId.toString(), chat: newChat }),
+      JSON.stringify({ chatId: result.insertedId.toString(), chat: body }),
       { headers: { 'Content-Type': 'application/json' }, status: 201 }
     );
   } catch (error) {
@@ -148,7 +58,7 @@ export async function POST(req) {
   }
 }
 
-// DELETE a particular chat by its _id
+// DELETE a chat by its _id
 export async function DELETE(req) {
   try {
     const url = new URL(req.url);

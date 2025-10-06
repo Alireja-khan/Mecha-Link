@@ -7,19 +7,17 @@ import {
   Wrench,
   ClipboardList,
   Menu,
-  LogOut,
-  User,
 } from "lucide-react";
 import useUser from "@/hooks/useUser";
 import AdminNotifications from "./AdminNotifications";
 import NotificationCanvas from "./NotificationCanvas";
 import axios from "axios";
-
-const transitionClasses = "transition duration-200 ease-in-out";
+import ToggleTheme from "./ToggleTheme";
+import Link from "next/link";
 
 // ✅ User Dropdown Component
 const UserDropdown = ({ loggedInUser, roleConfig }) => {
-  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [dropdownOpen, setDropdownOpen] = useState(true);
   const dropdownRef = useRef(null);
 
   useEffect(() => {
@@ -29,85 +27,62 @@ const UserDropdown = ({ loggedInUser, roleConfig }) => {
       }
     };
     document.addEventListener("mousedown", handleClickOutside);
-    return () =>
-      document.removeEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  const handleLogout = () => {
-    console.log("Logging out...");
-    setDropdownOpen(false);
+  const getRoleBadgeStyles = (role) => {
+    switch (role) {
+      case "admin":
+        return "bg-red-500 text-white border-red-600";
+      case "mechanic":
+        return "bg-blue-500 text-white border-blue-600";
+      default:
+        return "bg-orange-500 text-white border-orange-600";
+    }
   };
 
   return (
     <div
       ref={dropdownRef}
-      className="relative flex items-center gap-3 cursor-pointer py-1.5 pl-1.5 pr-1.5 md:pr-4 rounded-full hover:bg-gray-100 transition duration-150"
+      className="relative flex items-center gap-2 sm:gap-3 cursor-pointer px-1.5 py-1.5 xl:px-2 xl:py-2 rounded-full hover-lift transition-all duration-200 flex-shrink"
       onClick={() => setDropdownOpen((prev) => !prev)}
     >
       {loggedInUser && (
-        <img
-          src={
-            loggedInUser.profileImage
-              ? loggedInUser.profileImage
-              : `https://ui-avatars.com/api/?name=${loggedInUser.name}&background=f97316&color=fff&bold=true`
-          }
-          alt={loggedInUser.name || "User Avatar"}
-          className="w-11 h-11 md:w-12 md:h-12 rounded-full border border-orange-500 object-cover flex-shrink-0"
-        />
+        <div className="relative flex-shrink-0">
+          <img
+            src={
+              loggedInUser.profileImage
+                ? loggedInUser.profileImage
+                : `https://ui-avatars.com/api/?name=${loggedInUser.name}&background=f97316&color=fff&bold=true`
+            }
+            alt={loggedInUser.name || "User Avatar"}
+            className="aspect-square rounded-full object-cover border-2 border-primary transition-all duration-200 w-10 h-10"
+          />
+        </div>
       )}
 
       {loggedInUser?.role && (
-        <div className="hidden sm:flex flex-col text-left justify-center min-w-0">
-          <span className="text-base font-semibold text-gray-900 truncate max-w-[90px] md:max-w-[140px]">
+        <div className="hidden lg:flex flex-col text-left justify-center min-w-0">
+          <span className="text-sm font-semibold truncate text-base-content">
             {loggedInUser.name || "Unknown"}
           </span>
           <span
-            className={`text-xs font-medium px-2 py-0.5 rounded-md border self-start ${roleConfig.badgeColor}`}
+            className={`text-xs font-medium px-2 py-0.5 rounded-md self-start ${getRoleBadgeStyles(
+              loggedInUser.role
+            )}`}
           >
             {loggedInUser.role.charAt(0).toUpperCase() +
               loggedInUser.role.slice(1)}
           </span>
         </div>
       )}
-
-      {dropdownOpen && (
-        <div
-          className={`absolute right-0 top-16 w-56 bg-white shadow-xl rounded-lg border border-gray-100 p-3 z-30 transform opacity-100 scale-100 origin-top-right ${transitionClasses}`}
-          onClick={(e) => e.stopPropagation()}
-        >
-          <div className="sm:hidden p-2 mb-2 border-b border-gray-100">
-            <p className="text-sm font-semibold text-gray-900 truncate">
-              {loggedInUser.name || "Unknown"}
-            </p>
-            <span
-              className={`text-xs font-medium px-2 py-0.5 mt-1 inline-block rounded-md border ${roleConfig.badgeColor}`}
-            >
-              {loggedInUser.role.charAt(0).toUpperCase() +
-                loggedInUser.role.slice(1)}
-            </span>
-          </div>
-
-          <button className="flex items-center w-full px-3 py-2 text-sm text-gray-700 hover:bg-orange-50 hover:text-orange-600 rounded-md">
-            <User size={18} className="mr-2" />
-            Profile
-          </button>
-          <button
-            onClick={handleLogout}
-            className="flex items-center w-full px-3 py-2 text-sm text-red-600 hover:bg-red-50 rounded-md mt-1"
-          >
-            <LogOut size={18} className="mr-2" />
-            Logout
-          </button>
-        </div>
-      )}
     </div>
   );
 };
 
-// ✅ Updated Topbar with increased size
+// ✅ Topbar Component
 const Topbar = ({ pageTitle = "Dashboard", setIsMobileOpen }) => {
   const { user: loggedInUser } = useUser();
-
   const [notifications, setNotifications] = useState([]);
   const [showCanvas, setShowCanvas] = useState(false);
 
@@ -117,10 +92,7 @@ const Topbar = ({ pageTitle = "Dashboard", setIsMobileOpen }) => {
         const res = await axios.get("/api/notifications");
         if (res.data) {
           let filtered = res.data;
-
-          if (loggedInUser?.role === "admin") {
-            filtered = res.data;
-          } else if (loggedInUser?.role === "mechanic") {
+          if (loggedInUser?.role === "mechanic") {
             filtered = res.data.filter((n) =>
               ["serviceRequest", "coupon", "announcement"].includes(n.type)
             );
@@ -129,7 +101,6 @@ const Topbar = ({ pageTitle = "Dashboard", setIsMobileOpen }) => {
               ["coupon", "announcement"].includes(n.type)
             );
           }
-
           setNotifications(filtered);
         }
       } catch (err) {
@@ -137,26 +108,8 @@ const Topbar = ({ pageTitle = "Dashboard", setIsMobileOpen }) => {
       }
     };
 
-    if (loggedInUser) {
-      fetchNotifications();
-    }
+    if (loggedInUser) fetchNotifications();
   }, [loggedInUser]);
-
-  const handleNewNotification = (msg) => {
-    if (!loggedInUser) return;
-
-    if (loggedInUser.role === "admin") {
-      setNotifications((prev) => [msg, ...prev]);
-    } else if (loggedInUser.role === "mechanic") {
-      if (["serviceRequest", "coupon", "announcement"].includes(msg.type)) {
-        setNotifications((prev) => [msg, ...prev]);
-      }
-    } else if (loggedInUser.role === "user") {
-      if (["coupon", "announcement"].includes(msg.type)) {
-        setNotifications((prev) => [msg, ...prev]);
-      }
-    }
-  };
 
   const handleDeleteNotification = async (id) => {
     try {
@@ -183,24 +136,25 @@ const Topbar = ({ pageTitle = "Dashboard", setIsMobileOpen }) => {
     switch (role) {
       case "admin":
         return {
-          badgeColor: "bg-red-100 text-red-600 border-red-400",
+          badgeColor: "bg-red-500 text-white border-red-600",
           actionText: "Manage Users",
           actionIcon: <Users size={18} />,
-          btnBg: "bg-red-600 hover:bg-red-700 shadow-red-300/50",
+          gradient: "from-red-500 to-red-600",
+          Route: "/dashboard/admin/manageUsers",
         };
       case "mechanic":
         return {
-          badgeColor: "bg-blue-100 text-blue-600 border-blue-400",
+          badgeColor: "bg-blue-500 text-white border-blue-600",
           actionText: "Service Requests",
           actionIcon: <Wrench size={18} />,
-          btnBg: "bg-blue-600 hover:bg-blue-700 shadow-blue-300/50",
+          gradient: "from-blue-500 to-blue-600",
         };
       default:
         return {
-          badgeColor: "bg-orange-100 text-orange-600 border-orange-400",
+          badgeColor: "bg-orange-500 text-white border-orange-600",
           actionText: "New Booking",
           actionIcon: <ClipboardList size={18} />,
-          btnBg: "bg-orange-600 hover:bg-orange-700 shadow-orange-300/50",
+          gradient: "from-orange-500 to-orange-600",
         };
     }
   };
@@ -209,103 +163,135 @@ const Topbar = ({ pageTitle = "Dashboard", setIsMobileOpen }) => {
   const unreadCount = notifications.filter((n) => !n.read).length;
 
   return (
-    <header className="sticky top-0 z-20 flex items-center justify-between px-4 sm:px-8 md:px-10 py-3 sm:py-2 border-b border-gray-100 bg-white">
-      <div className="flex items-center gap-4">
-        {/* ✅ Hamburger Button */}
-        <button
-          className="p-3 rounded-lg text-gray-700 hover:bg-gray-100 hover:text-orange-600 transition duration-150 2xl:hidden"
-          onClick={() => setIsMobileOpen(true)}
-        >
-          <Menu size={26} />
-        </button>
-        <h1 className="text-2xl md:text-3xl font-extrabold text-gray-800 truncate">
-          {pageTitle}
-        </h1>
-      </div>
-
-      <div className="flex items-center gap-3 sm:gap-4 md:gap-6">
-        <AdminNotifications onNewNotification={handleNewNotification} />
-
-        <div className="relative">
-          <button
-            title="Notifications"
-            className="p-3 sm:p-3.5 rounded-full text-gray-600 hover:bg-orange-50 hover:text-orange-600 transition duration-150 relative group"
-            onClick={() => {
-              setShowCanvas(true);
-              handleMarkAsRead();
-            }}
-          >
-            <Bell size={22} className="sm:w-6 sm:h-6" />
-            {unreadCount > 0 && (
-              <span className="absolute top-1 -right-1 min-w-5 min-h-5 text-[11px] sm:text-sm text-white bg-red-600 rounded-full flex justify-center items-center px-[3px] font-bold">
-                {unreadCount}
-              </span>
-            )}
-            <span
-              className={`absolute -bottom-8 left-1/2 -translate-x-1/2 px-2 py-1 text-[11px] sm:text-sm bg-gray-800 text-white rounded opacity-0 group-hover:opacity-100 ${transitionClasses} hidden sm:block pointer-events-none`}
+    <>
+      {/* Topbar Header */}
+      <header className="sticky top-0 z-40 backdrop-blur-md bg-base-100/80 border-b border-neutral transition-all duration-300 w-full px-2">
+        <div className="flex items-center justify-between px-4 sm:px-6 py-2.5 w-full">
+          {/* Left Section */}
+          <div className="flex items-center gap-3 sm:gap-4 min-w-0">
+            <button
+              className="p-2 rounded-xl text-base-content hover:bg-base-300 hover-lift transition-all duration-200 2xl:hidden flex-shrink-0"
+              onClick={() => setIsMobileOpen(true)}
             >
-              Notifications
-            </span>
-          </button>
-        </div>
+              <Menu size={22} className="sm:w-6 sm:h-6" />
+            </button>
+            <h1 className="text-xl sm:text-2xl lg:text-4xl font-bold text-base-content truncate flex-shrink min-w-0">
+              {pageTitle}
+            </h1>
+          </div>
 
-        {roleConfig && (
-          <button
-            className={`px-4 py-2 sm:py-2.5 rounded-lg sm:rounded-xl text-white text-sm sm:text-base font-semibold transition flex items-center gap-2 shadow-md ${roleConfig.btnBg}`}
-            title={roleConfig.actionText}
-          >
-            {roleConfig.actionIcon}
-            <span className="hidden md:block">{roleConfig.actionText}</span>
-          </button>
-        )}
+          {/* Right Section */}
+          <div className="flex items-center gap-2 sm:gap-3 md:gap-4 flex-shrink-0 min-w-0 z-50">
+            <AdminNotifications />
+            <ToggleTheme />
 
-        <UserDropdown loggedInUser={loggedInUser} roleConfig={roleConfig} />
-      </div>
-
-      <NotificationCanvas
-        isOpen={showCanvas}
-        title="Notifications"
-        onClose={() => setShowCanvas(false)}
-      >
-        {notifications.length === 0 ? (
-          <p className="p-5 text-sm text-gray-500">No new notifications</p>
-        ) : (
-          notifications.map((notif) => {
-            const createdAt = notif.createdAt
-              ? new Date(notif.createdAt).toLocaleString()
-              : "Date not available";
-
-            return (
-              <div
-                key={notif._id}
-                className="flex flex-col gap-2 px-5 py-3 border-b border-gray-100 hover:bg-gray-50 transition"
+            {/* Notification Button */}
+            <div className="relative flex-shrink-0">
+              <button
+                title="Notifications"
+                className="relative p-2 sm:p-2.5 rounded-xl text-base-content hover:bg-base-300 hover-lift transition-all duration-200"
+                onClick={() => {
+                  setShowCanvas(true);
+                  handleMarkAsRead();
+                }}
               >
-                <div className="flex justify-between items-start">
-                  <p
-                    className={`text-sm font-semibold ${!notif.read ? "text-gray-900" : "text-gray-700"
-                      }`}
-                  >
-                    {notif.message || "Notification"}
-                  </p>
-                  <button
-                    className="text-gray-400 hover:text-red-600 text-xs font-bold transition duration-150"
-                    onClick={() => handleDeleteNotification(notif._id)}
-                  >
-                    ✕
-                  </button>
-                </div>
-                {notif.data && (
-                  <p className="text-xs text-gray-500 truncate">
-                    {JSON.stringify(notif.data)}
-                  </p>
+                <Bell size={20} className="sm:w-[22px] sm:h-[22px]" />
+                {unreadCount > 0 && (
+                  <span className="absolute -top-1 -right-1 min-w-[1.25rem] h-auto px-1.5 text-xs font-bold text-white bg-gradient-to-r from-red-500 to-red-600 rounded-full flex items-center justify-center shadow-lg animate-pulse">
+                    {unreadCount > 9 ? "9+" : unreadCount}
+                  </span>
                 )}
-                <p className="text-[11px] text-gray-400 self-end">{createdAt}</p>
+              </button>
+            </div>
+
+            {/* Role Button */}
+            {roleConfig && (
+              <Link href={roleConfig.Route || "#"}>
+                <button
+                  className={`hidden sm:flex items-center gap-2 px-3 sm:px-4 py-3 rounded-xl text-white text-sm font-semibold bg-gradient-to-r ${roleConfig.gradient} hover-lift shadow-lg hover:shadow-xl transition-all duration-200 flex-shrink`}
+                >
+                  {roleConfig.actionIcon}
+                  <span className="hidden md:inline">
+                    {roleConfig.actionText}
+                  </span>
+                </button>
+              </Link>
+            )}
+
+            {loggedInUser && (
+              <UserDropdown
+                loggedInUser={loggedInUser}
+                roleConfig={roleConfig}
+              />
+            )}
+          </div>
+        </div>
+      </header>
+
+      {/* ✅ Fixed Notification Canvas (placed outside header for z-index isolation) */}
+      <div className="fixed top-0 right-0 z-[100]">
+        <NotificationCanvas
+          isOpen={showCanvas}
+          title="Notifications"
+          onClose={() => setShowCanvas(false)}
+        >
+          {notifications.length === 0 ? (
+            <div className="flex flex-col items-center justify-center p-8 text-center">
+              <div className="rounded-full bg-base-300 flex items-center justify-center mb-4 p-4">
+                <Bell size={28} className="text-base-content/70" />
               </div>
-            );
-          })
-        )}
-      </NotificationCanvas>
-    </header>
+              <p className="text-sm font-medium text-base-content mb-1">
+                No notifications
+              </p>
+              <p className="text-xs text-base-content/60">
+                You're all caught up!
+              </p>
+            </div>
+          ) : (
+            notifications.map((notif) => {
+              const createdAt = notif.createdAt
+                ? new Date(notif.createdAt).toLocaleString()
+                : "Date not available";
+
+              return (
+                <div
+                  key={notif._id}
+                  className="group relative flex flex-col gap-2 px-5 py-3 border-b border-neutral hover:bg-base-200 transition-all duration-150"
+                >
+                  {!notif.read && (
+                    <div className="absolute top-6 left-2 w-2 h-2 rounded-full bg-primary" />
+                  )}
+                  <div className="flex justify-between items-start gap-3 min-w-0">
+                    <p
+                      className={`text-sm truncate ${!notif.read
+                        ? "font-semibold text-base-content"
+                        : "text-base-content/70"
+                        }`}
+                    >
+                      {notif.message || "Notification"}
+                    </p>
+                    <button
+                      className="opacity-0 group-hover:opacity-100 text-base-content/60 hover:text-red-500 text-xs font-bold transition-all duration-150"
+                      onClick={() => handleDeleteNotification(notif._id)}
+                    >
+                      ✕
+                    </button>
+                  </div>
+                  {notif.data && (
+                    <p className="text-xs text-base-content/70 break-all">
+                      {JSON.stringify(notif.data)}
+                    </p>
+                  )}
+                  <p className="text-[11px] text-base-content/60 self-end">
+                    {createdAt}
+                  </p>
+                </div>
+              );
+            })
+          )}
+        </NotificationCanvas>
+      </div>
+    </>
   );
 };
 

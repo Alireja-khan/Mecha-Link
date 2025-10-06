@@ -7,41 +7,50 @@ import Swal from 'sweetalert2';
 
 // --- Utility Components ---
 
-const StatCard = ({ icon: Icon, value, label, color = "orange" }) => {
+const StatCard = ({ icon: Icon, value, label, color = "primary" }) => { // Changed default color to primary
+  // Mapping standard colors to dynamic DaisyUI classes
   const colorClasses = {
-    orange: {
-      bg: "bg-orange-500/10",
-      bgHover: "group-hover:bg-orange-500/20",
-      text: "text-orange-600"
+    primary: {
+      bg: "bg-primary/10",
+      bgHover: "group-hover:bg-primary/20",
+      text: "text-primary"
     },
-    green: {
-      bg: "bg-green-500/10",
-      bgHover: "group-hover:bg-green-500/20",
-      text: "text-green-600"
+    success: {
+      bg: "bg-success/10",
+      bgHover: "group-hover:bg-success/20",
+      text: "text-success"
     },
-    red: {
-      bg: "bg-red-500/10",
-      bgHover: "group-hover:bg-red-500/20",
-      text: "text-red-600"
+    error: {
+      bg: "bg-error/10",
+      bgHover: "group-hover:bg-error/20",
+      text: "text-error"
     },
-    blue: {
-      bg: "bg-blue-500/10",
-      bgHover: "group-hover:bg-blue-500/20",
-      text: "text-blue-600"
+    info: {
+      bg: "bg-info/10",
+      bgHover: "group-hover:bg-info/20",
+      text: "text-info"
     }
   };
 
-  const classes = colorClasses[color] || colorClasses.orange;
+  // Map input colors to DaisyUI semantic names for StatCard
+  const mappedColor = {
+    orange: 'primary',
+    green: 'success',
+    red: 'error',
+    blue: 'info',
+  }[color] || 'primary';
+
+  const classes = colorClasses[mappedColor];
 
   return (
-    <div className="bg-white rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-orange-100 shadow-lg hover:shadow-xl transition-all duration-300 group">
+    <div className="bg-base-100 rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-base-300 shadow-lg hover:shadow-xl transition-all duration-300 group">
       <div className="flex items-center justify-between mb-3 sm:mb-4">
         <div className={`p-2 sm:p-3 rounded-xl ${classes.bg} ${classes.bgHover} transition-colors duration-300`}>
           <Icon className={classes.text} size={20} />
         </div>
       </div>
-      <p className="text-2xl sm:text-3xl font-bold text-gray-900 mb-1">{value}</p>
-      <p className="text-gray-600 text-xs sm:text-sm font-medium">{label}</p>
+      <p className="text-2xl sm:text-3xl font-bold text-base-content mb-1">{value}</p>
+      <p className="text-base-content/70 text-xs sm:text-sm font-medium">{label}</p>
     </div>
   );
 };
@@ -50,11 +59,11 @@ const getStatusBadge = (status) => {
   const base = "px-2 sm:px-3 py-1 text-xs font-semibold rounded-full border whitespace-nowrap";
   switch (status) {
     case "active":
-      return <span className={`${base} bg-green-100 text-green-700 border-green-200`}>Active</span>;
+      return <span className={`${base} bg-success/10 text-success border-success/30`}>Active</span>;
     case "inactive":
-      return <span className={`${base} bg-red-100 text-red-700 border-red-200`}>Inactive</span>;
+      return <span className={`${base} bg-error/10 text-error border-error/30`}>Inactive</span>;
     default:
-      return <span className={`${base} bg-gray-100 text-gray-700 border-gray-200`}>Unknown</span>;
+      return <span className={`${base} bg-base-300/50 text-base-content/70 border-base-300`}>Unknown</span>;
   }
 };
 
@@ -95,11 +104,11 @@ const ManageAnnouncements = () => {
       title: title,
       text: message,
       icon: 'success',
-      confirmButtonColor: '#f97316',
+      confirmButtonColor: '#f97316', // Keeping this hardcoded for the Swaleet color in the JS scope
       confirmButtonText: 'OK',
-      background: '#fff',
-      color: '#1f2937',
-      iconColor: '#22c55e'
+      background: 'var(--color-base-100)',
+      color: 'var(--color-base-content)',
+      iconColor: 'var(--color-success)'
     });
   };
 
@@ -108,11 +117,11 @@ const ManageAnnouncements = () => {
       title: title,
       text: message,
       icon: 'error',
-      confirmButtonColor: '#f97316',
+      confirmButtonColor: '#f97316', // Keeping this hardcoded for the Swaleet color in the JS scope
       confirmButtonText: 'OK',
-      background: '#fff',
-      color: '#1f2937',
-      iconColor: '#ef4444'
+      background: 'var(--color-base-100)',
+      color: 'var(--color-base-content)',
+      iconColor: 'var(--color-error)'
     });
   };
 
@@ -122,13 +131,13 @@ const ManageAnnouncements = () => {
       text: text,
       icon: 'warning',
       showCancelButton: true,
-      confirmButtonColor: '#f97316',
-      cancelButtonColor: '#6b7280',
+      confirmButtonColor: '#f97316', // Keeping this hardcoded for the Swaleet color in the JS scope
+      cancelButtonColor: 'var(--color-neutral)',
       confirmButtonText: confirmButtonText,
       cancelButtonText: 'Cancel',
-      background: '#fff',
-      color: '#1f2937',
-      iconColor: '#eab308',
+      background: 'var(--color-base-100)',
+      color: 'var(--color-base-content)',
+      iconColor: 'var(--color-warning)',
       reverseButtons: true
     });
   };
@@ -141,8 +150,8 @@ const ManageAnnouncements = () => {
       didOpen: () => {
         Swal.showLoading();
       },
-      background: '#fff',
-      color: '#1f2937'
+      background: 'var(--color-base-100)',
+      color: 'var(--color-base-content)'
     });
   };
 
@@ -312,7 +321,7 @@ const ManageAnnouncements = () => {
       {ann.status !== "active" && (
         <button
           onClick={() => handleUpdateStatus(ann._id, "activate")}
-          className="p-2 bg-green-500/10 text-green-600 rounded-xl border border-green-200 hover:bg-green-500/20 hover:scale-105 transition-all duration-200"
+          className="p-2 bg-success/10 text-success rounded-xl border border-success/30 hover:bg-success/20 hover:scale-105 transition-all duration-200"
           title="Activate"
         >
           <Check size={16} />
@@ -321,7 +330,7 @@ const ManageAnnouncements = () => {
       {ann.status === "active" && (
         <button
           onClick={() => handleUpdateStatus(ann._id, "deactivate")}
-          className="p-2 bg-red-500/10 text-red-600 rounded-xl border border-red-200 hover:bg-red-500/20 hover:scale-105 transition-all duration-200"
+          className="p-2 bg-error/10 text-error rounded-xl border border-error/30 hover:bg-error/20 hover:scale-105 transition-all duration-200"
           title="Deactivate"
         >
           <X size={16} />
@@ -329,14 +338,14 @@ const ManageAnnouncements = () => {
       )}
       <button
         onClick={() => openEditModal(ann)}
-        className="p-2 bg-orange-500/10 text-orange-600 rounded-xl border border-orange-200 hover:bg-orange-500/20 hover:scale-105 transition-all duration-200"
+        className="p-2 bg-primary/10 text-primary rounded-xl border border-primary/30 hover:bg-primary/20 hover:scale-105 transition-all duration-200"
         title="Edit"
       >
         <Edit size={16} />
       </button>
       <button
         onClick={() => handleDelete(ann._id)}
-        className="p-2 bg-red-500/10 text-red-600 rounded-xl border border-red-200 hover:bg-red-500/20 hover:scale-105 transition-all duration-200"
+        className="p-2 bg-error/10 text-error rounded-xl border border-error/30 hover:bg-error/20 hover:scale-105 transition-all duration-200"
         title="Delete"
       >
         <Trash size={16} />
@@ -345,27 +354,27 @@ const ManageAnnouncements = () => {
   );
 
   const AnnouncementMobileCard = ({ ann }) => (
-    <div className="bg-white p-4 rounded-xl border border-orange-100 shadow-sm hover:shadow-md transition-all duration-200">
-      <div className="flex items-start gap-3 mb-3 border-b border-gray-100 pb-3">
-        <div className="w-10 h-10 bg-gradient-to-br from-orange-400 to-orange-600 rounded-lg flex items-center justify-center text-white font-bold text-sm flex-shrink-0">
+    <div className="bg-base-100 p-4 rounded-xl border border-base-300 shadow-sm hover:shadow-md transition-all duration-200">
+      <div className="flex items-start gap-3 mb-3 border-b border-base-300 pb-3">
+        <div className="w-10 h-10 bg-primary rounded-lg flex items-center justify-center text-primary-content font-bold text-sm flex-shrink-0">
           <Megaphone size={16} />
         </div>
         <div className="flex-1 min-w-0">
-          <p className="font-semibold text-gray-900 truncate">{ann.title || 'No Title'}</p>
-          <p className="text-xs text-gray-600 truncate flex items-center gap-1">
-            <Calendar size={12} className="text-gray-400" />
+          <p className="font-semibold text-base-content truncate">{ann.title || 'No Title'}</p>
+          <p className="text-xs text-base-content/70 truncate flex items-center gap-1">
+            <Calendar size={12} className="text-base-content/50" />
             {formatDateShort(ann.createdAt)}
           </p>
         </div>
         {getStatusBadge(ann.status)}
       </div>
 
-      <p className="text-sm text-gray-600 line-clamp-2 mb-3">{ann.message}</p>
+      <p className="text-sm text-base-content/80 line-clamp-2 mb-3">{ann.message}</p>
 
       <div className="flex justify-between items-center flex-wrap gap-2 pt-2">
         <button
           onClick={() => openDetailModal(ann)}
-          className="text-orange-500 hover:text-orange-600 text-sm font-medium flex items-center gap-1 transition-colors duration-200"
+          className="text-primary hover:text-secondary text-sm font-medium flex items-center gap-1 transition-colors duration-200"
         >
           <Eye size={14} />
           View Details
@@ -376,22 +385,22 @@ const ManageAnnouncements = () => {
   );
 
   if (loading || userLoading) return (
-    <div className="flex items-center justify-center h-screen w-full">
-      <span className="loading loading-bars loading-xl text-orange-500"></span>
+    <div className="flex items-center justify-center h-screen w-full bg-base-100">
+      <span className="loading loading-bars loading-xl text-primary"></span>
     </div>
   );
 
   return (
-    <div className="min-h-screen w-full p-3 sm:p-4 lg:p-6 mx-auto">
+    <div className="min-h-screen w-full p-3 sm:p-4 lg:p-6 mx-auto bg-base-100">
       {/* Header Section */}
       <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-4 sm:mb-6 lg:mb-8">
         <div>
-          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 mb-1 sm:mb-2">Announcement Management</h1>
-          <p className="text-gray-600 text-sm sm:text-base lg:text-lg">Manage platform announcements and notifications</p>
+          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-base-content mb-1 sm:mb-2">Announcement Management</h1>
+          <p className="text-base-content/70 text-sm sm:text-base lg:text-lg">Manage platform announcements and notifications</p>
         </div>
         <button
           onClick={() => { setEditingAnnouncement(null); setFormData({ title: "", message: "" }); setModalOpen(true); }}
-          className="flex items-center gap-2 sm:gap-3 px-4 sm:px-6 py-2 sm:py-3 lg:py-4 bg-orange-500 text-white rounded-xl font-semibold transition-all duration-300 hover:bg-orange-600 hover:scale-[1.02] shadow-lg hover:shadow-xl mt-4 lg:mt-0 text-sm sm:text-base"
+          className="flex items-center gap-2 sm:gap-3 px-4 sm:px-6 py-2 sm:py-3 lg:py-4 bg-primary text-primary-content rounded-xl font-semibold transition-all duration-300 hover:bg-secondary hover:scale-[1.02] shadow-lg hover:shadow-xl mt-4 lg:mt-0 text-sm sm:text-base"
         >
           <Plus size={20} />
           <span>Add New Announcement</span>
@@ -407,22 +416,22 @@ const ManageAnnouncements = () => {
       </div>
 
       {/* Main Content */}
-      <div className="bg-white rounded-2xl sm:rounded-3xl p-4 sm:p-6 lg:p-8 border border-orange-100 shadow-xl">
+      <div className="bg-base-200 rounded-2xl sm:rounded-3xl p-4 sm:p-6 lg:p-8 border border-base-300 shadow-xl">
         <div className="flex flex-col md:flex-row gap-3 w-full mb-6">
           <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-base-content/50" size={18} />
             <input
               type="text"
               placeholder="Search by title..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10 pr-4 py-2.5 sm:py-3 border border-orange-200 rounded-xl bg-orange-50/50 focus:bg-white focus:border-orange-300 w-full text-sm focus:outline-none"
+              className="pl-10 pr-4 py-2.5 sm:py-3 border border-base-300 rounded-xl bg-base-100/50 focus:bg-base-100 focus:border-primary/50 w-full text-sm text-base-content focus:outline-none"
             />
           </div>
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
-            className="px-3 sm:px-4 py-2.5 sm:py-3 border border-orange-200 rounded-xl bg-orange-50/50 focus:bg-white focus:border-orange-300 text-sm focus:outline-none"
+            className="px-3 sm:px-4 py-2.5 sm:py-3 border border-base-300 rounded-xl bg-base-100/50 focus:bg-base-100 focus:border-primary/50 text-sm text-base-content focus:outline-none"
           >
             <option value="all">All Statuses</option>
             <option value="active">Active</option>
@@ -430,7 +439,7 @@ const ManageAnnouncements = () => {
           </select>
           <button
             onClick={() => showSuccessAlert('Coming Soon!', 'Export functionality will be implemented soon.')}
-            className="flex items-center gap-2 px-3 sm:px-4 py-2.5 sm:py-3 bg-orange-50 text-orange-700 rounded-xl border border-orange-200 hover:bg-orange-100 transition-colors duration-200 text-sm justify-center"
+            className="flex items-center gap-2 px-3 sm:px-4 py-2.5 sm:py-3 bg-base-100 text-primary rounded-xl border border-base-300 hover:bg-base-300/50 transition-colors duration-200 text-sm justify-center"
             title="Export Data"
           >
             <Download size={16} />
@@ -440,35 +449,35 @@ const ManageAnnouncements = () => {
 
         {/* Mobile View - Announcement Cards */}
         <div className="block lg:hidden space-y-4">
-          {filteredAnnouncements.length > 0 ? filteredAnnouncements.map(ann => <AnnouncementMobileCard key={ann._id} ann={ann} />) : <div className="text-center py-12"><MessageSquare size={48} className="mx-auto text-gray-300" /><p className="text-gray-500">No announcements found</p></div>}
+          {filteredAnnouncements.length > 0 ? filteredAnnouncements.map(ann => <AnnouncementMobileCard key={ann._id} ann={ann} />) : <div className="text-center py-12"><MessageSquare size={48} className="mx-auto text-base-content/30" /><p className="text-base-content/70">No announcements found</p></div>}
         </div>
 
         {/* Desktop View - Table */}
-        <div className="hidden lg:block rounded-2xl border border-orange-100 overflow-x-auto">
-          <table className="min-w-full divide-y divide-orange-100">
-            <thead className="bg-orange-50">
+        <div className="hidden lg:block rounded-2xl border border-base-300 overflow-x-auto">
+          <table className="min-w-full divide-y divide-base-300">
+            <thead className="bg-base-300/50">
               <tr>
-                <th className="px-6 py-4 text-left text-sm font-semibold text-orange-900">Announcement Title</th>
-                <th className="px-6 py-4 text-left text-sm font-semibold text-orange-900">Message Preview</th>
-                <th className="px-6 py-4 text-left text-sm font-semibold text-orange-900">Created Date</th>
-                <th className="px-6 py-4 text-left text-sm font-semibold text-orange-900">Status</th>
-                <th className="px-6 py-4 text-center text-sm font-semibold text-orange-900">Actions</th>
+                <th className="px-6 py-4 text-left text-sm font-semibold text-base-content">Announcement Title</th>
+                <th className="px-6 py-4 text-left text-sm font-semibold text-base-content">Message Preview</th>
+                <th className="px-6 py-4 text-left text-sm font-semibold text-base-content">Created Date</th>
+                <th className="px-6 py-4 text-left text-sm font-semibold text-base-content">Status</th>
+                <th className="px-6 py-4 text-center text-sm font-semibold text-base-content">Actions</th>
               </tr>
             </thead>
-            <tbody className="bg-white divide-y divide-orange-100">
+            <tbody className="bg-base-100 divide-y divide-base-300">
               {filteredAnnouncements.length > 0 ? (
                 filteredAnnouncements.map((ann) => (
-                  <tr key={ann._id} className="hover:bg-orange-50/30 transition-colors duration-200">
+                  <tr key={ann._id} className="hover:bg-base-300/30 transition-colors duration-200">
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 bg-gradient-to-br from-orange-400 to-orange-600 rounded-xl flex items-center justify-center text-white font-bold text-sm flex-shrink-0">
+                        <div className="w-10 h-10 bg-primary rounded-xl flex items-center justify-center text-primary-content font-bold text-sm flex-shrink-0">
                           <Megaphone size={16} />
                         </div>
                         <div>
-                          <p className="font-semibold text-gray-900 text-sm">{ann.title}</p>
+                          <p className="font-semibold text-base-content text-sm">{ann.title}</p>
                           <button
                             onClick={() => openDetailModal(ann)}
-                            className="text-orange-500 hover:text-orange-600 text-xs font-medium flex items-center gap-1 transition-colors duration-200 mt-1"
+                            className="text-primary hover:text-secondary text-xs font-medium flex items-center gap-1 transition-colors duration-200 mt-1"
                           >
                             <Eye size={12} />
                             View message
@@ -477,12 +486,12 @@ const ManageAnnouncements = () => {
                       </div>
                     </td>
                     <td className="px-6 py-4">
-                      <p className="text-sm text-gray-600 line-clamp-2 max-w-sm">{ann.message}</p>
+                      <p className="text-sm text-base-content/80 line-clamp-2 max-w-sm">{ann.message}</p>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center gap-2">
-                        <Calendar size={14} className="text-orange-500 flex-shrink-0" />
-                        <span className="text-sm text-gray-700">
+                        <Calendar size={14} className="text-primary flex-shrink-0" />
+                        <span className="text-sm text-base-content/80">
                           {formatDateShort(ann.createdAt)}
                         </span>
                       </div>
@@ -499,8 +508,8 @@ const ManageAnnouncements = () => {
                 <tr>
                   <td colSpan="5" className="text-center py-12">
                     <div className="flex flex-col items-center gap-3">
-                      <Megaphone className="text-gray-300" size={48} />
-                      <p className="text-gray-500 text-lg">No announcements found</p>
+                      <Megaphone className="text-base-content/30" size={48} />
+                      <p className="text-base-content/70 text-lg">No announcements found</p>
                     </div>
                   </td>
                 </tr>
@@ -513,14 +522,14 @@ const ManageAnnouncements = () => {
       {/* Create/Edit Modal */}
       {modalOpen && (
         <div className="fixed inset-0 flex items-center justify-center backdrop-blur-md z-50 p-4">
-          <div className="bg-white rounded-3xl p-6 sm:p-8 w-full max-w-2xl border border-orange-100 shadow-2xl max-h-[90vh] overflow-y-auto">
+          <div className="bg-base-100 rounded-3xl p-6 sm:p-8 w-full max-w-2xl border border-base-300 shadow-2xl max-h-[90vh] overflow-y-auto">
             <div className="flex justify-between items-center mb-6">
-              <h2 className="text-xl sm:text-2xl font-bold text-gray-900">
+              <h2 className="text-xl sm:text-2xl font-bold text-base-content">
                 {editingAnnouncement ? "Edit Announcement" : "Add New Announcement"}
               </h2>
               <button
                 onClick={handleModalClose}
-                className="p-2 bg-orange-50 text-orange-600 rounded-xl border border-orange-200 hover:bg-orange-100 transition-colors duration-200"
+                className="p-2 bg-base-300/50 text-base-content rounded-xl border border-base-300 hover:bg-base-300 transition-colors duration-200"
                 title="Close"
               >
                 <X size={20} />
@@ -528,22 +537,22 @@ const ManageAnnouncements = () => {
             </div>
             <form onSubmit={handleFormSubmit} className="space-y-4 sm:space-y-6">
               <div>
-                <label className="block text-gray-700 font-medium mb-2 sm:mb-3 text-sm">Title *</label>
+                <label className="block text-base-content/90 font-medium mb-2 sm:mb-3 text-sm">Title *</label>
                 <input
                   type="text"
                   value={formData.title}
                   onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                  className="w-full p-3 sm:p-4 border border-orange-200 rounded-xl bg-orange-50/50 focus:bg-white focus:border-orange-300 focus:outline-none transition-all duration-300 text-sm"
+                  className="w-full p-3 sm:p-4 border border-base-300 rounded-xl bg-base-200 focus:bg-base-100 focus:border-primary/50 focus:outline-none transition-all duration-300 text-sm text-base-content"
                   placeholder="Enter announcement title..."
                   required
                 />
               </div>
               <div>
-                <label className="block text-gray-700 font-medium mb-2 sm:mb-3 text-sm">Message *</label>
+                <label className="block text-base-content/90 font-medium mb-2 sm:mb-3 text-sm">Message *</label>
                 <textarea
                   value={formData.message}
                   onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-                  className="w-full p-3 sm:p-4 border border-orange-200 rounded-xl bg-orange-50/50 focus:bg-white focus:border-orange-300 focus:outline-none transition-all duration-300 resize-none text-sm"
+                  className="w-full p-3 sm:p-4 border border-base-300 rounded-xl bg-base-200 focus:bg-base-100 focus:border-primary/50 focus:outline-none transition-all duration-300 resize-none text-sm text-base-content"
                   rows={6}
                   placeholder="Enter announcement message..."
                   required
@@ -553,13 +562,13 @@ const ManageAnnouncements = () => {
                 <button
                   type="button"
                   onClick={handleModalClose}
-                  className="px-4 sm:px-6 py-2 sm:py-3 bg-white text-gray-700 rounded-xl font-semibold border border-orange-200 hover:bg-orange-50 transition-all duration-300 text-sm"
+                  className="px-4 sm:px-6 py-2 sm:py-3 bg-base-100 text-base-content rounded-xl font-semibold border border-base-300 hover:bg-base-200 transition-all duration-300 text-sm"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-4 sm:px-6 py-2 sm:py-3 bg-orange-500 text-white rounded-xl font-semibold transition-all duration-300 hover:bg-orange-600 hover:scale-[1.02] shadow-lg hover:shadow-xl text-sm"
+                  className="px-4 sm:px-6 py-2 sm:py-3 bg-primary text-primary-content rounded-xl font-semibold transition-all duration-300 hover:bg-secondary hover:scale-[1.02] shadow-lg hover:shadow-xl text-sm"
                 >
                   {editingAnnouncement ? "Update Announcement" : "Create Announcement"}
                 </button>
@@ -572,12 +581,12 @@ const ManageAnnouncements = () => {
       {/* Detail View Modal */}
       {detailModalOpen && selectedAnnouncement && (
         <div className="fixed inset-0 flex items-center justify-center backdrop-blur-md z-50 p-4">
-          <div className="bg-white rounded-3xl p-6 sm:p-8 w-full max-w-2xl border border-orange-100 shadow-2xl max-h-[90vh] overflow-y-auto">
+          <div className="bg-base-100 rounded-3xl p-6 sm:p-8 w-full max-w-2xl border border-base-300 shadow-2xl max-h-[90vh] overflow-y-auto">
             <div className="flex justify-between items-center mb-6">
-              <h2 className="text-xl sm:text-2xl font-bold text-gray-900">Announcement Details</h2>
+              <h2 className="text-xl sm:text-2xl font-bold text-base-content">Announcement Details</h2>
               <button
                 onClick={() => setDetailModalOpen(false)}
-                className="p-2 bg-orange-50 text-orange-600 rounded-xl border border-orange-200 hover:bg-orange-100 transition-colors duration-200"
+                className="p-2 bg-base-300/50 text-base-content rounded-xl border border-base-300 hover:bg-base-300 transition-colors duration-200"
                 title="Close"
               >
                 <X size={20} />
@@ -586,17 +595,17 @@ const ManageAnnouncements = () => {
 
             <div className="space-y-6">
               {/* Header */}
-              <div className="flex items-center gap-4 p-4 bg-orange-50 rounded-xl border border-orange-200">
-                <div className="w-12 h-12 bg-gradient-to-br from-orange-400 to-orange-600 rounded-xl flex items-center justify-center text-white flex-shrink-0">
+              <div className="flex items-center gap-4 p-4 bg-primary/10 rounded-xl border border-primary/30">
+                <div className="w-12 h-12 bg-primary rounded-xl flex items-center justify-center text-primary-content flex-shrink-0">
                   <Megaphone size={20} />
                 </div>
                 <div>
-                  <h3 className="text-lg sm:text-xl font-bold text-gray-900">{selectedAnnouncement.title}</h3>
+                  <h3 className="text-lg sm:text-xl font-bold text-base-content">{selectedAnnouncement.title}</h3>
                   <div className="flex items-center flex-wrap gap-x-4 gap-y-1 mt-1">
-                    <span className="text-sm text-gray-600">
+                    <span className="text-sm text-base-content/80">
                       {getStatusBadge(selectedAnnouncement.status)}
                     </span>
-                    <span className="text-sm text-gray-500 flex items-center gap-1">
+                    <span className="text-sm text-base-content/60 flex items-center gap-1">
                       <Calendar size={12} />
                       Created: {formatDate(selectedAnnouncement.createdAt)}
                     </span>
@@ -606,9 +615,9 @@ const ManageAnnouncements = () => {
 
               {/* Message Content */}
               <div>
-                <h4 className="text-lg font-semibold text-gray-900 mb-3">Message Content</h4>
-                <div className="p-4 bg-gray-50 rounded-xl border border-gray-200">
-                  <p className="text-gray-700 whitespace-pre-wrap leading-relaxed text-sm">
+                <h4 className="text-lg font-semibold text-base-content mb-3">Message Content</h4>
+                <div className="p-4 bg-base-200 rounded-xl border border-base-300">
+                  <p className="text-base-content/90 whitespace-pre-wrap leading-relaxed text-sm">
                     {selectedAnnouncement.message}
                   </p>
                 </div>
@@ -618,7 +627,7 @@ const ManageAnnouncements = () => {
               <div className="flex justify-end gap-3 pt-4">
                 <button
                   onClick={() => setDetailModalOpen(false)}
-                  className="px-4 sm:px-6 py-2 sm:py-3 bg-white text-gray-700 rounded-xl font-semibold border border-orange-200 hover:bg-orange-50 transition-all duration-300 text-sm"
+                  className="px-4 sm:px-6 py-2 sm:py-3 bg-base-100 text-base-content rounded-xl font-semibold border border-base-300 hover:bg-base-200 transition-all duration-300 text-sm"
                 >
                   Close
                 </button>
@@ -627,7 +636,7 @@ const ManageAnnouncements = () => {
                     setDetailModalOpen(false);
                     openEditModal(selectedAnnouncement);
                   }}
-                  className="px-4 sm:px-6 py-2 sm:py-3 bg-orange-500 text-white rounded-xl font-semibold transition-all duration-300 hover:bg-orange-600 shadow-lg text-sm"
+                  className="px-4 sm:px-6 py-2 sm:py-3 bg-primary text-primary-content rounded-xl font-semibold transition-all duration-300 hover:bg-secondary shadow-lg text-sm"
                 >
                   <Edit size={16} className="inline mr-2" />Edit Announcement
                 </button>
