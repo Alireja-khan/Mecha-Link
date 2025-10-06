@@ -264,7 +264,7 @@ const AdminDashboardOverview = () => {
                             <CartesianGrid strokeDasharray="3 3" stroke="var(--color-neutral)" />
                             <XAxis dataKey="month" stroke="var(--color-base-content)" style={{ fontSize: '10px' }} />
                             <YAxis stroke="var(--color-base-content)" style={{ fontSize: '10px' }} />
-                            <Tooltip contentStyle={{ borderRadius: '8px', fontSize: '12px', background: 'var(--fallback-b3, #415a77)', border: '1px solid var(--fallback-n, #2d3748)' }} />
+                            <Tooltip contentStyle={{ borderRadius: '8px', fontSize: '12px', background: 'var(--base-300, #ffffff)', border: '1px solid var(--neutral, #dddddd)' }} />
                             <Line
                                 type="monotone"
                                 dataKey="requests"
@@ -295,7 +295,7 @@ const AdminDashboardOverview = () => {
                                     <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                                 ))}
                             </Pie>
-                            <Tooltip contentStyle={{ borderRadius: '8px', fontSize: '12px', background: 'var(--fallback-b3, #415a77)', border: '1px solid var(--fallback-n, #2d3748)' }} />
+                            <Tooltip contentStyle={{ borderRadius: '8px', fontSize: '12px', background: 'var(--base-300, #ffffff)', border: '1px solid var(--fallback-n, #fafafa)' }} />
                             <Legend layout="horizontal" align="center" verticalAlign="bottom" wrapperStyle={{ fontSize: '12px', paddingTop: '10px' }} />
                         </PieChart>
                     </ResponsiveContainer>
