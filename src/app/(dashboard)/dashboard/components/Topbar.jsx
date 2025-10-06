@@ -174,7 +174,7 @@ const Topbar = ({ pageTitle = "Dashboard", setIsMobileOpen }) => {
                   : `https://ui-avatars.com/api/?name=${loggedInUser.name}&background=f97316&color=fff&bold=true`
               }
               alt={loggedInUser.name || "User Avatar"}
-              className="w-10 h-10 rounded-full border-2 border-orange-500"
+              className="w-10 h-10 rounded-full border-2 border-orange-500 object-cover "
             />
             <div className="hidden md:flex flex-col text-left">
               <span className="text-sm font-semibold text-gray-900">

@@ -21,7 +21,7 @@ export default function SignUpPage() {
         <div className="absolute inset-0 backdrop-blur-md"></div>
       </div>
 
-      <div className="flex flex-col md:flex-row w-full max-w-5xl bg-white rounded-3xl overflow-hidden shadow-lg">
+      <div className="flex flex-col md:flex-row w-full max-w-screen-xl bg-white rounded-3xl overflow-hidden shadow-lg">
 
         {/* Left Side - Form */}
         <div className="w-full md:w-1/2 flex flex-col justify-center items-center px-10 py-12">
@@ -45,7 +45,7 @@ export default function SignUpPage() {
             src="/Gear-Image-7.jpeg"
             alt="Gear mechanism"
             fill
-            className="object-cover ml-50 mt-5 object-center"
+            className="object-cover ml-50 mt-5 object-top"
             priority
           />
           {/* Overlay for better contrast */}

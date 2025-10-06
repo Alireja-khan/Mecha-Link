@@ -9,7 +9,7 @@ import { useSession } from 'next-auth/react';
 
 const locationData = {
    Dhaka: {
-       Dhaka: ["Dhamrai", "Dohar", "Keraniganj", "Savar", "Uttara", "Gulshan", "Mirpur"],
+       Dhaka: ["Dhamrai", "Dohar", "Keraniganj", "Savar", "Uttara", "Gulshan", "Mirpur", "Fakirhat"],
        Faridpur: ["Faridpur Sadar", "Bhanga", "Boalmari", "Alfadanga", "Nagarkanda", "Saltha"],
        Gazipur: ["Gazipur Sadar", "Kaliakoir", "Kapasia", "Sreepur"],
        Gopalganj: ["Gopalganj Sadar", "Kashiani", "Muksudpur", "Tungipara"],
@@ -39,7 +39,7 @@ const locationData = {
    },
 
    Khulna: {
-       Khulna: ["Khulna Sadar", "Dacope", "Dumuria", "Batiaghata", "Koyra", "Phultala", "Rupsa", "Terokhada"],
+       Khulna: ["Khulna Sadar", "Dacope", "Dumuria", "Batiaghata", "Koyra", "Phultala", "Rupsa", "Terokhada", "Sonadanga", "Kalishpur"],
        Jessore: ["Jessore Sadar", "Bagherpara", "Jhikargacha", "Manirampur", "Sharsha", "Keshabpur"],
        Satkhira: ["Satkhira Sadar", "Debhata", "Kaliganj", "Shyamnagar", "Tala", "Kalaroa"],
        Bagerhat: ["Bagerhat Sadar", "Chitalmari", "Kachua", "Morrelganj", "Mongla", "Rampal", "Sarankhola"],
@@ -63,7 +63,7 @@ const locationData = {
    },
 
    Barishal: {
-       Barishal: ["Barishal Sadar", "Agailjhara", "Babuganj", "Bakerganj", "Banaripara", "Gaurnadi", "Hizla", "Mehendiganj", "Muladi", "Wazirpur"],
+       Barishal: ["Barishal Sadar", "Agailjhara", "Babuganj", "Bakerganj", "Banaripara", "Gaurnadi", "Hizla", "Mehendiganj", "Muladi", "Wazirpur", "Rupatoli"],
        Patuakhali: ["Patuakhali Sadar", "Bauphal", "Kalapara", "Dashmina", "Rangabali", "Dumki", "Mirzaganj"],
        Bhola: ["Bhola Sadar", "Borhanuddin", "Charfassion", "Daulatkhan", "Lalmohan", "Tazumuddin", "Burhanuddin"],
        Jhalokathi: ["Jhalokathi Sadar", "Kathalia", "Nalchity", "Rajapur"],
