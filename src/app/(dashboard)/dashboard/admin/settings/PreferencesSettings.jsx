@@ -37,14 +37,15 @@ export default function PreferencesSettings({ preferences, setPreferences }) {
           },
         ].map((item) => (
           <div key={item.name} className="flex flex-col">
-            <label className="text-sm font-medium text-gray-700 mb-2">
+            <label className="text-sm font-medium text-base-content mb-2">
               {item.label}
             </label>
             <select
               name={item.name}
               value={preferences[item.name]}
               onChange={handleChange}
-              className="p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition duration-150"
+              // Select styling updated for theme compatibility
+              className="p-3 border border-base-300 bg-base-100 text-base-content rounded-xl focus:ring-2 focus:ring-primary focus:border-primary transition duration-150"
             >
               {item.options.map((opt) => (
                 <option key={opt} value={opt}>
@@ -58,10 +59,11 @@ export default function PreferencesSettings({ preferences, setPreferences }) {
 
       {/* Notification Preferences */}
       <div className="space-y-4">
-        <h3 className="text-xl font-bold text-gray-800 pb-2 border-b border-gray-200">
+        {/* Header text and border updated */}
+        <h3 className="text-xl font-bold text-base-content pb-2 border-b border-base-300">
           Notification Preferences
         </h3>
-        <div className="grid grid-cols-1 gap-4"> {/* Stays single column for better readability */}
+        <div className="grid grid-cols-1 gap-4">
           {[
             {
               name: "emailNotifications",
@@ -81,19 +83,22 @@ export default function PreferencesSettings({ preferences, setPreferences }) {
           ].map((item) => (
             <label
               key={item.name}
-              className="flex items-center justify-between p-4 border border-gray-200 rounded-xl hover:bg-orange-50/50 transition duration-150 cursor-pointer"
+              // Checkbox row updated for theme compatibility, hover effect uses base-300
+              className="flex items-center justify-between p-4 border border-base-300 rounded-xl bg-base-100 hover:bg-base-200 transition duration-150 cursor-pointer"
             >
               <div>
-                <div className="font-semibold text-gray-800">{item.label}</div>
-                <div className="text-sm text-gray-500">{item.desc}</div>
+                {/* Text colors updated */}
+                <div className="font-semibold text-base-content">{item.label}</div>
+                <div className="text-sm text-base-content/70">{item.desc}</div>
               </div>
               <input
                 type="checkbox"
                 name={item.name}
                 checked={preferences[item.name]}
                 onChange={handleChange}
-                // Tailwind class for custom checkbox color
-                className="w-5 h-5 accent-orange-500 focus:ring-orange-500/50"
+                // DaisyUI uses `toggle` or `checkbox` components, but for standard Tailwind fields, 
+                // we use `accent-primary` for the checkbox color.
+                className="w-5 h-5 accent-primary focus:ring-primary/50"
               />
             </label>
           ))}

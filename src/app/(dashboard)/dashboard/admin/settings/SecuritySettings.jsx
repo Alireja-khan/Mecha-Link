@@ -2,8 +2,8 @@
 
 import React, { useState } from "react";
 import { Eye, EyeOff } from "lucide-react";
-import Swal from "sweetalert2"; // ✅ import swal
-import { toast } from "react-hot-toast"; // assuming you have this
+import Swal from "sweetalert2";
+import { toast } from "react-hot-toast";
 
 export default function SecuritySettings({ security, setSecurity }) {
   const [showPassword, setShowPassword] = useState({
@@ -23,7 +23,7 @@ export default function SecuritySettings({ security, setSecurity }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // ❌ New & Confirm password mismatch
+    // New & Confirm password mismatch
     if (security.newPassword !== security.confirmPassword) {
       Swal.fire({
         icon: "error",
@@ -54,7 +54,7 @@ export default function SecuritySettings({ security, setSecurity }) {
         // Reset password fields after successful change
         setSecurity((prev) => ({ ...prev, password: "", newPassword: "", confirmPassword: "" }));
       } else {
-        // ❌ Wrong current password or backend error
+        // Wrong current password or backend error
         Swal.fire({
           icon: "error",
           title: "Error",
@@ -75,14 +75,15 @@ export default function SecuritySettings({ security, setSecurity }) {
     <div className="space-y-8">
 
       {/* Password Section with form */}
-      <form onSubmit={handleSubmit} className="space-y-6 p-6 border border-gray-200 rounded-xl bg-gray-50/50">
-        <h2 className="text-xl font-bold text-gray-800 border-b border-gray-200 pb-2 mb-4">
+      {/* Form Container BG: base-200, Border: base-300 */}
+      <form onSubmit={handleSubmit} className="space-y-6 p-6 border border-base-300 rounded-xl bg-base-200">
+        <h2 className="text-xl font-bold text-base-content border-b border-base-300 pb-2 mb-4">
           Change Password
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {["password", "newPassword", "confirmPassword"].map((field) => (
             <div key={field} className="flex flex-col">
-              <label className="text-sm font-medium text-gray-700 mb-2 capitalize">
+              <label className="text-sm font-medium text-base-content mb-2 capitalize">
                 {field.replace(/([A-Z])/g, " $1")}
               </label>
               <div className="relative">
@@ -91,9 +92,10 @@ export default function SecuritySettings({ security, setSecurity }) {
                   name={field}
                   value={security[field]}
                   onChange={handleChange}
-                  className="p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-orange-500 w-full outline-none transition"
+                  // Input styling updated
+                  className="p-3 border border-base-300 bg-base-100 text-base-content rounded-xl focus:ring-2 focus:ring-primary focus:border-primary w-full outline-none transition"
                   placeholder={field === 'password' ? 'Current Password' : 'New Password'}
-                  required={field !== 'password'} // Only require new/confirm for form submission
+                  required={field !== 'password'}
                 />
                 <button
                   type="button"
@@ -103,7 +105,8 @@ export default function SecuritySettings({ security, setSecurity }) {
                       [field]: !prev[field],
                     }))
                   }
-                  className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 p-1"
+                  // Icon colors updated
+                  className="absolute right-4 top-1/2 transform -translate-y-1/2 text-base-content/60 hover:text-base-content p-1 transition-colors"
                 >
                   {showPassword[field] ? (
                     <EyeOff size={18} />
@@ -118,7 +121,8 @@ export default function SecuritySettings({ security, setSecurity }) {
         <div className="flex justify-end pt-4">
           <button
             type="submit"
-            className="px-6 py-3 bg-orange-500 text-white rounded-xl hover:bg-orange-600 transition font-medium shadow-md shadow-orange-200"
+            // Button styling updated to use primary/secondary
+            className="px-6 py-3 bg-primary text-primary-content rounded-xl hover:bg-secondary transition font-medium shadow-md shadow-primary/30"
           >
             Change Password
           </button>
@@ -127,7 +131,7 @@ export default function SecuritySettings({ security, setSecurity }) {
 
       {/* Security Preferences */}
       <div className="space-y-4">
-        <h3 className="text-xl font-bold text-gray-800 pb-2 border-b border-gray-200">
+        <h3 className="text-xl font-bold text-base-content pb-2 border-b border-base-300">
           Security Preferences
         </h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -145,18 +149,20 @@ export default function SecuritySettings({ security, setSecurity }) {
           ].map((item) => (
             <label
               key={item.name}
-              className="flex items-center justify-between p-4 border border-gray-200 rounded-xl hover:bg-orange-50/50 cursor-pointer transition"
+              // Label BG: base-100, Border: base-300, Hover: base-200
+              className="flex items-center justify-between p-4 border border-base-300 bg-base-100 rounded-xl hover:bg-base-200 cursor-pointer transition"
             >
               <div>
-                <div className="font-semibold text-gray-800">{item.label}</div>
-                <div className="text-sm text-gray-500">{item.desc}</div>
+                <div className="font-semibold text-base-content">{item.label}</div>
+                <div className="text-sm text-base-content/70">{item.desc}</div>
               </div>
               <input
                 type="checkbox"
                 name={item.name}
                 checked={security[item.name]}
                 onChange={handleChange}
-                className="w-5 h-5 accent-orange-500 focus:ring-orange-500/50 ml-4"
+                // Checkbox accent color updated
+                className="w-5 h-5 accent-primary focus:ring-primary/50 ml-4"
               />
             </label>
           ))}
@@ -165,7 +171,7 @@ export default function SecuritySettings({ security, setSecurity }) {
 
       {/* Session Settings */}
       <div className="space-y-4">
-        <h3 className="text-xl font-bold text-gray-800 pb-2 border-b border-gray-200">
+        <h3 className="text-xl font-bold text-base-content pb-2 border-b border-base-300">
           Session & Password Settings
         </h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -186,7 +192,7 @@ export default function SecuritySettings({ security, setSecurity }) {
             },
           ].map((item) => (
             <div key={item.name} className="flex flex-col">
-              <label className="text-sm font-medium text-gray-700 mb-2">
+              <label className="text-sm font-medium text-base-content mb-2">
                 {item.label}
               </label>
               <input
@@ -196,9 +202,10 @@ export default function SecuritySettings({ security, setSecurity }) {
                 onChange={handleChange}
                 min={item.min}
                 max={item.max}
-                className="p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-orange-500 outline-none transition"
+                // Input styling updated
+                className="p-3 border border-base-300 bg-base-100 text-base-content rounded-xl focus:ring-2 focus:ring-primary focus:border-primary outline-none transition"
               />
-              <p className="text-xs text-gray-500 mt-1">{item.desc}</p>
+              <p className="text-xs text-base-content/70 mt-1">{item.desc}</p>
             </div>
           ))}
         </div>

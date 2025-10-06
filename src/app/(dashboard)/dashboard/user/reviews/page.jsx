@@ -2,15 +2,15 @@
 import React, { useState } from 'react';
 import { Star, ThumbsUp, X, CheckCircle } from 'lucide-react';
 
-// Reusable Star Renderer Component for consistency
-const StarRating = ({ rating, size = 'w-5 h-5', color = 'text-yellow-500' }) => {
+// Reusable Star Renderer Component for consistency (unchanged)
+const StarRating = ({ rating, size = 'w-5 h-5', color = 'text-warning' }) => {
   return (
     <div className="flex items-center">
       {[1, 2, 3, 4, 5].map(star => (
         <Star
           key={star}
-          // Added fill-yellow-500 for a consistent look
-          className={`${size} ${star <= rating ? `${color} fill-yellow-500` : 'text-gray-300'} transition-colors duration-200`}
+          // Use text-warning for color and fill-warning for fill (DaisyUI equivalent of yellow)
+          className={`${size} ${star <= rating ? `${color} fill-warning` : 'text-base-300'} transition-colors duration-200`}
         />
       ))}
     </div>
@@ -18,7 +18,7 @@ const StarRating = ({ rating, size = 'w-5 h-5', color = 'text-yellow-500' }) => 
 };
 
 const ReviewsComponent = () => {
-  // Sample reviews data
+  // Sample reviews data (unchanged)
   const [reviews, setReviews] = useState([
     {
       id: 1,
@@ -76,7 +76,7 @@ const ReviewsComponent = () => {
     }
   ]);
 
-  // Sample data for review form
+  // Sample data for review form (unchanged)
   const mechanics = [
     { id: 101, name: "Arif Hossain", specialty: "Engine Repair" },
     { id: 102, name: "Sajid Alam", specialty: "Electrical Systems" },
@@ -95,7 +95,7 @@ const ReviewsComponent = () => {
     { id: 2, make: "Honda", model: "Civic", year: "2020", plate: "DHA-5678" }
   ];
 
-  // Review form state
+  // Review form state (unchanged)
   const [isWritingReview, setIsWritingReview] = useState(false);
   const [newReview, setNewReview] = useState({
     mechanicId: "",
@@ -108,18 +108,16 @@ const ReviewsComponent = () => {
   const [filter, setFilter] = useState("all");
   const [sortBy, setSortBy] = useState("newest");
 
-  // Handle input changes in review form
+  // Handlers (unchanged)
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setNewReview(prev => ({ ...prev, [name]: value }));
   };
 
-  // Handle rating selection
   const handleRatingSelect = (rating) => {
     setNewReview(prev => ({ ...prev, rating }));
   };
 
-  // Submit a new review
   const handleSubmitReview = async (e) => {
     e.preventDefault();
     if (newReview.rating === 0) return;
@@ -160,7 +158,6 @@ const ReviewsComponent = () => {
     setIsSubmitting(false);
   };
 
-  // Mark a review as helpful
   const handleHelpful = (id) => {
     setReviews(prev =>
       prev.map(review =>
@@ -171,7 +168,7 @@ const ReviewsComponent = () => {
     );
   };
 
-  // Filter and sort reviews
+  // Filter and sort reviews (unchanged)
   const filteredAndSortedReviews = reviews
     .filter(review => {
       if (filter === "all") return true;
@@ -192,60 +189,64 @@ const ReviewsComponent = () => {
       }
     });
 
-  // Calculate average rating
+  // Calculate average rating (unchanged)
   const totalReviews = reviews.length;
   const averageRating = totalReviews > 0
     ? (reviews.reduce((sum, review) => sum + review.rating, 0) / totalReviews).toFixed(1)
     : 0;
 
-  // Count ratings
+  // Count ratings (unchanged)
   const ratingCounts = { 5: 0, 4: 0, 3: 0, 2: 0, 1: 0 };
   reviews.forEach(review => {
     ratingCounts[review.rating]++;
   });
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6 md:p-10">
-      <div className="container mx-auto"> {/* Applied container and centered */}
+    // Updated background to base-200 for page
+    <div className="min-h-screen bg-base-200 p-4 sm:p-6 md:p-10 text-base-content"> {/* Adjusted padding for small screens */}
+      <div className="container mx-auto">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-extrabold text-gray-900">My Service Reviews</h1>
-          <p className="text-gray-500">View and manage your service reviews for all completed bookings.</p>
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-base-content">My Service Reviews</h1> {/* Adjusted text size */}
+          <p className="text-neutral-content text-sm sm:text-base">View and manage your service reviews for all completed bookings.</p>
         </div>
 
         {/* Stats and Action Card */}
-        <div className="bg-white rounded-3xl shadow-xl p-8 mb-8 border border-gray-100">
+        <div className="bg-base-100 rounded-3xl shadow-xl p-6 sm:p-8 mb-8 border border-neutral"> {/* Adjusted padding */}
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center">
 
             {/* Rating Breakdown */}
-            <div className="flex items-center mb-6 md:mb-0">
-              <div className="mr-8 flex flex-col items-center">
-                <div className="text-6xl font-extrabold text-orange-600">{averageRating}</div>
-                <div className="mt-2"><StarRating rating={Number(averageRating)} size="w-6 h-6" /></div>
-                <div className="text-sm text-gray-500 mt-2 font-medium">{totalReviews} total reviews</div>
+            {/* On small screens, the breakdown will stack vertically with the button below it */}
+            <div className="flex flex-col sm:flex-row items-start sm:items-center mb-6 md:mb-0 w-full md:w-auto">
+              {/* Average Rating Block */}
+              <div className="mr-0 sm:mr-8 mb-4 sm:mb-0 flex flex-col items-center flex-shrink-0">
+                <div className="text-5xl sm:text-6xl font-extrabold text-primary">{averageRating}</div> {/* Adjusted text size */}
+                <div className="mt-2"><StarRating rating={Number(averageRating)} size="w-6 h-6" color="text-warning" /></div>
+                <div className="text-sm text-neutral-content mt-2 font-medium">{totalReviews} total reviews</div>
               </div>
 
-              <div className="space-y-1 w-full max-w-xs">
+              {/* Individual Star Count Bars */}
+              <div className="space-y-1 w-full max-w-sm sm:max-w-xs"> {/* Ensuring max width on small screen doesn't get too large */}
                 {[5, 4, 3, 2, 1].map(rating => (
                   <div key={rating} className="flex items-center">
-                    <div className="text-sm font-medium text-gray-700">{rating} star</div>
-                    <div className="w-32 h-2 bg-gray-200 rounded-full mx-3">
+                    <div className="text-sm font-medium text-base-content w-10 flex-shrink-0">{rating} star</div> {/* Fixed width for 'star' text */}
+                    <div className="w-full h-2 bg-base-300 rounded-full mx-3"> {/* w-full ensures it takes available space */}
                       <div
-                        className="h-2 bg-orange-500 rounded-full transition-all duration-500"
+                        className="h-2 bg-warning rounded-full transition-all duration-500"
                         style={{ width: `${(ratingCounts[rating] / totalReviews) * 100 || 0}%` }}
                         aria-label={`${ratingCounts[rating]} reviews for ${rating} stars`}
                       ></div>
                     </div>
-                    <div className="w-8 text-sm text-gray-600 font-medium">{ratingCounts[rating]}</div>
+                    <div className="w-8 text-sm text-neutral-content font-medium flex-shrink-0">{ratingCounts[rating]}</div> {/* Fixed width for count */}
                   </div>
                 ))}
               </div>
             </div>
 
-            {/* Write Review Button */}
+            {/* Write Review Button - takes full width on small screen, and auto on md+ */}
             <button
               onClick={() => setIsWritingReview(true)}
-              className="px-6 py-3 bg-orange-600 text-white font-semibold rounded-xl hover:bg-orange-700 transition duration-200 shadow-md hover:shadow-lg"
+              className="w-full md:w-auto px-6 py-3 bg-primary text-primary-content font-semibold rounded-xl hover:bg-primary/90 transition duration-200 shadow-md hover:shadow-lg"
             >
               Write a Review
             </button>
@@ -253,33 +254,40 @@ const ReviewsComponent = () => {
         </div>
 
         {/* Filters and Sort */}
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 p-4 bg-white rounded-2xl shadow-sm border border-gray-100">
-          <div className="flex flex-wrap gap-2 mb-4 sm:mb-0">
+        <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-6 p-4 bg-base-100 rounded-2xl shadow-sm border border-neutral">
+          {/* Filter Buttons: Use flex-wrap and gap for good flow on small screens. Use a grid on larger mobile screens for better density. */}
+          <div className="flex flex-wrap gap-2 mb-4 lg:mb-0 w-full sm:w-auto">
+            {/* All Reviews Button */}
             <button
               onClick={() => setFilter("all")}
-              className={`px-4 py-2 rounded-xl text-sm font-medium transition-colors ${filter === "all" ? "bg-orange-600 text-white shadow-md" : "bg-gray-100 text-gray-700 hover:bg-gray-200"}`}
+              className={`px-3 py-2 sm:px-4 sm:py-2 rounded-xl text-xs sm:text-sm font-medium transition-colors ${filter === "all" ? "bg-primary text-primary-content shadow-md" : "bg-base-300 text-base-content hover:bg-base-300/80"}`}
             >
               All Reviews
             </button>
+            {/* Star Filter Buttons */}
             {[5, 4, 3, 2, 1].map(rating => (
               <button
                 key={rating}
                 onClick={() => setFilter(rating.toString())}
-                className={`px-4 py-2 rounded-xl text-sm font-medium flex items-center transition-colors ${filter === rating.toString() ? "bg-orange-100 text-orange-700 ring-2 ring-orange-400/50" : "bg-gray-100 text-gray-700 hover:bg-gray-200"}`}
+                className={`px-3 py-2 sm:px-4 sm:py-2 rounded-xl text-xs sm:text-sm font-medium flex items-center transition-colors 
+                ${filter === rating.toString()
+                    ? "bg-primary/20 text-primary ring-2 ring-primary/50"
+                    : "bg-base-300 text-base-content hover:bg-base-300/80"
+                  }`}
               >
                 <span className="mr-1">{rating}</span>
-                <Star className="w-4 h-4 text-yellow-500 fill-current" />
+                <Star className="w-3 h-3 sm:w-4 sm:h-4 text-warning fill-warning" /> {/* Adjusted star size */}
               </button>
             ))}
           </div>
 
-          <div className="flex items-center">
-            <label htmlFor="sort-by" className="text-sm text-gray-600 mr-2 font-medium">Sort by:</label>
+          <div className="flex items-center w-full lg:w-auto"> {/* Ensure sort takes full width if needed */}
+            <label htmlFor="sort-by" className="text-sm text-neutral-content mr-2 font-medium flex-shrink-0">Sort by:</label>
             <select
               id="sort-by"
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value)}
-              className="text-sm border border-gray-300 rounded-xl px-4 py-2 focus:ring-orange-500 focus:border-orange-500 transition-colors cursor-pointer"
+              className="w-full lg:w-auto text-sm border border-neutral rounded-xl px-4 py-2 focus:ring-primary focus:border-primary transition-colors cursor-pointer bg-base-100 text-base-content"
             >
               <option value="newest">Newest</option>
               <option value="oldest">Oldest</option>
@@ -293,45 +301,46 @@ const ReviewsComponent = () => {
         <div className="space-y-6">
           {filteredAndSortedReviews.length > 0 ? (
             filteredAndSortedReviews.map(review => (
-              <div key={review.id} className="bg-white rounded-3xl shadow-lg p-6 border border-gray-100 transition-all duration-300 hover:shadow-xl">
-                <div className="flex flex-col md:flex-row">
+              <div key={review.id} className="bg-base-100 rounded-3xl shadow-lg p-6 border border-neutral transition-all duration-300 hover:shadow-xl">
+                <div className="flex flex-col sm:flex-row"> {/* Changed md to sm for better stacking on small phones */}
 
                   {/* Mechanic Info (Left Column) */}
-                  <div className="flex-shrink-0 mb-4 md:mb-0 md:mr-6 md:w-56">
+                  {/* On small screens, this is full-width (flex-shrink-0 mb-4) */}
+                  <div className="flex-shrink-0 mb-4 sm:mb-0 sm:mr-6 sm:w-44 md:w-56"> {/* Reduced width for medium screens for better content fit */}
                     <div className="flex items-center">
                       <img
                         src={review.mechanic.avatar}
                         alt={review.mechanic.name}
-                        className="w-12 h-12 rounded-full object-cover ring-2 ring-orange-200"
+                        className="w-10 h-10 sm:w-12 sm:h-12 rounded-full object-cover ring-2 ring-primary/50"
                       />
                       <div className="ml-3">
-                        <h3 className="font-semibold text-gray-900">{review.mechanic.name}</h3>
-                        <p className="text-sm text-gray-500">{review.mechanic.specialty}</p>
+                        <h3 className="font-semibold text-base-content text-sm sm:text-base">{review.mechanic.name}</h3>
+                        <p className="text-xs sm:text-sm text-neutral-content">{review.mechanic.specialty}</p>
                       </div>
                     </div>
                   </div>
 
                   {/* Review Content (Right Column) */}
-                  <div className="flex-1">
-                    <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start border-b border-gray-100 pb-3">
-                      <div>
+                  <div className="flex-1 min-w-0"> {/* min-w-0 is crucial for flex items to shrink in tight spaces */}
+                    <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start border-b border-neutral pb-3">
+                      <div className="mb-3 sm:mb-0">
                         <div className="flex items-center">
-                          <StarRating rating={review.rating} />
-                          <span className="ml-3 text-sm text-gray-500">{review.date}</span>
+                          <StarRating rating={review.rating} size="w-4 h-4 sm:w-5 sm:h-5" /> {/* Adjusted star size */}
+                          <span className="ml-3 text-xs sm:text-sm text-neutral-content">{review.date}</span>
                         </div>
-                        <h4 className="font-bold text-gray-800 mt-2 text-lg">{review.service}</h4>
-                        <p className="text-sm text-gray-500">{review.vehicle}</p>
+                        <h4 className="font-bold text-base-content mt-2 text-base sm:text-lg">{review.service}</h4> {/* Adjusted text size */}
+                        <p className="text-xs sm:text-sm text-neutral-content">{review.vehicle}</p>
                       </div>
 
-                      <div className="flex items-center mt-3 sm:mt-0">
+                      <div className="flex flex-col items-start sm:items-end mt-2 sm:mt-0"> {/* Stack badge/button vertically on small screen */}
                         {review.verified && (
-                          <span className="inline-flex items-center px-3 py-1 bg-green-100 text-green-800 text-xs font-medium rounded-full mr-3 shadow-inner">
-                            <CheckCircle className="w-3 h-3 mr-1" /> Verified Booking
+                          <span className="inline-flex items-center px-2 py-0.5 sm:px-3 sm:py-1 bg-success/20 text-success text-xs font-medium rounded-full mb-2 sm:mb-0 sm:mr-3 shadow-inner">
+                            <CheckCircle className="w-3 h-3 mr-1" /> Verified
                           </span>
                         )}
                         <button
                           onClick={() => handleHelpful(review.id)}
-                          className="text-sm text-gray-600 hover:text-orange-600 flex items-center transition-colors"
+                          className="text-neutral-content hover:text-primary flex items-center transition-colors text-sm mt-1 sm:mt-0"
                           aria-label={`Mark review as helpful. Currently ${review.helpful} helpful votes.`}
                         >
                           <ThumbsUp className="w-4 h-4 mr-1" />
@@ -340,28 +349,29 @@ const ReviewsComponent = () => {
                       </div>
                     </div>
 
-                    <p className="mt-4 text-gray-700 italic border-l-2 border-orange-300 pl-3 py-1">{review.comment}</p>
+                    <p className="mt-4 text-base-content italic border-l-2 border-primary/50 pl-3 py-1 text-sm">{review.comment}</p> {/* Adjusted text size */}
 
-                    <div className="flex items-center mt-4 pt-3 border-t border-gray-100">
+                    <div className="flex items-center mt-4 pt-3 border-t border-neutral">
                       <img
                         src={review.userAvatar}
                         alt={review.user}
-                        className="w-7 h-7 rounded-full object-cover ring-1 ring-gray-200"
+                        className="w-6 h-6 sm:w-7 sm:h-7 rounded-full object-cover ring-1 ring-neutral"
                       />
-                      <span className="ml-2 text-sm font-medium text-gray-700">{review.user}</span>
+                      <span className="ml-2 text-xs sm:text-sm font-medium text-base-content">{review.user}</span>
                     </div>
                   </div>
                 </div>
               </div>
             ))
           ) : (
-            <div className="bg-white rounded-3xl shadow-lg p-10 text-center border border-gray-100">
-              <Star className="w-8 h-8 text-orange-400 mx-auto mb-4" />
-              <h3 className="font-medium text-xl mb-2 text-gray-800">No Reviews to Show</h3>
-              <p className="text-gray-500 mb-6">Looks like you haven't written any reviews matching this filter yet.</p>
+            // No Reviews Card
+            <div className="bg-base-100 rounded-3xl shadow-lg p-6 sm:p-10 text-center border border-neutral">
+              <Star className="w-8 h-8 text-warning mx-auto mb-4" />
+              <h3 className="font-medium text-xl mb-2 text-base-content">No Reviews to Show</h3>
+              <p className="text-neutral-content mb-6">Looks like you haven't written any reviews matching this filter yet.</p>
               <button
                 onClick={() => setIsWritingReview(true)}
-                className="px-6 py-3 bg-orange-600 text-white font-semibold rounded-xl hover:bg-orange-700 transition shadow-md"
+                className="px-6 py-3 bg-primary text-primary-content font-semibold rounded-xl hover:bg-primary/90 transition shadow-md"
               >
                 Write Your First Review
               </button>
@@ -372,13 +382,13 @@ const ReviewsComponent = () => {
         {/* Write Review Modal */}
         {isWritingReview && (
           <div className="fixed inset-0 bg-black bg-opacity-60 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-            <div className="bg-white rounded-3xl shadow-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto transform transition-all duration-300">
-              <div className="p-8">
-                <div className="flex justify-between items-center pb-4 mb-6 border-b border-gray-200">
-                  <h2 className="text-2xl font-bold text-gray-800">Share Your Experience</h2>
+            <div className="bg-base-100 rounded-3xl shadow-2xl max-w-lg w-full max-h-[95vh] sm:max-h-[90vh] overflow-y-auto transform transition-all duration-300"> {/* Increased max-h on small screens */}
+              <div className="p-5 sm:p-8"> {/* Adjusted padding */}
+                <div className="flex justify-between items-center pb-4 mb-6 border-b border-neutral">
+                  <h2 className="text-xl sm:text-2xl font-bold text-base-content">Share Your Experience</h2> {/* Adjusted text size */}
                   <button
                     onClick={() => setIsWritingReview(false)}
-                    className="text-gray-500 hover:text-gray-700 transition-colors p-1 rounded-full hover:bg-gray-100"
+                    className="text-neutral-content hover:text-base-content transition-colors p-1 rounded-full hover:bg-base-200"
                     aria-label="Close review form"
                   >
                     <X className="w-6 h-6" />
@@ -388,16 +398,16 @@ const ReviewsComponent = () => {
                 <form onSubmit={handleSubmitReview}>
                   <div className="space-y-5">
 
-                    {/* Mechanic Selection */}
+                    {/* Mechanic Selection (unchanged, good) */}
                     <div>
-                      <label htmlFor="mechanicId" className="block text-sm font-medium text-gray-700 mb-1">Mechanic</label>
+                      <label htmlFor="mechanicId" className="block text-sm font-medium text-base-content mb-1">Mechanic</label>
                       <select
                         id="mechanicId"
                         name="mechanicId"
                         value={newReview.mechanicId}
                         onChange={handleInputChange}
                         required
-                        className="w-full p-3 border border-gray-300 rounded-xl focus:ring-orange-500 focus:border-orange-500 transition-colors"
+                        className="w-full p-3 border border-neutral rounded-xl focus:ring-primary focus:border-primary transition-colors bg-base-100 text-base-content"
                       >
                         <option value="">Select a mechanic</option>
                         {mechanics.map(mechanic => (
@@ -408,17 +418,17 @@ const ReviewsComponent = () => {
                       </select>
                     </div>
 
-                    {/* Service & Vehicle Selection */}
-                    <div className="flex space-x-4">
+                    {/* Service & Vehicle Selection - Stack vertically on extra small screens */}
+                    <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
                       <div className="flex-1">
-                        <label htmlFor="service" className="block text-sm font-medium text-gray-700 mb-1">Service</label>
+                        <label htmlFor="service" className="block text-sm font-medium text-base-content mb-1">Service</label>
                         <select
                           id="service"
                           name="service"
                           value={newReview.service}
                           onChange={handleInputChange}
                           required
-                          className="w-full p-3 border border-gray-300 rounded-xl focus:ring-orange-500 focus:border-orange-500 transition-colors"
+                          className="w-full p-3 border border-neutral rounded-xl focus:ring-primary focus:border-primary transition-colors bg-base-100 text-base-content"
                         >
                           <option value="">Select service</option>
                           {services.map(service => (
@@ -427,14 +437,14 @@ const ReviewsComponent = () => {
                         </select>
                       </div>
                       <div className="flex-1">
-                        <label htmlFor="vehicleId" className="block text-sm font-medium text-gray-700 mb-1">Vehicle</label>
+                        <label htmlFor="vehicleId" className="block text-sm font-medium text-base-content mb-1">Vehicle</label>
                         <select
                           id="vehicleId"
                           name="vehicleId"
                           value={newReview.vehicleId}
                           onChange={handleInputChange}
                           required
-                          className="w-full p-3 border border-gray-300 rounded-xl focus:ring-orange-500 focus:border-orange-500 transition-colors"
+                          className="w-full p-3 border border-neutral rounded-xl focus:ring-primary focus:border-primary transition-colors bg-base-100 text-base-content"
                         >
                           <option value="">Select vehicle</option>
                           {vehicles.map(vehicle => (
@@ -448,7 +458,8 @@ const ReviewsComponent = () => {
 
                     {/* Rating */}
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">Your Rating</label>
+                      <label className="block text-sm font-medium text-base-content mb-2">Your Rating</label>
+                      {/* Ensure buttons don't wrap oddly */}
                       <div className="flex space-x-2">
                         {[1, 2, 3, 4, 5].map(star => (
                           <button
@@ -459,16 +470,16 @@ const ReviewsComponent = () => {
                             aria-label={`${star} stars`}
                           >
                             <Star
-                              className={`w-9 h-9 ${star <= newReview.rating ? 'text-yellow-500 fill-yellow-500' : 'text-gray-300 fill-current'}`}
-                            />
+                              className={`w-8 h-8 sm:w-9 sm:h-9 ${star <= newReview.rating ? 'text-warning fill-warning' : 'text-base-300 fill-current'}`}
+                            /> {/* Adjusted star size */}
                           </button>
                         ))}
                       </div>
                     </div>
 
-                    {/* Comment */}
+                    {/* Comment (unchanged, good) */}
                     <div>
-                      <label htmlFor="comment" className="block text-sm font-medium text-gray-700 mb-1">Your Review</label>
+                      <label htmlFor="comment" className="block text-sm font-medium text-base-content mb-1">Your Review</label>
                       <textarea
                         id="comment"
                         name="comment"
@@ -477,7 +488,7 @@ const ReviewsComponent = () => {
                         required
                         rows="4"
                         placeholder="Share your experience with this mechanic..."
-                        className="w-full p-3 border border-gray-300 rounded-xl focus:ring-orange-500 focus:border-orange-500 transition-colors"
+                        className="w-full p-3 border border-neutral rounded-xl focus:ring-primary focus:border-primary transition-colors bg-base-100 text-base-content"
                       ></textarea>
                     </div>
                   </div>
@@ -486,14 +497,14 @@ const ReviewsComponent = () => {
                     <button
                       type="button"
                       onClick={() => setIsWritingReview(false)}
-                      className="px-6 py-3 border border-gray-300 rounded-xl text-gray-700 hover:bg-gray-100 transition-colors shadow-sm"
+                      className="px-4 py-3 sm:px-6 sm:py-3 border border-neutral rounded-xl text-base-content hover:bg-base-200 transition-colors shadow-sm text-sm sm:text-base"
                     >
                       Cancel
                     </button>
                     <button
                       type="submit"
                       disabled={isSubmitting || newReview.rating === 0}
-                      className="px-6 py-3 bg-orange-600 text-white font-semibold rounded-xl hover:bg-orange-700 transition-colors shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="px-4 py-3 sm:px-6 sm:py-3 bg-primary text-primary-content font-semibold rounded-xl hover:bg-primary/90 transition-colors shadow-lg disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base"
                     >
                       {isSubmitting ? 'Submitting...' : 'Submit Review'}
                     </button>
