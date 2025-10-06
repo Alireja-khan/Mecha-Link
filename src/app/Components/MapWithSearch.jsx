@@ -8,6 +8,7 @@ import { useState, useEffect } from "react";
 import markerIcon2x from "leaflet/dist/images/marker-icon-2x.png";
 import markerIcon from "leaflet/dist/images/marker-icon.png";
 import markerShadow from "leaflet/dist/images/marker-shadow.png";
+import Link from "next/link";
 
 delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({
@@ -110,8 +111,11 @@ export default function MapWithSearch() {
               />
               {mechanicShops && mechanicShops?.map((shop) => (
                 <Marker key={shop._id} position={[shop.latitude, shop.longitude]}>
-                  <Popup>
-                    <strong>{shop.shopName}</strong>
+                  <Popup className=" w-50">
+                    <Link href={`/services/${shop._id}`}>
+                      <img className="min-w-full w-50 h-40 object-cover" src={shop.logo} alt="Shop logo" />
+                      <h4 className="text-sm font-semibold mt-3">{shop.shopName}</h4>
+                    </Link>
                   </Popup>
                 </Marker>
               ))}
