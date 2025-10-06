@@ -595,10 +595,10 @@ export default function ServiceDetailsPage() {
                   {certifications.map((cert, index) => (
                     <div
                       key={index}
-                      className="flex items-start gap-3 p-3 bg-gradient-to-r from-orange-50 to-orange-100/50 rounded-lg border border-orange-200/50 hover:border-orange-300 transition-all duration-200"
+                      className="flex items-start gap-3 p-3 rounded-lg border border-primary bg-orange-100"
                     >
                       <Check className="w-4 h-4 text-green-500 flex-shrink-0 mt-0.5" />
-                      <span className="text-sm font-medium text-gray-700">
+                      <span className="text-sm font-medium text-orange-950">
                         {cert}
                       </span>
                     </div>

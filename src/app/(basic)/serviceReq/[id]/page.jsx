@@ -85,7 +85,7 @@ const ServiceRequestDetails = () => {
            <div className="min-h-screen bg-gray-50 flex items-center justify-center">
                <div className="text-center">
                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500 mx-auto"></div>
-                   <p className="mt-4 text-gray-600">Loading service request...</p>
+                   <p className="mt-4 text-gray-400">Loading service request...</p>
                </div>
            </div>
        );
@@ -279,19 +279,19 @@ const ServiceRequestDetails = () => {
 
 
    return (
-       <div className="min-h-screen bg-gray-50 py-10 sm:py-12">
+       <div className="min-h-screen py-10 sm:py-12">
            <div className="container mx-auto px-4 md:px-6 lg:px-8">
-               <div className="bg-white rounded-xl shadow-lg border border-gray-100 p-6 sm:p-8 mb-6">
+               <div className="rounded-xl shadow-lg border border-primary p-6 sm:p-8 mb-6">
                    <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
                        <div>
                            <div className="flex items-center gap-3 mb-2">
-                               <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Service Request</h1>
+                               <h1 className="text-2xl sm:text-3xl font-bold">Service Request</h1>
                                <span className={`px-3 py-1 rounded-full text-sm font-medium border ${statusInfo.color} whitespace-nowrap`}>
                                    <StatusIcon className="inline w-4 h-4 mr-1" />
                                    {statusInfo.label}
                                </span>
                            </div>
-                           <p className="text-sm text-gray-600">
+                           <p className="text-sm text-gray-400">
                                Created on {new Date(request.requestedDate).toLocaleDateString()} at{' '}
                                {new Date(request.requestedDate).toLocaleTimeString()}
                            </p>
@@ -313,13 +313,13 @@ const ServiceRequestDetails = () => {
                            {showMessagingButton ? (
                                <button
                                    onClick={handleMessageContact}
-                                   className="flex items-center justify-center gap-2 px-4 py-2 border border-orange-500 text-orange-600 bg-white rounded-lg hover:bg-orange-50 transition-colors font-medium text-sm"
+                                   className="flex items-center justify-center gap-2 px-4 py-2 border border-orange-500 text-orange-600 rounded-lg hover:bg-orange-50 transition-colors font-medium text-sm"
                                >
                                    <MessageCircle className="w-4 h-4" />
                                    Message Customer
                                </button>
                            ) : nonMechanicMessage ? (
-                               <div className="p-2 border border-gray-200 bg-gray-50 rounded-lg text-sm text-gray-600 font-medium">
+                               <div className="py-2 px-3 border border-primary bg-orange-100 rounded-lg text-sm text-orange-950 font-medium">
                                    {nonMechanicMessage}
                                </div>
                            ) : null}
@@ -357,8 +357,8 @@ const ServiceRequestDetails = () => {
                            <div className="space-y-4">
                                <DetailItem label="Problem Title" value={request.serviceDetails?.problemTitle} largeValue />
                                <div>
-                                   <label className="block text-sm font-medium text-gray-700 mb-2">Description</label>
-                                   <p className="text-gray-800 bg-gray-50 p-4 rounded-lg border border-gray-200 shadow-inner text-sm leading-relaxed">
+                                   <label className="block text-sm font-medium text-gray-400 mb-2">Description</label>
+                                   <p className="text-orange-950 bg-orange-100 p-4 rounded-lg border border-primary shadow-inner text-sm leading-relaxed">
                                        {request.serviceDetails?.description || "No detailed description provided by the customer."}
                                    </p>
                                </div>
@@ -366,7 +366,7 @@ const ServiceRequestDetails = () => {
 
                                {request.serviceDetails?.images?.length > 0 && (
                                    <div>
-                                       <label className="block text-sm font-medium text-gray-700 mb-3">Problem Images ({request.serviceDetails.images.length})</label>
+                                       <label className="block text-sm font-medium text-gray-400 mb-3">Problem Images ({request.serviceDetails.images.length})</label>
                                        <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-2">
                                            {request.serviceDetails.images.map((img, index) => (
                                                <div key={index} className="relative aspect-square cursor-pointer overflow-hidden rounded-lg group shadow-sm hover:shadow-md transition-shadow">
@@ -376,7 +376,7 @@ const ServiceRequestDetails = () => {
                                                        className="w-full h-full object-cover border border-gray-200 group-hover:scale-105 transition-transform duration-300"
                                                        onError={(e) => {
                                                            e.target.style.display = 'none';
-                                                           e.target.parentNode.innerHTML = '<div class="w-full h-full flex items-center justify-center bg-gray-200 text-gray-500"><ImageIcon size={18} /></div>';
+                                                           e.target.parentNode.innerHTML = '<div class="w-full h-full flex items-center justify-center bg-gray-200 text-gray-400"><ImageIcon size={18} /></div>';
                                                        }}
                                                        onClick={() => setSelectedImage(img)}
                                                    />
@@ -452,7 +452,7 @@ const ServiceRequestDetails = () => {
                                        />
                                    ) : (
                                        <div className="w-20 h-20 flex items-center justify-center rounded-full border-4 border-orange-100 shadow-md">
-                                           <User className="w-10 h-10 text-gray-300" />
+                                           <User className="w-10 h-10 text-gray-400" />
                                        </div>
                                    )}
                                </div>
@@ -463,7 +463,7 @@ const ServiceRequestDetails = () => {
 
 
                                <div className="pt-4 border-t border-gray-100 space-y-3">
-                                   <h3 className="text-sm font-semibold text-gray-700">Request Contact</h3>
+                                   <h3 className="text-sm font-semibold text-gray-400">Request Contact</h3>
                                    <DetailItem label="Service Phone" value={request.contactInfo?.phoneNumber} icon={Phone} />
                                    <DetailItem
                                        label="Alternate Phone"
@@ -530,11 +530,11 @@ const ServiceRequestDetails = () => {
                        )}
                        {request.status !== 'pending' && (
                            <div className="bg-white rounded-xl shadow-lg border border-gray-100 p-6">
-                               <h2 className="text-xl font-semibold mb-4 text-gray-700">Request Status</h2>
+                               <h2 className="text-xl font-semibold mb-4 text-gray-400">Request Status</h2>
                                <div className="space-y-2">
-                                   <p className="text-sm text-gray-600">Current Status: <span className="font-medium text-gray-900">{statusInfo.label}</span></p>
+                                   <p className="text-sm text-gray-400">Current Status: <span className="font-medium">{statusInfo.label}</span></p>
                                    {request.acceptedDate && (
-                                       <p className="text-sm text-gray-600">
+                                       <p className="text-sm text-gray-400">
                                            Accepted on: {new Date(request.acceptedDate).toLocaleDateString()}
                                        </p>
                                    )}
@@ -578,10 +578,10 @@ const ServiceRequestDetails = () => {
 
 
 const InfoCard = ({ title, icon: Icon, children }) => (
-   <div className="bg-white rounded-xl shadow-lg border border-gray-100 p-6">
-       <div className="flex items-center gap-3 mb-5 border-b border-gray-100 pb-3">
+   <div className="rounded-xl shadow-lg border border-primary p-6">
+       <div className="flex items-center gap-3 mb-5 border-b border-primary pb-3">
            <Icon className="w-6 h-6 text-orange-500" />
-           <h2 className="text-xl font-semibold text-gray-900">{title}</h2>
+           <h2 className="text-xl font-semibold">{title}</h2>
        </div>
        {children}
    </div>
@@ -590,10 +590,10 @@ const InfoCard = ({ title, icon: Icon, children }) => (
 
 const DetailItem = ({ label, value, icon: Icon, capitalize = false, largeValue = false }) => (
    <div>
-       <label className="block text-xs font-medium text-gray-500 uppercase tracking-wider mb-0.5">{label}</label>
+       <label className="block text-xs font-medium text-gray-400 uppercase tracking-wider mb-0.5">{label}</label>
        <div className="flex items-start gap-2">
            {Icon && <Icon className="w-4 h-4 text-orange-500 mt-0.5 flex-shrink-0" />}
-           <span className={`text-gray-900 ${capitalize ? 'capitalize' : ''} ${largeValue ? 'break-words text-base font-medium' : 'text-sm'} leading-tight`}>
+           <span className={`${capitalize ? 'capitalize' : ''} ${largeValue ? 'break-words text-base font-medium' : 'text-sm'} leading-tight`}>
                {value || <span className="text-gray-400 italic">Not provided</span>}
            </span>
        </div>
@@ -603,7 +603,7 @@ const DetailItem = ({ label, value, icon: Icon, capitalize = false, largeValue =
 
 const TimelineItem = ({ date, title, description, active = false, pending = false }) => {
    const color = active ? 'bg-orange-500' : pending ? 'bg-gray-300' : 'bg-green-500';
-   const textColor = active ? 'text-gray-900 font-semibold' : 'text-gray-700';
+   const textColor = active ? 'font-semibold' : 'text-gray-400';
 
 
    return (
@@ -614,7 +614,7 @@ const TimelineItem = ({ date, title, description, active = false, pending = fals
            </div>
            <div className="flex-1 pb-3">
                <p className={`text-sm ${textColor}`}>{title}</p>
-               <p className="text-xs text-gray-600 mt-0.5">{description}</p>
+               <p className="text-xs text-gray-400 mt-0.5">{description}</p>
                {date && (
                    <p className="text-xs text-gray-400 mt-1">
                        {new Date(date).toLocaleDateString()} · {new Date(date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
@@ -627,4 +627,3 @@ const TimelineItem = ({ date, title, description, active = false, pending = fals
 
 
 export default ServiceRequestDetails;
-
