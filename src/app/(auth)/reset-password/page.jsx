@@ -1,13 +1,14 @@
 "use client";
+
 import { useRouter, useSearchParams } from "next/navigation";
-import React, { useState } from "react";
+import React, { useState, Suspense } from "react";
 import Swal from "sweetalert2";
 import Link from "next/link";
 import Lottie from "lottie-react";
 import resetIllustration from "../../../../public/assets/login/login.json";
 import { Eye, EyeOff } from "lucide-react";
 
-export default function ResetPasswordPage() {
+function ResetPasswordContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const token = searchParams.get("token");
@@ -20,7 +21,6 @@ export default function ResetPasswordPage() {
     e.preventDefault();
     const password = e.target.password.value;
 
-    // ✅ Password validation with regex
     const passwordRegex =
       /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
 
@@ -31,7 +31,7 @@ export default function ResetPasswordPage() {
       return;
     }
 
-    setError(""); // clear error if password is valid
+    setError("");
 
     try {
       setLoading(true);
@@ -100,7 +100,6 @@ export default function ResetPasswordPage() {
               </button>
             </div>
 
-            {/* ❌ Error Message */}
             {error && <p className="text-red-500 text-sm mb-3">{error}</p>}
 
             <button
@@ -121,5 +120,13 @@ export default function ResetPasswordPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function ResetPasswordPage() {
+  return (
+    <Suspense fallback={<div>Loading reset password...</div>}>
+      <ResetPasswordContent />
+    </Suspense>
   );
 }

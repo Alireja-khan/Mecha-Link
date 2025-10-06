@@ -9,7 +9,9 @@ export default function DashboardLayout({ children }) {
   const [isMobileOpen, setIsMobileOpen] = useState(false);
 
   if (loading || !loggedInUser) {
-    return <div className="flex items-center justify-center h-screen w-screen">Loading...</div>;
+    return <div className="flex items-center justify-center h-screen w-full">
+                <span className="loading loading-bars loading-xl text-orange-500"></span>
+            </div>;
   }
 
   return (

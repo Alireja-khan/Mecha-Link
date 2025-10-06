@@ -8,21 +8,21 @@ import useUser from '@/hooks/useUser';
 import { useSession } from 'next-auth/react';
 
 const locationData = {
-    Dhaka: {
-        Dhaka: ["Dhamrai", "Dohar", "Keraniganj", "Savar", "Uttara", "Gulshan", "Mirpur"],
-        Faridpur: ["Faridpur Sadar", "Bhanga", "Boalmari", "Alfadanga", "Nagarkanda", "Saltha"],
-        Gazipur: ["Gazipur Sadar", "Kaliakoir", "Kapasia", "Sreepur"],
-        Gopalganj: ["Gopalganj Sadar", "Kashiani", "Muksudpur", "Tungipara"],
-        Kishoreganj: ["Kishoreganj Sadar", "Bhairab", "Karimganj", "Katiadi", "Mithamoin", "Nikli"],
-        Madaripur: ["Madaripur Sadar", "Shibchar", "Rajoir", "Kalkini"],
-        Manikganj: ["Manikganj Sadar", "Singair", "Shibalaya", "Daulatpur"],
-        Munshiganj: ["Munshiganj Sadar", "Gajaria", "Louhajang", "Sreenagar"],
-        Narayanganj: ["Narayanganj Sadar", "Araihazar", "Sonargaon", "Bandar", "Rupganj"],
-        Narsingdi: ["Narsingdi Sadar", "Belabo", "Palash", "Raipura", "Shibpur"],
-        Tangail: ["Tangail Sadar", "Basail", "Bhuapur", "Delduar", "Ghatail", "Gopalpur", "Mirzapur", "Nagarpur", "Sakhipur"],
-        Rajbari: ["Rajbari Sadar", "Baliakandi", "Pangsha", "Kalukhali", "Goalanda"],
-        Shariatpur: ["Shariatpur Sadar", "Gosairhat", "Bhedarganj", "Naria", "Zanjira"]
-    },
+   Dhaka: {
+       Dhaka: ["Dhamrai", "Dohar", "Keraniganj", "Savar", "Uttara", "Gulshan", "Mirpur", "Fakirhat"],
+       Faridpur: ["Faridpur Sadar", "Bhanga", "Boalmari", "Alfadanga", "Nagarkanda", "Saltha"],
+       Gazipur: ["Gazipur Sadar", "Kaliakoir", "Kapasia", "Sreepur"],
+       Gopalganj: ["Gopalganj Sadar", "Kashiani", "Muksudpur", "Tungipara"],
+       Kishoreganj: ["Kishoreganj Sadar", "Bhairab", "Karimganj", "Katiadi", "Mithamoin", "Nikli"],
+       Madaripur: ["Madaripur Sadar", "Shibchar", "Rajoir", "Kalkini"],
+       Manikganj: ["Manikganj Sadar", "Singair", "Shibalaya", "Daulatpur"],
+       Munshiganj: ["Munshiganj Sadar", "Gajaria", "Louhajang", "Sreenagar"],
+       Narayanganj: ["Narayanganj Sadar", "Araihazar", "Sonargaon", "Bandar", "Rupganj"],
+       Narsingdi: ["Narsingdi Sadar", "Belabo", "Palash", "Raipura", "Shibpur"],
+       Tangail: ["Tangail Sadar", "Basail", "Bhuapur", "Delduar", "Ghatail", "Gopalpur", "Mirzapur", "Nagarpur", "Sakhipur"],
+       Rajbari: ["Rajbari Sadar", "Baliakandi", "Pangsha", "Kalukhali", "Goalanda"],
+       Shariatpur: ["Shariatpur Sadar", "Gosairhat", "Bhedarganj", "Naria", "Zanjira"]
+   },
 
     Chattogram: {
         Chattogram: ["Chattogram Sadar", "Pahartali", "Mirsharai", "Sitakunda", "Fatikchhari", "Hathazari", "Rangunia"],
@@ -38,18 +38,18 @@ const locationData = {
         Lakshmipur: ["Lakshmipur Sadar", "Ramganj", "Raipur", "Ramgati", "Kamalnagar"]
     },
 
-    Khulna: {
-        Khulna: ["Khulna Sadar", "Dacope", "Dumuria", "Batiaghata", "Koyra", "Phultala", "Rupsa", "Terokhada"],
-        Jessore: ["Jessore Sadar", "Bagherpara", "Jhikargacha", "Manirampur", "Sharsha", "Keshabpur"],
-        Satkhira: ["Satkhira Sadar", "Debhata", "Kaliganj", "Shyamnagar", "Tala", "Kalaroa"],
-        Bagerhat: ["Bagerhat Sadar", "Chitalmari", "Kachua", "Morrelganj", "Mongla", "Rampal", "Sarankhola"],
-        Meherpur: ["Meherpur Sadar", "Mujibnagar", "Gangni", "Shalikha"],
-        Chuadanga: ["Chuadanga Sadar", "Alamdanga", "Damurhuda", "Jibannagar"],
-        Narail: ["Narail Sadar", "Lohagara", "Kalia"],
-        Magura: ["Magura Sadar", "Mohammadpur", "Shalikha", "Sreepur"],
-        Jhenaidah: ["Jhenaidah Sadar", "Harinakunda", "Kaliganj", "Kotchandpur", "Maheshpur"],
-        Kushtia: ["Kushtia Sadar", "Bheramara", "Daulatpur", "Khoksa", "Mirpur", "Kumarkhali"]
-    },
+   Khulna: {
+       Khulna: ["Khulna Sadar", "Dacope", "Dumuria", "Batiaghata", "Koyra", "Phultala", "Rupsa", "Terokhada", "Sonadanga", "Kalishpur"],
+       Jessore: ["Jessore Sadar", "Bagherpara", "Jhikargacha", "Manirampur", "Sharsha", "Keshabpur"],
+       Satkhira: ["Satkhira Sadar", "Debhata", "Kaliganj", "Shyamnagar", "Tala", "Kalaroa"],
+       Bagerhat: ["Bagerhat Sadar", "Chitalmari", "Kachua", "Morrelganj", "Mongla", "Rampal", "Sarankhola"],
+       Meherpur: ["Meherpur Sadar", "Mujibnagar", "Gangni", "Shalikha"],
+       Chuadanga: ["Chuadanga Sadar", "Alamdanga", "Damurhuda", "Jibannagar"],
+       Narail: ["Narail Sadar", "Lohagara", "Kalia"],
+       Magura: ["Magura Sadar", "Mohammadpur", "Shalikha", "Sreepur"],
+       Jhenaidah: ["Jhenaidah Sadar", "Harinakunda", "Kaliganj", "Kotchandpur", "Maheshpur"],
+       Kushtia: ["Kushtia Sadar", "Bheramara", "Daulatpur", "Khoksa", "Mirpur", "Kumarkhali"]
+   },
 
     Rajshahi: {
         Rajshahi: ["Rajshahi Sadar", "Bagmara", "Godagari", "Paba", "Puthia", "Tanore", "Charghat"],
@@ -62,14 +62,14 @@ const locationData = {
         Sirajganj: ["Sirajganj Sadar", "Belkuchi", "Chauhali", "Kamarkhanda", "Shahjadpur", "Tarash", "Ullapara"]
     },
 
-    Barishal: {
-        Barishal: ["Barishal Sadar", "Agailjhara", "Babuganj", "Bakerganj", "Banaripara", "Gaurnadi", "Hizla", "Mehendiganj", "Muladi", "Wazirpur"],
-        Patuakhali: ["Patuakhali Sadar", "Bauphal", "Kalapara", "Dashmina", "Rangabali", "Dumki", "Mirzaganj"],
-        Bhola: ["Bhola Sadar", "Borhanuddin", "Charfassion", "Daulatkhan", "Lalmohan", "Tazumuddin", "Burhanuddin"],
-        Jhalokathi: ["Jhalokathi Sadar", "Kathalia", "Nalchity", "Rajapur"],
-        Pirojpur: ["Pirojpur Sadar", "Bhandaria", "Kawkhali", "Mathbaria", "Nazirpur", "Nesarabad"],
-        Barguna: ["Barguna Sadar", "Amtali", "Bamna", "Betagi", "Patharghata", "Taltoli"]
-    },
+   Barishal: {
+       Barishal: ["Barishal Sadar", "Agailjhara", "Babuganj", "Bakerganj", "Banaripara", "Gaurnadi", "Hizla", "Mehendiganj", "Muladi", "Wazirpur", "Rupatoli"],
+       Patuakhali: ["Patuakhali Sadar", "Bauphal", "Kalapara", "Dashmina", "Rangabali", "Dumki", "Mirzaganj"],
+       Bhola: ["Bhola Sadar", "Borhanuddin", "Charfassion", "Daulatkhan", "Lalmohan", "Tazumuddin", "Burhanuddin"],
+       Jhalokathi: ["Jhalokathi Sadar", "Kathalia", "Nalchity", "Rajapur"],
+       Pirojpur: ["Pirojpur Sadar", "Bhandaria", "Kawkhali", "Mathbaria", "Nazirpur", "Nesarabad"],
+       Barguna: ["Barguna Sadar", "Amtali", "Bamna", "Betagi", "Patharghata", "Taltoli"]
+   },
 
     Sylhet: {
         Sylhet: ["Sylhet Sadar", "Balaganj", "Bishwanath", "Fenchuganj", "Gowainghat", "Jaintiapur", "Kanaighat", "Osmani Nagar"],

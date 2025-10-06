@@ -11,20 +11,36 @@ const NotificationWidget = ({ loggedInUser }) => {
   const [notifications, setNotifications] = useState([]);
   const [showCanvas, setShowCanvas] = useState(false);
 
-  useEffect(() => {
-    if (!loggedInUser) return;
-    setNotifications(loggedInUser.notifications || []);
-  }, [loggedInUser]);
+  // Load notifications from loggedInUser object
+ useEffect(() => {
+  if (!loggedInUser) return;
+  const uniqueNotifs = Array.from(
+    new Map((loggedInUser.notifications || []).map(n => [n._id, n])).values()
+  );
+  setNotifications(uniqueNotifs);
+}, [loggedInUser]);
+
 
   const handleNewNotification = (notif) => {
     if (!loggedInUser) return;
-    if (
-      loggedInUser.role === "admin" ||
-      loggedInUser.role === "mechanic" ||
-      (loggedInUser.role === "user" && notif.userEmail === loggedInUser.email)
-    ) {
-      setNotifications((prev) => [notif, ...prev]);
-    }
+
+    // Only add if not already in state
+    setNotifications((prev) => {
+      const exists = prev.some((n) => n._id === notif._id);
+if (exists) return prev;
+
+      // Check if this notification is relevant for this user
+      if (
+        loggedInUser.role === "admin" ||
+        loggedInUser.role === "mechanic" ||
+        (loggedInUser.role === "user" &&
+          notif.userEmail === loggedInUser.email) ||
+        notif.userEmail === "all"
+      ) {
+        return [notif, ...prev];
+      }
+      return prev;
+    });
   };
 
   const handleMarkAsRead = async () => {
