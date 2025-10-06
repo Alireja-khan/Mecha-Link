@@ -9,9 +9,7 @@ dotenv.config();
 
 const app = express();
 const server = http.createServer(app);
-const io = new Server(server, {
-  cors: {origin: "*"},
-});
+const io = new Server(server, {cors: {origin: "*"}});
 const PORT = process.env.PORT || 5000;
 
 app.use(express.json());
@@ -19,216 +17,200 @@ app.use(express.json());
 async function start() {
   try {
     // -----------------------------
-    // MongoDB Collections
+    // Connect MongoDB collections
     // -----------------------------
     const serviceRequests = await dbConnect(collections.serviceRequests);
-    const mechanicShopsCollection = await dbConnect(collections.mechanicShops);
-    const announcementsCollection = await dbConnect(collections.announcements);
-    const couponsCollection = await dbConnect(collections.coupons);
-    const usersCollection = await dbConnect(collections.users);
+    const mechanicShops = await dbConnect(collections.mechanicShops);
+    const announcements = await dbConnect(collections.announcements);
+    const coupons = await dbConnect(collections.coupons);
+    const users = await dbConnect(collections.users);
 
     console.log("✅ Connected to MongoDB collections");
 
     // -----------------------------
-    // Watch: New Service Requests
+    // Helper: push notification
     // -----------------------------
-    serviceRequests.watch().on("change", async (change) => {
-      if (change.operationType === "insert") {
-        const newRequest = change.fullDocument;
-
-        const notificationDoc = {
-          _id: new ObjectId().toString(),
-          message: "New service request added!",
-          type: "serviceRequest",
-          data: newRequest,
-          createdAt: new Date(),
-          read: false,
-        };
-
-        await usersCollection.updateOne(
-          {email: newRequest.userEmail},
-          {$push: {notifications: {$each: [notificationDoc], $position: 0}}}
-        );
-
-        await usersCollection.updateMany(
-          {role: {$in: ["mechanic", "admin"]}},
-          {$push: {notifications: {$each: [notificationDoc], $position: 0}}}
-        );
-
-        io.emit("serviceRequestNotification", notificationDoc);
-      }
-    });
+    const sendNotification = async (filter, notif, socketEvent) => {
+      // Use $addToSet to avoid duplicates
+      await users.updateMany(filter, {$addToSet: {notifications: notif}});
+      io.emit(socketEvent, notif);
+    };
 
     // -----------------------------
-    // Watch: Assignment Updates
+    // WATCH: Service Requests
     // -----------------------------
-    serviceRequests.watch().on("change", async (change) => {
-      if (change.operationType === "update") {
-        const updatedFields = change.updateDescription.updatedFields;
+    serviceRequests
+      .watch([], {fullDocument: "updateLookup"})
+      .on("change", async (change) => {
+        try {
+          const fullDoc = change.fullDocument;
 
-        if (updatedFields.assignedShopId) {
-          const serviceId = change.documentKey._id;
-          const updatedDoc = await serviceRequests.findOne({_id: serviceId});
+          if (change.operationType === "insert") {
+            const notif = {
+              _id: `serviceRequest_${fullDoc._id.toString()}`, // deterministic _id
+              message: "New service request added!",
+              type: "serviceRequest",
+              data: fullDoc,
+              createdAt: new Date(),
+              read: false,
+              userEmail: fullDoc.userEmail,
+            };
 
-          const shopDoc = await mechanicShopsCollection.findOne({
-            _id: new ObjectId(updatedFields.assignedShopId),
-          });
+            await sendNotification(
+              {email: fullDoc.userEmail},
+              notif,
+              "serviceRequestNotification"
+            );
+            await sendNotification(
+              {role: {$in: ["mechanic", "admin"]}},
+              notif,
+              "serviceRequestNotification"
+            );
+          }
 
-          const shopName = shopDoc?.shop?.shopName || "Assigned Shop";
+          if (change.operationType === "update") {
+            const updatedFields = change.updateDescription.updatedFields;
+            if (updatedFields.assignedShopId) {
+              const shopDoc = await mechanicShops.findOne({
+                _id: new ObjectId(updatedFields.assignedShopId),
+              });
+              const shopName = shopDoc?.shop?.shopName || "Assigned Shop";
 
-          const notificationDoc = {
-            _id: new ObjectId().toString(),
-            userEmail: updatedDoc?.userEmail,
-            message: `Service request has been assigned to "${shopName}"`,
-            type: "assignment",
-            data: {
-              serviceId,
-              shopId: updatedFields.assignedShopId,
-              assignedUserId: updatedDoc?.userId,
-            },
-            createdAt: new Date(),
-            read: false,
-          };
+              const notif = {
+                _id: `assignment_${fullDoc._id.toString()}`,
+                message: `Service request assigned to "${shopName}"`,
+                type: "assignment",
+                data: {
+                  serviceId: fullDoc._id,
+                  shopId: updatedFields.assignedShopId,
+                  assignedUserId: fullDoc.userId,
+                },
+                createdAt: new Date(),
+                read: false,
+                userEmail: fullDoc.userEmail,
+              };
 
-          await usersCollection.updateOne(
-            {email: updatedDoc.userEmail},
-            {$push: {notifications: {$each: [notificationDoc], $position: 0}}}
-          );
-
-          await usersCollection.updateMany(
-            {role: {$in: ["admin"]}},
-            {$push: {notifications: {$each: [notificationDoc], $position: 0}}}
-          );
-
-          io.emit("assignmentNotification", notificationDoc);
+              await sendNotification(
+                {email: fullDoc.userEmail},
+                notif,
+                "assignmentNotification"
+              );
+              await sendNotification(
+                {role: "admin"},
+                notif,
+                "assignmentNotification"
+              );
+            }
+          }
+        } catch (err) {
+          console.error("❌ ServiceRequests watcher error:", err);
         }
-      }
-    });
+      });
 
     // -----------------------------
-    // Watch: New Mechanic Shops
+    // WATCH: Mechanic Shops
     // -----------------------------
-    mechanicShopsCollection.watch().on("change", async (change) => {
+    mechanicShops.watch().on("change", async (change) => {
       if (change.operationType === "insert") {
-        const newMechanic = change.fullDocument;
-
-        const notificationDoc = {
-          _id: new ObjectId().toString(),
-          userEmail: newMechanic.userEmail,
-          message: `New mechanic shop added: ${newMechanic?.shop?.shopName}`,
+        const fullDoc = change.fullDocument;
+        const notif = {
+          _id: `mechanicShop_${fullDoc._id.toString()}`,
+          message: `New mechanic shop added: ${fullDoc?.shop?.shopName}`,
           type: "mechanicShopAdded",
-          data: newMechanic,
-          createdAt: newMechanic?.createdAt,
+          data: fullDoc,
+          createdAt: fullDoc?.createdAt || new Date(),
           read: false,
+          userEmail: fullDoc.userEmail,
         };
 
-        await usersCollection.updateMany(
-          {role: {$in: ["admin"]}},
-          {$push: {notifications: {$each: [notificationDoc], $position: 0}}}
+        await sendNotification(
+          {role: "admin"},
+          notif,
+          "mechanicShopNotification"
         );
-
-        io.emit("mechanicShopNotification", notificationDoc);
       }
     });
 
     // -----------------------------
-    // Watch: New Announcements
+    // WATCH: Announcements
     // -----------------------------
-    announcementsCollection.watch().on("change", async (change) => {
+    announcements.watch().on("change", async (change) => {
       if (change.operationType === "insert") {
-        const newAnnouncement = change.fullDocument;
-
-        const notificationDoc = {
-          _id: new ObjectId().toString(),
-          userEmail: "all",
-          message: `New announcement: ${newAnnouncement.title}`,
+        const fullDoc = change.fullDocument;
+        const notif = {
+          _id: `announcement_${fullDoc._id.toString()}`,
+          message: `New announcement: ${fullDoc.title}`,
           type: "announcement",
-          data: newAnnouncement,
-          createdAt: newAnnouncement?.createdAt || new Date(),
+          data: fullDoc,
+          createdAt: fullDoc?.createdAt || new Date(),
           read: false,
-        };
-
-        await usersCollection.updateMany(
-          {role: {$in: ["mechanic", "user"]}},
-          {$push: {notifications: {$each: [notificationDoc], $position: 0}}}
-        );
-
-        io.emit("announcementNotification", notificationDoc);
-      }
-    });
-
-    // -----------------------------
-    // Watch: New Coupons
-    // -----------------------------
-    couponsCollection.watch().on("change", async (change) => {
-      if (change.operationType === "insert") {
-        const newCoupon = change.fullDocument;
-
-        const notificationDoc = {
-          _id: new ObjectId().toString(),
           userEmail: "all",
-          message: `New coupon available: ${newCoupon.code}`,
-          type: "coupon",
-          data: newCoupon,
-          createdAt: newCoupon?.createdAt || new Date(),
-          read: false,
         };
 
-        await usersCollection.updateMany(
+        await sendNotification(
           {role: {$in: ["user", "mechanic"]}},
-          {$push: {notifications: {$each: [notificationDoc], $position: 0}}}
+          notif,
+          "announcementNotification"
         );
-
-        io.emit("couponNotification", notificationDoc);
       }
     });
 
     // -----------------------------
-    // Socket.io: Chat + Events
+    // WATCH: Coupons
+    // -----------------------------
+    coupons.watch().on("change", async (change) => {
+      if (change.operationType === "insert") {
+        const fullDoc = change.fullDocument;
+        const notif = {
+          _id: `coupon_${fullDoc._id.toString()}`,
+          message: `New coupon available: ${fullDoc.code}`,
+          type: "coupon",
+          data: fullDoc,
+          createdAt: fullDoc?.createdAt || new Date(),
+          read: false,
+          userEmail: "all",
+        };
+
+        await sendNotification(
+          {role: {$in: ["user", "mechanic"]}},
+          notif,
+          "couponNotification"
+        );
+      }
+    });
+
+    // -----------------------------
+    // Socket.IO connections
     // -----------------------------
     io.on("connection", (socket) => {
       console.log("⚡ User connected:", socket.id);
 
-      // Join Chat
-      socket.on("joinChat", (chatId) => {
-        socket.join(chatId);
-        console.log(`${socket.id} joined room: ${chatId}`);
-      });
-
-      // Send Message
-      socket.on("sendMessage", (msg) => {
-        io.to(msg.chatId).emit("newMessage", msg);
-      });
-
-      // Typing
-      socket.on("typing", (chatId, senderId) => {
-        socket.to(chatId).emit("typing", chatId, senderId);
-      });
-
-      // Stop Typing
-      socket.on("stopTyping", (chatId, senderId) => {
-        socket.to(chatId).emit("stopTyping", chatId, senderId);
-      });
-
-      // Disconnect
-      socket.on("disconnect", () => {
-        console.log("❌ User disconnected:", socket.id);
-      });
+      socket.on("joinChat", (chatId) => socket.join(chatId));
+      socket.on("sendMessage", (msg) =>
+        io.to(msg.chatId).emit("newMessage", msg)
+      );
+      socket.on("typing", (chatId, senderId) =>
+        socket.to(chatId).emit("typing", chatId, senderId)
+      );
+      socket.on("stopTyping", (chatId, senderId) =>
+        socket.to(chatId).emit("stopTyping", chatId, senderId)
+      );
+      socket.on("disconnect", () =>
+        console.log("❌ User disconnected:", socket.id)
+      );
     });
 
     // -----------------------------
     // Root Route
     // -----------------------------
-    app.get("/", (req, res) => {
-      res.send("🚀 Socket.IO server with Notifications + Chat is running!");
-    });
+    app.get("/", (req, res) => res.send("🚀 Socket.IO server running!"));
 
     // -----------------------------
     // Server Listen
     // -----------------------------
     server.listen(PORT, () => {
       const host = process.env.PORT
-        ? `https://mechalink-socket-server.onrender.com/`
+        ? `https://mechalink-socket-server-production.up.railway.app/`
         : `http://localhost:${PORT}`;
       console.log(`✅ Socket.IO server running on ${host}`);
     });
