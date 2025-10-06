@@ -36,8 +36,8 @@ const Sidebar = ({ isMobileOpen, setIsMobileOpen }) => {
 
   if (status === "loading") {
     return (
-      <aside className="w-64 border-r border-gray-100 bg-white shadow-xl flex items-center justify-center">
-        <p className="text-gray-500">Loading...</p>
+      <aside className="w-64 border-r border-neutral bg-base-100 flex items-center justify-center">
+        <p className="text-neutral-content">Loading...</p>
       </aside>
     );
   }
@@ -74,14 +74,14 @@ const Sidebar = ({ isMobileOpen, setIsMobileOpen }) => {
     <>
       {/* Mobile overlay */}
       <div
-        className={`fixed inset-0 bg-black/40 backdrop-blur-sm z-40 2xl:hidden transition-opacity duration-300 ease-in-out 
+        className={`fixed top-0 inset-0 bg-black/40 backdrop-blur-sm z-40 2xl:hidden transition-opacity duration-300 ease-in-out 
           ${isMobileOpen ? "opacity-100" : "opacity-0 pointer-events-none"}`}
         onClick={() => setIsMobileOpen(false)}
       />
 
       {/* Sidebar */}
       <aside
-        className={`flex flex-col border-r border-gray-100 bg-white shadow-xl transition-all duration-300 ease-in-out z-50
+        className={`flex flex-col border-r border-neutral bg-base-100 shadow-xl transition-all duration-300 ease-in-out z-50
           ${isExpanded ? "w-64" : "w-[5.5rem]"}
           ${isMobileOpen
             ? "fixed left-0 top-0 h-full"
@@ -91,13 +91,15 @@ const Sidebar = ({ isMobileOpen, setIsMobileOpen }) => {
       >
         {/* Header */}
         <div
-          className={`flex items-center p-5 border-b border-gray-100 transition-all duration-300 
+          className={`flex items-center p-5 border-b border-neutral transition-all duration-300 
             ${isExpanded ? "justify-start gap-3" : "justify-center"}`}
         >
           <Link href="/" className="flex items-center gap-2" title="MechaLink Home">
+            {/* Logo Icon */}
             <FaGear className="h-9 w-9 text-primary" />
             <h1
               className={`text-2xl font-extrabold whitespace-nowrap transition-all duration-300 ease-in-out overflow-hidden
+              text-base-content
               ${isExpanded ? "opacity-100 max-w-[200px]" : "opacity-0 max-w-0"}`}
             >
               Mecha<span className="text-primary">Link</span>
@@ -108,7 +110,7 @@ const Sidebar = ({ isMobileOpen, setIsMobileOpen }) => {
           {isLargeScreen && (
             <button
               onClick={() => setIsExpanded(!isExpanded)}
-              className={`hidden 2xl:flex ml-3 items-center transition-all duration-300 p-1.5 rounded-full text-gray-600 bg-gray-100 hover:bg-gray-200 font-medium absolute ${isExpanded ? "left-[14.2rem]" : "left-[3.7rem]"}`}
+              className={`hidden 2xl:flex ml-3 items-center transition-all duration-300 p-1.5 rounded-full text-neutral-content bg-base-200 hover:bg-base-300 font-medium absolute ${isExpanded ? "left-[14.2rem]" : "left-[3.7rem]"}`}
               title={isExpanded ? "Collapse Sidebar" : "Expand Sidebar"}
             >
               {isExpanded ? <PanelLeft size={20} /> : <PanelRight size={20} />}
@@ -117,7 +119,7 @@ const Sidebar = ({ isMobileOpen, setIsMobileOpen }) => {
 
           {/* Mobile close button */}
           <button
-            className="ml-auto 2xl:hidden hover:text-primary"
+            className="ml-auto 2xl:hidden text-base-content hover:text-primary"
             onClick={() => setIsMobileOpen(false)}
             title="Close Sidebar"
           >
@@ -138,8 +140,8 @@ const Sidebar = ({ isMobileOpen, setIsMobileOpen }) => {
                   flex items-center transition-all duration-200 p-3 rounded-xl relative overflow-hidden 
                   ${isExpanded ? "justify-start gap-4" : "justify-center"} 
                   ${isActive
-                    ? "bg-primary text-white shadow-lg shadow-primary/50 font-semibold"
-                    : "text-gray-700 hover:bg-primary/10 hover:text-primary font-medium"
+                    ? "bg-primary text-primary-content shadow-lg shadow-primary/50 font-semibold"
+                    : "text-base-content hover:bg-primary/10 hover:text-primary font-medium"
                   }
                 `}
                 title={item.name}
@@ -157,9 +159,9 @@ const Sidebar = ({ isMobileOpen, setIsMobileOpen }) => {
         </nav>
 
         {/* Footer */}
-        <div className="border-t border-gray-100 p-4 flex flex-col gap-2">
+        <div className="border-t border-neutral p-4 flex flex-col gap-2">
           <button
-            className={`flex items-center transition-all duration-200 p-3 rounded-xl text-red-500 hover:bg-red-50 hover:shadow-sm font-medium
+            className={`flex items-center transition-all duration-200 p-3 rounded-xl text-error hover:bg-error/10 hover:shadow-sm font-medium
               ${isExpanded ? "justify-start gap-4" : "justify-center"}`}
             title="Logout"
           >

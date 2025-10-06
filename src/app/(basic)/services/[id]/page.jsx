@@ -137,7 +137,7 @@ export default function ServiceDetailsPage() {
 
   // FIXED: Create service sections based on the actual data structure
   const serviceSections = [];
-  
+
   if (vehicleTypes && typeof vehicleTypes === 'object') {
     Object.entries(vehicleTypes).forEach(([category, categoryData]) => {
       if (categoryData && typeof categoryData === 'object' && Object.keys(categoryData).length > 0) {
@@ -166,14 +166,13 @@ export default function ServiceDetailsPage() {
   const handleMessageContact = async () => {
     const shopId = _id;
     const customerId = user?._id;
-    const serviceProviderId = userId;
-
-    console.log("--- Chat Initiation Data ---");
-    console.log("Shop ID (Service Entity ID):", shopId);
-    console.log("Customer ID (Logged-in User ID):", customerId);
-    console.log("Service Provider ID (Owner ID):", serviceProviderId);
-    console.log("Shop Name:", shopName);
-    console.log("----------------------------");
+    const customerName = user?.name;
+    const customerEmail = user?.email;
+    const customerProfileImage = user?.profileImage;
+    const shopName = shop.shopName;
+    const OwnerName = shop.ownerName;
+    const OwnerEmail = shop.ownerEmail;
+    const logo = shop.logo;
 
     if (!customerId) {
       Swal.fire({
@@ -185,42 +184,23 @@ export default function ServiceDetailsPage() {
       return;
     }
 
-    if (customerId === serviceProviderId) {
+    if (customerId === userId) {
       Swal.fire({
         icon: "info",
         title: "Access Denied",
         text: "You cannot start a chat with your own service shop.",
         confirmButtonColor: "#f97316",
       });
-      console.log(
-        "Chat initiation aborted: Customer ID matches Service Provider ID."
-      );
       return;
     }
 
-    if (!shopId || !serviceProviderId || !shopName) {
+    if (!shopId || !shopName) {
       Swal.fire({
         icon: "warning",
         title: "Data Missing",
         text: "Cannot start chat: Missing Shop ID, Owner ID, or Shop Name.",
         confirmButtonColor: "#f97316",
       });
-      console.log("Chat initiation aborted: Missing required shop data.");
-      return;
-    }
-
-    const result = await Swal.fire({
-      title: "Start Conversation?",
-      html: `Do you want to start an in-app chat with **${shopName}**?`,
-      icon: "question",
-      showCancelButton: true,
-      confirmButtonText: "Yes, Start Chat!",
-      cancelButtonText: "No, Cancel",
-      confirmButtonColor: "#f97316",
-    });
-
-    if (!result.isConfirmed) {
-      console.log("Chat initiation cancelled by user.");
       return;
     }
 
@@ -228,12 +208,15 @@ export default function ServiceDetailsPage() {
       const chatRequestBody = {
         shopId: shopId,
         customerId: customerId,
-        mechanicId: serviceProviderId,
-        mechanicName: shopName,
-        mechanicLogo: logo,
+        customerName: customerName,
+        customerEmail: customerEmail,
+        customerProfileImage: customerProfileImage,
+        ShopName: shopName,
+        ShopLogo: logo,
+        ShopOwnerName: OwnerName,
+        ShopOwnerEmail: OwnerEmail,
+        messages: [],
       };
-
-      console.log("API Request Body for /api/chats:", chatRequestBody);
 
       const apiResponse = await fetch("/api/chats", {
         method: "POST",
@@ -243,30 +226,17 @@ export default function ServiceDetailsPage() {
 
       const data = await apiResponse.json();
 
-      console.log(
-        "API Response Status:",
-        apiResponse.status,
-        apiResponse.statusText
-      );
-      console.log("API Response Data:", data);
-
       if (!apiResponse.ok) {
         throw new Error(data.message || "Failed to create/retrieve chat.");
       }
 
       const chatPath = `/dashboard/${user?.role || "customer"}/messages`;
-
-      console.log("Chat successfully initiated. Redirecting to:", chatPath);
-
       window.location.href = chatPath;
     } catch (error) {
-      console.error("Chat Error in handleMessageContact:", error);
       Swal.fire({
         icon: "error",
         title: "Chat Error",
-        text:
-          error.message ||
-          "An unexpected error occurred while starting the chat.",
+        text: error.message || "An unexpected error occurred while starting the chat.",
         confirmButtonColor: "#f97316",
       });
     }
@@ -279,8 +249,7 @@ export default function ServiceDetailsPage() {
 
   const fullAddress =
     street || city || country
-      ? `${street || ""}${street ? ", " : ""}${city || ""}${city ? ", " : ""}${
-          country || ""
+      ? `${street || ""}${street ? ", " : ""}${city || ""}${city ? ", " : ""}${country || ""
         }${postalCode ? " " + postalCode : ""}`.trim()
       : "Address not provided";
 
@@ -385,7 +354,7 @@ export default function ServiceDetailsPage() {
                   {categories && categories.length > 0 && (
                     <div className="flex flex-wrap gap-2">
                       {categories.map((category, index) => (
-                        <span 
+                        <span
                           key={index}
                           className="inline-block bg-gradient-to-r from-orange-500 to-orange-600 text-white px-4 py-1.5 rounded-full text-sm font-medium shadow-sm"
                         >
