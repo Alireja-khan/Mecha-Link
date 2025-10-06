@@ -3,7 +3,7 @@
 import { useEffect } from "react";
 import { io } from "socket.io-client";
 
-const socket = io("http://localhost:5000"); // replace with your socket server URL
+const socket = io("https://mechalink-socket-server.onrender.com"); // replace with your socket server URL
 
 export default function AdminNotifications({ onNewNotification }) {
   useEffect(() => {
@@ -31,11 +31,18 @@ export default function AdminNotifications({ onNewNotification }) {
       if (onNewNotification) onNewNotification(msg);
     });
 
+    // Assignment notifications (when a shop is assigned to a service request)
+    socket.on("assignmentNotification", (msg) => {
+      console.log("Service Request Assigned:", msg);
+      if (onNewNotification) onNewNotification(msg);
+    });
+
     return () => {
       socket.off("serviceRequestNotification");
       socket.off("mechanicShopNotification");
       socket.off("announcementNotification");
       socket.off("couponNotification");
+      socket.off("assignmentNotification");
     };
   }, [onNewNotification]);
 

@@ -61,3 +61,34 @@ export async function GET(req, { params }) {
     );
   }
 }
+
+
+export async function DELETE(req, { params }) {
+  try {
+    const { id } = await params;
+    
+    // Validate ID
+    if (!ObjectId.isValid(id)) {
+      return NextResponse.json({ error: "Invalid service request ID" }, { status: 400 });
+    }
+
+    const collection = await dbConnect(collections.mechanicShops);
+    
+    const result = await collection.deleteOne({ _id: new ObjectId(id) });
+
+    if (result.deletedCount === 0) {
+      return NextResponse.json({ error: "Mechanic Shop not found" }, { status: 404 });
+    }
+
+    return NextResponse.json({ 
+      success: true, 
+      message: "Mechanic Shop deleted successfully" 
+    });
+  } catch (error) {
+    console.error("Error deleting mechanic shop:", error);
+    return NextResponse.json(
+      { error: "Failed to delete mechanic shop" },
+      { status: 500 }
+    );
+  }
+}

@@ -205,11 +205,13 @@ const ServiceRequest = () => {
       const userId = loggedInUser?.user?._id;
       const userEmail = session?.user?.email || loggedInUser?.email || "guest@example.com";
       const userName = session?.user?.name || loggedInUser?.name || "Guest User";
+      const userImage = session?.user?.profileImage || loggedInUser?.profileImage || "Guest User";
 
       const formData = {
         userId: userId,
         userEmail: userEmail,
         userName: userName,
+        userImage: userImage,
         deviceType: data.deviceType,
         problemCategory: data.problemCategory,
         serviceDetails: {
