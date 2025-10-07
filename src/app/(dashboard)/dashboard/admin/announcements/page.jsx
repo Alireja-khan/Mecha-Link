@@ -98,60 +98,56 @@ const ManageAnnouncements = () => {
   const [statusFilter, setStatusFilter] = useState("all");
 
   // --- Swal Utility Functions (Kept the same) ---
+  const swalOptions = {
+    confirmButtonColor: 'var(--color-success)',
+    background: 'var(--color-base-100,)',
+    color: 'var(--color-base-content)',
+    cancelButtonColor: 'var(--color-error)',
+  };
 
   const showSuccessAlert = (title, message) => {
     Swal.fire({
+      ...swalOptions,
       title: title,
       text: message,
       icon: 'success',
-      confirmButtonColor: '#f97316',
-      confirmButtonText: 'OK',
-      background: 'var(--color-base-100)',
-      color: 'var(--color-base-content)',
       iconColor: 'var(--color-success)'
     });
   };
 
   const showErrorAlert = (title, message) => {
     Swal.fire({
+      ...swalOptions,
       title: title,
       text: message,
       icon: 'error',
-      confirmButtonColor: '#f97316',
-      confirmButtonText: 'OK',
-      background: 'var(--color-base-100)',
-      color: 'var(--color-base-content)',
       iconColor: 'var(--color-error)'
     });
   };
 
   const showConfirmDialog = (title, text, confirmButtonText = 'Yes, proceed') => {
     return Swal.fire({
+      ...swalOptions,
       title: title,
       text: text,
       icon: 'warning',
       showCancelButton: true,
-      confirmButtonColor: '#f97316',
-      cancelButtonColor: 'var(--color-neutral)',
       confirmButtonText: confirmButtonText,
       cancelButtonText: 'Cancel',
-      background: 'var(--color-base-100)',
-      color: 'var(--color-base-content)',
-      iconColor: 'var(--color-warning)',
-      reverseButtons: true
+      reverseButtons: true,
+      iconColor: 'var(--color-warning)'
     });
   };
 
   const showLoadingAlert = (title, text) => {
     Swal.fire({
+      ...swalOptions,
       title: title,
       text: text,
       allowOutsideClick: false,
       didOpen: () => {
         Swal.showLoading();
       },
-      background: 'var(--color-base-100)',
-      color: 'var(--color-base-content)'
     });
   };
 
@@ -498,7 +494,7 @@ const ManageAnnouncements = () => {
                       </div>
                     </td>
                     <td className="px-6 py-4">
-                      <p className="text-sm text-base-content/80 max-w-[400px] truncate">{ann.message}</p>
+                      <p className="text-sm text-base-content/80 max-w-[800px] ">{ann.message}</p>
                     </td>
                     <td className="px-6 py-4"> {/* Removed whitespace-nowrap */}
                       <div className="flex items-center gap-2">
