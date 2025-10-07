@@ -144,18 +144,15 @@ export default function MapWithSearch() {
 
               {mechanicShops?.length > 0 ? (
                 mechanicShops.map((shop) => (
-                  <Marker key={shop._id} position={[shop.latitude, shop.longitude]}>
-                    <Popup>
-                      <div className="font-sans b flex flex-col text-center">
-                        <strong className="text-primary text-lg mb-2">
-                          {shop.shopName}
-                        </strong>
-                        <Link href={`/services/${shop._id}`}>
-                          <button className="bg-primary text-white py-1 px-3 rounded-lg font-semibold hover:bg-primary/90 transition">
-                            View Details
-                          </button>
-                        </Link>
-                      </div>
+                  <Marker
+                    key={shop._id}
+                    position={[shop.latitude, shop.longitude]}
+                  >
+                    <Popup className=" w-50">
+                      <Link href={`/services/${shop._id}`}>
+                        <img className="min-w-full w-50 h-40 object-cover" src={shop.logo} alt="Shop logo" />
+                        <h4 className="text-sm font-semibold mt-3">{shop.shopName}</h4>
+                      </Link>
                     </Popup>
                   </Marker>
                 ))
