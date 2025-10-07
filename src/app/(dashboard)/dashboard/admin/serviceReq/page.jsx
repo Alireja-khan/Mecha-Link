@@ -145,36 +145,37 @@ const ManageServiceRequests = () => {
   const [shops, setShops] = useState([]);
   const [saving, setSaving] = useState(false);
 
-  // SweetAlert2 Functions (Refactored to use CSS variables for dynamic colors)
+  // SweetAlert2 Functions (color updates for DaisyUI theme)
+  const swalOptions = {
+    confirmButtonColor: 'var(--color-success)',
+    background: 'var(--color-base-100,)',
+    color: 'var(--color-base-content)',
+    cancelButtonColor: 'var(--color-error)',
+  };
+
   const showSuccessAlert = (title, message) => {
     Swal.fire({
+      ...swalOptions,
       title: title,
       text: message,
       icon: 'success',
-      confirmButtonText: 'OK',
-      // Using generic DaisyUI themed settings for Swal
-      confirmButtonColor: 'var(--fallback-p, oklch(var(--p)/1))',
-      background: 'var(--fallback-b1, oklch(var(--b1)/1))',
-      color: 'var(--fallback-bc, oklch(var(--bc)/1))',
-      iconColor: 'var(--fallback-su, oklch(var(--su)/1))'
+      iconColor: 'var(--color-success)'
     });
   };
 
   const showErrorAlert = (title, message) => {
     Swal.fire({
+      ...swalOptions,
       title: title,
       text: message,
       icon: 'error',
-      confirmButtonText: 'OK',
-      confirmButtonColor: 'var(--fallback-p, oklch(var(--p)/1))',
-      background: 'var(--fallback-b1, oklch(var(--b1)/1))',
-      color: 'var(--fallback-bc, oklch(var(--bc)/1))',
-      iconColor: 'var(--fallback-er, oklch(var(--er)/1))'
+      iconColor: 'var(--color-error)'
     });
   };
 
   const showConfirmDialog = (title, text, confirmButtonText = 'Yes, proceed') => {
     return Swal.fire({
+      ...swalOptions,
       title: title,
       text: text,
       icon: 'warning',
@@ -182,24 +183,19 @@ const ManageServiceRequests = () => {
       confirmButtonText: confirmButtonText,
       cancelButtonText: 'Cancel',
       reverseButtons: true,
-      confirmButtonColor: 'var(--fallback-p, oklch(var(--p)/1))',
-      cancelButtonColor: 'var(--fallback-nc, oklch(var(--nc)/1))',
-      background: 'var(--fallback-b1, oklch(var(--b1)/1))',
-      color: 'var(--fallback-bc, oklch(var(--bc)/1))',
-      iconColor: 'var(--fallback-wa, oklch(var(--wa)/1))'
+      iconColor: 'var(--color-warning)'
     });
   };
 
   const showLoadingAlert = (title, text) => {
     Swal.fire({
+      ...swalOptions,
       title: title,
       text: text,
       allowOutsideClick: false,
       didOpen: () => {
         Swal.showLoading();
       },
-      background: 'var(--fallback-b1, oklch(var(--b1)/1))',
-      color: 'var(--fallback-bc, oklch(var(--bc)/1))'
     });
   };
 
