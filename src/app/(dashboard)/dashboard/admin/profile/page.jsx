@@ -13,16 +13,16 @@ const AdminProfile = () => {
 
     if (userLoading) {
         return (
-            // Use base-300 for deepest background, text-primary for spinner
-            <div className="flex items-center justify-center h-screen w-screen ">
+            <div className="flex items-center justify-center h-full w-full">
                 <span className="loading loading-bars loading-xl text-primary"></span>
             </div>
         );
     }
 
     if (!loggedInUser) {
+        // optional redirect logic here
         return (
-            <div className="flex items-center justify-center h-screen w-screen ">
+            <div className="flex items-center justify-center h-full w-full">
                 <span className="loading loading-bars loading-xl text-primary"></span>
             </div>
         );

@@ -5,11 +5,11 @@ import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import { useState, useEffect } from "react";
 import { Search, MapPin, Loader2, Filter } from "lucide-react";
+import Link from "next/link";
 
 import markerIcon2x from "leaflet/dist/images/marker-icon-2x.png";
 import markerIcon from "leaflet/dist/images/marker-icon.png";
 import markerShadow from "leaflet/dist/images/marker-shadow.png";
-import Link from "next/link";
 
 delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({
@@ -49,7 +49,6 @@ const shopCategories = [
   "Car Detailing & Accessories",
 ];
 
-
 export default function MapWithSearch() {
   const [search, setSearch] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
@@ -58,42 +57,45 @@ export default function MapWithSearch() {
 
   useEffect(() => {
     setLoading(true);
-    fetch(`/api/maps?category=${encodeURIComponent(selectedCategory)}&search=${encodeURIComponent(search)}`)
-      .then(res => res.json())
-      .then(data => {
-        const filteredData = data.filter(shop => shop.latitude && shop.longitude);
+    fetch(
+      `/api/maps?category=${encodeURIComponent(selectedCategory)}&search=${encodeURIComponent(search)}`
+    )
+      .then((res) => res.json())
+      .then((data) => {
+        const filteredData = data.filter((shop) => shop.latitude && shop.longitude);
         setMechanicShops(filteredData);
         setLoading(false);
       })
-      .catch(error => {
+      .catch((error) => {
         console.error("Failed to fetch shops:", error);
         setLoading(false);
         setMechanicShops([]);
       });
-  }, [search, selectedCategory])
+  }, [search, selectedCategory]);
 
   return (
-    <section className="py-12 md:py-20 bg-base-100">
+    <section className="py-16 bg-base-100 text-text font-poppins">
       <div className="container mx-auto px-4">
-        <div className="text-center mb-8 md:mb-10">
-          <h2 className="text-4xl md:text-5xl font-bold mb-3 flex items-center justify-center gap-3 font-roboto-con">
-            Find Mechanic Shops <span className="text-primary font-caveat inline-block">Near You</span>
+        {/* Section Header */}
+        <div className="text-center mb-12">
+          <h2 className="text-4xl md:text-5xl font-bold mb-4 font-urbanist text-base-content">
+            Find <span className="text-primary inline-block">Mechanic Shops</span> Near You
           </h2>
-          <p className="text-base md:text-xl max-w-2xl mx-auto font-nunito-sans">
-            Explore local service providers and filter by category or search term.
+          <p className="text-lg text-text/70 max-w-2xl mx-auto">
+            Explore trusted service providers and filter by category or location to get quick, reliable help.
           </p>
         </div>
 
-        <div className="flex flex-col sm:flex-row gap-4 mb-6 md:mb-8 bg-base-200 p-4 rounded-xl border border-base-300 shadow-lg">
-
+        {/* Search + Filter Bar */}
+        <div className="flex flex-col sm:flex-row gap-4 mb-10 bg-base-200 p-5 rounded-xl shadow-md border border-neutral">
           <div className="relative flex-1">
-            <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-base-content/60 w-5 h-5" />
+            <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
             <input
               type="search"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              placeholder="Search by location"
-              className="w-full pl-12 pr-5 py-3 rounded-xl border border-base-300 bg-base-100 text-base-content placeholder:text-base-content/50 focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all duration-200 shadow-sm"
+              placeholder="Search by shop name, service, or city..."
+              className="w-full pl-12 pr-5 py-3 rounded-lg border border-neutral/50 bg-base-100 text-base-content placeholder:text-base-content outline-none transition-all duration-200"
             />
           </div>
 
@@ -103,7 +105,7 @@ export default function MapWithSearch() {
               id="category"
               value={selectedCategory}
               onChange={(e) => setSelectedCategory(e.target.value)}
-              className="select select-bordered w-full bg-base-100 border-base-300 text-base-content focus:border-primary focus:ring-1 focus:ring-primary text-sm shadow-sm"
+              className="select select-bordered w-full bg-base-100 border-neutral/50 text-base-content text-sm rounded-lg"
             >
               <option value="all">All Service Categories</option>
               {shopCategories.map((category) => (
@@ -115,13 +117,15 @@ export default function MapWithSearch() {
           </div>
         </div>
 
-        <div className="h-[600px] w-full relative bg-base-300 rounded-2xl shadow-2xl border-4 border-base-300 overflow-hidden">
-
+        {/* Map Card */}
+        <div className="relative h-[600px] w-full rounded-2xl overflow-hidden shadow-xl border border-base-200">
           {loading && (
-            <div className="absolute inset-0 flex items-center justify-center bg-base-100/80 backdrop-blur-sm z-[1000]">
+            <div className="absolute inset-0 flex items-center justify-center bg-base-100 backdrop-blur-sm z-50">
               <div className="flex flex-col items-center">
                 <Loader2 className="w-10 h-10 animate-spin text-primary mb-3" />
-                <span className="text-lg font-semibold text-base-content">Loading map data...</span>
+                <span className="text-lg font-semibold text-base-content/60">
+                  Loading nearby shops...
+                </span>
               </div>
             </div>
           )}
@@ -131,14 +135,14 @@ export default function MapWithSearch() {
               center={[23.8121, 90.4134]}
               zoom={8}
               scrollWheelZoom={true}
-              className="h-full w-full z-10"
+              className="h-full w-full z-[1]"
             >
               <TileLayer
-                attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
                 url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
               />
 
-              {mechanicShops && mechanicShops.length > 0 ? (
+              {mechanicShops?.length > 0 ? (
                 mechanicShops.map((shop) => (
                   <Marker
                     key={shop._id}
@@ -153,8 +157,8 @@ export default function MapWithSearch() {
                   </Marker>
                 ))
               ) : (
-                <div className="leaflet-control leaflet-bottom leaflet-left p-4 bg-warning/90 rounded-lg text-warning-content shadow-lg m-3 border border-warning">
-                  No shops found for your search criteria. Try a different category or search term.
+                <div className="leaflet-control leaflet-bottom leaflet-left text-sm p-4 bg-yellow-100/90 text-yellow-800 rounded-lg shadow-lg m-3 border border-yellow-200">
+                  No shops found. Try adjusting your filters.
                 </div>
               )}
 
@@ -164,16 +168,15 @@ export default function MapWithSearch() {
 
           {!loading && mechanicShops.length === 0 && (
             <div className="absolute inset-0 flex items-center justify-center z-20">
-              <div className="text-center p-8 bg-base-100 rounded-xl shadow-2xl border border-base-300">
-                <MapPin className="w-10 h-10 mx-auto text-warning mb-4" />
+              <div className="text-center p-8 bg-base-100 rounded-xl shadow-lg border border-neutral">
+                <MapPin className="w-10 h-10 mx-auto text-primary mb-4" />
                 <h3 className="text-xl font-bold text-base-content">No Shops Found</h3>
-                <p className="text-base-content/70 mt-2 max-w-sm">
-                  Your search or filter combination returned no results. Try adjusting the category or search term.
+                <p className="text-base-content/60 mt-2 max-w-sm mx-auto">
+                  Your search didn’t match any shops. Try another keyword or category.
                 </p>
               </div>
             </div>
           )}
-
         </div>
       </div>
     </section>

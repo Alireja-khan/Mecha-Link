@@ -39,10 +39,8 @@
 
  --color-accent-content: #1e1e1e;
 
-
- --color-neutral: #D1D7E1;
- --color-neutral-content: #1e1e1e;
-
+  --color-neutral: #D1D7E1;
+  --color-neutral-content: #1e1e1e;
 
  --color-info: #3b82f6;
  --color-info-content: #f0f9ff;
@@ -106,9 +104,7 @@
 
  --color-accent-content: #e0e6ed;
 
-
- --color-neutral: #555A65;
-
+  --color-neutral: #434851;
 
  --color-neutral-content: #e0e6ed;
 
