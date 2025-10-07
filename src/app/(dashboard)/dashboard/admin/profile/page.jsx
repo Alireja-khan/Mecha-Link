@@ -14,7 +14,7 @@ const AdminProfile = () => {
     if (userLoading) {
         return (
             // Use base-300 for deepest background, text-primary for spinner
-            <div className="flex items-center justify-center h-screen w-screen bg-base-300">
+            <div className="flex items-center justify-center h-screen w-screen ">
                 <span className="loading loading-bars loading-xl text-primary"></span>
             </div>
         );
@@ -22,8 +22,8 @@ const AdminProfile = () => {
 
     if (!loggedInUser) {
         return (
-            <div className="flex items-center justify-center h-screen w-screen text-base-content text-xl">
-                <p>Authentication failed or user not logged in.</p>
+            <div className="flex items-center justify-center h-screen w-screen ">
+                <span className="loading loading-bars loading-xl text-primary"></span>
             </div>
         );
     }

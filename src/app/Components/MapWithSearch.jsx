@@ -75,12 +75,13 @@ export default function MapWithSearch() {
   return (
     <section className="py-12 md:py-20 bg-base-100">
       <div className="container mx-auto px-4">
-        <div className="mb-8 md:mb-10">
-          <h2 className="text-3xl md:text-4xl font-extrabold text-base-content flex items-center gap-3">
-            <MapPin className="w-8 h-8 text-primary" />
-            Find Mechanic Shops Near You
+        <div className="text-center mb-8 md:mb-10">
+          <h2 className="text-4xl md:text-5xl font-bold mb-3 flex items-center justify-center gap-3 font-roboto-con">
+            Find Mechanic Shops <span className="text-primary font-caveat inline-block">Near You</span>
           </h2>
-          <p className="text-base-content/70 mt-1">Explore local service providers and filter by category or search term.</p>
+          <p className="text-base md:text-xl max-w-2xl mx-auto font-nunito-sans">
+            Explore local service providers and filter by category or search term.
+          </p>
         </div>
 
         <div className="flex flex-col sm:flex-row gap-4 mb-6 md:mb-8 bg-base-200 p-4 rounded-xl border border-base-300 shadow-lg">
@@ -91,7 +92,7 @@ export default function MapWithSearch() {
               type="search"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              placeholder="Search by shop name, service, or city..."
+              placeholder="Search by location"
               className="w-full pl-12 pr-5 py-3 rounded-xl border border-base-300 bg-base-100 text-base-content placeholder:text-base-content/50 focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all duration-200 shadow-sm"
             />
           </div>
@@ -143,13 +144,11 @@ export default function MapWithSearch() {
                     key={shop._id}
                     position={[shop.latitude, shop.longitude]}
                   >
-                    <Popup>
-                      <div className="font-sans flex flex-col">
-                        <strong className="text-primary text-lg mb-4">{shop.shopName}</strong>
-                        <Link href={`/services/${shop._id}`}>
-                            <button className="bg-primary rounded-lg text-base-content py-1 px-2 w-full text-base font-semibold">view details</button>
-                        </Link>
-                      </div>
+                    <Popup className=" w-50">
+                      <Link href={`/services/${shop._id}`}>
+                        <img className="min-w-full w-50 h-40 object-cover" src={shop.logo} alt="Shop logo" />
+                        <h4 className="text-sm font-semibold mt-3">{shop.shopName}</h4>
+                      </Link>
                     </Popup>
                   </Marker>
                 ))
