@@ -1,120 +1,157 @@
 @import "tailwindcss";
 
+
 @plugin "daisyui" {
-  themes: light --default, dark;
+ themes: light --default, dark;
 }
+
 
 @import "swiper/css";
 @import "swiper/css/navigation";
 @import "swiper/css/pagination";
 
+
 @plugin "daisyui/theme" {
-  name: "light";
-  default: true;
+ name: "light";
+ default: true;
 
-  --color-base-100: #ffffff;
-  --color-base-200: #f9fafb;
-  --color-base-300: #e5e7eb;
-  --color-base-content: #1e1e1e;
 
-  --color-primary: #f97316;
+ --color-base-100: #ffffff;
+ --color-base-200: #f9fafb;
+ --color-base-300: #e5e7eb;
+ --color-base-content: #1e1e1e;
 
-  --color-primary-content: #fffaf7;
 
-  --color-secondary: #fb923c;
+ --color-primary: #f97316;
 
-  --color-secondary-content: #1e1e1e;
 
-  --color-accent: #ffedd5;
+ --color-primary-content: #fffaf7;
 
-  --color-accent-content: #1e1e1e;
+
+ --color-secondary: #fb923c;
+
+
+ --color-secondary-content: #1e1e1e;
+
+
+ --color-accent: #ffedd5;
+
+
+ --color-accent-content: #1e1e1e;
 
   --color-neutral: #D1D7E1;
   --color-neutral-content: #1e1e1e;
 
-  --color-info: #3b82f6;
-  --color-info-content: #f0f9ff;
+ --color-info: #3b82f6;
+ --color-info-content: #f0f9ff;
 
-  --color-success: #22c55e;
-  --color-success-content: #f0fdf4;
 
-  --color-warning: #facc15;
-  --color-warning-content: #1f2937;
+ --color-success: #22c55e;
+ --color-success-content: #f0fdf4;
 
-  --color-error: #ef4444;
-  --color-error-content: #fff1f2;
 
-  --radius-selector: 1rem;
-  --radius-field: 0.25rem;
-  --radius-box: 0.5rem;
+ --color-warning: #facc15;
+ --color-warning-content: #1f2937;
 
-  --size-selector: 0.25rem;
-  --size-field: 0.25rem;
 
-  --border: 1px;
+ --color-error: #ef4444;
+ --color-error-content: #fff1f2;
 
-  --depth: 1;
-  --noise: 0;
+
+ --radius-selector: 1rem;
+ --radius-field: 0.25rem;
+ --radius-box: 0.5rem;
+
+
+ --size-selector: 0.25rem;
+ --size-field: 0.25rem;
+
+
+ --border: 1px;
+
+
+ --depth: 1;
+ --noise: 0;
 }
 
+
 @plugin "daisyui/theme" {
-  name: "dark";
+ name: "dark";
 
-  --color-base-100: #343434;
-  --color-base-200: #2c2c2c;
-  --color-base-300: #3d3d3d;
 
-  --color-base-content: #e0e6ed;
+ --color-base-100: #343434;
+ --color-base-200: #2c2c2c;
+ --color-base-300: #3d3d3d;
 
-  --color-primary: #e86a33;
 
-  --color-primary-content: #fff7ed;
+ --color-base-content: #e0e6ed;
 
-  --color-secondary: #fb923c;
 
-  --color-secondary-content: #1b263b;
+ --color-primary: #e86a33;
 
-  --color-accent: #3d5a80;
 
-  --color-accent-content: #e0e6ed;
+ --color-primary-content: #fff7ed;
+
+
+ --color-secondary: #fb923c;
+
+
+ --color-secondary-content: #1b263b;
+
+
+ --color-accent: #3d5a80;
+
+
+ --color-accent-content: #e0e6ed;
 
   --color-neutral: #434851;
 
-  --color-neutral-content: #e0e6ed;
+ --color-neutral-content: #e0e6ed;
 
-  --color-info: #60a5fa;
-  --color-info-content: #0f172a;
 
-  --color-success: #22c55e;
-  --color-success-content: #052e16;
+ --color-info: #60a5fa;
+ --color-info-content: #0f172a;
 
-  --color-warning: #fbbf24;
-  --color-warning-content: #1e1e1e;
 
-  --color-error: #ef4444;
-  --color-error-content: #fff1f2;
+ --color-success: #22c55e;
+ --color-success-content: #052e16;
 
-  --radius-selector: 1rem;
-  --radius-field: 0.25rem;
-  --radius-box: 0.5rem;
 
-  --size-selector: 0.25rem;
-  --size-field: 0.25rem;
+ --color-warning: #fbbf24;
+ --color-warning-content: #1e1e1e;
 
-  --border: 1px;
 
-  --depth: 1;
-  --noise: 0;
+ --color-error: #ef4444;
+ --color-error-content: #fff1f2;
+
+
+ --radius-selector: 1rem;
+ --radius-field: 0.25rem;
+ --radius-box: 0.5rem;
+
+
+ --size-selector: 0.25rem;
+ --size-field: 0.25rem;
+
+
+ --border: 1px;
+
+
+ --depth: 1;
+ --noise: 0;
 }
+
 
 @theme {
-  --font-urbanist: "Urbanist", sans-serif;
-  --font-poppins: "Poppins", sans-serif;
+ --font-urbanist: "Urbanist", sans-serif;
+ --font-poppins: "Poppins", sans-serif;
 }
 
+
 body {
-  @apply font-poppins;
+ @apply font-poppins;
 }
+
 
 h1,
 h2,
@@ -122,17 +159,21 @@ h3,
 h4,
 h5,
 h6 {
-  @apply font-urbanist;
+ @apply font-urbanist;
 }
+
 
 .font-caveat {
-  font-family: var(--font-caveat);
+ font-family: var(--font-caveat);
 }
+
 
 .font-nunito-sans {
-  font-family: var(--font-nunito-sans);
+ font-family: var(--font-nunito-sans);
 }
 
+
 .container {
-  @apply px-5 mx-auto w-full sm:max-w-xl md:max-w-[45rem] lg:max-w-[62rem] xl:max-w-[77rem] 2xl:max-w-[100rem];
+ @apply px-5 mx-auto w-full sm:max-w-xl md:max-w-[45rem] lg:max-w-[62rem] xl:max-w-[77rem] 2xl:max-w-[100rem];
 }
+
