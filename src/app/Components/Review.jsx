@@ -148,7 +148,7 @@ const ReviewSection = () => {
           >
             {reviews.map((review, index) => (
               <SwiperSlide key={index}>
-                <div className="group flex flex-col border border-primary bg-white rounded-xl shadow-md hover:shadow-xl transition-transform duration-300 p-6 h-full">
+                <div className="group flex flex-col border border-primary bg-white rounded-xl shadow-md hover:shadow-xl transition-transform duration-300 p-6 h-full md:h-[360px]">
                   {/* User Profile */}
                   <div className="flex items-center mb-4">
                     <img
