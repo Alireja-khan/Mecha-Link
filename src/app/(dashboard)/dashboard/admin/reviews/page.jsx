@@ -475,7 +475,7 @@ const Page = () => {
                                     </div>
                                     {/* Rating & Feedback Card (Accent Color) */}
                                     <div className="p-4 bg-accent/10 rounded-xl border border-accent/20 text-base-content">
-                                        <p className="font-semibold text-accent mb-1">Rating & Feedback</p>
+                                        <p className="font-semibold text-accent mb-1 text-warning">Rating & Feedback</p>
                                         {renderStars(selectedReview.rating)}
                                         <p className='bg-base-200 text-base-content rounded-lg border-2 border-base-300 p-2 mt-2'>{selectedReview.feedback || 'No feedback'}</p>
                                     </div>
