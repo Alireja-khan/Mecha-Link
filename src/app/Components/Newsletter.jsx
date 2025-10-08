@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import { useState } from "react";
 import Lottie from "lottie-react";
@@ -20,8 +20,8 @@ export default function Newsletter() {
         text: `Do you want to unsubscribe ${email}? You’ll stop receiving all updates.`,
         icon: "warning",
         showCancelButton: true,
-        confirmButtonColor: "#EF4444",
-        cancelButtonColor: "#6B7280",
+        confirmButtonColor: "hsl(var(--color-error))",
+        cancelButtonColor: "hsl(var(--color-neutral))",
         confirmButtonText: "Yes, Unsubscribe",
         cancelButtonText: "Cancel",
       }).then((result) => {
@@ -33,7 +33,7 @@ export default function Newsletter() {
               title: "Unsubscribed",
               text: `${email} has been removed from our newsletter.`,
               icon: "success",
-              confirmButtonColor: "#4F46E5",
+              confirmButtonColor: "hsl(var(--color-primary))",
             });
             resetForm();
           }, 500);
@@ -49,7 +49,7 @@ export default function Newsletter() {
           title: "Welcome 🎉",
           text: `Thanks for subscribing, ${email}! Stay tuned for updates.`,
           icon: "success",
-          confirmButtonColor: "#4F46E5",
+          confirmButtonColor: "hsl(var(--color-primary))",
         });
         resetForm();
       }, 1500);
@@ -85,16 +85,17 @@ export default function Newsletter() {
     : "Enter your email";
 
   return (
-    <section className="py-12 sm:py-16 lg:py-24 bg-gradient-to-br from-white to-slate-50">
+    <section className="py-12 sm:py-16 lg:py-24 bg-base-100 ">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-6xl">
-        <div className="flex flex-col lg:flex-row items-center bg-white rounded-3xl shadow-xl overflow-hidden border border-gray-100">
+        <div className="flex flex-col lg:flex-row items-center bg-base-100 rounded-3xl shadow-xl overflow-hidden border border-base-content/10">
 
+          {/* LEFT SIDE */}
           <div className="w-full lg:w-1/2 p-6 sm:p-10 lg:p-14 text-center lg:text-left">
             <h2
-              className="text-3xl sm:text-4xl lg:text-5xl font-extrabold mb-4 text-gray-900 leading-tight font-urbanist"
+              className="text-3xl sm:text-4xl lg:text-5xl font-extrabold mb-4 text-base-content leading-tight font-urbanist"
               dangerouslySetInnerHTML={{ __html: titleText }}
             />
-            <p className="text-base sm:text-lg text-gray-600 mb-8 font-poppins max-w-md mx-auto lg:mx-0">
+            <p className="text-base sm:text-lg text-base-content/70 mb-8 font-poppins max-w-md mx-auto lg:mx-0">
               {descriptionText}
             </p>
 
@@ -108,18 +109,22 @@ export default function Newsletter() {
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder={inputPlaceholder}
                 aria-label="Email address"
-                className="flex-1 px-5 py-3 rounded-xl border-2 border-gray-200 placeholder:text-gray-400 text-gray-700 text-sm sm:text-base"
+                className="flex-1 px-5 py-3 rounded-xl border-2 border-base-300 placeholder:text-base-content/40 text-base-content bg-base-200 text-sm sm:text-base focus:outline-none focus:border-primary"
                 required
                 disabled={loading}
               />
+
               <button
                 type="submit"
-                className={`px-6 sm:px-8 py-3 rounded-xl text-white font-semibold text-base sm:text-lg hover:opacity-90 transition-colors shadow-md disabled:opacity-70 disabled:cursor-not-allowed ${isUnsubscribeView ? 'bg-red-600 hover:bg-red-700' : 'bg-primary hover:bg-primary/90'}`}
+                className={`lg:px-3 sm:px-8 xl:px-6  py-3 rounded-xl text-primary-content font-semibold text-base sm:text-lg hover:opacity-90 shadow-md disabled:opacity-70 disabled:cursor-not-allowed ${isUnsubscribeView
+                    ? "bg-error hover:bg-error/90"
+                    : "bg-primary hover:bg-primary/90"
+                  }`}
                 disabled={loading}
               >
                 {loading ? (
                   <svg
-                    className="animate-spin h-5 w-5 text-white mx-auto"
+                    className="animate-spin h-5 w-5 text-primary-content mx-auto"
                     xmlns="http://www.w3.org/2000/svg"
                     fill="none"
                     viewBox="0 0 24 24"
@@ -144,7 +149,7 @@ export default function Newsletter() {
               </button>
             </form>
 
-            <p className="mt-6 text-xs sm:text-sm text-gray-500 font-poppins max-w-md mx-auto lg:mx-0">
+            <p className="mt-6 text-xs sm:text-sm text-base-content/60 font-poppins max-w-md mx-auto lg:mx-0">
               {isUnsubscribeView ? (
                 <span>
                   Changed your mind?
@@ -162,7 +167,7 @@ export default function Newsletter() {
                   <button
                     onClick={handleToggleUnsubscribe}
                     type="button"
-                    className="ml-0.5 text-gray-600 hover:text-orange-500 font-medium transition-colors underline underline-offset-2 rounded px-1 -mx-1"
+                    className="ml-0.5 text-base-content/70 hover:text-secondary font-medium transition-colors underline underline-offset-2 rounded px-1 -mx-1"
                   >
                     Unsubscribe here
                   </button>
@@ -171,6 +176,7 @@ export default function Newsletter() {
             </p>
           </div>
 
+          {/* RIGHT SIDE */}
           <div className="w-full lg:w-1/2 lg:flex items-center justify-center hidden">
             <Lottie
               animationData={newsletterAnimation}

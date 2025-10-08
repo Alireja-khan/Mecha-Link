@@ -110,7 +110,7 @@ export default function FeaturesSection() {
                   const Icon = feature.icon;
                   return (
                     <SwiperSlide key={index}>
-                      <div className="bg-white text-gray-800 p-6 rounded-xl shadow-lg border border-primary h-[230px] flex flex-col justify-between">
+                      <div className="bg-white text-gray-800 p-6 lg:p-3 xl:p-6 rounded-xl shadow-lg border border-primary h-[230px] flex flex-col justify-between">
                         <div className="flex flex-col items-center">
                           <div className="w-14 h-14 flex items-center justify-center rounded-full bg-primary/10 text-primary mb-4">
                             <Icon className="h-7 w-7" />
@@ -118,7 +118,7 @@ export default function FeaturesSection() {
                           <h3 className="text-lg font-bold text-primary font-urbanist text-center">
                             {feature.title}
                           </h3>
-                          <p className="mt-2 text-sm  font-poppins text-center">
+                          <p className="mt-2 text-sm font-poppins text-center">
                             {feature.desc}
                           </p>
                         </div>
@@ -143,7 +143,7 @@ export default function FeaturesSection() {
             <div className="grid grid-cols-2 gap-8 m-20  text-center lg:text-left">
               {stats.map((stat, idx) => (
                 <div key={idx} className="flex flex-col items-center lg:items-start">
-                  <h3 className="text-2xl md:text-5xl font-extrabold text-primary">
+                  <h3 className="text-2xl md:text-5xl lg:text-4xl xl:text-5xl font-extrabold text-primary">
                     <CountUp end={stat.value} duration={10} suffix={stat.suffix} />
                   </h3>
                   <p className="text-gray-200 text-lg font-poppins">{stat.label}</p>

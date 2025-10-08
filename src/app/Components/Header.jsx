@@ -1,151 +1,236 @@
 "use client";
 
-import { useContext, useState, useEffect } from "react";
-
+import useUser from "@/hooks/useUser";
+import { User as UserIcon, ChevronDown } from "lucide-react";
+import { signOut } from "next-auth/react";
 import Link from "next/link";
-import Image from "next/image";
 import { usePathname } from "next/navigation";
-import { UserIcon } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
 import { FaGear } from "react-icons/fa6";
+import { AiOutlineMenuFold, AiOutlineMenuUnfold } from "react-icons/ai";
+import ToggleTheme from "../shared/ToggleTheme";
 
 export default function Header() {
-  const { user, setUser } = useContext(UserContext);
   const [scrolled, setScrolled] = useState(false);
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [userMenuOpen, setUserMenuOpen] = useState(false);
-
   const pathname = usePathname();
+  const [theme, setTheme] = useState("light");
+  const [userMenuOpen, setUserMenuOpen] = useState(false);
+  const dropdownRef = useRef(null);
+  const { user: loggedInUser, status } = useUser();
+
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  const [rotating, setRotating] = useState(false);
 
   useEffect(() => {
-    const handleScroll = () => setScrolled(window.scrollY > 50);
+    const savedTheme = localStorage.getItem("theme") || "light";
+    setTheme(savedTheme);
+  }, []);
+
+  useEffect(() => {
+    document.documentElement.setAttribute("data-theme", theme);
+    localStorage.setItem("theme", theme);
+  }, [theme]);
+
+  useEffect(() => {
+    const handleScroll = () => setScrolled(window.scrollY > 0);
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
+        setUserMenuOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const handleGearClick = () => {
+    if (rotating) return;
+    setRotating(true);
+    setTimeout(() => {
+      setRotating(false);
+      setDrawerOpen(!drawerOpen);
+    }, 600);
+  };
+
   const navigation = [
     { href: "/", label: "Home" },
-    { href: "/services", label: "Services" },
+    { href: "/services", label: "Mechanic Shops" },
+    { href: "/serviceReq", label: "Service Requests" },
     { href: "/about", label: "About" },
-    { href: "/dashboard", label: "Dashboard" },
   ];
-
-  const shakeVariants = {
-    hover: {
-      x: [0, -5, 5, -5, 5, 0], // horizontal shake
-      transition: { duration: 0.5 },
-    },
-  };
 
   return (
     <header
-      className={`fixed top-0 w-full z-50 transition-all duration-300 ${scrolled
-        ? "bg-white/95 backdrop-blur-md shadow-sm py-2"
-        : "bg-white/90 backdrop-blur-sm py-4"
+      className={`sticky top-0 w-full z-50 transition-all duration-300 ${scrolled
+          ? "bg-base-100/95 backdrop-blur-md shadow-sm py-3"
+          : "bg-transparent backdrop-blur-sm py-4"
         }`}
     >
-      <div className="container mx-auto px-4 md:px-6 flex justify-between items-center">
+      <div className="container mx-auto px-2 md:px-3 flex justify-between items-center text-base-content">
         {/* Logo */}
-        <Link href="/" className="flex gap-5 items-center z-50">
-          <FaGear className="h-12  w-12" />
-          <h1 className="text-3xl font-bold">Mecha<span className="text-orange-500">Link</span></h1>
+        <Link href="/" className="z-50">
+          <button className="flex gap-2 lg:gap-3 items-center cursor-pointer">
+            <FaGear
+              className={`h-6 w-6 lg:h-12 lg:w-12 transition-transform duration-500 ${rotating && (drawerOpen ? "-rotate-90" : "rotate-90")
+                } text-primary`}
+            />
+            <h1 className="text-2xl lg:text-3xl font-bold">
+              Mecha<span className="text-primary">Link</span>
+            </h1>
+          </button>
         </Link>
 
         {/* Desktop Navigation */}
-        <nav className="hidden md:flex items-center space-x-6 lg:space-x-8">
+        <nav className="hidden lg:flex items-center space-x-3 lg:space-x-8">
           {navigation.map((item) => (
             <Link
               key={item.href}
               href={item.href}
-              className={`relative text-lg font-medium transition-colors hover:text-orange-500 ${pathname === item.href ? "text-orange-500" : "text-gray-700"
+              className={`relative text-base lg:text-lg font-medium transition-colors hover:text-primary ${pathname === item.href ? "text-primary" : ""
                 }`}
             >
               {item.label}
-              {pathname === item.href && (
-                <span></span>
-              )}
             </Link>
           ))}
         </nav>
 
-        {/* Right Side Auth / User Menu */}
-        <div className="hidden md:flex items-center space-x-4">
-          {!user ? (
-            <>
-              <Link
-                href="/login"
-                className="text-md font-medium border-2 py-2 px-4 rounded-md border-orange-500 text-orange-500 hover:text-white hover:bg-orange-500 transition-colors"
-              >
-                Log in
-              </Link>
-              <Link
-                href="/register"
-                className="bg-orange-500 border-2 border-orange-500 hover:bg-white hover:text-orange-500 text-white px-4 py-2 rounded-md text-md font-medium transition-colors shadow-sm"
-              >
-                Sign up
-              </Link>
-            </>
-          ) : (
-            <div className="relative">
-              <button
-                className="flex items-center space-x-2 focus:outline-none"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setUserMenuOpen(!userMenuOpen);
-                }}
-              >
-                <div className="w-8 h-8 rounded-full bg-gray-200 overflow-hidden flex items-center justify-center">
-                  {user?.avatar ? (
-                    <UserIcon className="w-5 h-5 text-gray-500" />
-                  ) : (
-                    <UserIcon className="w-5 h-5 text-gray-500" />
-                  )}
-                </div>
-                <span className="text-lg font-medium text-gray-700">
-                  {user.name}
-                </span>
-                <svg
-                  className={`w-4 h-4 transition-transform ${userMenuOpen ? "rotate-180" : ""
-                    }`}
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M19 9l-7 7-7-7"
-                  />
-                </svg>
-              </button>
-
-              {/* User Dropdown */}
-              {userMenuOpen && (
-                <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50 border border-gray-100">
-                  <div className="px-4 py-2 border-b border-gray-100">
-                    <p className="text-sm font-medium text-gray-900">{user.name}</p>
-                    <p className="text-xs text-gray-500 truncate">{user.email}</p>
-                  </div>
-                  <Link
-                    href="/profile"
-                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
-                  >
-                    Profile
-                  </Link>
-                  <div className="border-t border-gray-100 my-1"></div>
-                  <button
-                    className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
-                    onClick={() => {
-                      setUser(null); // logout
-                      setUserMenuOpen(false);
-                    }}
-                  >
-                    Sign out
-                  </button>
-                </div>
-              )}
+        {/* Right Side */}
+        <div className="flex gap-2 items-center">
+          <div className="flex items-center gap-4">
+            <div className="hidden md:block">
+              <ToggleTheme />
             </div>
-          )}
+
+            {status === "loading" && !loggedInUser ? (
+              <span className="loading loading-spinner loading-xs"></span>
+            ) : loggedInUser ? (
+              <div className="relative" ref={dropdownRef}>
+                <button
+                  className="flex items-center space-x-2 focus:outline-none"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setUserMenuOpen(!userMenuOpen);
+                  }}
+                >
+                  <div className="flex items-center space-x-1">
+                    <div className="w-9 h-9 rounded-full bg-base-300 overflow-hidden flex items-center justify-center">
+                      {loggedInUser?.profileImage ? (
+                        <img
+                          src={loggedInUser.profileImage}
+                          alt={loggedInUser.name || "User"}
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <UserIcon className="w-5 h-5 text-base-content/70" />
+                      )}
+                    </div>
+                    <ChevronDown
+                      className={`w-4 h-4 transition-transform duration-300 ${userMenuOpen ? "rotate-180" : ""
+                        }`}
+                    />
+                  </div>
+                </button>
+
+                {userMenuOpen && (
+                  <div className="absolute right-0 mt-2 w-48 bg-base-100 text-base-content rounded-md shadow-lg py-1 z-50 border border-base-300">
+                    <div className="px-4 py-2 border-b border-base-300">
+                      <p className="text-sm font-medium">{loggedInUser?.name}</p>
+                      <p className="text-xs truncate opacity-80">
+                        {loggedInUser?.email}
+                      </p>
+                    </div>
+                    <Link
+                      href="/profile"
+                      className="block px-4 py-2 text-sm hover:bg-base-200"
+                      onClick={() => setUserMenuOpen(false)}
+                    >
+                      Profile
+                    </Link>
+                    <Link
+                      href={
+                        loggedInUser?.role === "admin"
+                          ? "/dashboard/admin"
+                          : loggedInUser?.role === "mechanic"
+                            ? "/dashboard/mechanic"
+                            : "/dashboard/user"
+                      }
+                      className="block px-4 py-2 text-sm hover:bg-base-200"
+                      onClick={() => setUserMenuOpen(false)}
+                    >
+                      Dashboard
+                    </Link>
+                    <div className="border-t border-base-300 my-1"></div>
+                    <button
+                      type="button"
+                      className="w-full text-left px-4 py-2 text-sm hover:bg-base-200"
+                      onClick={() => {
+                        signOut();
+                        setUserMenuOpen(false);
+                      }}
+                    >
+                      Sign out
+                    </button>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <>
+                <Link
+                  href="/login"
+                  className="text-md font-medium border-2 py-1 px-3 rounded-md border-primary text-primary hover:bg-primary hover:text-primary-content transition-colors lg:mr-2"
+                >
+                  Log in
+                </Link>
+                <Link
+                  href="/register"
+                  className="hidden lg:flex bg-primary border-2 border-primary hover:bg-base-100 hover:text-primary text-primary-content px-3 py-1 rounded-md text-md font-medium transition-colors shadow-sm"
+                >
+                  Sign up
+                </Link>
+              </>
+            )}
+          </div>
+
+          <div className="md:hidden">
+            <ToggleTheme />
+          </div>
+
+          <div className="lg:hidden text-primary" onClick={handleGearClick}>
+            {drawerOpen ? (
+              <AiOutlineMenuFold size={40} />
+            ) : (
+              <AiOutlineMenuUnfold size={40} />
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* Mobile Drawer */}
+      <div
+        className={`fixed lg:hidden top-0 left-0 h-full w-64 transform transition-transform duration-500 z-40 ${drawerOpen ? "translate-x-0" : "-translate-x-full"
+          }`}
+      >
+        <div className="relative p-4 top-14 left-0 bg-base-200 text-base-content border-r border-base-300">
+          <ul className="space-y-2">
+            {navigation.map((item) => (
+              <li key={item.href}>
+                <Link
+                  href={item.href}
+                  className={`block px-2 py-2 rounded hover:bg-base-300 ${pathname === item.href
+                      ? "text-primary font-semibold"
+                      : ""
+                    }`}
+                  onClick={() => setDrawerOpen(false)}
+                >
+                  {item.label}
+                </Link>
+              </li>
+            ))}
+          </ul>
         </div>
       </div>
     </header>
