@@ -27,10 +27,10 @@ export default function ServiceCard({service}) {
         {/* service Info */}
         <div className="flex-1 p-4">
           <div className="flex justify-between">
-            <h2 className="text-3xl font-bold md:truncate xl:overflow-visible xl:whitespace-normal xl:text-clip">{service.shop.shopName}</h2>
+            <h2 className="text-3xl font-bold truncate">{service.shop.shopName}</h2>
             
           </div>
-          <div className="text-lg mt-3 md:truncate xl:overflow-visible xl:whitespace-normal xl:text-clip">
+          <div className="text-lg mt-3 truncate">
             <span className="font-semibold">Category:</span>{" "}
             <Link href={`/category/${service.shop.categories}`}>
               {service.shop.categories}
@@ -41,7 +41,7 @@ export default function ServiceCard({service}) {
               strokeWidth={1.25}
               className="w-6 h-6 text-2xl text-primary"
             />{" "}
-            <p className="md:truncate xl:overflow-visible xl:whitespace-normal xl:text-clip">Location: {service.shop.address.street || ""} {" "} { service.shop.address.city || ""}  {" - "} { service.shop.address.postalCode || ""} </p>
+            <p className="truncate">Location: {service.shop.address.street || ""} {" "} { service.shop.address.city || ""}  {" - "} { service.shop.address.postalCode || ""} </p>
           </div>
           <p className="text-base flex gap-2 items-center mt-3">
             <Clock
