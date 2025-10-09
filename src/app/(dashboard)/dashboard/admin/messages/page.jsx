@@ -18,8 +18,6 @@ import useUser from "@/hooks/useUser";
 
 let socket;
 
-// --- NEW UTILITY FUNCTIONS (For Date Separation and Time Display) ---
-
 const isSameDay = (d1, d2) => {
     return d1.getFullYear() === d2.getFullYear() &&
         d1.getMonth() === d2.getMonth() &&
@@ -42,14 +40,12 @@ const formatDateSeparator = (dateString) => {
     return date.toLocaleDateString([], { month: 'long', day: 'numeric', year: 'numeric' });
 };
 
-// Formats time for display inside the message bubble (e.g., "5:37 PM")
 const formatMessageTime = (dateString) => {
     if (!dateString) return "";
     const date = new Date(dateString);
     return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 };
 
-// --- UTILITY FUNCTION FOR TIME FORMATTING (For Conversation List) ---
 const formatRelativeTime = (dateString) => {
     if (!dateString) return "";
     const date = new Date(dateString);
@@ -77,7 +73,6 @@ const formatRelativeTime = (dateString) => {
     return date.toLocaleDateString([], { month: 'short', day: 'numeric' });
 };
 
-// --- UTILITY FUNCTION FOR DEBOUNCE ---
 const useDebouncedCallback = (callback, delay) => {
     const timeoutRef = useRef(null);
 
@@ -91,7 +86,6 @@ const useDebouncedCallback = (callback, delay) => {
     }, [callback, delay]);
 };
 
-// --- DateSeparator Component ---
 const DateSeparator = ({ dateString }) => (
     <div className="flex items-center my-6">
         <div className="flex-grow border-t border-neutral"></div>
@@ -102,25 +96,25 @@ const DateSeparator = ({ dateString }) => (
     </div>
 );
 
-// --- UPDATED MessageBubble Component (Now includes time) ---
 const MessageBubble = ({ text, isSender, time }) => (
     <div className="flex flex-col max-w-xs md:max-w-md lg:max-w-lg break-words transition-all duration-300 ease-in-out">
+        {/* Message Bubble */}
         <div
             className={`flex flex-col py-2 px-4 rounded-xl text-base ${isSender
                 ? "bg-primary text-white rounded-br-md ml-auto shadow-lg shadow-primary/20"
-                : "bg-base-300/60 text-base-content rounded-tl-md mr-auto shadow-sm border border-neutral"
+                : "bg-white text-gray-800 rounded-tl-md mr-auto shadow-sm border border-gray-100"
                 }`}
         >
             <span>{text}</span>
         </div>
 
+        {/* Timestamp outside the bubble */}
         <span className={`text-xs mt-1 flex ${isSender ? "text-gray-400 self-end" : "text-gray-400 self-start"}`}>
             {formatMessageTime(time)}
         </span>
     </div>
 );
 
-// Helper component for Avatar
 const Avatar = ({ src, alt, size = "large" }) => {
     const wH = size === "small" ? "w-10 h-10" : "w-12 h-12";
     const iconSize = size === "small" ? "w-5 h-5" : "w-6 h-6";
@@ -155,12 +149,11 @@ const AvatarHeader = ({ src, alt, size = "large" }) => {
     );
 };
 
-// Role-agnostic ConversationListItem
 const ConversationListItem = ({ conv, userId, active, onSelect, onDeleteUser }) => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const menuRef = useRef(null);
 
-    const isCurrentUserCustomer = conv.customerId === userId;
+    const isCurrentUserCustomer = conv.customerEmail === userId;
 
     const otherUser = isCurrentUserCustomer
         ? {
@@ -192,7 +185,6 @@ const ConversationListItem = ({ conv, userId, active, onSelect, onDeleteUser }) 
 
     const timeDisplay = formatRelativeTime(conv.lastMessageAt);
 
-    // UPGRADE: Modernized list item design (rounded corners, shadow on active, hover scale)
     return (
         <div
             onClick={() => onSelect(conv)}
@@ -240,10 +232,9 @@ const ConversationListItem = ({ conv, userId, active, onSelect, onDeleteUser }) 
     );
 };
 
-// PROFESSIONAL TYPING INDICATOR COMPONENT
 const TypingBubble = () => (
     <div className="flex items-center h-5">
-        <div className="bg-base-300/50 p-3 rounded-xl rounded-tl-md flex items-center space-x-1.5 shadow-sm border border-base-content/10">
+        <div className="bg-base-100 p-3 rounded-xl rounded-tl-md flex items-center space-x-1.5 shadow-sm border border-base-content/10">
             <div
                 className="w-2 h-2 bg-primary rounded-full animate-typing-dot-0"
                 style={{ animationDelay: '0s' }}
@@ -260,7 +251,7 @@ const TypingBubble = () => (
     </div>
 );
 
-export default function AdminMessagesPage() {
+function AdminMessagesPage() {
     const { user } = useUser();
     const [conversations, setConversations] = useState([]);
     const [activeConversation, setActiveConversation] = useState(null);
@@ -275,8 +266,9 @@ export default function AdminMessagesPage() {
     const [isOtherUserTyping, setIsOtherUserTyping] = useState(false);
 
     const messagesEndRef = useRef(null);
-    const messageContainerRef = useRef(null); // Added for scroll logic
+    const messageContainerRef = useRef(null);
     const typingTimeoutRef = useRef(null);
+    const socketRef = useRef(null);
 
     const [isMobileDevice, setIsMobileDevice] = useState(
         typeof window !== "undefined" ? window.innerWidth < 1024 : false
@@ -286,12 +278,11 @@ export default function AdminMessagesPage() {
 
     const debouncedStopTyping = useDebouncedCallback(() => {
         if (socket && activeConversation?._id) {
-            socket.emit("stopTyping", activeConversation._id, user._id); // Include user ID
+            socket.emit("stopTyping", activeConversation._id, user.email);
         }
         typingTimeoutRef.current = null;
     }, 1500);
 
-    // --- Hooks for Mobile/Resize/ClickOutside ---
     useEffect(() => {
         const handleResize = () => setIsMobileDevice(window.innerWidth < 1024);
         handleResize();
@@ -316,21 +307,20 @@ export default function AdminMessagesPage() {
         return () => document.removeEventListener("mousedown", handleClickOutside);
     }, []);
 
-    // Role-agnostic formatLastMessage
     const formatLastMessage = (msg, senderId, conv) => {
         if (!msg) return "";
         const words = msg.split(" ");
         const truncated = words.length > 7 ? words.slice(0, 7).join(" ") + "..." : msg;
 
-        // Since the current user is the Admin, the other user will be either the customer or mechanic
-        const otherName = conv.customerId === user._id ? conv.mechanicName : conv.customerName;
-        // Determine the display name for the preview
-        const displayedName = senderId === user._id ? "You" : (otherName?.split(" ")[0] || "Them");
+        const isSenderCurrentUser = senderId === user?.email;
 
-        return senderId === user._id ? `You: ${truncated}` : `${displayedName}: ${truncated}`;
+        const otherName = conv.customerEmail === user?.email ? conv.mechanicName : conv.customerName;
+
+        const displayedName = isSenderCurrentUser ? "You" : (otherName?.split(" ")[0] || "Them");
+
+        return isSenderCurrentUser ? `You: ${truncated}` : `${displayedName}: ${truncated}`;
     };
 
-    // --- Effect: Fetch Conversations on Load ---
     useEffect(() => {
         if (!user?.email) return;
 
@@ -338,11 +328,9 @@ export default function AdminMessagesPage() {
             setError(null);
             setIsLoading(true);
             try {
-                // Fetch all chats and filter on backend or pass email as query
                 const res = await axios.get(`/api/chats?userEmail=${user.email}`);
                 const allChats = res.data || [];
 
-                // Filter chats where the user email matches either customer or mechanic
                 const filteredChats = allChats.filter(conv =>
                     conv.customerEmail === user.email ||
                     conv.mechanicEmail === user.email ||
@@ -385,18 +373,16 @@ export default function AdminMessagesPage() {
         fetchChats();
     }, [user?.email]);
 
-    // --- Effect: Socket Setup ---
     useEffect(() => {
-        if (!activeConversation?._id || !user?._id) return;
+        if (!activeConversation?._id || !user?.email) return;
 
         if (socket) socket.disconnect();
-        // NOTE: Replace with your actual backend socket URL
         socket = io("https://mechalink-socket-server-production.up.railway.app/");
         socket.emit("joinChat", activeConversation._id);
 
         const handleNewMessage = msg => {
             if (msg.chatId === activeConversation._id) {
-                if (msg.senderId !== user._id) {
+                if (msg.senderId !== user.email) {
                     setMessages(prev => [...prev, msg]);
                     setIsOtherUserTyping(false);
                 }
@@ -404,7 +390,7 @@ export default function AdminMessagesPage() {
                 setConversations(prev => {
                     const updatedConvs = prev.map(conv =>
                         conv._id === msg.chatId
-                            ? { ...conv, lastMessagePreview: formatLastMessage(msg.text, msg.senderId, conv), lastMessageAt: msg.createdAt } // Use definitive message time
+                            ? { ...conv, lastMessagePreview: formatLastMessage(msg.text, msg.senderId, conv), lastMessageAt: msg.createdAt }
                             : conv
                     );
                     updatedConvs.sort((a, b) => new Date(b.lastMessageAt) - new Date(a.lastMessageAt));
@@ -414,14 +400,18 @@ export default function AdminMessagesPage() {
         };
 
         const handleTyping = (chatId, senderId) => {
-            if (chatId === activeConversation._id && senderId !== user._id) {
-                setIsOtherUserTyping(true);
+            if (chatId === activeConversation._id) {
+                if (senderId !== user.email) {
+                    setIsOtherUserTyping(true);
+                }
             }
         };
 
         const handleStopTyping = (chatId, senderId) => {
-            if (chatId === activeConversation._id && senderId !== user._id) {
-                setIsOtherUserTyping(false);
+            if (chatId === activeConversation._id) {
+                if (senderId !== user.email) {
+                    setIsOtherUserTyping(false);
+                }
             }
         };
 
@@ -435,9 +425,8 @@ export default function AdminMessagesPage() {
             socket.off("stopTyping", handleStopTyping);
             socket.disconnect();
         };
-    }, [activeConversation?._id, user?._id]);
+    }, [activeConversation?._id, user?.email]);
 
-    // --- Effect: Auto-Scroll ---
     useEffect(() => {
         const timeout = setTimeout(() => {
             if (messageContainerRef.current) {
@@ -451,7 +440,6 @@ export default function AdminMessagesPage() {
         return () => clearTimeout(timeout);
     }, [messages, isOtherUserTyping, isMessageLoading]);
 
-    // --- Message List Processor (Memoized for performance) ---
     const messagesWithSeparators = useMemo(() => {
         if (messages.length === 0) return [];
 
@@ -460,7 +448,6 @@ export default function AdminMessagesPage() {
             const currentMsg = messages[i];
             const prevMsg = messages[i - 1];
 
-            // 1. Add Date Separator if it's the first message or a new day
             if (!prevMsg || !isSameDay(new Date(currentMsg.createdAt), new Date(prevMsg.createdAt))) {
                 processed.push({
                     type: 'separator',
@@ -468,7 +455,6 @@ export default function AdminMessagesPage() {
                 });
             }
 
-            // 2. Add the actual message
             processed.push({
                 type: 'message',
                 data: currentMsg
@@ -504,7 +490,7 @@ export default function AdminMessagesPage() {
         if (!socket || !activeConversation?._id) return;
 
         if (!typingTimeoutRef.current) {
-            socket.emit("typing", activeConversation._id, user._id); // Emit with user ID
+            socket.emit("typing", activeConversation._id, user.email);
         }
 
         debouncedStopTyping();
@@ -518,28 +504,38 @@ export default function AdminMessagesPage() {
             clearTimeout(typingTimeoutRef.current);
             typingTimeoutRef.current = null;
         }
-        socket.emit("stopTyping", activeConversation._id, user._id); // Emit with user ID
+        socket.emit("stopTyping", activeConversation._id, user.email);
 
         const now = new Date().toISOString();
-        const msgToSend = { senderId: user._id, text, chatId: activeConversation._id };
-        const optimisticMsg = { ...msgToSend, _id: Date.now(), createdAt: now };
 
-        // 1. Optimistic UI update
+        const msgToSend = {
+            senderId: user.email,
+            text,
+            chatId: activeConversation._id,
+            senderName: user.name,
+            adminId: user.role === "admin" ? user._id : undefined,
+            adminName: user.role === "admin" ? user.name : undefined,
+        };
+
+        const optimisticMsg = {
+            ...msgToSend,
+            _id: Date.now(),
+            createdAt: now,
+        };
+
         setMessages(prev => [...prev, optimisticMsg]);
         setInput("");
 
-        // 2. Update conversations list optimistically
         setConversations(prev => {
             const updatedConvs = prev.map(c =>
                 c._id === activeConversation._id
-                    ? { ...c, lastMessagePreview: formatLastMessage(text, user._id, c), lastMessageAt: now }
+                    ? { ...c, lastMessagePreview: formatLastMessage(text, user.email, c), lastMessageAt: now }
                     : c
             );
             updatedConvs.sort((a, b) => new Date(b.lastMessageAt) - new Date(a.lastMessageAt));
             return updatedConvs;
         });
 
-        // 3. API Call
         try {
             const res = await fetch(`/api/chats/${activeConversation._id}/messages`, {
                 method: "POST",
@@ -548,11 +544,9 @@ export default function AdminMessagesPage() {
             });
             if (!res.ok) throw new Error("Failed to post message");
 
-            // 4. Emit to socket
             socket.emit("sendMessage", optimisticMsg);
         } catch (err) {
             console.error("Failed to send message:", err);
-            // 5. Rollback optimistic update on failure
             setMessages(prev => prev.filter(m => m._id !== optimisticMsg._id));
             Swal.fire({
                 title: "Error",
@@ -674,7 +668,7 @@ export default function AdminMessagesPage() {
     };
 
     const otherUserForHeader = activeConversation
-        ? activeConversation.customerId === user._id
+        ? activeConversation.customerEmail === user.email
             ? {
                 name: activeConversation.mechanicName || activeConversation.ShopName || "Unknown User",
                 image: activeConversation.mechanicProfileImage || activeConversation.ShopLogo || null,
@@ -739,7 +733,7 @@ export default function AdminMessagesPage() {
                                     <ConversationListItem
                                         key={conv._id}
                                         conv={conv}
-                                        userId={user?._id}
+                                        userId={user?.email}
                                         active={activeConversation?._id === conv._id}
                                         onSelect={handleSelectConversation}
                                         onDeleteUser={handleDeleteChat}
@@ -819,10 +813,10 @@ export default function AdminMessagesPage() {
 
                                         const msg = item.data;
                                         return (
-                                            <div key={msg?._id || idx} className={`flex ${msg?.senderId === user?._id ? "justify-end" : "justify-start"}`}>
+                                            <div key={msg?._id || idx} className={`flex ${msg?.senderId === user?.email ? "justify-end" : "justify-start"}`}>
                                                 <MessageBubble
                                                     text={msg?.text}
-                                                    isSender={msg?.senderId === user?._id}
+                                                    isSender={msg?.senderId === user?.email}
                                                     time={msg?.createdAt}
                                                 />
                                             </div>
@@ -873,3 +867,5 @@ export default function AdminMessagesPage() {
         </div>
     );
 }
+
+export default AdminMessagesPage;

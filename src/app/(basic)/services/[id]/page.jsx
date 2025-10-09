@@ -175,63 +175,73 @@ export default function ServiceDetailsPage() {
     const logo = shop.logo;
 
     if (!customerId) {
-      Swal.fire({
+      return Swal.fire({
         icon: "error",
         title: "Login Required",
         text: "You must be logged in to start a chat.",
         confirmButtonColor: "#f97316",
       });
-      return;
     }
 
     if (customerId === userId) {
-      Swal.fire({
+      return Swal.fire({
         icon: "info",
         title: "Access Denied",
         text: "You cannot start a chat with your own service shop.",
         confirmButtonColor: "#f97316",
       });
-      return;
     }
 
     if (!shopId || !shopName) {
-      Swal.fire({
+      return Swal.fire({
         icon: "warning",
         title: "Data Missing",
         text: "Cannot start chat: Missing Shop ID, Owner ID, or Shop Name.",
         confirmButtonColor: "#f97316",
       });
-      return;
     }
 
     try {
-      const chatRequestBody = {
-        shopId: shopId,
-        customerId: customerId,
-        customerName: customerName,
-        customerEmail: customerEmail,
-        customerProfileImage: customerProfileImage,
-        ShopName: shopName,
-        ShopLogo: logo,
-        ShopOwnerName: OwnerName,
-        ShopOwnerEmail: OwnerEmail,
-        messages: [],
-      };
+      // Fetch all chats for this user
+      const chatsResponse = await fetch(`/api/chats?userId=${customerId}`);
+      const chats = await chatsResponse.json();
 
-      const apiResponse = await fetch("/api/chats", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(chatRequestBody),
-      });
+      // Check if a chat with this shop/email already exists
+      const existingChat = chats.find(
+        (c) =>
+          c.customerEmail === customerEmail &&
+          c.ShopOwnerEmail === OwnerEmail
+      );
 
-      const data = await apiResponse.json();
+      // If no chat exists, create one
+      if (!existingChat) {
+        const chatRequestBody = {
+          shopId,
+          customerId,
+          customerName,
+          customerEmail,
+          customerProfileImage,
+          ShopName: shopName,
+          ShopLogo: logo,
+          ShopOwnerName: OwnerName,
+          ShopOwnerEmail: OwnerEmail,
+          messages: [],
+        };
 
-      if (!apiResponse.ok) {
-        throw new Error(data.message || "Failed to create/retrieve chat.");
+        const createResponse = await fetch("/api/chats", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(chatRequestBody),
+        });
+
+        const data = await createResponse.json();
+        if (!createResponse.ok)
+          throw new Error(data.message || "Failed to create chat");
       }
 
-      const chatPath = `/dashboard/${user?.role || "customer"}/messages`;
-      window.location.href = chatPath;
+      // Navigate to messages page
+      window.location.href = `/dashboard/${user?.role || "customer"}/messages`;
+
     } catch (error) {
       Swal.fire({
         icon: "error",

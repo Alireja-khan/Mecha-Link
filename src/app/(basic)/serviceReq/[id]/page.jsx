@@ -114,7 +114,7 @@ const ServiceRequestDetails = () => {
 
     const nonMechanicMessage = isCustomerViewingOwnRequest
         ? "This is your service request. Contact options are for service providers."
-            : "";
+        : "";
 
     const handleAcceptRequest = async () => {
         if (loggedInUserRole !== 'mechanic') {
@@ -175,21 +175,62 @@ const ServiceRequestDetails = () => {
             return;
         }
 
-        // Gather all info including the full service request
-        const chatPayload = {
-            serviceRequestId: request._id,
-            customerId: request.userId,
-            customerName: request.user?.name || request.userName || "Not Provided",
-            customerEmail: request.user?.email || request.userEmail,
-            customerProfileImage: request.user?.profileImage || null,
-            mechanicId: loggedInUser._id,
-            mechanicName: loggedInUser.name || "Not Provided",
-            mechanicEmail: loggedInUser.email,
-            messages: [],
-            mechanicProfileImage: loggedInUser.profileImage || null,
-        };
-
         try {
+            const loggedInUserRole = loggedInUser.role?.toLowerCase();
+            const loggedInUserEmail = loggedInUser.email;
+
+            // 1️⃣ Fetch all chats of the logged-in user
+            const res = await fetch(`/api/chats?userId=${loggedInUser._id}`);
+            if (!res.ok) throw new Error('Failed to fetch chats');
+
+            const userChats = await res.json();
+
+            const customerEmail = request.user?.email || request.userEmail;
+
+            // 2️⃣ Check if a chat already exists between logged-in user and customer email
+            const existingChat = userChats.find(chat =>
+                (chat.customerEmail === customerEmail) &&
+                (
+                    (chat.mechanicEmail && chat.mechanicEmail === loggedInUserEmail) ||
+                    (chat.adminEmail && chat.adminEmail === loggedInUserEmail)
+                )
+            );
+
+            if (existingChat) {
+                // Redirect to existing chat
+                window.location.href = `/dashboard/${loggedInUserRole}/messages`;
+                return;
+            }
+
+            // 3️⃣ Build chat payload
+            let chatPayload = {
+                serviceRequestId: request._id,
+                customerId: request.userId,
+                customerName: request.user?.name || request.userName || "Not Provided",
+                customerEmail,
+                customerProfileImage: request.user?.profileImage || null,
+                messages: [],
+            };
+
+            if (loggedInUserRole === "admin") {
+                chatPayload = {
+                    ...chatPayload,
+                    adminId: loggedInUser._id,
+                    adminName: loggedInUser.name || "Admin",
+                    adminEmail: loggedInUser.email,
+                    adminProfileImage: loggedInUser.profileImage || null,
+                };
+            } else {
+                chatPayload = {
+                    ...chatPayload,
+                    mechanicId: loggedInUser._id,
+                    mechanicName: loggedInUser.name || "Mechanic",
+                    mechanicEmail: loggedInUser.email,
+                    mechanicProfileImage: loggedInUser.profileImage || null,
+                };
+            }
+
+            // 4️⃣ Create new chat
             const apiResponse = await fetch('/api/chats', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -198,9 +239,8 @@ const ServiceRequestDetails = () => {
 
             if (!apiResponse.ok) throw new Error('Failed to create chat');
 
-            // Redirect to messages page
-            window.location.href = `/dashboard/${loggedInUser.role.toLowerCase()}/messages`;
-
+            // Redirect to new chat
+            window.location.href = `/dashboard/${loggedInUserRole}/messages`;
         } catch (error) {
             Swal.fire({
                 icon: 'error',
@@ -210,6 +250,7 @@ const ServiceRequestDetails = () => {
             });
         }
     };
+
 
     const handleOpenMaps = () => {
         const { latitude, longitude } = request.location || {};
