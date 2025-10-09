@@ -84,8 +84,8 @@ const AboutPage = () => {
       </section>
 
       {/* Our Story */}
-      <section className="container mx-auto px-6 py-20">
-        <div className="text-center mb-16">
+      <section className="container mx-auto px-6 py-5 lg:py-20">
+        <div className="text-center md:mb-16">
           <h2 className="text-4xl font-bold mb-4">Our Story</h2>
           <div className="w-20 h-1 bg-orange-500 mx-auto"></div>
           <p className="max-w-2xl mx-auto mt-4 text-gray-400">
@@ -94,8 +94,8 @@ const AboutPage = () => {
           </p>
         </div>
 
-        <div className="grid md:grid-cols-2 gap-16 items-center">
-          <div className="w-full lg:w-full lg:flex items-center justify-center hidden">
+        <div className="grid xl:grid-cols-2 gap-16 items-center">
+          <div className="w-full lg:w-full lg:flex items-center justify-center">
             <Lottie
               animationData={storyAnimation}
               loop={true}
@@ -534,11 +534,6 @@ const AboutPage = () => {
                     : "border-2 border-orange-500"
                 }`}
               >
-                {person.featured && (
-                  <div className="absolute top-4 right-4 bg-orange-500 text-white text-xs font-bold px-2 py-1 rounded-full">
-                    Team Leader
-                  </div>
-                )}
                 <div className="h-118 overflow-hidden">
                   <img
                     src={person.image}
