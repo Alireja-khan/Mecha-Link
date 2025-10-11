@@ -6,7 +6,8 @@ import { usePathname } from "next/navigation";
 import {
   User, Settings, LogOut, Users, Wrench, Tag, Megaphone,
   List, ClipboardList, Star, MessageSquare, WrenchIcon,
-  Store, LayoutDashboard, X, PanelLeft, PanelRight
+  Store, LayoutDashboard, X, PanelLeft, PanelRight,
+  LucideBrainCircuit
 } from "lucide-react";
 import { FaGear } from "react-icons/fa6";
 import useUser from "@/hooks/useUser";
@@ -48,6 +49,7 @@ const Sidebar = ({ isMobileOpen, setIsMobileOpen }) => {
     menuItem("Settings", <Settings size={20} />, `/dashboard/${role}/settings`),
     menuItem("Reviews", <Star size={20} />, `/dashboard/${role}/reviews`),
     menuItem("Messages", <MessageSquare size={20} />, `/dashboard/${role}/messages`),
+    menuItem("Ask AI", <LucideBrainCircuit size={20} />, "/dashboard/user/AskAI"),
   ];
 
   const roleMenu = {
