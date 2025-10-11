@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 export default function MechaLinkQnA() {
   const [question, setQuestion] = useState("");
@@ -11,6 +11,28 @@ export default function MechaLinkQnA() {
 
   const apiKey = process.env.NEXT_PUBLIC_GEMINI_API_KEY;
   const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
+
+  // Load history from localStorage on mount
+  useEffect(() => {
+    const stored = localStorage.getItem("mechaHistory");
+    if (stored) {
+      const parsed = JSON.parse(stored);
+      const now = new Date().getTime();
+      if (now - parsed.timestamp < 24 * 60 * 60 * 1000) {
+        setHistory(parsed.data);
+      } else {
+        localStorage.removeItem("mechaHistory");
+      }
+    }
+  }, []);
+
+  // Save history to localStorage
+  const saveHistory = (newHistory) => {
+    localStorage.setItem(
+      "mechaHistory",
+      JSON.stringify({ data: newHistory, timestamp: new Date().getTime() })
+    );
+  };
 
   const handleAsk = async () => {
     if (!question.trim()) {
@@ -57,12 +79,12 @@ export default function MechaLinkQnA() {
         const cleanText = generatedText.replace(/\*\*(.*?)\*\*/g, "$1").trim();
         setAnswer(cleanText);
 
-        setHistory((prev) => {
-          const updated = [{ question, answer: cleanText }, ...prev];
-          return updated.slice(0, 5);
-        });
+        // Update history
+        const newHistory = [{ question, answer: cleanText }, ...history].slice(0, 10);
+        setHistory(newHistory);
+        saveHistory(newHistory);
 
-        setQuestion("");
+        setQuestion(""); // clear input
       } else {
         setError("No response received from MechaLink AI.");
       }
