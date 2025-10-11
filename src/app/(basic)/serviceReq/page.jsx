@@ -62,28 +62,41 @@ const ServiceReq = () => {
 
   return (
     <div className="min-h-screen ">
-      {/* 1. HERO BANNER SECTION */}
-      <section
-        className="relative bg-cover bg-center"
-        style={{ backgroundImage: `url(${BACKGROUND_IMAGE_URL})` }}
-      >
-        {/* Overlay */}
-        <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/30 to-black/50"></div>
-
-        <div className="container relative z-10 flex flex-col items-center justify-center text-center text-white py-40 px-4">
-          <h1 className="text-4xl md:text-6xl font-extrabold uppercase mb-6 tracking-wide">
-            Reliable Services, Anytime
+      
+      
+{/* <section className="container mx-auto px-6 pb-16 pt-22 flex flex-col-reverse md:flex-row items-center gap-12 font-roboto">
+        <div className="flex-1 flex flex-col gap-6">
+          <h1 className="text-5xl md:text-6xl font-extrabold leading-tight">
+            Reliable <span className="text-primary">Services</span>, Anytime
           </h1>
-          <p className="text-lg md:text-xl font-medium max-w-2xl mb-8">
-            Browse trusted mechanics and service providers to keep your vehicle
-            and electrionic heavy gadgets running smoothly without the stress.
+          <p className="text-gray-600 text-lg leading-relaxed">
+            Connect with trusted professionals to keep your vehicle and heavy electronic
+            gadgets running smoothly — without the hassle or stress.
           </p>
+
+          <div className="flex flex-wrap gap-4 mt-4">
+            <button className="px-6 py-3 bg-primary text-white font-semibold rounded-full shadow-md hover:bg-primary transition-all duration-300">
+              Get Started
+            </button>
+            <button className="px-6 py-3 border border-gray-400 text-gray-700 font-semibold rounded-full hover:bg-gray-100 transition-all duration-300">
+              Learn More
+            </button>
+          </div>
         </div>
-      </section>
+
+        <div className="flex-1 relative">
+          <div className="absolute inset-0 bg-blue-100 blur-3xl rounded-full opacity-40 -z-10"></div>
+          <img
+            src="/banner-image.jpeg"
+            alt="Reliable Service Illustration"
+            className="w-full h-auto rounded-3xl shadow-xl object-cover"
+          />
+        </div>
+      </section> */}
 
       <section>
-        <div className="container mx-auto px-4 md:px-6 lg:px-8 -mt-8 pb-10">
-          <div className="text-center mt-18 mb-12">
+        <div className="container mx-auto px-4 md:px-6 lg:px-8 mt-8 pb-10 ">
+          {/* <div className="text-center mt-18 mb-12">
             <h2 className="text-4xl md:text-5xl font-extrabold text-center">
               Welcome to <span className="text-primary">MechaLink</span>
             </h2>
@@ -91,7 +104,7 @@ const ServiceReq = () => {
               Explore our service requests, find the request which is best with
               your shop category.
             </p>
-          </div>
+          </div> */}
 
           {/* Search & Sort */}
           <div className="flex flex-col md:flex-row justify-between items-center gap-4 mb-6">
@@ -159,7 +172,7 @@ const ServiceReq = () => {
           )}
 
           {!loading && requests.length > 0 && (
-            <div className="space-y-6 ">
+            <div className="space-y-6 grid grid-cols-2 gap-5">
               {requests?.map((req) => (
                 <ServiceReqCard key={req._id} request={req} />
               ))}
@@ -201,11 +214,10 @@ const ServiceReq = () => {
               {Array.from({ length: totalPage }, (_, i) => (
                 <button
                   key={i}
-                  className={`px-4 py-1 border rounded-md transition duration-400 cursor-pointer ${
-                    currentPage === i + 1
+                  className={`px-4 py-1 border rounded-md transition duration-400 cursor-pointer ${currentPage === i + 1
                       ? "bg-primary text-white border-primary"
                       : "border-primary hover:bg-primary hover:text-white"
-                  }`}
+                    }`}
                   onClick={() => handlePageChange(i + 1)}
                 >
                   {i + 1}

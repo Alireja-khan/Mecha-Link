@@ -1,22 +1,7 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import {
-    Phone,
-    MapPin,
-    Wrench,
-    CalendarClock,
-    Clock,
-    User,
-    AlertTriangle,
-    DollarSign,
-    MessageCircle,
-    Shield,
-    CheckCircle,
-    XCircle,
-    Mail,
-    Map,
-    Image as ImageIcon,
-    Trash2
+    Phone, MapPin, Wrench, CalendarClock, Clock, User, AlertTriangle, DollarSign, MessageCircle, Shield, CheckCircle, XCircle, Mail, Map, Image as ImageIcon, Trash2
 } from "lucide-react";
 import { useParams } from "next/navigation";
 import Swal from 'sweetalert2';
@@ -25,6 +10,8 @@ import useUser from "@/hooks/useUser";
 const ServiceRequestDetails = () => {
     const [selectedImage, setSelectedImage] = useState(null);
     const [request, setRequest] = useState(null);
+    const [completeUserData, setCompleteUserData] = useState(null);
+    const [loading, setLoading] = useState(true);
     const { id } = useParams();
     const { user: loggedInUser, status } = useUser();
 
@@ -32,52 +19,81 @@ const ServiceRequestDetails = () => {
     const currentMechanicId = loggedInUser?._id;
 
     useEffect(() => {
-        if (!id) return; // Guard against missing ID
+        if (!id) return;
 
-        fetch(`/api/service-request/${id}`)
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
+        const fetchData = async () => {
+            try {
+                setLoading(true);
+
+                // First, get the service request
+                const requestResponse = await fetch(`/api/service-request/${id}`);
+                if (!requestResponse.ok) {
+                    throw new Error('Failed to fetch service request');
                 }
-                return response.json();
-            })
-            .then(data => {
-                if (!data.user) {
-                    data.user = { email: data.userEmail, _id: data.userId };
+                const requestData = await requestResponse.json();
+
+                // If user data is incomplete, fetch complete user data using the email
+                if (requestData.userEmail) {
+                    const userResponse = await fetch(`/api/users?email=${encodeURIComponent(requestData.userEmail)}`);
+                    if (userResponse.ok) {
+                        const userData = await userResponse.json();
+                        setCompleteUserData(userData);
+                    }
                 }
-                setRequest(data);
 
-                // --- START Console Log Additions ---
-                const serviceRequestId = id;
-                const customerId = data.userId;
-                // currentMechanicId here is the ID of the logged-in user viewing the page.
-                const viewerId = loggedInUser?._id;
+                // Prepare the request data with user info
+                if (!requestData.user) {
+                    requestData.user = {
+                        email: requestData.userEmail,
+                        _id: requestData.userId
+                    };
+                }
 
+                setRequest(requestData);
+
+                // Console logs for debugging
                 console.log("--- Service Request IDs ---");
-                console.log("Service Request ID (from URL):", serviceRequestId);
-                console.log("Customer User ID (from request data):", customerId);
-                console.log("Current Logged-in User ID (Mechanic/Viewer):", viewerId);
+                console.log("Service Request ID (from URL):", id);
+                console.log("Customer User ID (from request data):", requestData.userId);
+                console.log("Current Logged-in User ID (Mechanic/Viewer):", loggedInUser?._id);
+                console.log("Complete User Data:", completeUserData);
                 console.log("---------------------------");
-                // --- END Console Log Additions ---
 
-            })
-            .catch(error => {
-                console.error("Error fetching service request:", error);
+            } catch (error) {
+                console.error("Error fetching data:", error);
                 Swal.fire({
                     icon: 'error',
                     title: 'Fetch Error',
                     text: 'Could not load service request details.',
                     confirmButtonColor: '#f97316'
                 });
-            });
-    }, [id, loggedInUser?._id]) // Added loggedInUser?._id as a dependency
+            } finally {
+                setLoading(false);
+            }
+        };
 
-    if (!request) {
+        fetchData();
+    }, [id, loggedInUser?._id]);
+
+    // Combine user data for display
+    const displayUser = completeUserData || request?.user;
+
+    if (loading) {
         return (
             <div className="min-h-screen bg-gray-50 flex items-center justify-center">
                 <div className="text-center">
                     <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500 mx-auto"></div>
                     <p className="mt-4 text-gray-400">Loading service request...</p>
+                </div>
+            </div>
+        );
+    }
+
+    if (!request) {
+        return (
+            <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+                <div className="text-center">
+                    <p className="text-gray-400">Service request not found.</p>
                 </div>
             </div>
         );
@@ -103,57 +119,127 @@ const ServiceRequestDetails = () => {
 
     const urgencyInfo = urgencyConfig[request.serviceDetails?.urgency] || urgencyConfig.medium;
 
-    // --- REMOVED MOCK_MECHANIC_EMAIL and isMockMechanic logic ---
     const loggedInUserRole = loggedInUser?.role?.toLowerCase();
-
     const isCustomerViewingOwnRequest = loggedInUser?._id === request.userId;
+    const isShopOwnerAcceptedRequest = request.acceptedBy === currentMechanicId;
 
-    const showMessagingButton = (loggedInUserRole === 'mechanic' || loggedInUserRole === 'admin') && !isCustomerViewingOwnRequest;
-    const showCallButton = (loggedInUserRole === 'mechanic' || loggedInUserRole === 'admin') && !isCustomerViewingOwnRequest;
-
+    const showMessagingButton = (loggedInUserRole === 'mechanic' || loggedInUserRole === 'admin' || loggedInUserRole === 'shop') && !isCustomerViewingOwnRequest;
+    const showCallButton = (loggedInUserRole === 'mechanic' || loggedInUserRole === 'admin' || loggedInUserRole === 'shop') && !isCustomerViewingOwnRequest;
 
     const nonMechanicMessage = isCustomerViewingOwnRequest
         ? "This is your service request. Contact options are for service providers."
-            : "";
+        : "";
 
     const handleAcceptRequest = async () => {
-        if (loggedInUserRole !== 'mechanic') {
-            Swal.fire({ icon: 'warning', title: 'Permission Denied', text: 'Only a mechanic can accept this request.', confirmButtonColor: '#f97316' });
+        // Allow both 'mechanic' and 'shop' roles to accept requests
+        if (loggedInUserRole !== 'mechanic' && loggedInUserRole !== 'shop') {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Permission Denied',
+                text: 'Only mechanics or shop owners can accept this request.',
+                confirmButtonColor: '#f97316'
+            });
             return;
         }
 
-        try {
-            const response = await fetch(`/api/service-requests/${id}`, {
-                method: 'PATCH',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    status: 'accepted',
-                    acceptedBy: currentMechanicId,
-                    acceptedDate: new Date().toISOString()
-                })
-            });
+        const result = await Swal.fire({
+            title: 'Accept Service Request?',
+            text: 'You are about to accept this service request. This will assign your shop as the service provider.',
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonColor: '#f97316',
+            cancelButtonColor: '#6b7280',
+            confirmButtonText: 'Yes, Accept Request',
+            cancelButtonText: 'Cancel'
+        });
 
-            if (response.ok) {
-                // --- REMOVED SUCCESS ALERT ---
-                window.location.reload();
-            } else {
+        if (result.isConfirmed) {
+            try {
+                const response = await fetch(`/api/service-request/${id}/status`, {
+                    method: 'PATCH',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        status: 'in-progress',
+                        acceptedBy: currentMechanicId, // This is the shop owner's user ID
+                        acceptedByRole: loggedInUserRole,
+                        assignedShop: currentMechanicId, // Assign to this shop
+                        acceptedDate: new Date().toISOString()
+                    })
+                });
+
+                if (response.ok) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Request Accepted!',
+                        text: 'Service request has been accepted and is now in progress.',
+                        confirmButtonColor: '#f97316'
+                    }).then(() => {
+                        window.location.reload();
+                    });
+                } else {
+                    const errorData = await response.json();
+                    throw new Error(errorData.error || 'Failed to accept request');
+                }
+            } catch (error) {
+                console.error('Error accepting request:', error);
                 Swal.fire({
                     icon: 'error',
-                    title: 'Update Failed',
-                    text: 'Failed to accept request status.',
+                    title: 'Accept Failed',
+                    text: error.message || 'Failed to accept service request.',
                     confirmButtonColor: '#f97316'
                 });
             }
-        } catch (error) {
-            console.error('Error accepting request:', error);
-            Swal.fire({
-                icon: 'error',
-                title: 'System Error',
-                text: 'An unexpected error occurred while accepting the request.',
-                confirmButtonColor: '#f97316'
-            });
+        }
+    };
+
+    const handleCompleteRequest = async () => {
+        const result = await Swal.fire({
+            title: 'Complete Service Request?',
+            text: 'This will mark the service request as completed. This action cannot be undone.',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#10b981',
+            cancelButtonColor: '#6b7280',
+            confirmButtonText: 'Yes, Complete Service',
+            cancelButtonText: 'Cancel'
+        });
+
+        if (result.isConfirmed) {
+            try {
+                const response = await fetch(`/api/service-request/${id}/status`, {
+                    method: 'PATCH',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        status: 'completed',
+                        completedDate: new Date().toISOString()
+                    })
+                });
+
+                if (response.ok) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Service Completed!',
+                        text: 'Service request has been marked as completed.',
+                        confirmButtonColor: '#10b981'
+                    }).then(() => {
+                        window.location.reload();
+                    });
+                } else {
+                    throw new Error('Failed to complete service request');
+                }
+            } catch (error) {
+                console.error('Error completing request:', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Completion Failed',
+                    text: 'Failed to mark service request as completed.',
+                    confirmButtonColor: '#f97316'
+                });
+            }
         }
     };
 
@@ -175,13 +261,15 @@ const ServiceRequestDetails = () => {
             return;
         }
 
-        // Gather all info including the full service request
+        // Use complete user data if available
+        const userData = displayUser || request.user;
+
         const chatPayload = {
             serviceRequestId: request._id,
             customerId: request.userId,
-            customerName: request.user?.name || request.userName || "Not Provided",
-            customerEmail: request.user?.email || request.userEmail,
-            customerProfileImage: request.user?.profileImage || null,
+            customerName: userData?.name || userData?.userName || "Not Provided",
+            customerEmail: userData?.email || request.userEmail,
+            customerProfileImage: userData?.profileImage || null,
             mechanicId: loggedInUser._id,
             mechanicName: loggedInUser.name || "Not Provided",
             mechanicEmail: loggedInUser.email,
@@ -198,7 +286,6 @@ const ServiceRequestDetails = () => {
 
             if (!apiResponse.ok) throw new Error('Failed to create chat');
 
-            // Redirect to messages page
             window.location.href = `/dashboard/${loggedInUser.role.toLowerCase()}/messages`;
 
         } catch (error) {
@@ -216,11 +303,9 @@ const ServiceRequestDetails = () => {
         const address = encodeURIComponent(request.location?.address || "Service Location");
 
         if (latitude && longitude) {
-            // Updated mapsUrl to use standard Google Maps format
             const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${latitude},${longitude}`;
             window.open(mapsUrl, '_blank');
         } else if (address) {
-            // Updated mapsUrl to use standard Google Maps format
             const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${address}`;
             window.open(mapsUrl, '_blank');
         } else {
@@ -386,9 +471,9 @@ const ServiceRequestDetails = () => {
                         <InfoCard title="Customer Information" icon={User}>
                             <div className="space-y-4">
                                 <div className="flex justify-center mb-4">
-                                    {request.user?.profileImage ? (
+                                    {displayUser?.profileImage ? (
                                         <img
-                                            src={request.user.profileImage}
+                                            src={displayUser.profileImage}
                                             alt="Customer profile"
                                             className="w-20 h-20 rounded-full object-cover border-4 border-orange-100 shadow-md"
                                             onError={(e) => {
@@ -403,8 +488,19 @@ const ServiceRequestDetails = () => {
                                     )}
                                 </div>
 
-                                <DetailItem label="Full Name" value={request?.userName || "Not Provided"} />
-                                <DetailItem label="Email" value={request.user?.email || request.userEmail} icon={Mail} />
+                                {/* Display all user data from completeUserData */}
+                                <DetailItem label="Full Name" value={displayUser?.name || displayUser?.userName || "Not Provided"} />
+                                <DetailItem label="Email" value={displayUser?.email || request.userEmail} icon={Mail} />
+                                <DetailItem label="Phone" value={displayUser?.phone} icon={Phone} />
+                                {displayUser?.address && <DetailItem label="Address" value={displayUser.address} largeValue />}
+                                {displayUser?.bio && <DetailItem label="Bio" value={displayUser.bio} largeValue />}
+
+                                {/* Display any other user fields that might exist */}
+                                {displayUser && Object.entries(displayUser).map(([key, value]) => {
+                                    if (['_id', 'email', 'name', 'userName', 'profileImage', 'phone', 'address', 'bio', 'password', 'otp', 'otpExpiresAt'].includes(key)) return null;
+                                    if (typeof value === 'object' || !value) return null;
+                                    return <DetailItem key={key} label={key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())} value={value.toString()} />;
+                                })}
 
                                 <div className="pt-4 border-t border-gray-100 space-y-3">
                                     <h3 className="text-sm font-semibold text-gray-400">Request Contact</h3>
@@ -458,7 +554,8 @@ const ServiceRequestDetails = () => {
                             </div>
                         </InfoCard>
 
-                        {loggedInUserRole === 'mechanic' && request.status === 'pending' && (
+                        {/* Service Action Cards */}
+                        {(loggedInUserRole === 'mechanic' || loggedInUserRole === 'shop') && request.status === 'pending' && (
                             <div className="bg-white rounded-xl shadow-lg border border-gray-100 p-6">
                                 <h2 className="text-xl font-semibold mb-4 text-orange-600">Service Action</h2>
                                 <button
@@ -470,7 +567,24 @@ const ServiceRequestDetails = () => {
                                 </button>
                             </div>
                         )}
-                        {request.status !== 'pending' && (
+
+                        {request.status === 'in-progress' && isShopOwnerAcceptedRequest && (
+                            <div className="bg-white rounded-xl shadow-lg border border-gray-100 p-6">
+                                <h2 className="text-xl font-semibold mb-4 text-green-600">Service In Progress</h2>
+                                <p className="text-sm text-gray-600 mb-4">
+                                    You are currently working on this service request.
+                                </p>
+                                <button
+                                    onClick={handleCompleteRequest}
+                                    className="w-full bg-green-500 text-white py-3 rounded-lg hover:bg-green-600 transition-colors font-semibold shadow-md hover:shadow-lg"
+                                >
+                                    <CheckCircle className="w-5 h-5 inline mr-2" />
+                                    Mark as Completed
+                                </button>
+                            </div>
+                        )}
+
+                        {request.status !== 'pending' && request.status !== 'in-progress' && (
                             <div className="bg-white rounded-xl shadow-lg border border-gray-100 p-6">
                                 <h2 className="text-xl font-semibold mb-4 text-gray-400">Request Status</h2>
                                 <div className="space-y-2">
@@ -478,6 +592,11 @@ const ServiceRequestDetails = () => {
                                     {request.acceptedDate && (
                                         <p className="text-sm text-gray-400">
                                             Accepted on: {new Date(request.acceptedDate).toLocaleDateString()}
+                                        </p>
+                                    )}
+                                    {request.completedDate && (
+                                        <p className="text-sm text-gray-400">
+                                            Completed on: {new Date(request.completedDate).toLocaleDateString()}
                                         </p>
                                     )}
                                 </div>
@@ -561,8 +680,5 @@ const TimelineItem = ({ date, title, description, active = false, pending = fals
         </div>
     );
 };
-
-
-
 
 export default ServiceRequestDetails;

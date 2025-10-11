@@ -50,11 +50,11 @@ export default function Services() {
 
   return (
     <>
-      <ServiceBanner />
-      <section className="py-20">
+      {/* <ServiceBanner /> */}
+      <section className="">
         <div className="container">
-          {/* Title */}
-          <div className="text-center mb-12">
+          
+          {/* <div className="text-center mb-12">
             <h2 className="text-4xl md:text-5xl font-extrabold text-center">
               Explore <span className="text-primary">MechaLink Services</span>
             </h2>
@@ -62,10 +62,10 @@ export default function Services() {
               Discover professional services for all your needs and manage
               bookings effortlessly with MechaLink.
             </p>
-          </div>
+          </div> */}
 
           {/* Search & Sort */}
-          <div className="flex flex-col md:flex-row justify-between items-center gap-4 mb-6">
+          <div className="flex flex-col md:flex-row pt-8  justify-between items-center gap-4 mb-6">
             {/* Search */}
             <div className="flex-1">
               <div className="flex items-center gap-3 bg-primary rounded-lg px-4 py-1 shadow-sm">
@@ -122,7 +122,7 @@ export default function Services() {
 
           {/* Services Grid */}
           {!loading && (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-10">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mt-10">
               {services.map((service) => (
                 <ServiceCard key={service._id} service={service} />
               ))}
