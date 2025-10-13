@@ -8,7 +8,7 @@ export default function HeroModern() {
         
         {/* Text Content */}
         <div className="flex-1 text-center lg:text-left">
-          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold leading-tight">
+          <h1 className="text-4xl sm:text-5xl xl:text-6xl font-extrabold leading-tight">
             Connect with <span className="text-primary">Trusted Mechanics</span>{" "}
             <br className="hidden sm:block" /> Anytime, Anywhere
           </h1>

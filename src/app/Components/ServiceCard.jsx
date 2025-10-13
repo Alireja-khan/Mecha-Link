@@ -7,8 +7,12 @@ export default function ServiceCard({service}) {
   return (
     <div>
       <div
-        className="border border-primary rounded-xl overflow-hidden shadow-md h-full flex flex-col group"
+        className="border border-primary rounded-xl overflow-hidden shadow-md h-full flex flex-col group relative"
       >
+        <div className="absolute z-10 shrink-0 text-right flex items-center gap-1 justify-center bg-white top-4 right-4 rounded-xl px-2">
+              <Star size={18} strokeWidth={1.25} className="text-primary" />{" "}
+              {service.avgRating? service.avgRating : "0"}/5
+            </div>
         {/* service Image */}
         <div className="h-60 w-full overflow-hidden relative">
           <Image
@@ -23,25 +27,22 @@ export default function ServiceCard({service}) {
         {/* service Info */}
         <div className="flex-1 p-4">
           <div className="flex justify-between">
-            <h2 className="text-3xl font-bold">{service.shop.shopName}</h2>
-            <p className="w-14 shrink-0 text-right flex items-center gap-2">
-              <Star strokeWidth={1.25} className="w-6 text-primary" />{" "}
-              {service.avgRating? service.avgRating : "0"}/5
-            </p>
+            <h2 className="text-3xl font-bold md:truncate xl:overflow-visible xl:whitespace-normal xl:text-clip">{service.shop.shopName}</h2>
+            
           </div>
-          <p className="text-lg mt-3">
+          <div className="text-lg mt-3 md:truncate xl:overflow-visible xl:whitespace-normal xl:text-clip">
             <span className="font-semibold">Category:</span>{" "}
             <Link href={`/category/${service.shop.categories}`}>
               {service.shop.categories}
             </Link>
-          </p>
-          <p className="text-base mt-3 flex gap-2 items-center">
+          </div>
+          <div className="text-base mt-3 flex gap-2 items-center">
             <MapPinPlus
               strokeWidth={1.25}
               className="w-6 h-6 text-2xl text-primary"
             />{" "}
-            Location: {service.shop.address.street || ""} {" "} { service.shop.address.city || ""}  {" - "} { service.shop.address.postalCode || ""} 
-          </p>
+            <p className="md:truncate xl:overflow-visible xl:whitespace-normal xl:text-clip">Location: {service.shop.address.street || ""} {" "} { service.shop.address.city || ""}  {" - "} { service.shop.address.postalCode || ""} </p>
+          </div>
           <p className="text-base flex gap-2 items-center mt-3">
             <Clock
               strokeWidth={1.25}
@@ -62,12 +63,12 @@ export default function ServiceCard({service}) {
         <div className="flex justify-between gap-2 border-t border-primary p-3 w-full mt-auto">
           <a
             href={`tel:${service.shop.contact.phone}`}
-            className="w-1/2  py-3 bg-primary  hover:bg-white hover:border hover:border-primary  text-white hover:text-primary font-bold text-xl capitalize leading-none font-urbanist rounded-md transition duration-400 cursor-pointer text-center "
+            className="w-1/2  py-3 bg-primary  hover:bg-white hover:border hover:border-primary  text-white hover:text-primary font-bold lg:text-lg text-xl capitalize leading-none font-urbanist rounded-md transition duration-400 cursor-pointer text-center "
           >
             Contact
           </a>
           <Link
-            className="w-1/2 py-3 border hover:border border-primary hover-border-primary hover:bg-accent text-primary font-bold text-xl capitalize leading-none font-urbanist rounded-md transition duration-400 cursor-pointer text-center"
+            className="w-1/2 py-3 border hover:border border-primary hover-border-primary hover:bg-accent text-primary font-bold text-xl lg:text-lg xl:text-xl capitalize leading-none font-urbanist rounded-md transition duration-400 cursor-pointer text-center"
             href={`/services/${service._id}`}
           >
             Service Details

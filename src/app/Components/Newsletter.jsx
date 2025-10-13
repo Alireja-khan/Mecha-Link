@@ -116,7 +116,7 @@ export default function Newsletter() {
 
               <button
                 type="submit"
-                className={`px-6 sm:px-8 py-3 rounded-xl text-primary-content font-semibold text-base sm:text-lg hover:opacity-90 shadow-md disabled:opacity-70 disabled:cursor-not-allowed ${isUnsubscribeView
+                className={`lg:px-3 sm:px-8 xl:px-6  py-3 rounded-xl text-primary-content font-semibold text-base sm:text-lg hover:opacity-90 shadow-md disabled:opacity-70 disabled:cursor-not-allowed ${isUnsubscribeView
                     ? "bg-error hover:bg-error/90"
                     : "bg-primary hover:bg-primary/90"
                   }`}
