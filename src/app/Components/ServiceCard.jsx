@@ -25,26 +25,24 @@ export default function ServiceCard({ service }) {
           />
         </div>
 
-        {/* Service Info */}
-        <div className="flex-1 p-4 flex flex-col gap-2">
-          <h2 className="text-3xl font-bold truncate">
-            {service.shop.shopName}
-          </h2>
-
-          <div className="text-lg truncate">
+        {/* service Info */}
+        <div className="flex-1 p-4">
+          <div className="flex justify-between">
+            <h2 className="text-3xl font-bold truncate">{service.shop.shopName}</h2>
+            
+          </div>
+          <div className="text-lg mt-3 truncate">
             <span className="font-semibold">Category:</span>{" "}
             <Link href={`/category/${service.shop.categories}`} className="truncate">
               {service.shop.categories}
             </Link>
           </div>
-
-          <div className="text-base flex gap-2 items-center truncate">
-            <MapPinPlus strokeWidth={1.25} className="w-6 h-6 text-primary shrink-0" />
-            <p className="truncate">
-              Location: {service.shop.address.street || ""}{" "}
-              {service.shop.address.city || ""} {" - "}{" "}
-              {service.shop.address.postalCode || ""}
-            </p>
+          <div className="text-base mt-3 flex gap-2 items-center">
+            <MapPinPlus
+              strokeWidth={1.25}
+              className="w-6 h-6 text-2xl text-primary"
+            />{" "}
+            <p className="truncate">Location: {service.shop.address.street || ""} {" "} { service.shop.address.city || ""}  {" - "} { service.shop.address.postalCode || ""} </p>
           </div>
 
           <p className="text-base flex gap-2 items-center truncate">

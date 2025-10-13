@@ -680,5 +680,4 @@ const TimelineItem = ({ date, title, description, active = false, pending = fals
         </div>
     );
 };
-
 export default ServiceRequestDetails;

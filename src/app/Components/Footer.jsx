@@ -13,7 +13,7 @@ const Footer = () => {
             <Link href="/">
               <FaGear className="h-8 w-8 lg:h-12 lg:w-12 text-primary" />
             </Link>
-            <h1 className="text-xl lg:text-4xl font-bold text-white">
+            <h1 className="text-xl lg:text-3xl xl:text-4xl font-bold text-white">
               MechaLink
             </h1>
           </div>

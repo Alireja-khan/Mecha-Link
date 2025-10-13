@@ -1,6 +1,6 @@
 "use client";
 
-import { Wrench, AlertTriangle, Eye, Clock, Zap, HardHat, User, Mail } from "lucide-react";
+import { Wrench, AlertTriangle, Eye, Clock, Zap, HardHat, User, Mail, CheckCircle, Circle } from "lucide-react";
 import Link from "next/link";
 import { useState, useEffect } from "react";
 
@@ -74,11 +74,17 @@ const ServiceReqCard = ({ request }) => {
 
   const statusConfig = {
     pending: { color: "text-blue-500", bg: "bg-amber-100", label: "Pending" },
-    accepted: { color: "text-indigo-500", bg: "bg-indigo-100", label: "Accepted" },
     "in-progress": { color: "text-blue-600", bg: "bg-orange-100", label: "In Progress" },
     completed: { color: "text-green-600", bg: "bg-green-100", label: "Completed" },
     cancelled: { color: "text-gray-500", bg: "bg-gray-100", label: "Cancelled" },
   };
+
+  // Status tracking steps in order
+  const statusSteps = [
+    { key: 'pending', label: 'Pending' },
+    { key: 'in-progress', label: 'In Progress' },
+    { key: 'completed', label: 'Completed' }
+  ];
 
   // Safe data extraction
   const urgency = getValue(
@@ -89,6 +95,9 @@ const ServiceReqCard = ({ request }) => {
   const status = getValue(request, "status", "pending").toLowerCase();
   const urgencyInfo = urgencyConfig[urgency] || urgencyConfig.medium;
   const statusInfo = statusConfig[status] || statusConfig.pending;
+
+  // Get current status index
+  const currentStatusIndex = statusSteps.findIndex(step => step.key === status);
 
   // --- Sub-Components ---
 
@@ -106,6 +115,54 @@ const ServiceReqCard = ({ request }) => {
         >
           {value}
         </span>
+      </div>
+    </div>
+  );
+
+  // Vertical Status Tracker Component
+  const StatusTracker = () => (
+    <div className="w-full">
+      <h4 className="text-xs font-bold uppercase tracking-widest text-gray-500 mb-4">
+        Status Tracking
+      </h4>
+      <div className="space-y-3">
+        {statusSteps.map((step, index) => {
+          const isCompleted = index < currentStatusIndex; // Previous steps are completed
+          const isCurrent = index === currentStatusIndex; // Current step
+          const isFuture = index > currentStatusIndex; // Future steps
+          
+          return (
+            <div key={step.key} className="flex items-center gap-3">
+              {/* Status Icon */}
+              <div className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center border-2 ${
+                isCompleted 
+                  ? 'bg-green-500 border-green-500 text-white' // Green for completed steps
+                  : isCurrent
+                  ? 'border-orange-500 bg-white text-orange-500' // Orange for current step
+                  : 'border-gray-300 bg-gray-100 text-gray-400' // Gray for future steps
+              }`}>
+                {isCompleted || isCurrent ? (
+                  <CheckCircle className="w-4 h-4" />
+                ) : (
+                  <Circle className="w-4 h-4" />
+                )}
+              </div>
+              
+              {/* Status Label */}
+              <div className="flex-1">
+                <span className={`text-sm font-medium ${
+                  isCompleted 
+                    ? 'text-green-600' // Green text for completed steps
+                    : isCurrent
+                    ? 'text-orange-500 font-semibold' // Orange text for current step
+                    : 'text-gray-400' // Gray text for future steps
+                }`}>
+                  {step.label}
+                </span>
+              </div>
+            </div>
+          );
+        })}
       </div>
     </div>
   );
@@ -196,15 +253,9 @@ const ServiceReqCard = ({ request }) => {
             <UserInfo />
           </div>
 
-          {/* Status Badge */}
-          <div className="order-2 md:order-none text-center md:text-left w-full mt-4">
-            <span className="text-xs font-bold uppercase tracking-widest opacity-80">
-              Request Status
-            </span>
-            <div className="mt-1 text-2xl font-extrabold flex items-center gap-2">
-              <HardHat className="w-6 h-6" />
-              {statusInfo.label}
-            </div>
+          {/* Status Tracker - Replaces the Status Badge */}
+          <div className="order-2 md:order-none w-full mt-4">
+            <StatusTracker />
           </div>
 
           {/* Time & Date */}
@@ -222,36 +273,25 @@ const ServiceReqCard = ({ request }) => {
         <div className="flex-1 p-6 md:p-8">
           {/* Header / Title Section */}
           <div className="flex justify-between items-start gap-4 pb-4 border-b border-primary mb-6">
-            <div>
-              <div className="flex gap-5 items-center">
+            <div className="flex-1">
+              <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
                 <div>
                   <h2 className="text-2xl font-extrabold leading-snug capitalize">
                     {getValue(request, "deviceType")} -{" "}
                     {getValue(request, "serviceDetails.problemTitle")}
                   </h2>
-                </div>
-
-                <div>
-                  {/* Action Button */}
-                  <Link
-                    href={`/serviceReq/${request._id}`}
-                    className="hidden lg:flex items-center gap-2 px-5 py-2 bg-orange-500 text-white rounded-md hover:bg-orange-600 transition-colors font-semibold shadow-lg"
+                  <p
+                    className={`text-sm font-medium mt-1 ${urgencyInfo.color} flex items-center gap-1`}
                   >
-                    <Eye className="w-4 h-4" />
-                    Details
-                  </Link>
+                    <urgencyInfo.icon className="w-4 h-4" />
+                    Urgency: {urgencyInfo.label}
+                  </p>
+                  <div>
+                    <p className="mt-2 truncate">
+                      <strong>Location:</strong> {request.location?.address || "N/A"}
+                    </p>
+                  </div>
                 </div>
-              </div>
-              <p
-                className={`text-sm font-medium mt-1 ${urgencyInfo.color} flex items-center gap-1`}
-              >
-                <urgencyInfo.icon className="w-4 h-4" />
-                Urgency: {urgencyInfo.label}
-              </p>
-              <div>
-                <p className="mt-2 truncate">
-                  <strong>Location:</strong> {request.location?.address || "N/A"}
-                </p>
               </div>
             </div>
           </div>
@@ -280,7 +320,7 @@ const ServiceReqCard = ({ request }) => {
           </div>
 
           {/* Problem Description Block */}
-          <div className="p-4 border border-l-4 border-orange-300 rounded-lg">
+          <div className="p-4 border border-l-4 border-orange-300 rounded-lg mb-6">
             <h3 className="text-sm font-bold text-gray-700 uppercase mb-2">
               Detailed Problem
             </h3>
@@ -291,6 +331,17 @@ const ServiceReqCard = ({ request }) => {
                 "No detailed description provided."
               )}
             </p>
+          </div>
+
+          {/* Details Button - Moved under Problem Description */}
+          <div className="flex justify-end">
+            <Link
+              href={`/serviceReq/${request._id}`}
+              className="flex items-center gap-2 px-6 py-3 bg-orange-500 text-white rounded-md hover:bg-orange-600 transition-colors font-semibold shadow-lg"
+            >
+              <Eye className="w-4 h-4" />
+              View Details
+            </Link>
           </div>
         </div>
       </div>

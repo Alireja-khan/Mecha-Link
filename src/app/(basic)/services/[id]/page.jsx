@@ -296,12 +296,12 @@ export default function ServiceDetailsPage() {
         </div>
       )}
 
-      <div className="border-b border-primary">
-        <div className="px-4 sm:px-6 lg:px-8 py-10">
+      <div className="container">
+        <div className=" py-10">
           <div className="flex flex-col lg:flex-row gap-8 lg:gap-12 items-start">
             <div className="flex-shrink-0 mx-auto lg:mx-0">
               {logo && (
-                <div className="relative w-92 h-56 md:w-[800px] md:h-72 lg:w-[900px] lg:h-[450px] rounded-lg overflow-hidden ring-2  ring-orange-100 shadow-lg object-cover">
+                <div className="relative h-56 md:w-[800px] md:h-72 lg:w-[900px] lg:h-[450px] rounded-lg overflow-hidden ring-2  ring-orange-100 shadow-lg object-cover">
                   <Image
                     src={logo}
                     alt={shopName || "Shop Logo"}

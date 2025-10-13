@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import ServiceReqCard from "./components/ServiceReqCard";
+import { Search, Filter, AlertTriangle, TrendingUp, Users, Clock, ArrowRight, Grid, List } from "lucide-react";
 
 // Fallback image URL
 const BACKGROUND_IMAGE_URL =
@@ -25,6 +26,13 @@ const ServiceReq = () => {
   const [itemsPerPage, setItemsPerPage] = useState(10);
   const [currentPage, setCurrentPage] = useState(1);
   const [sortOrder, setSortOrder] = useState("");
+  const [viewMode, setViewMode] = useState("grid"); // "grid" or "list"
+  const [stats, setStats] = useState({
+    total: 0,
+    pending: 0,
+    inProgress: 0,
+    completed: 0
+  });
 
   useEffect(() => {
     setLoading(true);
@@ -34,12 +42,21 @@ const ServiceReq = () => {
       .then((res) => res.json())
       .then((data) => {
         setTotalData(data);
+        // Calculate stats from data
+        if (data.result) {
+          const requests = data.result;
+          setStats({
+            total: requests.length,
+            pending: requests.filter(req => req.status === 'pending').length,
+            inProgress: requests.filter(req => req.status === 'in-progress').length,
+            completed: requests.filter(req => req.status === 'completed').length
+          });
+        }
         setLoading(false);
       });
   }, [searchTerm, itemsPerPage, currentPage, sortOrder]);
-  const { result: requests = [], totalDocs, totalPage } = totalData;
 
-  console.log(totalData);
+  const { result: requests = [], totalDocs, totalPage } = totalData;
 
   // ===== Handlers =====
   const handleSearch = (e) => {
@@ -60,96 +77,137 @@ const ServiceReq = () => {
     setCurrentPage(page);
   };
 
+  const toggleViewMode = () => {
+    setViewMode(viewMode === "grid" ? "list" : "grid");
+  };
+
   return (
-    <div className="min-h-screen ">
-      
-      
-{/* <section className="container mx-auto px-6 pb-16 pt-22 flex flex-col-reverse md:flex-row items-center gap-12 font-roboto">
-        <div className="flex-1 flex flex-col gap-6">
-          <h1 className="text-5xl md:text-6xl font-extrabold leading-tight">
-            Reliable <span className="text-primary">Services</span>, Anytime
-          </h1>
-          <p className="text-gray-600 text-lg leading-relaxed">
-            Connect with trusted professionals to keep your vehicle and heavy electronic
-            gadgets running smoothly — without the hassle or stress.
-          </p>
+    <div className="min-h-screen bg-gray-50">
+      {/* Modern Interactive Banner */}
+      <section className="relative bg-gradient-to-r from-orange-500 via-orange-600 to-red-600 py-16 overflow-hidden">
+        {/* Background Pattern */}
+        <div className="absolute inset-0 bg-black/10"></div>
+        <div className="absolute top-0 left-0 w-72 h-72 bg-white/10 rounded-full -translate-x-1/2 -translate-y-1/2"></div>
+        <div className="absolute bottom-0 right-0 w-96 h-96 bg-white/5 rounded-full translate-x-1/3 translate-y-1/3"></div>
 
-          <div className="flex flex-wrap gap-4 mt-4">
-            <button className="px-6 py-3 bg-primary text-white font-semibold rounded-full shadow-md hover:bg-primary transition-all duration-300">
-              Get Started
-            </button>
-            <button className="px-6 py-3 border border-gray-400 text-gray-700 font-semibold rounded-full hover:bg-gray-100 transition-all duration-300">
-              Learn More
-            </button>
-          </div>
-        </div>
+        <div className="container mx-auto px-6 relative z-10">
+          <div className="max-w-4xl mx-auto text-center">
 
-        <div className="flex-1 relative">
-          <div className="absolute inset-0 bg-blue-100 blur-3xl rounded-full opacity-40 -z-10"></div>
-          <img
-            src="/banner-image.jpeg"
-            alt="Reliable Service Illustration"
-            className="w-full h-auto rounded-3xl shadow-xl object-cover"
-          />
-        </div>
-      </section> */}
+            <h1 className="text-4xl md:text-6xl font-bold text-white mb-6">
+              Available Service Jobs
+              <span className="block text-2xl md:text-3xl font-semibold text-orange-100 mt-2">
+                Find Your Next Repair Assignment
+              </span>
+            </h1>
 
-      <section>
-        <div className="container mx-auto px-4 md:px-6 lg:px-8 mt-8 pb-10 ">
-          {/* <div className="text-center mt-18 mb-12">
-            <h2 className="text-4xl md:text-5xl font-extrabold text-center">
-              Welcome to <span className="text-primary">MechaLink</span>
-            </h2>
-            <p className="text-md max-w-2xl mx-auto md:text-xl mt-3">
-              Explore our service requests, find the request which is best with
-              your shop category.
+            <p className="text-xl text-orange-100 mb-8 leading-relaxed">
+              Browse urgent repair requests, accept jobs that match your expertise, and grow your service business
             </p>
-          </div> */}
 
-          {/* Search & Sort */}
-          <div className="flex flex-col md:flex-row justify-between items-center gap-4 mb-6">
-            {/* Search */}
-            <div className="flex-1">
-              <div className="flex items-center gap-3 bg-primary rounded-lg px-4 py-1 shadow-sm">
-                <label htmlFor="search" className="text-white font-medium">
-                  Search
-                </label>
-                <input
-                  type="search"
-                  id="search"
-                  placeholder="Title, Type, or Location"
-                  value={searchTerm}
-                  onChange={handleSearch}
-                  className="flex-1 bg-white  placeholder-gray-800 px-3 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
-                />
+            {/* Quick Stats */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+              <div className="bg-white/20 backdrop-blur-sm rounded-xl p-4 text-white">
+                <Users className="w-8 h-8 mx-auto mb-2" />
+                <div className="text-2xl font-bold">{stats.total}</div>
+                <div className="text-sm opacity-90">Total Requests</div>
+              </div>
+              <div className="bg-white/20 backdrop-blur-sm rounded-xl p-4 text-white">
+                <Clock className="w-8 h-8 mx-auto mb-2" />
+                <div className="text-2xl font-bold">{stats.pending}</div>
+                <div className="text-sm opacity-90">Pending</div>
+              </div>
+              <div className="bg-white/20 backdrop-blur-sm rounded-xl p-4 text-white">
+                <TrendingUp className="w-8 h-8 mx-auto mb-2" />
+                <div className="text-2xl font-bold">{stats.inProgress}</div>
+                <div className="text-sm opacity-90">In Progress</div>
+              </div>
+              <div className="bg-white/20 backdrop-blur-sm rounded-xl p-4 text-white">
+                <AlertTriangle className="w-8 h-8 mx-auto mb-2" />
+                <div className="text-2xl font-bold">{stats.completed}</div>
+                <div className="text-sm opacity-90">Completed</div>
               </div>
             </div>
 
-            {/* Sort */}
-            <div className="flex items-center gap-3">
-              <label htmlFor="sort" className="font-medium">
-                Sort by Priority:
-              </label>
-              <select
-                name="sort"
-                id="sort"
-                value={sortOrder}
-                onChange={handleSort}
-                className="px-3 py-2  rounded-md border-2 border-primary focus:outline-none focus:ring-2 focus:ring-primary"
+            {/* Quick Actions */}
+            <div className="flex flex-wrap justify-center gap-4">
+              <button
+                onClick={() => setSortOrder('emergency')}
+                className="bg-white text-orange-600 px-6 py-3 rounded-full font-semibold hover:bg-orange-50 transition-all duration-300 flex items-center gap-2"
               >
-                <option className="text-black" value="">
-                  All
-                </option>
-                <option className="text-black" value="high">
-                  High
-                </option>
-                <option className="text-black" value="low">
-                  Low
-                </option>
-                <option className="text-black" value="emergency">
-                  Emergency
-                </option>
-              </select>
+                <AlertTriangle className="w-5 h-5" />
+                Show Emergencies
+              </button>
+              <button
+                onClick={() => setSortOrder('high')}
+                className="bg-orange-700 text-white px-6 py-3 rounded-full font-semibold hover:bg-orange-800 transition-all duration-300 flex items-center gap-2"
+              >
+                <Filter className="w-5 h-5" />
+                High Priority
+              </button>
+            </div>
+
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <div className="container mx-auto px-4 md:px-6 lg:px-8 -mt-8 pb-10 relative z-20">
+          {/* Search & Sort Card */}
+          <div className="bg-white rounded-2xl shadow-xl p-6 mb-8 border border-gray-200">
+            <div className="flex flex-col md:flex-row justify-between items-center gap-4">
+              {/* Search */}
+              <div className="flex-1 w-full">
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                  <input
+                    type="search"
+                    placeholder="Search by title, type, or location..."
+                    value={searchTerm}
+                    onChange={handleSearch}
+                    className="w-full bg-gray-50 placeholder-gray-500 pl-10 pr-4 py-3 rounded-xl border-2 border-gray-200 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all duration-300"
+                  />
+                </div>
+              </div>
+
+              {/* View Mode Toggle and Sort */}
+              <div className="flex items-center gap-4 w-full md:w-auto">
+                {/* View Mode Toggle */}
+                <div className="flex items-center gap-2 bg-gray-100 rounded-lg p-1">
+                  <button
+                    onClick={() => setViewMode("grid")}
+                    className={`p-2 rounded-md transition-all duration-300 ${viewMode === "grid"
+                        ? "bg-white text-orange-500 shadow-sm"
+                        : "text-gray-500 hover:text-orange-500"
+                      }`}
+                  >
+                    <Grid className="w-4 h-4" />
+                  </button>
+                  <button
+                    onClick={() => setViewMode("list")}
+                    className={`p-2 rounded-md transition-all duration-300 ${viewMode === "list"
+                        ? "bg-white text-orange-500 shadow-sm"
+                        : "text-gray-500 hover:text-orange-500"
+                      }`}
+                  >
+                    <List className="w-4 h-4" />
+                  </button>
+                </div>
+
+                {/* Sort */}
+                <div className="flex items-center gap-3">
+                  <Filter className="text-gray-600 w-5 h-5" />
+                  <select
+                    value={sortOrder}
+                    onChange={handleSort}
+                    className="px-4 py-3 bg-gray-50 rounded-xl border-2 border-gray-200 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all duration-300 w-full md:w-auto"
+                  >
+                    <option value="">All Priorities</option>
+                    <option value="high">High Priority</option>
+                    <option value="low">Low Priority</option>
+                    <option value="emergency">Emergency</option>
+                  </select>
+                </div>
+              </div>
             </div>
           </div>
 
@@ -160,63 +218,72 @@ const ServiceReq = () => {
           )}
 
           {!loading && requests.length === 0 && (
-            <div className="text-center py-16 rounded-xl shadow-lg border border-gray-200">
+            <div className="text-center py-16 rounded-2xl shadow-lg border border-gray-200 bg-white">
+              <div className="w-24 h-24 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <AlertTriangle className="w-12 h-12 text-orange-500" />
+              </div>
               <p className="text-2xl text-orange-500 font-bold mb-2">
                 No Requests Found
               </p>
-              <p className="text-gray-500">
-                You're all caught up! There are currently no pending service
-                requests.
+              <p className="text-gray-500 max-w-md mx-auto">
+                You're all caught up! There are currently no pending service requests matching your criteria.
               </p>
             </div>
           )}
 
           {!loading && requests.length > 0 && (
-            <div className="space-y-6 grid grid-cols-2 gap-5">
+            <div className={
+              viewMode === "grid"
+                ? "grid grid-cols-1 lg:grid-cols-2 gap-6"
+                : "space-y-6"
+            }>
               {requests?.map((req) => (
-                <ServiceReqCard key={req._id} request={req} />
+                <ServiceReqCard
+                  key={req._id}
+                  request={req}
+                  compact={viewMode === "grid"}
+                />
               ))}
             </div>
           )}
 
           {/* Pagination & Items per page */}
-          <div className="flex flex-col md:flex-row justify-between mt-8 items-center">
+          <div className="flex flex-col md:flex-row justify-between mt-8 items-center gap-4">
             {/* Items per page */}
-            <div>
-              <div className="flex items-center gap-3 mb-4 md:mb-0">
-                <label htmlFor="itemsPerPage">Show on page</label>
-                <select
-                  name="itemsPerPage"
-                  id="itemsPerPage"
-                  value={itemsPerPage}
-                  onChange={handleItemsPerPage}
-                  className="px-3 py-1 border-2 rounded-lg border-primary focus:outline-none"
-                >
-                  <option value="12">10</option>
-                  <option className="text-black" value="24">20</option>
-                  <option className="text-black" value="36">30</option>
-                  <option className="text-black" value="48">40</option>
-                  <option className="text-black" value="48">50</option>
-                </select>
-              </div>
+            <div className="flex items-center gap-3">
+              <label htmlFor="itemsPerPage" className="text-gray-600 font-medium">
+                Show per page:
+              </label>
+              <select
+                value={itemsPerPage}
+                onChange={handleItemsPerPage}
+                className="px-4 py-2 bg-white rounded-lg border-2 border-gray-300 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all duration-300"
+              >
+                <option value="10">10</option>
+                <option value="20">20</option>
+                <option value="30">30</option>
+                <option value="40">40</option>
+                <option value="50">50</option>
+              </select>
             </div>
 
             {/* Page buttons */}
-            <div className="flex justify-center space-x-2">
+            <div className="flex justify-center items-center gap-2">
               <button
-                className="px-4 py-1 border border-primary rounded-md hover:bg-primary hover:text-white transition duration-400 cursor-pointer"
+                className="px-4 py-2 border border-orange-500 text-orange-500 rounded-lg hover:bg-orange-500 hover:text-white transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
                 disabled={currentPage === 1}
                 onClick={() => handlePageChange(currentPage - 1)}
               >
+                <ArrowRight className="w-4 h-4 rotate-180" />
                 Prev
               </button>
 
               {Array.from({ length: totalPage }, (_, i) => (
                 <button
                   key={i}
-                  className={`px-4 py-1 border rounded-md transition duration-400 cursor-pointer ${currentPage === i + 1
-                      ? "bg-primary text-white border-primary"
-                      : "border-primary hover:bg-primary hover:text-white"
+                  className={`px-4 py-2 border rounded-lg transition-all duration-300 ${currentPage === i + 1
+                      ? "bg-orange-500 text-white border-orange-500"
+                      : "border-gray-300 text-gray-600 hover:bg-orange-50 hover:border-orange-500"
                     }`}
                   onClick={() => handlePageChange(i + 1)}
                 >
@@ -225,11 +292,12 @@ const ServiceReq = () => {
               ))}
 
               <button
-                className="px-4 py-1 border border-primary rounded-md hover:bg-primary hover:text-white transition duration-400 cursor-pointer"
+                className="px-4 py-2 border border-orange-500 text-orange-500 rounded-lg hover:bg-orange-500 hover:text-white transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
                 disabled={currentPage === totalPage}
                 onClick={() => handlePageChange(currentPage + 1)}
               >
                 Next
+                <ArrowRight className="w-4 h-4" />
               </button>
             </div>
           </div>
