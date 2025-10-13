@@ -9,7 +9,7 @@ import { useSession } from 'next-auth/react';
 
 const locationData = {
    Dhaka: {
-       Dhaka: ["Dhamrai", "Dohar", "Keraniganj", "Savar", "Uttara", "Gulshan", "Mirpur", "Fakirhat"],
+       Dhaka: ["Dhamrai", "Dohar", "Keraniganj", "Savar", "Uttara", "Gulshan", "Mirpur", "Fakirhat", "Dhaka south city corporation", "Dhaka north city corporation"],
        Faridpur: ["Faridpur Sadar", "Bhanga", "Boalmari", "Alfadanga", "Nagarkanda", "Saltha"],
        Gazipur: ["Gazipur Sadar", "Kaliakoir", "Kapasia", "Sreepur"],
        Gopalganj: ["Gopalganj Sadar", "Kashiani", "Muksudpur", "Tungipara"],
