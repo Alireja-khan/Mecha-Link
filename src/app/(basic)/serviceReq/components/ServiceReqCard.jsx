@@ -130,33 +130,31 @@ const ServiceReqCard = ({ request }) => {
           const isCompleted = index < currentStatusIndex; // Previous steps are completed
           const isCurrent = index === currentStatusIndex; // Current step
           const isFuture = index > currentStatusIndex; // Future steps
-          
+
           return (
             <div key={step.key} className="flex items-center gap-3">
               {/* Status Icon */}
-              <div className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center border-2 ${
-                isCompleted 
+              <div className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center border-2 ${isCompleted
                   ? 'bg-green-500 border-green-500 text-white' // Green for completed steps
                   : isCurrent
-                  ? 'border-orange-500 bg-white text-orange-500' // Orange for current step
-                  : 'border-gray-300 bg-gray-100 text-gray-400' // Gray for future steps
-              }`}>
+                    ? 'border-orange-500 bg-white text-orange-500' // Orange for current step
+                    : 'border-gray-300 bg-gray-100 text-gray-400' // Gray for future steps
+                }`}>
                 {isCompleted || isCurrent ? (
                   <CheckCircle className="w-4 h-4" />
                 ) : (
                   <Circle className="w-4 h-4" />
                 )}
               </div>
-              
+
               {/* Status Label */}
               <div className="flex-1">
-                <span className={`text-sm font-medium ${
-                  isCompleted 
+                <span className={`text-sm font-medium ${isCompleted
                     ? 'text-green-600' // Green text for completed steps
                     : isCurrent
-                    ? 'text-orange-500 font-semibold' // Orange text for current step
-                    : 'text-gray-400' // Gray text for future steps
-                }`}>
+                      ? 'text-orange-500 font-semibold' // Orange text for current step
+                      : 'text-gray-400' // Gray text for future steps
+                  }`}>
                   {step.label}
                 </span>
               </div>
@@ -183,13 +181,13 @@ const ServiceReqCard = ({ request }) => {
 
     if (!userData) {
       return (
-        <div className="flex items-center gap-3 p-3 bg-orange-50 rounded-lg border border-orange-200">
+        <div className="flex items-center gap-3 p-3 bg-orange-50 truncate rounded-lg border border-orange-200">
           <div className="w-10 h-10 bg-orange-100 rounded-full flex items-center justify-center">
             <User className="w-5 h-5 text-orange-400" />
           </div>
           <div>
             <p className="font-medium text-orange-800">Customer</p>
-            <p className="text-sm text-orange-600 flex items-center gap-1">
+            <p className="text-sm text-orange-600 flex items-center truncate gap-1">
               <Mail className="w-3 h-3" />
               {request?.userEmail || "No email"}
             </p>
@@ -324,7 +322,7 @@ const ServiceReqCard = ({ request }) => {
             <h3 className="text-sm font-bold text-gray-700 uppercase mb-2">
               Detailed Problem
             </h3>
-            <p className="text-gray-700 leading-relaxed text-sm">
+            <p className="text-gray-700 leading-relaxed text-sm line-clamp-2">
               {getValue(
                 request,
                 "serviceDetails.description",

@@ -69,7 +69,7 @@ export default function ServiceCard({ service }) {
             className="w-1/2 py-3 border border-primary hover:bg-accent text-primary font-bold text-lg capitalize leading-none font-urbanist rounded-md transition duration-400 cursor-pointer text-center truncate"
             href={`/services/${service._id}`}
           >
-            Service Details
+            Shop Details
           </Link>
         </div>
       </div>

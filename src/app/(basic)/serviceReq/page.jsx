@@ -106,22 +106,22 @@ const ServiceReq = () => {
 
             {/* Quick Stats */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-              <div className="bg-white/20 backdrop-blur-sm rounded-xl p-4 text-white">
+              <div className="bg-white/90 backdrop-blur-sm rounded-xl p-4 border border-white text-black">
                 <Users className="w-8 h-8 mx-auto mb-2" />
                 <div className="text-2xl font-bold">{stats.total}</div>
                 <div className="text-sm opacity-90">Total Requests</div>
               </div>
-              <div className="bg-white/20 backdrop-blur-sm rounded-xl p-4 text-white">
+              <div className="bg-white/90 backdrop-blur-sm rounded-xl p-4 border border-white text-black">
                 <Clock className="w-8 h-8 mx-auto mb-2" />
                 <div className="text-2xl font-bold">{stats.pending}</div>
                 <div className="text-sm opacity-90">Pending</div>
               </div>
-              <div className="bg-white/20 backdrop-blur-sm rounded-xl p-4 text-white">
+              <div className="bg-white/90 backdrop-blur-sm rounded-xl p-4 border border-white text-black">
                 <TrendingUp className="w-8 h-8 mx-auto mb-2" />
                 <div className="text-2xl font-bold">{stats.inProgress}</div>
                 <div className="text-sm opacity-90">In Progress</div>
               </div>
-              <div className="bg-white/20 backdrop-blur-sm rounded-xl p-4 text-white">
+              <div className="bg-white/90 backdrop-blur-sm rounded-xl p-4 border border-white text-black">
                 <AlertTriangle className="w-8 h-8 mx-auto mb-2" />
                 <div className="text-2xl font-bold">{stats.completed}</div>
                 <div className="text-sm opacity-90">Completed</div>
