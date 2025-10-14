@@ -23,42 +23,42 @@ const HowToWork = () => {
             description:
                 "Search trusted mechanics by category, location, and rating. Utilize smart filters to pinpoint the perfect match for your specific vehicle repair needs.",
             icon: <MapPin className="w-6 h-6" />,
-            image: "https://placehold.co/500x300/FFA500/FFFFFF/png?text=Search+by+Map",
+            image: "/henry-perks-BJXAxQ1L7dI-unsplash.jpg",
         },
         {
             title: "Check Profiles",
             description:
                 "View comprehensive mechanic profiles, verify their skills, and review past work portfolios before making a service request. Transparency builds trust.",
             icon: <User className="w-6 h-6" />,
-            image: "https://placehold.co/500x300/FFA500/FFFFFF/png?text=Mechanic+Profile",
+            image: "/istockphoto-2152902531-1024x1024.jpg",
         },
         {
             title: "Book Service",
             description:
                 "Easily schedule a convenient time slot that fits your busy calendar, based on the mechanic's real-time availability. Confirm your booking instantly.",
             icon: <CalendarCheck className="w-6 h-6" />,
-            image: "https://placehold.co/500x300/FFA500/FFFFFF/png?text=Booking+Calendar",
+            image: "/patrick-tomasso-fMntI8HAAB8-unsplash.jpg",
         },
         {
             title: "Chat with Mechanics",
             description:
                 "Communicate directly and securely with the mechanic to clarify job details, get estimated quotes, or share necessary updates throughout the service process.",
             icon: <MessageCircle className="w-6 h-6" />,
-            image: "https://placehold.co/500x300/FFA500/FFFFFF/png?text=Secure+Chat",
+            image: "/istockphoto-1134890323-1024x1024.jpg",
         },
         {
             title: "Secure Payment",
             description:
                 "Pay safely online using our supported secure gateways. Benefit from exclusive discounts and receive a transparent, itemized invoice for the services rendered.",
             icon: <CreditCard className="w-6 h-6" />,
-            image: "https://placehold.co/500x300/FFA500/FFFFFF/png?text=Secure+Payment",
+            image: "/rc-xyz-nft-gallery-N_ZRvP-0HHM-unsplash.jpg",
         },
         {
             title: "Rate & Review",
             description:
                 "Once the service is complete, provide valuable feedback by rating and reviewing the mechanic. Your input helps maintain quality and guides other users.",
             icon: <Star className="w-6 h-6" />,
-            image: "https://placehold.co/500x300/FFA500/FFFFFF/png?text=Rate+and+Review",
+            image: "/towfiqu-barbhuiya-0ZUoBtLw3y4-unsplash.jpg",
         },
     ];
 
@@ -78,7 +78,7 @@ const HowToWork = () => {
                 {/* Interactive Timeline Steps */}
                 <div className="relative">
                     {/* Connecting line */}
-                    <div className="absolute left-4 top-10 bottom-45 w-1 bg-orange-400 hidden md:block"></div>
+                    <div className="absolute left-4 top-10 xl:bottom-45 md:bottom-55 w-1 bg-orange-400 hidden md:block"></div>
 
                     <div className="grid grid-cols-1 gap-10">
                         {steps.map((step, index) => (

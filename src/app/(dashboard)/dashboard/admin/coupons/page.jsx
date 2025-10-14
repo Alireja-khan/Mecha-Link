@@ -114,59 +114,56 @@ const ManageCoupons = () => {
 
   // --- Swal Utility Functions (Updated to use CSS variables for theme) ---
 
+  const swalOptions = {
+    confirmButtonColor: 'var(--color-success)',
+    background: 'var(--color-base-100,)',
+    color: 'var(--color-base-content)',
+    cancelButtonColor: 'var(--color-error)',
+  };
+
   const showSuccessAlert = (title, message) => {
     Swal.fire({
+      ...swalOptions,
       title: title,
       text: message,
       icon: 'success',
-      confirmButtonColor: 'var(--color-primary)',
-      confirmButtonText: 'OK',
-      background: 'var(--color-base-100)',
-      color: 'var(--color-base-content)',
       iconColor: 'var(--color-success)'
     });
   };
 
   const showErrorAlert = (title, message) => {
     Swal.fire({
+      ...swalOptions,
       title: title,
       text: message,
       icon: 'error',
-      confirmButtonColor: 'var(--color-primary)',
-      confirmButtonText: 'OK',
-      background: 'var(--color-base-100)',
-      color: 'var(--color-base-content)',
       iconColor: 'var(--color-error)'
     });
   };
 
   const showConfirmDialog = (title, text, confirmButtonText = 'Yes, proceed') => {
     return Swal.fire({
+      ...swalOptions,
       title: title,
       text: text,
       icon: 'warning',
       showCancelButton: true,
-      confirmButtonColor: 'var(--color-primary)',
-      cancelButtonColor: 'var(--color-neutral)',
       confirmButtonText: confirmButtonText,
       cancelButtonText: 'Cancel',
-      background: 'var(--color-base-100)',
-      color: 'var(--color-base-content)',
-      iconColor: 'var(--color-warning)',
-      reverseButtons: true
+      reverseButtons: true,
+      iconColor: 'var(--color-warning)'
     });
   };
 
   const showLoadingAlert = (title, text) => {
     Swal.fire({
+      ...swalOptions,
       title: title,
       text: text,
       allowOutsideClick: false,
       didOpen: () => {
         Swal.showLoading();
       },
-      background: 'var(--color-base-100)',
-      color: 'var(--color-base-content)'
     });
   };
 

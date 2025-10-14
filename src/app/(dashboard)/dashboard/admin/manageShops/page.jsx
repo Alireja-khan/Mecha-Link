@@ -85,10 +85,10 @@ const ManageShops = () => {
 
     // SweetAlert2 Configuration
     const swalOptions = {
-        confirmButtonColor: 'var(--fallback-p, oklch(var(--p)/1))',
-        background: 'var(--fallback-b1, oklch(var(--b1)/1))',
-        color: 'var(--fallback-bc, oklch(var(--bc)/1))',
-        cancelButtonColor: 'var(--fallback-nc, oklch(var(--nc)/1))',
+        confirmButtonColor: 'var(--color-success)',
+        background: 'var(--color-base-100,)',
+        color: 'var(--color-base-content)',
+        cancelButtonColor: 'var(--color-error)',
     };
 
     const showSuccessAlert = (title, message) => {
@@ -97,7 +97,7 @@ const ManageShops = () => {
             title: title,
             text: message,
             icon: 'success',
-            iconColor: 'var(--fallback-su, oklch(var(--su)/1))'
+            iconColor: 'var(--color-success)'
         });
     };
 
@@ -107,7 +107,7 @@ const ManageShops = () => {
             title: title,
             text: message,
             icon: 'error',
-            iconColor: 'var(--fallback-er, oklch(var(--er)/1))'
+            iconColor: 'var(--color-error)'
         });
     };
 
@@ -121,7 +121,7 @@ const ManageShops = () => {
             confirmButtonText: confirmButtonText,
             cancelButtonText: 'Cancel',
             reverseButtons: true,
-            iconColor: 'var(--fallback-wa, oklch(var(--wa)/1))'
+            iconColor: 'var(--color-warning)'
         });
     };
 

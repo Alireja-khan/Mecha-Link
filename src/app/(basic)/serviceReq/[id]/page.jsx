@@ -108,16 +108,12 @@ const ServiceRequestDetails = () => {
 
     const isCustomerViewingOwnRequest = loggedInUser?._id === request.userId;
 
-    const showMessagingButton = loggedInUserRole === 'mechanic' && !isCustomerViewingOwnRequest;
-    const showCallButton = loggedInUserRole === 'mechanic' && !isCustomerViewingOwnRequest;
+    const showMessagingButton = (loggedInUserRole === 'mechanic' || loggedInUserRole === 'admin') && !isCustomerViewingOwnRequest;
+    const showCallButton = (loggedInUserRole === 'mechanic' || loggedInUserRole === 'admin') && !isCustomerViewingOwnRequest;
 
-    // Check if the user is an Admin to show the clear all button
-    const showAdminClearButton = loggedInUserRole === 'admin';
 
     const nonMechanicMessage = isCustomerViewingOwnRequest
         ? "This is your service request. Contact options are for service providers."
-        : loggedInUserRole === 'admin'
-            ? "Messaging is disabled for Admin review."
             : "";
 
     const handleAcceptRequest = async () => {

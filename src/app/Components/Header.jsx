@@ -13,23 +13,12 @@ import ToggleTheme from "../shared/ToggleTheme";
 export default function Header() {
   const [scrolled, setScrolled] = useState(false);
   const pathname = usePathname();
-  const [theme, setTheme] = useState("light");
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const dropdownRef = useRef(null);
   const { user: loggedInUser, status } = useUser();
 
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [rotating, setRotating] = useState(false);
-
-  useEffect(() => {
-    const savedTheme = localStorage.getItem("theme") || "light";
-    setTheme(savedTheme);
-  }, []);
-
-  useEffect(() => {
-    document.documentElement.setAttribute("data-theme", theme);
-    localStorage.setItem("theme", theme);
-  }, [theme]);
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 0);
@@ -85,7 +74,7 @@ export default function Header() {
         </Link>
 
         {/* Desktop Navigation */}
-        <nav className="hidden md:flex items-center space-x-6 lg:space-x-8">
+        <nav className="hidden lg:flex items-center space-x-3 lg:space-x-8">
           {navigation.map((item) => (
             <Link
               key={item.href}
@@ -199,7 +188,7 @@ export default function Header() {
             <ToggleTheme />
           </div>
 
-          <div className="md:hidden text-primary" onClick={handleGearClick}>
+          <div className="lg:hidden text-primary" onClick={handleGearClick}>
             {drawerOpen ? (
               <AiOutlineMenuFold size={40} />
             ) : (
@@ -211,7 +200,7 @@ export default function Header() {
 
       {/* Mobile Drawer */}
       <div
-        className={`fixed md:hidden top-0 left-0 h-full w-64 transform transition-transform duration-500 z-40 ${drawerOpen ? "translate-x-0" : "-translate-x-full"
+        className={`fixed lg:hidden top-0 left-0 h-full w-64 transform transition-transform duration-500 z-40 ${drawerOpen ? "translate-x-0" : "-translate-x-full"
           }`}
       >
         <div className="relative p-4 top-14 left-0 bg-base-200 text-base-content border-r border-base-300">
