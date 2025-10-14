@@ -1,6 +1,7 @@
 "use client";
 import React from "react";
-import { Users, Rocket, Target, Star, Heart, Wrench, MapPin, Shield, MessageCircle, Clock, TrendingUp, Award, Zap, Calendar, CreditCard, Globe,
+import {
+  Users, Rocket, Target, Star, Heart, Wrench, MapPin, Shield, MessageCircle, Clock, TrendingUp, Award, Zap, Calendar, CreditCard, Globe,
 } from "lucide-react";
 import CountUp from "react-countup";
 import Image from "next/image";
@@ -525,14 +526,16 @@ const AboutPage = () => {
                 linkedin_profile: "https://www.linkedin.com/in/m-munim/",
                 portfolio: "https://mmunim.netlify.app/",
               },
+
+
+
             ].map((person, i) => (
               <div
                 key={i}
-                className={`rounded-2xl overflow-hidden shadow-md hover:shadow-lg transition transform hover:-translate-y-2 ${
-                  person.featured
-                    ? "md:order-first border-2 border-orange-500"
-                    : "border-2 border-orange-500"
-                }`}
+                className={`group rounded-2xl overflow-hidden shadow-md hover:shadow-lg transition transform hover:-translate-y-2 ${person.featured
+                  ? "md:order-first border-2 border-orange-500"
+                  : "border-2 border-orange-500"
+                  }`}
               >
                 <div className="h-118 overflow-hidden">
                   <img
@@ -540,106 +543,119 @@ const AboutPage = () => {
                     alt={person.name}
                     className="w-full h-full object-cover object-top"
                   />
-                </div>
-                <div className="p-6 text-center">
-                  <h3 className="text-xl font-semibold mb-1">{person.name}</h3>
-                  <p className="text-gray-400 mb-4">{person.role}</p>
-                  <div className="flex justify-center items-center space-x-3">
-                    <a
-                      href={person.facebook_profile}
-                      target="_blank"
-                      className="cursor-pointer hover:text-orange-500 transition"
-                    >
-                      <svg
-                        className="w-6 h-6"
-                        fill="currentColor"
-                        viewBox="0 0 24 24"
-                        aria-hidden="true"
-                      >
-                        <path
-                          fillRule="evenodd"
-                          d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z"
-                          clipRule="evenodd"
-                        />
-                      </svg>
-                    </a>
-                    <a
-                      href={person.linkedin_profile}
-                      target="_blank"
-                      className=" hover:text-orange-500 transition"
-                    >
-                      <svg
-                        className="w-5 h-5"
-                        fill="currentColor"
-                        viewBox="0 0 24 24"
-                        aria-hidden="true"
-                      >
-                        <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.761 0 5-2.239 5-5v-14c0-2.761-2.239-5-5-5zm-11.75 19h-3v-9h3v9zm-1.5-10.25c-.966 0-1.75-.784-1.75-1.75s.784-1.75 1.75-1.75 1.75.784 1.75 1.75-.784 1.75-1.75 1.75zm13.25 10.25h-3v-4.75c0-1.133-.022-2.591-1.578-2.591-1.578 0-1.818 1.231-1.818 2.503v4.838h-3v-9h2.879v1.233h.041c.401-.762 1.381-1.563 2.842-1.563 3.037 0 3.598 2 3.598 4.599v5.731z" />
-                      </svg>
-                    </a>
-                    <a
-                      href={person.github_profile}
-                      target="_blank"
-                      className=" hover:text-orange-500 transition"
-                    >
-                      <svg
-                        className="w-6 h-6"
-                        fill="currentColor"
-                        viewBox="0 0 24 24"
-                        aria-hidden="true"
-                      >
-                        <path
-                          fillRule="evenodd"
-                          d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"
-                          clipRule="evenodd"
-                        />
-                      </svg>
-                    </a>
-                    
-                    <a
-                      href={person.portfolio}
-                      target="_blank"
-                      className=" hover:text-orange-500 transition"
-                    >
-                      <Globe size={24}/>
-                    </a>
+
+
+            
+
+
+                    </div>
+                    <div className="p-6 text-center relative">
+                      {/* Admin Badge that appears on hover for Alireja Khan */}
+                      {person.featured && (
+                        <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10">
+                          <span className="bg-orange-500 text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg">
+                            Team Lead
+                          </span>
+                        </div>
+                      )}
+                      <h3 className="text-xl font-semibold mb-1">{person.name}</h3>
+                      <p className="text-gray-400 mb-4">{person.role}</p>
+                      <div className="flex justify-center items-center space-x-3">
+                        <a
+                          href={person.facebook_profile}
+                          target="_blank"
+                          className="cursor-pointer hover:text-orange-500 transition"
+                        >
+                          <svg
+                            className="w-6 h-6"
+                            fill="currentColor"
+                            viewBox="0 0 24 24"
+                            aria-hidden="true"
+                          >
+                            <path
+                              fillRule="evenodd"
+                              d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z"
+                              clipRule="evenodd"
+                            />
+                          </svg>
+                        </a>
+                        <a
+                          href={person.linkedin_profile}
+                          target="_blank"
+                          className=" hover:text-orange-500 transition"
+                        >
+                          <svg
+                            className="w-5 h-5"
+                            fill="currentColor"
+                            viewBox="0 0 24 24"
+                            aria-hidden="true"
+                          >
+                            <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.761 0 5-2.239 5-5v-14c0-2.761-2.239-5-5-5zm-11.75 19h-3v-9h3v9zm-1.5-10.25c-.966 0-1.75-.784-1.75-1.75s.784-1.75 1.75-1.75 1.75.784 1.75 1.75-.784 1.75-1.75 1.75zm13.25 10.25h-3v-4.75c0-1.133-.022-2.591-1.578-2.591-1.578 0-1.818 1.231-1.818 2.503v4.838h-3v-9h2.879v1.233h.041c.401-.762 1.381-1.563 2.842-1.563 3.037 0 3.598 2 3.598 4.599v5.731z" />
+                          </svg>
+                        </a>
+                        <a
+                          href={person.github_profile}
+                          target="_blank"
+                          className=" hover:text-orange-500 transition"
+                        >
+                          <svg
+                            className="w-6 h-6"
+                            fill="currentColor"
+                            viewBox="0 0 24 24"
+                            aria-hidden="true"
+                          >
+                            <path
+                              fillRule="evenodd"
+                              d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"
+                              clipRule="evenodd"
+                            />
+                          </svg>
+                        </a>
+
+                        <a
+                          href={person.portfolio}
+                          target="_blank"
+                          className=" hover:text-orange-500 transition"
+                        >
+                          <Globe size={24} />
+                        </a>
+                      </div>
+                    </div>
                   </div>
+      ))}
                 </div>
               </div>
-            ))}
-          </div>
-        </div>
-      </section>
+</section>
 
-      {/* CTA Section */}
-      <section className="py-20 bg-gradient-to-r from-orange-500 to-amber-600 text-white">
-        <div className="max-w-4xl mx-auto px-6 text-center">
-          <h2 className="text-4xl font-bold mb-6">
-            Join the MechaLink Revolution
-          </h2>
-          <p className="text-xl mb-10 max-w-3xl mx-auto">
-            Whether you're a vehicle owner seeking reliable service or a
-            mechanic looking to grow your business, MechaLink offers the perfect
-            platform to connect, transact, and thrive.
-          </p>
-          <div className="flex flex-col sm:flex-row justify-center gap-4">
-            <button className="bg-white text-orange-600 font-semibold px-8 py-4 rounded-full shadow-lg hover:bg-gray-100 transition transform hover:-translate-y-1">
-              Sign Up as Customer
-            </button>
-            <button className="bg-transparent border-2 border-white text-white font-semibold px-8 py-4 rounded-full hover:bg-white/10 transition">
-              Register as Mechanic
-            </button>
-          </div>
-          <p className="mt-8 text-orange-100">
-            Have questions?{" "}
-            <a href="https://www.facebook.com/alirejaa.khan" target="_blank" className="text-white font-semibold underline">
-              Contact our team
-            </a>
-          </p>
+          {/* CTA Section */}
+          <section className="py-20 bg-gradient-to-r from-orange-500 to-amber-600 text-white">
+            <div className="max-w-4xl mx-auto px-6 text-center">
+              <h2 className="text-4xl font-bold mb-6">
+                Join the MechaLink Revolution
+              </h2>
+              <p className="text-xl mb-10 max-w-3xl mx-auto">
+                Whether you're a vehicle owner seeking reliable service or a
+                mechanic looking to grow your business, MechaLink offers the perfect
+                platform to connect, transact, and thrive.
+              </p>
+              <div className="flex flex-col sm:flex-row justify-center gap-4">
+                <button className="bg-white text-orange-600 font-semibold px-8 py-4 rounded-full shadow-lg hover:bg-gray-100 transition transform hover:-translate-y-1">
+                  Sign Up as Customer
+                </button>
+                <button className="bg-transparent border-2 border-white text-white font-semibold px-8 py-4 rounded-full hover:bg-white/10 transition">
+                  Register as Mechanic
+                </button>
+              </div>
+              <p className="mt-8 text-orange-100">
+                Have questions?{" "}
+                <a href="https://www.facebook.com/alirejaa.khan" target="_blank" className="text-white font-semibold underline">
+                  Contact our team
+                </a>
+              </p>
+            </div>
+          </section>
         </div>
-      </section>
-    </div>
-  );
+        );
 };
 
-export default AboutPage;
+        export default AboutPage;
