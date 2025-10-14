@@ -13,6 +13,7 @@ export const collections = {
   coupons: "coupons",
   notifications: "notifications",
   reviews: "reviews",
+  blogs: "blogs",
 };
 
 let client;
