@@ -1,11 +1,31 @@
-import React from 'react';
+"use client";
 
-const loading = () => {
-    return (
-            <div className="flex items-center justify-center h-screen w-full bg-base-100">
-                <span className="loading loading-bars loading-xl text-orange-500"></span>
-            </div>
-    );
-};
+import { mirage } from "ldrs";
+mirage.register();
 
-export default loading;
+export default function Loader() {
+  return (
+    <div className="flex items-center justify-center h-screen text-primary">
+      <l-mirage
+        size="75"
+        speed="2.5"
+        color="currentColor"
+      ></l-mirage>
+    </div>
+  );
+}
+
+
+// "use client";
+
+// export default function Loader() {
+//   return (
+//     <div className="flex items-center justify-center h-screen bg-white">
+//       <img
+//         src="/Gear.gif"
+//         alt="Loading..."
+//         className="w-20 h-20"
+//       />
+//     </div>
+//   );
+// }
