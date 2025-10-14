@@ -1,6 +1,8 @@
 import { Toaster } from "react-hot-toast";
 import Footer from "../Components/Footer";
 import Header from "../Components/Header";
+import ScrollToTopButton from "./ScrollToTopButton";
+import AskToAIButton from "./AskToAIButton";
 
 export default function BasicLayout({ children }) {
   return (
@@ -8,6 +10,8 @@ export default function BasicLayout({ children }) {
       <Header></Header>
       {children}
       <Toaster position="top-center" reverseOrder={false} />
+      <AskToAIButton />
+      <ScrollToTopButton />
       <Footer></Footer>
     </div>
   );
