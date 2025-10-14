@@ -61,7 +61,6 @@ const Sidebar = ({ isMobileOpen, setIsMobileOpen }) => {
       menuItem("Announcements", <Megaphone size={20} />, "/dashboard/admin/announcements"),
     ],
     mechanic: [
-      menuItem("Service Listings", <List size={20} />, "/dashboard/mechanic/listings"),
       menuItem("Requests", <ClipboardList size={20} />, "/dashboard/mechanic/requests"),
       menuItem("Add Shop", <Store size={20} />, "/dashboard/mechanic/AddMechanicShop"),
     ],
