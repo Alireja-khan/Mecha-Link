@@ -49,7 +49,7 @@ const Sidebar = ({ isMobileOpen, setIsMobileOpen }) => {
     menuItem("Settings", <Settings size={20} />, `/dashboard/${role}/settings`),
     menuItem("Reviews", <Star size={20} />, `/dashboard/${role}/reviews`),
     menuItem("Messages", <MessageSquare size={20} />, `/dashboard/${role}/messages`),
-    menuItem("Ask AI", <LucideBrainCircuit size={20} />, "/dashboard/user/AskAI"),
+    menuItem("Ask AI", <LucideBrainCircuit size={20} />, `/dashboard/${role}/AskAI`),
   ];
 
   const roleMenu = {

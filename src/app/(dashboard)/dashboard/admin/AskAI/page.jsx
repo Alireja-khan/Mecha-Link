@@ -107,15 +107,15 @@ export default function MechaLinkQnA() {
     <div className="min-h-screen flex flex-col md:flex-row">
       {/* Sidebar */}
       <aside
-        className={`min-h-screen bg-gray-100 border-r p-5 md:w-1/4 md:block absolute md:static z-10 h-full transition-transform duration-300 ${
+        className={`min-h-screen bg-gray-500 md:bg-transparent border-r p-5 md:w-1/4 md:block absolute md:static z-10 h-full transition-transform duration-300 ${
           showSidebar ? "translate-x-0" : "-translate-x-full"
         } md:translate-x-0`}
       >
         <div className="flex justify-between items-center mb-4 md:hidden">
-          <h3 className="text-xl font-semibold text-gray-800">📜 History</h3>
+          <h3 className="text-xl font-semibold text-gray-900">📜 History</h3>
           <button
             onClick={() => setShowSidebar(false)}
-            className="text-gray-600 font-bold px-2"
+            className="text-gray-900 font-bold px-2"
           >
             Close
           </button>
@@ -130,7 +130,7 @@ export default function MechaLinkQnA() {
           {history.map((item, index) => (
             <li key={index}>
               <button
-                className="w-full text-left px-3 py-2 rounded hover:bg-gray-200 transition"
+                className="w-full text-left px-3 py-2 rounded hover:bg-gray-200 hover:text-black transition"
                 onClick={() => {
                   setAnswer(item.answer);
                   if (window.innerWidth < 768) setShowSidebar(false); // close on mobile
@@ -162,18 +162,18 @@ export default function MechaLinkQnA() {
           <h1 className={`text-3xl font-bold ${primaryText} mb-2`}>
             🧠 MechaLink Q&A Assistant
           </h1>
-          <p className="text-gray-700">
+          <p className="text-gray-400">
             Ask anything about car repair, maintenance, or mechanical systems.
           </p>
         </header>
 
-        <div className="mb-6 border rounded-lg bg-white p-5 shadow-sm">
+        <div className="mb-6 border rounded-lg p-5 shadow-sm">
           <textarea
             value={question}
             onChange={(e) => setQuestion(e.target.value)}
             placeholder="Ask something like: Why does my engine make a ticking sound? or How to fix low brake pressure?"
             rows={4}
-            className="w-full border rounded-md px-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary resize-none text-gray-800"
+            className="w-full border rounded-md px-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary resize-none text-gray-400"
           />
           <div className="mt-4 flex justify-end">
             <button
