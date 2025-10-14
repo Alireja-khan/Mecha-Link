@@ -1,6 +1,5 @@
 "use client";
 
-import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import { useState, useEffect } from "react";
@@ -10,6 +9,7 @@ import Link from "next/link";
 import markerIcon2x from "leaflet/dist/images/marker-icon-2x.png";
 import markerIcon from "leaflet/dist/images/marker-icon.png";
 import markerShadow from "leaflet/dist/images/marker-shadow.png";
+import { MapContainer, Marker, Popup, TileLayer, useMap } from "react-leaflet";
 
 delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({
@@ -146,7 +146,7 @@ export default function MapWithSearch() {
               type="search"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              placeholder="Search by shop name, service, or city..."
+              placeholder="Search by location..."
               className="w-full pl-12 pr-5 py-3 rounded-lg border border-neutral/50 bg-base-100 text-base-content placeholder:text-base-content outline-none transition-all duration-200"
             />
           </div>
@@ -186,7 +186,7 @@ export default function MapWithSearch() {
             <MapContainer
               center={[23.8121, 90.4134]}
               zoom={8}
-              scrollWheelZoom={true}
+              scrollWheelZoom={false}
               className="h-full w-full z-[1]"
             >
               <TileLayer
