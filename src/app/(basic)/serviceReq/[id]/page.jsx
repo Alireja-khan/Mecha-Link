@@ -177,23 +177,19 @@ const ServiceRequestDetails = () => {
 
         try {
             const loggedInUserRole = loggedInUser.role?.toLowerCase();
-            const loggedInUserEmail = loggedInUser.email;
 
             // 1️⃣ Fetch all chats of the logged-in user
             const res = await fetch(`/api/chats?userId=${loggedInUser._id}`);
             if (!res.ok) throw new Error('Failed to fetch chats');
-
             const userChats = await res.json();
 
-            const customerEmail = request.user?.email || request.userEmail;
+            const customerId = request.userId;
+            const mechanicId = loggedInUser._id;
 
-            // 2️⃣ Check if a chat already exists between logged-in user and customer email
+            // 2️⃣ Check if a chat already exists with these participants
             const existingChat = userChats.find(chat =>
-                (chat.customerEmail === customerEmail) &&
-                (
-                    (chat.mechanicEmail && chat.mechanicEmail === loggedInUserEmail) ||
-                    (chat.adminEmail && chat.adminEmail === loggedInUserEmail)
-                )
+                chat.participants?.some(p => p.userId === customerId) &&
+                chat.participants?.some(p => p.userId === mechanicId)
             );
 
             if (existingChat) {
@@ -202,35 +198,28 @@ const ServiceRequestDetails = () => {
                 return;
             }
 
-            // 3️⃣ Build chat payload
-            let chatPayload = {
-                serviceRequestId: request._id,
-                customerId: request.userId,
-                customerName: request.user?.name || request.userName || "Not Provided",
-                customerEmail,
-                customerProfileImage: request.user?.profileImage || null,
+            // 3️⃣ Build new chat structure
+            const chatPayload = {
+                participants: [
+                    {
+                        userId: loggedInUser?._id,
+                        name: loggedInUser?.name || "User",
+                        email: loggedInUser?.email,
+                        profileImage: loggedInUser?.profileImage || ""
+                    },
+                    {
+                        userId: request?.userId,
+                        name: request?.user?.name || request.userName || "Customer",
+                        email: request?.user?.email || request.userEmail,
+                        profileImage: request?.user?.profileImage || ""
+                    }
+                ],
                 messages: [],
+                createdAt: new Date().toISOString(),
+                serviceRequestId: request._id
             };
 
-            if (loggedInUserRole === "admin") {
-                chatPayload = {
-                    ...chatPayload,
-                    adminId: loggedInUser._id,
-                    adminName: loggedInUser.name || "Admin",
-                    adminEmail: loggedInUser.email,
-                    adminProfileImage: loggedInUser.profileImage || null,
-                };
-            } else {
-                chatPayload = {
-                    ...chatPayload,
-                    mechanicId: loggedInUser._id,
-                    mechanicName: loggedInUser.name || "Mechanic",
-                    mechanicEmail: loggedInUser.email,
-                    mechanicProfileImage: loggedInUser.profileImage || null,
-                };
-            }
-
-            // 4️⃣ Create new chat
+            // 4️⃣ Create chat
             const apiResponse = await fetch('/api/chats', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -239,8 +228,15 @@ const ServiceRequestDetails = () => {
 
             if (!apiResponse.ok) throw new Error('Failed to create chat');
 
-            // Redirect to new chat
+            Swal.fire({
+                icon: 'success',
+                title: 'Chat Created',
+                text: 'You can now message this customer.',
+                confirmButtonColor: '#f97316'
+            });
+
             window.location.href = `/dashboard/${loggedInUserRole}/messages`;
+
         } catch (error) {
             Swal.fire({
                 icon: 'error',
@@ -250,7 +246,6 @@ const ServiceRequestDetails = () => {
             });
         }
     };
-
 
     const handleOpenMaps = () => {
         const { latitude, longitude } = request.location || {};

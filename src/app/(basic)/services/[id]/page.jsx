@@ -170,8 +170,8 @@ export default function ServiceDetailsPage() {
     const customerEmail = user?.email;
     const customerProfileImage = user?.profileImage;
     const shopName = shop.shopName;
-    const OwnerName = shop.ownerName;
-    const OwnerEmail = shop.ownerEmail;
+    const ownerName = shop.ownerName;
+    const ownerEmail = shop.ownerEmail;
     const logo = shop.logo;
 
     if (!customerId) {
@@ -192,40 +192,23 @@ export default function ServiceDetailsPage() {
       });
     }
 
-    if (!shopId || !shopName) {
-      return Swal.fire({
-        icon: "warning",
-        title: "Data Missing",
-        text: "Cannot start chat: Missing Shop ID, Owner ID, or Shop Name.",
-        confirmButtonColor: "#f97316",
-      });
-    }
-
     try {
       // Fetch all chats for this user
       const chatsResponse = await fetch(`/api/chats?userId=${customerId}`);
       const chats = await chatsResponse.json();
 
-      // Check if a chat with this shop/email already exists
-      const existingChat = chats.find(
-        (c) =>
-          c.customerEmail === customerEmail &&
-          c.ShopOwnerEmail === OwnerEmail
+      // Check if a chat with this shop already exists
+      const existingChat = chats.find((c) =>
+        c.participants.some(p => p.userId === ownerEmail) &&
+        c.participants.some(p => p.userId === customerId)
       );
 
-      // If no chat exists, create one
       if (!existingChat) {
         const chatRequestBody = {
-          shopId,
-          customerId,
-          customerName,
-          customerEmail,
-          customerProfileImage,
-          ShopName: shopName,
-          ShopLogo: logo,
-          ShopOwnerName: OwnerName,
-          ShopOwnerEmail: OwnerEmail,
-          messages: [],
+          participants: [
+            { userId: customerId, name: customerName, email: customerEmail, profileImage: customerProfileImage },
+            { userId: ownerEmail, name: ownerName, email: ownerEmail, profileImage: logo }
+          ]
         };
 
         const createResponse = await fetch("/api/chats", {
@@ -235,8 +218,7 @@ export default function ServiceDetailsPage() {
         });
 
         const data = await createResponse.json();
-        if (!createResponse.ok)
-          throw new Error(data.message || "Failed to create chat");
+        if (!createResponse.ok) throw new Error(data.message || "Failed to create chat");
       }
 
       // Navigate to messages page
