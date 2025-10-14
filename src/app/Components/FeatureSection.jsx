@@ -16,8 +16,18 @@ import { Autoplay, Navigation } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/navigation";
 import CountUp from "react-countup";
+import { useState, useEffect } from "react";
 
 export default function FeaturesSection() {
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setLoading(false);
+    }, 1500);
+    return () => clearTimeout(timer);
+  }, []);
+
   const features = [
     {
       title: "Online Service Booking",
@@ -67,6 +77,67 @@ export default function FeaturesSection() {
     { value: 2000, suffix: "+", label: "Partner Garages" },
     { value: 24, suffix: "/7", label: "Customer Support" },
   ];
+
+  // Skeleton Components
+  const FeatureCardSkeleton = () => (
+    <div className="bg-white text-gray-800 p-6 lg:p-3 xl:p-6 rounded-xl shadow-lg border border-gray-200 h-[230px] flex flex-col justify-between animate-pulse">
+      <div className="flex flex-col items-center">
+        <div className="skeleton bg-gray-200 w-14 h-14 rounded-full mb-4"></div>
+        <div className="skeleton bg-gray-200 h-6 w-32 rounded mb-2"></div>
+        <div className="skeleton bg-gray-200 h-4 w-full rounded mb-1"></div>
+        <div className="skeleton bg-gray-200 h-4 w-5/6 rounded"></div>
+      </div>
+    </div>
+  );
+
+  const StatsSkeleton = () => (
+    <div className="grid grid-cols-2 gap-8 m-20 text-center lg:text-left animate-pulse">
+      {[...Array(4)].map((_, idx) => (
+        <div key={idx} className="flex flex-col items-center lg:items-start">
+          <div className="skeleton bg-gray-300 h-12 w-24 rounded mb-2"></div>
+          <div className="skeleton bg-gray-300 h-5 w-32 rounded"></div>
+        </div>
+      ))}
+    </div>
+  );
+
+  const SectionHeaderSkeleton = () => (
+    <div className="container mx-auto px-6 text-center mb-10 animate-pulse">
+      <div className="skeleton bg-gray-300 h-12 w-64 mx-auto rounded-lg mb-4"></div>
+      <div className="skeleton bg-gray-300 h-5 w-80 mx-auto rounded"></div>
+    </div>
+  );
+
+  if (loading) {
+    return (
+      <section className="relative">
+        <SectionHeaderSkeleton />
+        <div className="relative py-24 bg-gray-200 animate-pulse">
+          <div className="absolute inset-0 bg-black/60"></div>
+          <div className="relative container mx-auto px-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+              {/* Left: Feature Slider Skeleton */}
+              <div className="relative">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {[...Array(4)].map((_, index) => (
+                    <FeatureCardSkeleton key={index} />
+                  ))}
+                </div>
+                {/* Arrow Buttons Skeleton */}
+                <div className="absolute -bottom-14 left-1/2 -translate-x-1/2 flex gap-4">
+                  <div className="skeleton bg-gray-300 w-10 h-10 rounded-full"></div>
+                  <div className="skeleton bg-gray-300 w-10 h-10 rounded-full"></div>
+                </div>
+              </div>
+
+              {/* Right: Stats Skeleton */}
+              <StatsSkeleton />
+            </div>
+          </div>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section className="relative ">
