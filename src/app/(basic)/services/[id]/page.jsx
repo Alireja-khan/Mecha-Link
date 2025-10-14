@@ -39,23 +39,166 @@ const gradientClasses = {
   "Car Detailing & Accessories": "from-teal-500 to-teal-600",
 };
 
+// Skeleton Loading Components
+const HeroSkeleton = () => (
+  <div className="relative bg-gradient-to-r from-orange-500 via-orange-600 to-red-600 overflow-hidden text-white py-12">
+    <div className="absolute inset-0 bg-black/10"></div>
+    <div className="absolute top-0 left-0 w-72 h-72 bg-white/10 rounded-full -translate-x-1/2 -translate-y-1/2"></div>
+    <div className="absolute bottom-0 right-0 w-96 h-96 bg-white/5 rounded-full translate-x-1/3 translate-y-1/3"></div>
+    
+    <div className="container relative z-10">
+      <div className="flex flex-col lg:flex-row gap-8 items-center">
+        {/* Logo Skeleton */}
+        <div className="skeleton bg-orange-400/50 h-100 w-200 rounded-2xl"></div>
+        
+        {/* Shop Info Skeleton */}
+        <div className="flex-1 text-center lg:text-left">
+          <div className="skeleton bg-orange-400/50 h-8 w-48 rounded-full mb-4 mx-auto lg:mx-0"></div>
+          <div className="skeleton bg-orange-400/50 h-12 w-64 rounded-lg mb-3 mx-auto lg:mx-0"></div>
+          <div className="skeleton bg-orange-400/50 h-6 w-48 rounded mb-6 mx-auto lg:mx-0"></div>
+          
+          {/* Action Buttons Skeleton */}
+          <div className="flex flex-wrap gap-4 justify-center lg:justify-start">
+            <div className="skeleton bg-white/30 h-12 w-40 rounded-xl"></div>
+            <div className="skeleton bg-white/30 h-12 w-32 rounded-xl"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+);
+
+const OverviewSkeleton = () => (
+  <div className="bg-white rounded-2xl shadow-lg p-8 border border-orange-100">
+    <div className="skeleton bg-gray-200 h-8 w-40 rounded-lg mb-6"></div>
+    <div className="space-y-6">
+      <div className="flex flex-wrap gap-3">
+        {[...Array(3)].map((_, i) => (
+          <div key={i} className="skeleton bg-gray-200 h-8 w-24 rounded-full"></div>
+        ))}
+      </div>
+      <div className="space-y-3">
+        <div className="skeleton bg-gray-200 h-4 w-full rounded"></div>
+        <div className="skeleton bg-gray-200 h-4 w-3/4 rounded"></div>
+        <div className="skeleton bg-gray-200 h-4 w-5/6 rounded"></div>
+      </div>
+      <div className="flex flex-wrap gap-4 pt-4">
+        {[...Array(2)].map((_, i) => (
+          <div key={i} className="skeleton bg-gray-200 h-12 w-48 rounded-xl"></div>
+        ))}
+      </div>
+    </div>
+  </div>
+);
+
+const ServicesSkeleton = () => (
+  <div className="bg-white rounded-2xl shadow-lg p-8 border border-orange-100">
+    <div className="skeleton bg-gray-200 h-8 w-48 rounded-lg mb-8"></div>
+    <div className="space-y-8">
+      {[...Array(2)].map((_, i) => (
+        <div key={i} className="space-y-6">
+          <div className="flex items-center gap-4">
+            <div className="skeleton bg-gray-200 w-12 h-12 rounded-xl"></div>
+            <div className="skeleton bg-gray-200 h-6 w-40 rounded"></div>
+          </div>
+          <div className="grid sm:grid-cols-2 gap-6">
+            {[...Array(2)].map((_, j) => (
+              <div key={j} className="rounded-xl p-6 border border-orange-200">
+                <div className="skeleton bg-gray-200 h-5 w-32 rounded mb-4"></div>
+                <ul className="space-y-3">
+                  {[...Array(3)].map((_, k) => (
+                    <li key={k} className="flex items-start">
+                      <div className="skeleton bg-gray-200 w-5 h-5 rounded-full mr-3"></div>
+                      <div className="skeleton bg-gray-200 h-4 w-40 rounded"></div>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
+        </div>
+      ))}
+    </div>
+  </div>
+);
+
+const ContactSkeleton = () => (
+  <div className="bg-white rounded-2xl shadow-lg p-7 border border-orange-100">
+    <div className="skeleton bg-gray-200 h-6 w-40 rounded-lg mb-6"></div>
+    <div className="space-y-6">
+      {[...Array(4)].map((_, i) => (
+        <div key={i} className="flex items-start gap-4">
+          <div className="skeleton bg-gray-200 w-12 h-12 rounded-xl"></div>
+          <div className="flex-1">
+            <div className="skeleton bg-gray-200 h-5 w-24 rounded mb-2"></div>
+            <div className="skeleton bg-gray-200 h-4 w-32 rounded"></div>
+          </div>
+        </div>
+      ))}
+    </div>
+  </div>
+);
+
+const MapSkeleton = () => (
+  <div className="bg-white rounded-2xl shadow-lg p-7 border border-orange-100">
+    <div className="skeleton bg-gray-200 h-6 w-32 rounded-lg mb-6"></div>
+    <div className="skeleton bg-gray-200 h-4 w-full rounded mb-5"></div>
+    <div className="skeleton bg-gray-200 h-72 rounded-xl mb-5"></div>
+    <div className="skeleton bg-gray-200 h-12 w-full rounded-xl"></div>
+  </div>
+);
+
+const ReviewSkeleton = () => (
+  <div className="rounded-2xl border border-primary shadow-sm p-8">
+    <div className="skeleton bg-gray-200 h-8 w-48 rounded-lg mb-6"></div>
+    <div className="space-y-4">
+      {[...Array(3)].map((_, i) => (
+        <div key={i} className="rounded-xl p-5 border border-primary">
+          <div className="flex items-start justify-between gap-4 mb-3">
+            <div className="flex items-center gap-3 flex-1">
+              <div className="skeleton bg-gray-200 w-12 h-12 rounded-full"></div>
+              <div className="flex-1">
+                <div className="skeleton bg-gray-200 h-5 w-32 rounded mb-2"></div>
+                <div className="skeleton bg-gray-200 h-4 w-24 rounded"></div>
+              </div>
+            </div>
+            <div className="text-right">
+              <div className="skeleton bg-gray-200 h-6 w-16 rounded mb-1"></div>
+              <div className="skeleton bg-gray-200 h-3 w-20 rounded"></div>
+            </div>
+          </div>
+          <div className="skeleton bg-gray-200 h-4 w-full rounded"></div>
+        </div>
+      ))}
+    </div>
+  </div>
+);
+
 export default function ServiceDetailsPage() {
   const { id } = useParams();
   const [shopdata, setShopdata] = useState({});
   const [mapCenter, setMapCenter] = useState([51.505, -0.09]);
   const [isMapReady, setIsMapReady] = useState(false);
   const [submitSuccess, setSubmitSuccess] = useState(false);
+  const [loading, setLoading] = useState(true);
   const { user } = useUser();
 
   useEffect(() => {
+    setLoading(true);
     fetch(`/api/shops/${id}`)
       .then((res) => res.json())
       .then((data) => {
-        console.log("Shop Data:", data); // Debug log
+        console.log("Shop Data:", data);
         setShopdata(data);
         if (data.shop?.address) {
           geocodeAddress(data.shop.address);
+        } else {
+          setLoading(false);
         }
+      })
+      .catch((error) => {
+        console.error("Error fetching shop data:", error);
+        setLoading(false);
       });
   }, [id]);
 
@@ -73,13 +216,13 @@ export default function ServiceDetailsPage() {
 
       if (data && data.length > 0) {
         setMapCenter([parseFloat(data[0].lat), parseFloat(data[0].lon)]);
-        setIsMapReady(true);
-      } else {
-        setIsMapReady(true);
       }
+      setIsMapReady(true);
+      setLoading(false);
     } catch (error) {
       console.error("Geocoding error:", error);
       setIsMapReady(true);
+      setLoading(false);
     }
   };
 
@@ -113,8 +256,8 @@ export default function ServiceDetailsPage() {
     ownerName,
   } = shop;
 
-  console.log("Vehicle Types:", vehicleTypes); // Debug log
-  console.log("Categories:", categories); // Debug log
+  console.log("Vehicle Types:", vehicleTypes);
+  console.log("Categories:", categories);
 
   // FIXED: Create service sections based on the actual data structure
   const serviceSections = [];
@@ -266,6 +409,42 @@ export default function ServiceDetailsPage() {
       });
   };
 
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-orange-50 to-white">
+        {/* Hero Skeleton */}
+        <HeroSkeleton />
+        
+        {/* Main Content Skeleton */}
+        <div className="container py-8">
+          <div className="grid lg:grid-cols-3 gap-8">
+            {/* Left Column - Services & Reviews */}
+            <div className="lg:col-span-2 space-y-8">
+              <OverviewSkeleton />
+              <ServicesSkeleton />
+              <ReviewSkeleton />
+            </div>
+
+            {/* Right Column - Contact Info, Certifications, etc. */}
+            <div className="space-y-8">
+              <ContactSkeleton />
+              <MapSkeleton />
+              {/* Rating Form Skeleton */}
+              <div className="bg-white rounded-2xl shadow-lg p-7 border border-orange-100">
+                <div className="skeleton bg-gray-200 h-6 w-40 rounded-lg mb-6"></div>
+                <div className="space-y-4">
+                  <div className="skeleton bg-gray-200 h-10 w-full rounded"></div>
+                  <div className="skeleton bg-gray-200 h-24 w-full rounded"></div>
+                  <div className="skeleton bg-gray-200 h-12 w-full rounded"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-orange-50 to-white">
       {submitSuccess && (
@@ -278,31 +457,27 @@ export default function ServiceDetailsPage() {
       )}
 
       {/* Hero Section */}
-      <div className="relative  bg-gradient-to-r from-orange-500 via-orange-600 to-red-600 overflow-hidden text-white py-12">
+      <div className="relative bg-gradient-to-r from-orange-500 via-orange-600 to-red-600 overflow-hidden text-white py-12">
         {/* Background Pattern */}
         <div className="absolute inset-0 bg-black/10"></div>
         <div className="absolute top-0 left-0 w-72 h-72 bg-white/10 rounded-full -translate-x-1/2 -translate-y-1/2"></div>
         <div className="absolute bottom-0 right-0 w-96 h-96 bg-white/5 rounded-full translate-x-1/3 translate-y-1/3"></div>
         <div className="absolute inset-0 bg-black/10"></div>
 
-
         <div className="container relative z-10">
           <div className="flex flex-col lg:flex-row gap-8 items-center">
-                {logo && (
-                  <div className="relative h-100 w-200 rounded-2xl overflow-hidden ring-2 ring-white shadow-2xl">
-                    <Image
-                      src={logo}
-                      alt={shopName || "Shop Logo"}
-                      fill
-                      className="object-cover"
-                      priority
-                    />
-                  </div>
-                )}
-            {/* Logo */}
-            <div className="">
-            </div>
-
+            {logo && (
+              <div className="relative h-100 w-200 rounded-2xl overflow-hidden ring-2 ring-white shadow-2xl">
+                <Image
+                  src={logo}
+                  alt={shopName || "Shop Logo"}
+                  fill
+                  className="object-cover"
+                  priority
+                />
+              </div>
+            )}
+            
             {/* Shop Info */}
             <div className="flex-1 text-center lg:text-left">
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">

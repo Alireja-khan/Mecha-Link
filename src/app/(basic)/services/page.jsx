@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from "react";
 import ServiceCard from "@/app/Components/ServiceCard";
 import { Search, Filter, Star, MapPin, Users, Award, Shield, Sparkles } from "lucide-react";
+import Loading from "../../Components/Loading"
 
 const Services = () => {
   const [totalData, setTotalData] = useState([]);
@@ -37,9 +38,13 @@ const Services = () => {
           });
         }
         setLoading(false);
+      })
+      .catch((error) => {
+        console.error("Error fetching shops:", error);
+        setLoading(false);
       });
   }, [searchTerm, sortOrder, itemsPerPage, currentPage]);
-  
+
   const { result: services = [], totalDocs, totalPage } = totalData;
 
   // ===== Handlers =====
@@ -61,6 +66,69 @@ const Services = () => {
     setCurrentPage(page);
   };
 
+  // Service Card Skeleton Component
+  const ServiceCardSkeleton = () => (
+    <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-6 animate-pulse">
+      {/* Image Skeleton */}
+      <div className="skeleton bg-gray-200 h-48 w-full rounded-2xl mb-4"></div>
+      
+      {/* Title Skeleton */}
+      <div className="skeleton bg-gray-200 h-6 w-3/4 rounded mb-3"></div>
+      
+      {/* Rating Skeleton */}
+      <div className="flex items-center gap-2 mb-3">
+        <div className="skeleton bg-gray-200 h-5 w-5 rounded-full"></div>
+        <div className="skeleton bg-gray-200 h-4 w-16 rounded"></div>
+      </div>
+      
+      {/* Location Skeleton */}
+      <div className="flex items-center gap-2 mb-4">
+        <div className="skeleton bg-gray-200 h-4 w-4 rounded"></div>
+        <div className="skeleton bg-gray-200 h-4 w-32 rounded"></div>
+      </div>
+      
+      {/* Services Skeleton */}
+      <div className="space-y-2 mb-4">
+        <div className="skeleton bg-gray-200 h-3 w-full rounded"></div>
+        <div className="skeleton bg-gray-200 h-3 w-5/6 rounded"></div>
+        <div className="skeleton bg-gray-200 h-3 w-4/6 rounded"></div>
+      </div>
+      
+      {/* Button Skeleton */}
+      <div className="skeleton bg-gray-200 h-10 w-full rounded-xl"></div>
+    </div>
+  );
+
+  // Stats Skeleton Component
+  // const StatsSkeleton = () => (
+  //   <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 mb-8 animate-pulse">
+  //     {[...Array(4)].map((_, index) => (
+  //       <div key={index} className="bg-white rounded-2xl shadow-lg p-6 border border-gray-200">
+  //         <div className="skeleton bg-gray-200 h-12 w-12 rounded-xl mb-3"></div>
+  //         <div className="skeleton bg-gray-200 h-6 w-20 rounded mb-2"></div>
+  //         <div className="skeleton bg-gray-200 h-8 w-16 rounded"></div>
+  //       </div>
+  //     ))}
+  //   </div>
+  // );
+
+  // Pagination Skeleton
+  const PaginationSkeleton = () => (
+    <div className="flex flex-col md:flex-row justify-between mt-8 items-center gap-4 animate-pulse">
+      <div className="flex items-center gap-3">
+        <div className="skeleton bg-gray-200 h-4 w-24 rounded"></div>
+        <div className="skeleton bg-gray-200 h-10 w-20 rounded-lg"></div>
+      </div>
+      <div className="flex justify-center items-center gap-2">
+        <div className="skeleton bg-gray-200 h-10 w-24 rounded-lg"></div>
+        {[...Array(5)].map((_, i) => (
+          <div key={i} className="skeleton bg-gray-200 h-10 w-10 rounded-lg"></div>
+        ))}
+        <div className="skeleton bg-gray-200 h-10 w-20 rounded-lg"></div>
+      </div>
+    </div>
+  );
+
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Modern Banner for Shops - Same color theme and height */}
@@ -69,7 +137,7 @@ const Services = () => {
         <div className="absolute inset-0 bg-black/10"></div>
         <div className="absolute top-0 left-0 w-72 h-72 bg-white/10 rounded-full -translate-x-1/2 -translate-y-1/2"></div>
         <div className="absolute bottom-0 right-0 w-96 h-96 bg-white/5 rounded-full translate-x-1/3 translate-y-1/3"></div>
-        
+
         <div className="container mx-auto px-6 relative z-10">
           <div className="max-w-6xl mx-auto">
             <div className="flex flex-col lg:flex-row items-center justify-between gap-12">
@@ -79,34 +147,33 @@ const Services = () => {
                   <Sparkles className="w-5 h-5 text-yellow-300" />
                   <span className="text-white text-sm font-semibold">Trusted Service Providers</span>
                 </div>
-                
+
                 <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-6 leading-tight">
                   Find Your Perfect
                   <span className="block text-orange-100">Service Partner</span>
                 </h1>
-                
+
                 <p className="text-xl text-orange-100 mb-8 leading-relaxed max-w-2xl">
                   Connect with certified mechanics and service shops. Browse ratings, services, and locations to find the perfect match for your needs.
                 </p>
 
-
                 {/* Quick Actions */}
-                <div className="flex flex-wrap gap-4">
-                  <button 
+                {/* <div className="flex flex-wrap gap-4">
+                  <button
                     onClick={() => setSortOrder('htl')}
                     className="bg-white text-orange-600 px-6 py-3 rounded-full font-semibold hover:bg-orange-50 transition-all duration-300 flex items-center gap-2"
                   >
                     <Star className="w-5 h-5" />
                     Top Rated Shops
                   </button>
-                  <button 
+                  <button
                     onClick={() => setSortOrder('certified')}
                     className="bg-orange-700 text-white px-6 py-3 rounded-full font-semibold hover:bg-orange-800 transition-all duration-300 flex items-center gap-2"
                   >
                     <Award className="w-5 h-5" />
                     Certified Only
                   </button>
-                </div>
+                </div> */}
               </div>
 
               {/* Right Illustration/Content */}
@@ -167,20 +234,54 @@ const Services = () => {
             </div>
           </div>
 
-          {loading && (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mt-10">
-              {[...Array(8)].map((_, index) => (
-                <div key={index} className="flex w-full flex-col gap-4">
-                  <div className="skeleton bg-gray-200 h-48 w-full rounded-2xl"></div>
-                  <div className="skeleton bg-gray-200 h-4 w-3/4 rounded"></div>
-                  <div className="skeleton bg-gray-200 h-4 w-full rounded"></div>
-                  <div className="skeleton bg-gray-200 h-4 w-1/2 rounded"></div>
-                  <div className="skeleton bg-gray-200 h-8 w-full rounded"></div>
+          {/* Stats Section */}
+          {/* {loading ? (
+            <StatsSkeleton />
+          ) : (
+            services.length > 0 && (
+              <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                <div className="bg-white rounded-2xl shadow-lg p-6 border border-gray-200 text-center">
+                  <div className="bg-orange-100 w-12 h-12 rounded-xl flex items-center justify-center mx-auto mb-3">
+                    <Users className="w-6 h-6 text-orange-600" />
+                  </div>
+                  <h3 className="text-gray-600 text-sm font-medium mb-1">Total Shops</h3>
+                  <p className="text-2xl font-bold text-gray-900">{stats.total}</p>
                 </div>
+                <div className="bg-white rounded-2xl shadow-lg p-6 border border-gray-200 text-center">
+                  <div className="bg-orange-100 w-12 h-12 rounded-xl flex items-center justify-center mx-auto mb-3">
+                    <Star className="w-6 h-6 text-orange-600" />
+                  </div>
+                  <h3 className="text-gray-600 text-sm font-medium mb-1">Top Rated</h3>
+                  <p className="text-2xl font-bold text-gray-900">{stats.topRated}</p>
+                </div>
+                <div className="bg-white rounded-2xl shadow-lg p-6 border border-gray-200 text-center">
+                  <div className="bg-orange-100 w-12 h-12 rounded-xl flex items-center justify-center mx-auto mb-3">
+                    <Award className="w-6 h-6 text-orange-600" />
+                  </div>
+                  <h3 className="text-gray-600 text-sm font-medium mb-1">Certified</h3>
+                  <p className="text-2xl font-bold text-gray-900">{stats.certified}</p>
+                </div>
+                <div className="bg-white rounded-2xl shadow-lg p-6 border border-gray-200 text-center">
+                  <div className="bg-orange-100 w-12 h-12 rounded-xl flex items-center justify-center mx-auto mb-3">
+                    <Shield className="w-6 h-6 text-orange-600" />
+                  </div>
+                  <h3 className="text-gray-600 text-sm font-medium mb-1">Active</h3>
+                  <p className="text-2xl font-bold text-gray-900">{stats.active}</p>
+                </div>
+              </div>
+            )
+          )} */}
+
+          {/* Loading State */}
+          {loading && (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+              {[...Array(8)].map((_, index) => (
+                <ServiceCardSkeleton key={index} />
               ))}
             </div>
           )}
 
+          {/* Empty State */}
           {!loading && services.length === 0 && (
             <div className="text-center py-16 rounded-2xl shadow-lg border border-gray-200 bg-white">
               <div className="w-24 h-24 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -197,65 +298,69 @@ const Services = () => {
 
           {/* Services Grid */}
           {!loading && services.length > 0 && (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-              {services.map((service) => (
-                <ServiceCard key={service._id} service={service} />
-              ))}
-            </div>
+            <>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                {services.map((service) => (
+                  <ServiceCard key={service._id} service={service} />
+                ))}
+              </div>
+
+              {/* Pagination & Items per page */}
+              <div className="flex flex-col md:flex-row justify-between mt-8 items-center gap-4">
+                {/* Items per page */}
+                <div className="flex items-center gap-3">
+                  <label htmlFor="itemsPerPage" className="text-gray-600 font-medium">
+                    Show per page:
+                  </label>
+                  <select
+                    value={itemsPerPage}
+                    onChange={handleItemsPerPage}
+                    className="px-4 py-2 bg-white rounded-lg border-2 border-gray-300 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all duration-300"
+                  >
+                    <option value="12">12</option>
+                    <option value="24">24</option>
+                    <option value="36">36</option>
+                    <option value="48">48</option>
+                  </select>
+                </div>
+
+                {/* Page buttons */}
+                <div className="flex justify-center items-center gap-2">
+                  <button
+                    className="px-4 py-2 border border-orange-500 text-orange-500 rounded-lg hover:bg-orange-500 hover:text-white transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                    disabled={currentPage === 1}
+                    onClick={() => handlePageChange(currentPage - 1)}
+                  >
+                    Previous
+                  </button>
+
+                  {Array.from({ length: totalPage }, (_, i) => (
+                    <button
+                      key={i}
+                      className={`px-4 py-2 border rounded-lg transition-all duration-300 ${currentPage === i + 1
+                          ? "bg-orange-500 text-white border-orange-500"
+                          : "border-gray-300 text-gray-600 hover:bg-orange-50 hover:border-orange-500"
+                        }`}
+                      onClick={() => handlePageChange(i + 1)}
+                    >
+                      {i + 1}
+                    </button>
+                  ))}
+
+                  <button
+                    className="px-4 py-2 border border-orange-500 text-orange-500 rounded-lg hover:bg-orange-500 hover:text-white transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                    disabled={currentPage === totalPage}
+                    onClick={() => handlePageChange(currentPage + 1)}
+                  >
+                    Next
+                  </button>
+                </div>
+              </div>
+            </>
           )}
 
-          {/* Pagination & Items per page */}
-          <div className="flex flex-col md:flex-row justify-between mt-8 items-center gap-4">
-            {/* Items per page */}
-            <div className="flex items-center gap-3">
-              <label htmlFor="itemsPerPage" className="text-gray-600 font-medium">
-                Show per page:
-              </label>
-              <select
-                value={itemsPerPage}
-                onChange={handleItemsPerPage}
-                className="px-4 py-2 bg-white rounded-lg border-2 border-gray-300 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all duration-300"
-              >
-                <option value="12">12</option>
-                <option value="24">24</option>
-                <option value="36">36</option>
-                <option value="48">48</option>
-              </select>
-            </div>
-
-            {/* Page buttons */}
-            <div className="flex justify-center items-center gap-2">
-              <button
-                className="px-4 py-2 border border-orange-500 text-orange-500 rounded-lg hover:bg-orange-500 hover:text-white transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
-                disabled={currentPage === 1}
-                onClick={() => handlePageChange(currentPage - 1)}
-              >
-                Previous
-              </button>
-
-              {Array.from({ length: totalPage }, (_, i) => (
-                <button
-                  key={i}
-                  className={`px-4 py-2 border rounded-lg transition-all duration-300 ${
-                    currentPage === i + 1
-                      ? "bg-orange-500 text-white border-orange-500"
-                      : "border-gray-300 text-gray-600 hover:bg-orange-50 hover:border-orange-500"
-                  }`}
-                  onClick={() => handlePageChange(i + 1)}
-                >
-                  {i + 1}
-                </button>
-              ))}
-
-              <button
-                className="px-4 py-2 border border-orange-500 text-orange-500 rounded-lg hover:bg-orange-500 hover:text-white transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
-                disabled={currentPage === totalPage}
-                onClick={() => handlePageChange(currentPage + 1)}
-              >
-                Next
-              </button>
-            </div>
-          </div>
+          {/* Pagination Skeleton for loading state */}
+          {loading && <PaginationSkeleton />}
         </div>
       </section>
     </div>

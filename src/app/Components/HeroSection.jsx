@@ -1,9 +1,90 @@
+"use client";
 import Image from "next/image";
 import Link from "next/link";
+import { useState, useEffect } from "react";
 
 export default function HeroModern() {
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    // Simulate loading for hero section
+    const timer = setTimeout(() => {
+      setLoading(false);
+    }, 1000);
+    return () => clearTimeout(timer);
+  }, []);
+
+  // Hero Skeleton Component
+  const HeroSkeleton = () => (
+    <section className="relative py-20 md:py-20">
+      <div className="container mx-auto px-6 lg:px-12 flex flex-col-reverse lg:flex-row items-center gap-16 max-w-7xl">
+        {/* Text Content Skeleton */}
+        <div className="flex-1 text-center lg:text-left animate-pulse">
+          {/* Main Title Skeleton */}
+          <div className="space-y-4 mb-6">
+            <div className="skeleton bg-gray-300 h-12 w-3/4 mx-auto lg:mx-0 rounded-lg"></div>
+            <div className="skeleton bg-gray-300 h-12 w-4/5 mx-auto lg:mx-0 rounded-lg"></div>
+          </div>
+          
+          {/* Description Skeleton */}
+          <div className="space-y-2 mb-10">
+            <div className="skeleton bg-gray-300 h-4 w-full rounded"></div>
+            <div className="skeleton bg-gray-300 h-4 w-5/6 rounded"></div>
+            <div className="skeleton bg-gray-300 h-4 w-4/6 rounded"></div>
+          </div>
+
+          {/* Buttons Skeleton */}
+          <div className="mt-10 flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
+            <div className="skeleton bg-gray-300 h-12 w-40 rounded-xl"></div>
+            <div className="skeleton bg-gray-300 h-12 w-48 rounded-xl"></div>
+          </div>
+
+          {/* Trust Indicators Skeleton */}
+          <div className="mt-10 flex flex-wrap items-center justify-center lg:justify-start gap-6">
+            <div className="flex items-center">
+              <div className="flex -space-x-3 mr-2">
+                {[...Array(4)].map((_, index) => (
+                  <div 
+                    key={index} 
+                    className="skeleton bg-gray-300 h-8 w-8 rounded-full border-2 border-white"
+                  ></div>
+                ))}
+              </div>
+              <div className="skeleton bg-gray-300 h-4 w-32 rounded"></div>
+            </div>
+            <div className="skeleton bg-gray-300 h-4 w-px"></div>
+            <div className="skeleton bg-gray-300 h-4 w-40 rounded"></div>
+          </div>
+        </div>
+
+        {/* Image Skeleton */}
+        <div className="flex-1 relative animate-pulse">
+          <div className="relative rounded-3xl overflow-hidden shadow-2xl border-8 border-white">
+            <div className="skeleton bg-gray-300 w-full h-80 md:h-96 rounded-2xl"></div>
+            {/* Overlay card skeleton */}
+            <div className="absolute bottom-6 left-6 bg-white/90 backdrop-blur-md rounded-2xl shadow-md p-4 flex items-center gap-4">
+              <div className="skeleton bg-gray-300 w-12 h-12 rounded-xl"></div>
+              <div className="space-y-2">
+                <div className="skeleton bg-gray-300 h-4 w-24 rounded"></div>
+                <div className="skeleton bg-gray-300 h-3 w-32 rounded"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Decorative Background Elements Skeleton */}
+      <div className="absolute top-15 right-0 w-72 h-72 bg-gray-300 rounded-full blur-3xl opacity-30 -z-10"></div>
+      <div className="absolute bottom-0 left-0 w-72 h-72 bg-gray-300 rounded-full blur-3xl opacity-30 -z-10"></div>
+    </section>
+  );
+
+  if (loading) {
+    return <HeroSkeleton />;
+  }
+
   return (
-    <section className="relative  py-20 md:py-20 ">
+    <section className="relative py-20 md:py-20">
       <div className="container mx-auto px-6 lg:px-12 flex flex-col-reverse lg:flex-row items-center gap-16 max-w-7xl">
         
         {/* Text Content */}
@@ -12,8 +93,8 @@ export default function HeroModern() {
             Connect with <span className="text-primary">Trusted Mechanics</span>{" "}
             <br className="hidden sm:block" /> Anytime, Anywhere
           </h1>
-          <p className="mt-6 text-lg sm:text-xl  max-w-2xl mx-auto lg:mx-0">
-            MechaLink helps vehicle ownexrs find verified mechanics, book
+          <p className="mt-6 text-lg sm:text-xl max-w-2xl mx-auto lg:mx-0">
+            MechaLink helps vehicle owners find verified mechanics, book
             services instantly, and track repairs—all in one platform. Reliable.
             Fast. Hassle-free.
           </p>
@@ -31,7 +112,7 @@ export default function HeroModern() {
           </div>
 
           {/* Trust Indicators */}
-          <div className="mt-10 flex flex-wrap items-center justify-center lg:justify-start gap-6  text-sm">
+          <div className="mt-10 flex flex-wrap items-center justify-center lg:justify-start gap-6 text-sm">
             <div className="flex items-center">
               <div className="flex -space-x-3 mr-2">
                 {[
@@ -86,7 +167,7 @@ export default function HeroModern() {
               </div>
               <div>
                 <h4 className="font-semibold text-gray-800">Live Booking</h4>
-                <p className=" text-sm text-gray-800">Instant mechanic availability</p>
+                <p className="text-sm text-gray-800">Instant mechanic availability</p>
               </div>
             </div>
           </div>
@@ -95,7 +176,7 @@ export default function HeroModern() {
 
       {/* Decorative Background Elements */}
       <div className="absolute top-15 right-0 w-72 h-72 bg-secondary rounded-full blur-3xl opacity-30 -z-10"></div>
-            <div className="absolute bottom-0 left-0 w-72 h-72 bg-secondary rounded-full blur-3xl opacity-30 -z-10"></div>
+      <div className="absolute bottom-0 left-0 w-72 h-72 bg-secondary rounded-full blur-3xl opacity-30 -z-10"></div>
     </section>
   );
 }

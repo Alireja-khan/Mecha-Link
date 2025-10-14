@@ -3,21 +3,11 @@
 import { useEffect, useState } from "react";
 import ServiceReqCard from "./components/ServiceReqCard";
 import { Search, Filter, AlertTriangle, TrendingUp, Users, Clock, ArrowRight, Grid, List } from "lucide-react";
+import Loading from "../../Components/Loading"
 
 // Fallback image URL
 const BACKGROUND_IMAGE_URL =
   "https://images.unsplash.com/photo-1570129476815-ba368ac77013?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D";
-
-const OrangeSpinner = () => (
-  <div className="flex justify-center items-center h-48">
-    <div
-      className="w-12 h-12 border-4 border-orange-500 border-t-transparent rounded-full animate-spin"
-      role="status"
-    >
-      <span className="sr-only">Loading...</span>
-    </div>
-  </div>
-);
 
 const ServiceReq = () => {
   const [loading, setLoading] = useState(true);
@@ -53,6 +43,10 @@ const ServiceReq = () => {
           });
         }
         setLoading(false);
+      })
+      .catch((error) => {
+        console.error("Error fetching service requests:", error);
+        setLoading(false);
       });
   }, [searchTerm, itemsPerPage, currentPage, sortOrder]);
 
@@ -81,6 +75,78 @@ const ServiceReq = () => {
     setViewMode(viewMode === "grid" ? "list" : "grid");
   };
 
+  // Skeleton Components
+  const StatsSkeleton = () => (
+    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8 animate-pulse">
+      {[...Array(4)].map((_, index) => (
+        <div key={index} className="bg-white/90 backdrop-blur-sm rounded-xl p-4 border border-white">
+          <div className="skeleton bg-gray-300 w-8 h-8 mx-auto mb-2 rounded-full"></div>
+          <div className="skeleton bg-gray-300 h-7 w-12 mx-auto mb-1 rounded"></div>
+          <div className="skeleton bg-gray-300 h-4 w-16 mx-auto rounded"></div>
+        </div>
+      ))}
+    </div>
+  );
+
+  const ServiceReqCardSkeleton = ({ compact = false }) => (
+    <div className={`bg-white rounded-2xl shadow-lg border border-gray-200 p-6 animate-pulse ${compact ? '' : 'mb-4'}`}>
+      {/* Header Section */}
+      <div className="flex items-start justify-between mb-4">
+        <div className="flex-1">
+          <div className="skeleton bg-gray-200 h-6 w-3/4 rounded mb-3"></div>
+          <div className="flex items-center gap-4 mb-3">
+            <div className="skeleton bg-gray-200 h-5 w-24 rounded-full"></div>
+            <div className="skeleton bg-gray-200 h-5 w-20 rounded-full"></div>
+          </div>
+        </div>
+        <div className="skeleton bg-gray-200 h-8 w-20 rounded-full"></div>
+      </div>
+
+      {/* Content Section */}
+      <div className="space-y-3 mb-4">
+        <div className="skeleton bg-gray-200 h-4 w-full rounded"></div>
+        <div className="skeleton bg-gray-200 h-4 w-5/6 rounded"></div>
+        {!compact && (
+          <div className="skeleton bg-gray-200 h-4 w-4/6 rounded"></div>
+        )}
+      </div>
+
+      {/* Location and Vehicle Info */}
+      <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center gap-2">
+          <div className="skeleton bg-gray-200 h-4 w-4 rounded"></div>
+          <div className="skeleton bg-gray-200 h-4 w-32 rounded"></div>
+        </div>
+        <div className="skeleton bg-gray-200 h-5 w-24 rounded"></div>
+      </div>
+
+      {/* Footer Section */}
+      <div className="flex items-center justify-between pt-4 border-t border-gray-100">
+        <div className="flex items-center gap-4">
+          <div className="skeleton bg-gray-200 h-8 w-8 rounded-full"></div>
+          <div className="skeleton bg-gray-200 h-4 w-20 rounded"></div>
+        </div>
+        <div className="skeleton bg-gray-200 h-10 w-28 rounded-xl"></div>
+      </div>
+    </div>
+  );
+
+  const PaginationSkeleton = () => (
+    <div className="flex flex-col md:flex-row justify-between mt-8 items-center gap-4 animate-pulse">
+      <div className="flex items-center gap-3">
+        <div className="skeleton bg-gray-200 h-4 w-24 rounded"></div>
+        <div className="skeleton bg-gray-200 h-10 w-20 rounded-lg"></div>
+      </div>
+      <div className="flex justify-center items-center gap-2">
+        <div className="skeleton bg-gray-200 h-10 w-20 rounded-lg"></div>
+        {[...Array(5)].map((_, i) => (
+          <div key={i} className="skeleton bg-gray-200 h-10 w-10 rounded-lg"></div>
+        ))}
+        <div className="skeleton bg-gray-200 h-10 w-20 rounded-lg"></div>
+      </div>
+    </div>
+  );
+
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Modern Interactive Banner */}
@@ -92,7 +158,6 @@ const ServiceReq = () => {
 
         <div className="container mx-auto px-6 relative z-10">
           <div className="max-w-4xl mx-auto text-center">
-
             <h1 className="text-4xl md:text-6xl font-bold text-white mb-6">
               Available Service Jobs
               <span className="block text-2xl md:text-3xl font-semibold text-orange-100 mt-2">
@@ -105,28 +170,32 @@ const ServiceReq = () => {
             </p>
 
             {/* Quick Stats */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-              <div className="bg-white/90 backdrop-blur-sm rounded-xl p-4 border border-white text-black">
-                <Users className="w-8 h-8 mx-auto mb-2" />
-                <div className="text-2xl font-bold">{stats.total}</div>
-                <div className="text-sm opacity-90">Total Requests</div>
+            {loading ? (
+              <StatsSkeleton />
+            ) : (
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+                <div className="bg-white/90 backdrop-blur-sm rounded-xl p-4 border border-white text-black">
+                  <Users className="w-8 h-8 mx-auto mb-2" />
+                  <div className="text-2xl font-bold">{stats.total}</div>
+                  <div className="text-sm opacity-90">Total Requests</div>
+                </div>
+                <div className="bg-white/90 backdrop-blur-sm rounded-xl p-4 border border-white text-black">
+                  <Clock className="w-8 h-8 mx-auto mb-2" />
+                  <div className="text-2xl font-bold">{stats.pending}</div>
+                  <div className="text-sm opacity-90">Pending</div>
+                </div>
+                <div className="bg-white/90 backdrop-blur-sm rounded-xl p-4 border border-white text-black">
+                  <TrendingUp className="w-8 h-8 mx-auto mb-2" />
+                  <div className="text-2xl font-bold">{stats.inProgress}</div>
+                  <div className="text-sm opacity-90">In Progress</div>
+                </div>
+                <div className="bg-white/90 backdrop-blur-sm rounded-xl p-4 border border-white text-black">
+                  <AlertTriangle className="w-8 h-8 mx-auto mb-2" />
+                  <div className="text-2xl font-bold">{stats.completed}</div>
+                  <div className="text-sm opacity-90">Completed</div>
+                </div>
               </div>
-              <div className="bg-white/90 backdrop-blur-sm rounded-xl p-4 border border-white text-black">
-                <Clock className="w-8 h-8 mx-auto mb-2" />
-                <div className="text-2xl font-bold">{stats.pending}</div>
-                <div className="text-sm opacity-90">Pending</div>
-              </div>
-              <div className="bg-white/90 backdrop-blur-sm rounded-xl p-4 border border-white text-black">
-                <TrendingUp className="w-8 h-8 mx-auto mb-2" />
-                <div className="text-2xl font-bold">{stats.inProgress}</div>
-                <div className="text-sm opacity-90">In Progress</div>
-              </div>
-              <div className="bg-white/90 backdrop-blur-sm rounded-xl p-4 border border-white text-black">
-                <AlertTriangle className="w-8 h-8 mx-auto mb-2" />
-                <div className="text-2xl font-bold">{stats.completed}</div>
-                <div className="text-sm opacity-90">Completed</div>
-              </div>
-            </div>
+            )}
 
             {/* Quick Actions */}
             <div className="flex flex-wrap justify-center gap-4">
@@ -145,7 +214,6 @@ const ServiceReq = () => {
                 High Priority
               </button>
             </div>
-
           </div>
         </div>
       </section>
@@ -176,8 +244,8 @@ const ServiceReq = () => {
                   <button
                     onClick={() => setViewMode("grid")}
                     className={`p-2 rounded-md transition-all duration-300 ${viewMode === "grid"
-                        ? "bg-white text-orange-500 shadow-sm"
-                        : "text-gray-500 hover:text-orange-500"
+                      ? "bg-white text-orange-500 shadow-sm"
+                      : "text-gray-500 hover:text-orange-500"
                       }`}
                   >
                     <Grid className="w-4 h-4" />
@@ -185,8 +253,8 @@ const ServiceReq = () => {
                   <button
                     onClick={() => setViewMode("list")}
                     className={`p-2 rounded-md transition-all duration-300 ${viewMode === "list"
-                        ? "bg-white text-orange-500 shadow-sm"
-                        : "text-gray-500 hover:text-orange-500"
+                      ? "bg-white text-orange-500 shadow-sm"
+                      : "text-gray-500 hover:text-orange-500"
                       }`}
                   >
                     <List className="w-4 h-4" />
@@ -211,12 +279,23 @@ const ServiceReq = () => {
             </div>
           </div>
 
+          {/* Loading State */}
           {loading && (
-            <div className="pt-10">
-              <OrangeSpinner />
+            <div className={
+              viewMode === "grid"
+                ? "grid grid-cols-1 lg:grid-cols-2 gap-6"
+                : "space-y-6"
+            }>
+              {[...Array(6)].map((_, index) => (
+                <ServiceReqCardSkeleton 
+                  key={index} 
+                  compact={viewMode === "grid"}
+                />
+              ))}
             </div>
           )}
 
+          {/* Empty State */}
           {!loading && requests.length === 0 && (
             <div className="text-center py-16 rounded-2xl shadow-lg border border-gray-200 bg-white">
               <div className="w-24 h-24 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -231,6 +310,7 @@ const ServiceReq = () => {
             </div>
           )}
 
+          {/* Service Requests Grid/List */}
           {!loading && requests.length > 0 && (
             <div className={
               viewMode === "grid"
@@ -247,60 +327,66 @@ const ServiceReq = () => {
             </div>
           )}
 
-          {/* Pagination & Items per page */}
-          <div className="flex flex-col md:flex-row justify-between mt-8 items-center gap-4">
-            {/* Items per page */}
-            <div className="flex items-center gap-3">
-              <label htmlFor="itemsPerPage" className="text-gray-600 font-medium">
-                Show per page:
-              </label>
-              <select
-                value={itemsPerPage}
-                onChange={handleItemsPerPage}
-                className="px-4 py-2 bg-white rounded-lg border-2 border-gray-300 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all duration-300"
-              >
-                <option value="10">10</option>
-                <option value="20">20</option>
-                <option value="30">30</option>
-                <option value="40">40</option>
-                <option value="50">50</option>
-              </select>
-            </div>
+          {/* Pagination */}
+          {loading ? (
+            <PaginationSkeleton />
+          ) : (
+            requests.length > 0 && (
+              <div className="flex flex-col md:flex-row justify-between mt-8 items-center gap-4">
+                {/* Items per page */}
+                <div className="flex items-center gap-3">
+                  <label htmlFor="itemsPerPage" className="text-gray-600 font-medium">
+                    Show per page:
+                  </label>
+                  <select
+                    value={itemsPerPage}
+                    onChange={handleItemsPerPage}
+                    className="px-4 py-2 bg-white rounded-lg border-2 border-gray-300 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all duration-300"
+                  >
+                    <option value="10">10</option>
+                    <option value="20">20</option>
+                    <option value="30">30</option>
+                    <option value="40">40</option>
+                    <option value="50">50</option>
+                  </select>
+                </div>
 
-            {/* Page buttons */}
-            <div className="flex justify-center items-center gap-2">
-              <button
-                className="px-4 py-2 border border-orange-500 text-orange-500 rounded-lg hover:bg-orange-500 hover:text-white transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
-                disabled={currentPage === 1}
-                onClick={() => handlePageChange(currentPage - 1)}
-              >
-                <ArrowRight className="w-4 h-4 rotate-180" />
-                Prev
-              </button>
+                {/* Page buttons */}
+                <div className="flex justify-center items-center gap-2">
+                  <button
+                    className="px-4 py-2 border border-orange-500 text-orange-500 rounded-lg hover:bg-orange-500 hover:text-white transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                    disabled={currentPage === 1}
+                    onClick={() => handlePageChange(currentPage - 1)}
+                  >
+                    <ArrowRight className="w-4 h-4 rotate-180" />
+                    Prev
+                  </button>
 
-              {Array.from({ length: totalPage }, (_, i) => (
-                <button
-                  key={i}
-                  className={`px-4 py-2 border rounded-lg transition-all duration-300 ${currentPage === i + 1
-                      ? "bg-orange-500 text-white border-orange-500"
-                      : "border-gray-300 text-gray-600 hover:bg-orange-50 hover:border-orange-500"
-                    }`}
-                  onClick={() => handlePageChange(i + 1)}
-                >
-                  {i + 1}
-                </button>
-              ))}
+                  {Array.from({ length: totalPage }, (_, i) => (
+                    <button
+                      key={i}
+                      className={`px-4 py-2 border rounded-lg transition-all duration-300 ${currentPage === i + 1
+                        ? "bg-orange-500 text-white border-orange-500"
+                        : "border-gray-300 text-gray-600 hover:bg-orange-50 hover:border-orange-500"
+                        }`}
+                      onClick={() => handlePageChange(i + 1)}
+                    >
+                      {i + 1}
+                    </button>
+                  ))}
 
-              <button
-                className="px-4 py-2 border border-orange-500 text-orange-500 rounded-lg hover:bg-orange-500 hover:text-white transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
-                disabled={currentPage === totalPage}
-                onClick={() => handlePageChange(currentPage + 1)}
-              >
-                Next
-                <ArrowRight className="w-4 h-4" />
-              </button>
-            </div>
-          </div>
+                  <button
+                    className="px-4 py-2 border border-orange-500 text-orange-500 rounded-lg hover:bg-orange-500 hover:text-white transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                    disabled={currentPage === totalPage}
+                    onClick={() => handlePageChange(currentPage + 1)}
+                  >
+                    Next
+                    <ArrowRight className="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
+            )
+          )}
         </div>
       </section>
     </div>

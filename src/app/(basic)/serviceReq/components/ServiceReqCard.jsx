@@ -3,10 +3,12 @@
 import { Wrench, AlertTriangle, Eye, Clock, Zap, HardHat, User, Mail, CheckCircle, Circle } from "lucide-react";
 import Link from "next/link";
 import { useState, useEffect } from "react";
+// import Loading from "../../../Components/Loading"
 
 const ServiceReqCard = ({ request }) => {
   const [userData, setUserData] = useState(null);
   const [loadingUser, setLoadingUser] = useState(false);
+  // const [loading, setLoading] = useState(true);
 
   // Fetch user data when component mounts
   useEffect(() => {
@@ -135,10 +137,10 @@ const ServiceReqCard = ({ request }) => {
             <div key={step.key} className="flex items-center gap-3">
               {/* Status Icon */}
               <div className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center border-2 ${isCompleted
-                  ? 'bg-green-500 border-green-500 text-white' // Green for completed steps
-                  : isCurrent
-                    ? 'border-orange-500 bg-white text-orange-500' // Orange for current step
-                    : 'border-gray-300 bg-gray-100 text-gray-400' // Gray for future steps
+                ? 'bg-green-500 border-green-500 text-white' // Green for completed steps
+                : isCurrent
+                  ? 'border-orange-500 bg-white text-orange-500' // Orange for current step
+                  : 'border-gray-300 bg-gray-100 text-gray-400' // Gray for future steps
                 }`}>
                 {isCompleted || isCurrent ? (
                   <CheckCircle className="w-4 h-4" />
@@ -150,10 +152,10 @@ const ServiceReqCard = ({ request }) => {
               {/* Status Label */}
               <div className="flex-1">
                 <span className={`text-sm font-medium ${isCompleted
-                    ? 'text-green-600' // Green text for completed steps
-                    : isCurrent
-                      ? 'text-orange-500 font-semibold' // Orange text for current step
-                      : 'text-gray-400' // Gray text for future steps
+                  ? 'text-green-600' // Green text for completed steps
+                  : isCurrent
+                    ? 'text-orange-500 font-semibold' // Orange text for current step
+                    : 'text-gray-400' // Gray text for future steps
                   }`}>
                   {step.label}
                 </span>
@@ -240,6 +242,15 @@ const ServiceReqCard = ({ request }) => {
       </div>
     );
   }
+
+  // if (loading) {
+  //   return (
+  //     <div className="flex items-center justify-center h-screen">
+  //       <Loading></Loading>
+  //     </div>
+  //   );
+  // }
+
 
   return (
     <>

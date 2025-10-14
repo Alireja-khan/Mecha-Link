@@ -9,6 +9,7 @@ import {
 import { useParams } from "next/navigation";
 import Swal from 'sweetalert2';
 import useUser from "@/hooks/useUser";
+import Loading from "../../../Components/Loading"
 
 const ServiceRequestDetails = () => {
     const [selectedImage, setSelectedImage] = useState(null);
@@ -17,6 +18,7 @@ const ServiceRequestDetails = () => {
     const [loading, setLoading] = useState(true);
     const { id } = useParams();
     const { user: loggedInUser, status } = useUser();
+    
 
     const customerUserId = request?.userId;
     const currentMechanicId = loggedInUser?._id;
@@ -73,12 +75,127 @@ const ServiceRequestDetails = () => {
     // Combine user data for display
     const displayUser = completeUserData || request?.user;
 
+    // Skeleton Components
+    const HeroSkeleton = () => (
+        <div className="relative bg-gradient-to-r from-orange-500 via-orange-600 to-red-600 overflow-hidden text-white py-12">
+            <div className="absolute inset-0 bg-black/10"></div>
+            <div className="absolute top-0 left-0 w-72 h-72 bg-white/10 rounded-full -translate-x-1/2 -translate-y-1/2"></div>
+            <div className="absolute bottom-0 right-0 w-96 h-96 bg-white/5 rounded-full translate-x-1/3 translate-y-1/3"></div>
+
+            <div className="container relative z-10">
+                <div className="flex flex-col lg:flex-row gap-8 items-center">
+                    {/* Device Image Skeleton */}
+                    <div className="relative h-100 w-200 rounded-2xl overflow-hidden ring-2 ring-white shadow-2xl animate-pulse">
+                        <div className="skeleton bg-orange-400/50 w-full h-full"></div>
+                    </div>
+
+                    {/* Request Info Skeleton */}
+                    <div className="flex-1 text-center lg:text-left animate-pulse">
+                        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
+                            <div className="flex-1">
+                                <div className="flex flex-wrap items-center justify-center lg:justify-start gap-3 mb-3">
+                                    <div className="skeleton bg-white/30 h-12 w-64 rounded-lg"></div>
+                                    <div className="skeleton bg-white/30 h-8 w-32 rounded-xl"></div>
+                                </div>
+
+                                <div className="flex items-center justify-center lg:justify-start gap-2 mb-2">
+                                    <div className="skeleton bg-white/30 w-5 h-5 rounded-full"></div>
+                                    <div className="skeleton bg-white/30 h-6 w-40 rounded"></div>
+                                </div>
+
+                                <div className="flex items-center justify-center lg:justify-start gap-2">
+                                    <div className="skeleton bg-white/30 w-5 h-5 rounded-full"></div>
+                                    <div className="skeleton bg-white/30 h-6 w-48 rounded"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Action Buttons Skeleton */}
+                        <div className="flex flex-wrap gap-4 justify-center lg:justify-start">
+                            <div className="skeleton bg-white/30 h-12 w-32 rounded-xl"></div>
+                            <div className="skeleton bg-white/30 h-12 w-36 rounded-xl"></div>
+                            <div className="skeleton bg-white/30 h-12 w-40 rounded-xl"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+
+    const CardSkeleton = ({ title = true, items = 3 }) => (
+        <div className="bg-white rounded-2xl shadow-lg p-8 border border-orange-100 animate-pulse">
+            {title && (
+                <div className="flex items-center gap-3 mb-6">
+                    <div className="skeleton bg-gray-200 w-10 h-10 rounded-lg"></div>
+                    <div className="skeleton bg-gray-200 h-7 w-48 rounded"></div>
+                </div>
+            )}
+            <div className="space-y-4">
+                {[...Array(items)].map((_, index) => (
+                    <div key={index} className="space-y-2">
+                        <div className="skeleton bg-gray-200 h-4 w-32 rounded"></div>
+                        <div className="skeleton bg-gray-200 h-6 w-full rounded"></div>
+                    </div>
+                ))}
+            </div>
+        </div>
+    );
+
+    const CustomerCardSkeleton = () => (
+        <div className="bg-white rounded-2xl shadow-lg p-7 border border-orange-100 animate-pulse">
+            <div className="flex items-center gap-3 mb-6">
+                <div className="skeleton bg-gray-200 w-10 h-10 rounded-lg"></div>
+                <div className="skeleton bg-gray-200 h-7 w-48 rounded"></div>
+            </div>
+            
+            <div className="flex justify-center mb-4">
+                <div className="skeleton bg-gray-200 w-54 h-44 rounded-md"></div>
+            </div>
+
+            <div className="space-y-4">
+                {[...Array(4)].map((_, index) => (
+                    <div key={index} className="space-y-2">
+                        <div className="skeleton bg-gray-200 h-3 w-24 rounded"></div>
+                        <div className="skeleton bg-gray-200 h-4 w-full rounded"></div>
+                    </div>
+                ))}
+            </div>
+        </div>
+    );
+
+    const ActionCardSkeleton = () => (
+        <div className="bg-gradient-to-br from-orange-500 to-orange-600 rounded-2xl shadow-lg p-7 text-white animate-pulse">
+            <div className="flex items-center gap-4 mb-5">
+                <div className="skeleton bg-white/30 w-12 h-12 rounded-xl"></div>
+                <div className="skeleton bg-white/30 h-6 w-32 rounded"></div>
+            </div>
+            <div className="skeleton bg-white/30 h-12 w-full rounded-xl"></div>
+        </div>
+    );
+
     if (loading) {
         return (
-            <div className="min-h-screen bg-gradient-to-br from-orange-50 to-white flex items-center justify-center">
-                <div className="text-center">
-                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500 mx-auto"></div>
-                    <p className="mt-4 text-gray-500">Loading service request...</p>
+            <div className="min-h-screen bg-gradient-to-br from-orange-50 to-white">
+                <HeroSkeleton />
+                
+                {/* Main Content Skeleton */}
+                <div className="container py-8">
+                    <div className="grid lg:grid-cols-3 gap-8">
+                        {/* Left Column - Main Content */}
+                        <div className="lg:col-span-2 space-y-8">
+                            <CardSkeleton items={4} />
+                            <CardSkeleton items={3} />
+                            <CardSkeleton items={2} />
+                            <CardSkeleton items={4} />
+                        </div>
+
+                        {/* Right Column - Sidebar */}
+                        <div className="space-y-8">
+                            <CustomerCardSkeleton />
+                            <CardSkeleton title={true} items={4} />
+                            <ActionCardSkeleton />
+                        </div>
+                    </div>
                 </div>
             </div>
         );
@@ -86,10 +203,8 @@ const ServiceRequestDetails = () => {
 
     if (!request) {
         return (
-            <div className="min-h-screen bg-gradient-to-br from-orange-50 to-white flex items-center justify-center">
-                <div className="text-center">
-                    <p className="text-gray-500 text-lg">Service request not found.</p>
-                </div>
+            <div className="flex items-center justify-center h-screen">
+                <Loading></Loading>
             </div>
         );
     }
@@ -335,6 +450,8 @@ const ServiceRequestDetails = () => {
         }
     };
 
+    
+
     return (
         <div className="min-h-screen bg-gradient-to-br from-orange-50 to-white">
             {/* Hero Section with Device Image */}
@@ -439,12 +556,12 @@ const ServiceRequestDetails = () => {
                             </h2>
 
                             <div className="grid sm:grid-cols-2 gap-6">
-                                <div className="">
+                                <div className="space-y-2">
                                     <DetailItem label="Device Type" value={request.deviceType} capitalize />
                                     <DetailItem label="Problem Category" value={request.problemCategory} capitalize />
                                     <DetailItem label="Brand" value={request.serviceDetails?.vehicleInfo?.brand} />
                                 </div>
-                                <div className="">
+                                <div className="space-y-2">
                                     <DetailItem label="Model" value={request.serviceDetails?.vehicleInfo?.model} />
                                     <DetailItem label="Year" value={request.serviceDetails?.vehicleInfo?.year} />
                                     <DetailItem label="VIN" value={request.serviceDetails?.vehicleInfo?.vin} />
@@ -553,7 +670,7 @@ const ServiceRequestDetails = () => {
                                 Customer Information
                             </h3>
 
-                            <div className="">
+                            <div className="space-y-2">
                                 <div className="flex justify-center mb-4">
                                     {displayUser?.profileImage ? (
                                         <img
@@ -579,7 +696,7 @@ const ServiceRequestDetails = () => {
                                 {displayUser?.address && <DetailItem label="Address" value={displayUser.address} largeValue />}
                                 {displayUser?.bio && <DetailItem label="Bio" value={displayUser.bio} largeValue />}
 
-                                <div className="pt-4 border-t border-orange-200 ">
+                                <div className="pt-4 border-t border-orange-200 space-y-2">
                                     <h3 className="text-sm font-semibold text-gray-600">Request Contact</h3>
                                     <DetailItem label="Service Phone" value={request.contactInfo?.phoneNumber} icon={Phone} />
                                     <DetailItem
@@ -606,7 +723,7 @@ const ServiceRequestDetails = () => {
                                 Schedule & Budget
                             </h3>
 
-                            <div className="">
+                            <div className="space-y-2">
                                 <DetailItem
                                     label="Preferred Date"
                                     value={request.preferredSchedule?.date ?
@@ -742,7 +859,7 @@ const ServiceRequestDetails = () => {
 
 // Updated DetailItem component to match the style
 const DetailItem = ({ label, value, icon: Icon, capitalize = false, largeValue = false }) => (
-    <div className="group hover:bg-orange-50 p-4 rounded-xl transition-colors duration-200 border border-transparent hover:border-orange-200">
+    <div className="group hover:bg-orange-50  py-3 px-4 rounded-xl transition-colors duration-200 border border-orange-500">
         <label className="block text-sm font-semibold text-gray-600 uppercase tracking-wider mb-2">
             {label}
         </label>
