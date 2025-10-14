@@ -1,36 +1,39 @@
 "use client";
-import { useEffect, useState } from "react";
+import {useEffect, useState} from "react";
 import axios from "axios";
-import { Calendar, Eye, Heart } from "lucide-react";
+import {Calendar, Eye, Heart} from "lucide-react";
 import Link from "next/link";
+import Button from "@/app/shared/Button";
 
 const BlogSection = () => {
   const [blogs, setBlogs] = useState([]);
+  const [allBlogs, setAllBlogs] = useState([]); // store all blogs
   const [loading, setLoading] = useState(true);
+  const [showAll, setShowAll] = useState(false);
 
   useEffect(() => {
     const fetchBlogs = async () => {
       try {
         const res = await axios.get("/api/blogs");
-        // Take first 3 blogs as they come
-        setBlogs(res.data.slice(0, 3));
+        setAllBlogs(res.data); // save all blogs
+        setBlogs(res.data.slice(0, 3)); // initially show first 3
       } catch (error) {
         console.error("❌ Failed to fetch blogs:", error);
       } finally {
         setLoading(false);
       }
     };
-
     fetchBlogs();
   }, []);
 
-  if (loading) {
-    return (
-      <section className="py-16 text-center text-text">
-        <p>Loading latest blogs...</p>
-      </section>
-    );
-  }
+  const handleViewAll = () => {
+    setShowAll(!showAll);
+    if (!showAll) {
+      setBlogs(allBlogs); // show all blogs
+    } else {
+      setBlogs(allBlogs.slice(0, 3)); // collapse to first 3
+    }
+  };
 
   if (blogs.length === 0) {
     return (
@@ -60,20 +63,15 @@ const BlogSection = () => {
           {blogs.map((post) => (
             <div
               key={post._id}
-              className="group flex flex-col rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-shadow duration-300 cursor-pointer bg-base-100"
+              className="group flex flex-col rounded-xl shadow-md hover:shadow-xl transition duration-300"
             >
-              {/* Blog Image */}
               {post.image && (
-                <div className="flex-shrink-0">
-                  <img
-                    src={post.image}
-                    alt={post.title}
-                    className="w-full h-full object-cover aspect-[4/3] group-hover:scale-105 transition-transform duration-300"
-                  />
-                </div>
+                <img
+                  src={post.image}
+                  alt={post.title}
+                  className="w-full h-full object-cover aspect-[4/3]"
+                />
               )}
-
-              {/* Blog Content */}
               <div className="p-6 flex flex-col justify-between flex-grow">
                 <div>
                   <div className="flex items-center justify-between mb-3">
@@ -82,28 +80,23 @@ const BlogSection = () => {
                     </span>
                     <div className="flex items-center gap-4 text-text/70 text-sm">
                       <div className="flex items-center gap-1">
-                        <Heart className="w-4 h-4" /> {post.likes || 0}
+                        <Heart className="w-4 h-4" /> {post.likes}
                       </div>
                       <div className="flex items-center gap-1">
-                        <Eye className="w-4 h-4" /> {post.views || 0}
+                        <Eye className="w-4 h-4" /> {post.views}
                       </div>
                     </div>
                   </div>
-
-                  <h3 className="text-2xl font-bold font-urbanist group-hover:text-primary transition-colors duration-300 truncate">
+                  <h3 className="text-2xl font-bold font-urbanist">
                     {post.title}
                   </h3>
-
-                  <p className="text-sm text-text/70 mt-3">{post.description.slice(0,100)}</p>
+                  <p className="text-sm text-text/70 mt-3">{post.excerpt}</p>
                 </div>
-
                 <div className="mt-6 flex items-center justify-between text-sm md:text-base text-text/70">
                   <div className="flex items-center">
                     <Calendar className="w-4 h-4 mr-2" />
                     <span className="text-xs">{post.date}</span>
                   </div>
-
-                  {/* View Details Button */}
                   <Link
                     href={`/blogs/${post._id}`}
                     className="text-primary font-semibold hover:underline"
@@ -114,6 +107,12 @@ const BlogSection = () => {
               </div>
             </div>
           ))}
+        </div>
+
+        <div className="mt-4 flex justify-center">
+          <Button onClick={handleViewAll}>
+            {showAll ? "Show Less" : "View All"}
+          </Button>
         </div>
       </div>
     </section>
