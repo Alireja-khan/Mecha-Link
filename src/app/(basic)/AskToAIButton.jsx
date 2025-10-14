@@ -26,7 +26,7 @@ export default function AskToAIButton() {
   return (
     <button
       onClick={() => router.push(`/dashboard/${role}/AskAI`)}
-      className="fixed bottom-20 right-6 p-3 rounded-full bg-primary text-white shadow-lg hover:opacity-90 transition duration-300 flex items-center justify-center cursor-pointer"
+      className="fixed bottom-20 right-6 p-3 rounded-full bg-primary text-white shadow-lg hover:opacity-90 transition duration-300 flex items-center justify-center cursor-pointer z-50"
       aria-label="Go to Ask to AI page"
     >
       <RiRobot3Line size={20} />

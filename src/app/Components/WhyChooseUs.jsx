@@ -1,3 +1,4 @@
+"use client";
 import {
   CheckCircle,
   Shield,
@@ -8,6 +9,7 @@ import {
   DollarSign,
   ThumbsUp,
 } from "lucide-react";
+import { useState, useEffect } from "react";
 
 const reasons = [
   {
@@ -61,6 +63,71 @@ const reasons = [
 ];
 
 const WhyChooseUs = () => {
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setLoading(false);
+    }, 2000);
+    return () => clearTimeout(timer);
+  }, []);
+
+  // Skeleton Components
+  const ReasonCardSkeleton = ({ featured = false, wide = false }) => (
+    <div className={`
+      group rounded-2xl p-8 shadow-md border border-gray-200 flex flex-col items-center text-center relative overflow-hidden animate-pulse
+      ${featured ? "lg:col-span-2 lg:row-span-2 justify-center" : ""} 
+      ${wide ? "lg:col-span-2" : ""} 
+    `}>
+      {/* Icon Skeleton */}
+      <div className="skeleton bg-gray-200 w-14 h-14 rounded-full mb-6"></div>
+
+      {/* Content Skeleton */}
+      <div className={`${featured ? "max-w-md" : "w-full"} z-10`}>
+        {/* Title Skeleton */}
+        <div className={`skeleton bg-gray-200 h-7 rounded mb-3 ${featured ? "w-48 mx-auto" : "w-32"}`}></div>
+        
+        {/* Description Skeleton */}
+        <div className="space-y-2">
+          <div className="skeleton bg-gray-200 h-4 w-full rounded"></div>
+          <div className="skeleton bg-gray-200 h-4 w-5/6 mx-auto rounded"></div>
+        </div>
+      </div>
+
+      {/* Decorative underline skeleton */}
+      <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-16 h-1 bg-gray-200 rounded-full"></div>
+    </div>
+  );
+
+  const SectionHeaderSkeleton = () => (
+    <div className="text-center mb-20 max-w-2xl mx-auto animate-pulse">
+      <div className="skeleton bg-gray-300 h-12 w-80 mx-auto rounded-lg mb-4"></div>
+      <div className="skeleton bg-gray-300 h-5 w-full rounded mb-2"></div>
+      <div className="skeleton bg-gray-300 h-5 w-5/6 mx-auto rounded"></div>
+    </div>
+  );
+
+  if (loading) {
+    return (
+      <section className="py-24 relative">
+        <div className="container mx-auto px-6 lg:px-8">
+          <SectionHeaderSkeleton />
+          
+          {/* Reasons Grid Skeleton */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10 lg:gap-5 xl:gap-10 auto-rows-[minmax(200px,auto)]">
+            <ReasonCardSkeleton featured={true} />
+            <ReasonCardSkeleton />
+            <ReasonCardSkeleton />
+            <ReasonCardSkeleton wide={true} />
+            <ReasonCardSkeleton />
+            <ReasonCardSkeleton />
+            <ReasonCardSkeleton />
+          </div>
+        </div>
+      </section>
+    );
+  }
+
   return (
     <section className="py-24  relative">
       <div className="container mx-auto px-6 lg:px-8">

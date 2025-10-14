@@ -1,6 +1,5 @@
 "use client";
 
-import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import { useState, useEffect } from "react";
@@ -10,6 +9,7 @@ import Link from "next/link";
 import markerIcon2x from "leaflet/dist/images/marker-icon-2x.png";
 import markerIcon from "leaflet/dist/images/marker-icon.png";
 import markerShadow from "leaflet/dist/images/marker-shadow.png";
+import { MapContainer, Marker, Popup, TileLayer, useMap } from "react-leaflet";
 
 delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({
@@ -54,6 +54,15 @@ export default function MapWithSearch() {
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [mechanicShops, setMechanicShops] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [initialLoading, setInitialLoading] = useState(true);
+
+  useEffect(() => {
+    setInitialLoading(true);
+    const timer = setTimeout(() => {
+      setInitialLoading(false);
+    }, 2000);
+    return () => clearTimeout(timer);
+  }, []);
 
   useEffect(() => {
     setLoading(true);
@@ -72,6 +81,49 @@ export default function MapWithSearch() {
         setMechanicShops([]);
       });
   }, [search, selectedCategory]);
+
+  // Skeleton Components
+  const SectionHeaderSkeleton = () => (
+    <div className="text-center mb-12 animate-pulse">
+      <div className="skeleton bg-gray-300 h-12 w-80 mx-auto rounded-lg mb-4"></div>
+      <div className="skeleton bg-gray-300 h-5 w-96 mx-auto rounded"></div>
+    </div>
+  );
+
+  const SearchBarSkeleton = () => (
+    <div className="flex flex-col sm:flex-row gap-4 mb-10 bg-base-200 p-5 rounded-xl shadow-md border border-neutral animate-pulse">
+      <div className="relative flex-1">
+        <div className="skeleton bg-gray-300 w-full h-12 rounded-lg"></div>
+      </div>
+      <div className="flex items-center gap-2 flex-shrink-0 sm:w-64">
+        <div className="skeleton bg-gray-300 w-full h-12 rounded-lg"></div>
+      </div>
+    </div>
+  );
+
+  const MapSkeleton = () => (
+    <div className="relative h-[600px] w-full rounded-2xl overflow-hidden shadow-xl border border-base-200 animate-pulse">
+      <div className="absolute inset-0 flex items-center justify-center bg-base-100 z-50">
+        <div className="flex flex-col items-center">
+          <div className="skeleton bg-gray-300 w-10 h-10 rounded-full mb-3"></div>
+          <div className="skeleton bg-gray-300 h-5 w-48 rounded"></div>
+        </div>
+      </div>
+      <div className="skeleton bg-gray-200 w-full h-full"></div>
+    </div>
+  );
+
+  if (initialLoading) {
+    return (
+      <section className="py-16 bg-base-100 text-text font-poppins">
+        <div className="container mx-auto px-4">
+          <SectionHeaderSkeleton />
+          <SearchBarSkeleton />
+          <MapSkeleton />
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section className="py-16 bg-base-100 text-text font-poppins">
@@ -94,7 +146,7 @@ export default function MapWithSearch() {
               type="search"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              placeholder="Search by shop name, service, or city..."
+              placeholder="Search by location..."
               className="w-full pl-12 pr-5 py-3 rounded-lg border border-neutral/50 bg-base-100 text-base-content placeholder:text-base-content outline-none transition-all duration-200"
             />
           </div>
@@ -134,7 +186,7 @@ export default function MapWithSearch() {
             <MapContainer
               center={[23.8121, 90.4134]}
               zoom={8}
-              scrollWheelZoom={true}
+              scrollWheelZoom={false}
               className="h-full w-full z-[1]"
             >
               <TileLayer
@@ -172,7 +224,7 @@ export default function MapWithSearch() {
                 <MapPin className="w-10 h-10 mx-auto text-primary mb-4" />
                 <h3 className="text-xl font-bold text-base-content">No Shops Found</h3>
                 <p className="text-base-content/60 mt-2 max-w-sm mx-auto">
-                  Your search didn’t match any shops. Try another keyword or category.
+                  Your search didn't match any shops. Try another keyword or category.
                 </p>
               </div>
             </div>

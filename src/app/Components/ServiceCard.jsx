@@ -2,25 +2,26 @@ import { CalendarHeart, Clock, MapPinPlus, Star } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 
-export default function ServiceCard({service}) {
-  // console.log(service)
+export default function ServiceCard({ service }) {
   return (
     <div>
-      <div
-        className="border border-primary rounded-xl overflow-hidden shadow-md h-full flex flex-col group relative"
-      >
+      <div className="border border-primary rounded-xl overflow-hidden shadow-md h-full flex flex-col group relative">
+        {/* Rating */}
         <div className="absolute z-10 shrink-0 text-right flex items-center gap-1 justify-center bg-white top-4 right-4 rounded-xl px-2">
-              <Star size={18} strokeWidth={1.25} className="text-primary" />{" "}
-              {service.avgRating? service.avgRating : "0"}/5
-            </div>
-        {/* service Image */}
+          <Star size={18} strokeWidth={1.25} className="text-primary" />{" "}
+          {service.avgRating ? service.avgRating : "0"}/5
+        </div>
+
+        {/* Service Image */}
         <div className="h-60 w-full overflow-hidden relative">
           <Image
             fill
-            src={service.shop.logo || "https://static.vecteezy.com/system/resources/previews/009/292/244/non_2x/default-avatar-icon-of-social-media-user-vector.jpg"}
-            className="object-cover group-hover:scale-120 duration-500 object-top"
+            src={
+              service.shop.logo ||
+              "https://static.vecteezy.com/system/resources/previews/009/292/244/non_2x/default-avatar-icon-of-social-media-user-vector.jpg"
+            }
+            className="object-cover group-hover:scale-110 duration-500 object-top"
             alt={service.shop.shopName || "shop"}
-            // width={500}
           />
         </div>
 
@@ -32,7 +33,7 @@ export default function ServiceCard({service}) {
           </div>
           <div className="text-lg mt-3 truncate">
             <span className="font-semibold">Category:</span>{" "}
-            <Link href={`/category/${service.shop.categories}`}>
+            <Link href={`/category/${service.shop.categories}`} className="truncate">
               {service.shop.categories}
             </Link>
           </div>
@@ -43,18 +44,15 @@ export default function ServiceCard({service}) {
             />{" "}
             <p className="truncate">Location: {service.shop.address.street || ""} {" "} { service.shop.address.city || ""}  {" - "} { service.shop.address.postalCode || ""} </p>
           </div>
-          <p className="text-base flex gap-2 items-center mt-3">
-            <Clock
-              strokeWidth={1.25}
-              className="w-6 h-6 text-2xl text-primary"
-            />{" "}
-            Working Hour: {service.shop.workingHours.open || ""} {" - "} {service.shop.workingHours.close || ""}
+
+          <p className="text-base flex gap-2 items-center truncate">
+            <Clock strokeWidth={1.25} className="w-6 h-6 text-primary shrink-0" />
+            Working Hour: {service.shop.workingHours.open || ""} {" - "}{" "}
+            {service.shop.workingHours.close || ""}
           </p>
-          <p className="text-base flex gap-2 items-center mt-3">
-            <CalendarHeart
-              strokeWidth={1.25}
-              className="w-6 h-6 text-2xl text-primary"
-            />{" "}
+
+          <p className="text-base flex gap-2 items-center truncate">
+            <CalendarHeart strokeWidth={1.25} className="w-6 h-6 text-primary shrink-0" />
             Weekend: {service.shop.workingHours.weekend}
           </p>
         </div>
@@ -63,15 +61,15 @@ export default function ServiceCard({service}) {
         <div className="flex justify-between gap-2 border-t border-primary p-3 w-full mt-auto">
           <a
             href={`tel:${service.shop.contact.phone}`}
-            className="w-1/2  py-3 bg-primary  hover:bg-white hover:border hover:border-primary  text-white hover:text-primary font-bold lg:text-lg text-xl capitalize leading-none font-urbanist rounded-md transition duration-400 cursor-pointer text-center "
+            className="w-1/2 py-3 bg-primary hover:bg-white hover:border hover:border-primary text-white hover:text-primary font-bold text-lg capitalize leading-none font-urbanist rounded-md transition duration-400 cursor-pointer text-center truncate"
           >
             Contact
           </a>
           <Link
-            className="w-1/2 py-3 border hover:border border-primary hover-border-primary hover:bg-accent text-primary font-bold text-xl lg:text-lg xl:text-xl capitalize leading-none font-urbanist rounded-md transition duration-400 cursor-pointer text-center"
+            className="w-1/2 py-3 border border-primary hover:bg-accent text-primary font-bold text-lg capitalize leading-none font-urbanist rounded-md transition duration-400 cursor-pointer text-center truncate"
             href={`/services/${service._id}`}
           >
-            Service Details
+            Shop Details
           </Link>
         </div>
       </div>
