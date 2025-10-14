@@ -1,11 +1,14 @@
+"use client";
+
 import { Calendar, Clock } from "lucide-react";
 import Image from "next/image";
+import { useState, useEffect } from "react";
 
 const blogPosts = [
   {
     title: "Top 5 Car Maintenance Tips Every Driver Should Know",
     excerpt:
-      "Keep your vehicle in top shape with these essential maintenance tips to improve safety and extend your car’s lifespan.",
+      "Keep your vehicle in top shape with these essential maintenance tips to improve safety and extend your car's lifespan.",
     author: "Alex Johnson",
     date: "Sep 10, 2024",
     readTime: "4 min read",
@@ -27,7 +30,7 @@ const blogPosts = [
   {
     title: "How to Detect Common Brake Issues Early",
     excerpt:
-      "Brakes are vital for your safety. Here’s how to identify warning signs of brake problems before they get worse.",
+      "Brakes are vital for your safety. Here's how to identify warning signs of brake problems before they get worse.",
     author: "Michael Brown",
     date: "Aug 28, 2024",
     readTime: "6 min read",
@@ -61,7 +64,7 @@ const blogPosts = [
   {
     title: "When Should You Replace Your Car Battery?",
     excerpt:
-      "Learn the signs of a weak battery and when it’s the right time to replace it to avoid unexpected breakdowns.",
+      "Learn the signs of a weak battery and when it's the right time to replace it to avoid unexpected breakdowns.",
     author: "Olivia Martinez",
     date: "Aug 5, 2024",
     readTime: "5 min read",
@@ -72,8 +75,78 @@ const blogPosts = [
 ];
 
 const BlogSection = () => {
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setLoading(false);
+    }, 2000);
+    return () => clearTimeout(timer);
+  }, []);
+
+  // Blog Card Skeleton
+  const BlogCardSkeleton = () => (
+    <div className="flex flex-col rounded-xl overflow-hidden shadow-md animate-pulse">
+      {/* Image Skeleton */}
+      <div className="skeleton bg-gray-200 w-full h-48"></div>
+      
+      <div className="p-6 flex flex-col justify-between flex-grow">
+        <div>
+          {/* Category and Read Time Skeleton */}
+          <div className="flex items-center justify-between mb-3">
+            <div className="skeleton bg-gray-200 h-6 w-20 rounded-full"></div>
+            <div className="skeleton bg-gray-200 h-4 w-16 rounded"></div>
+          </div>
+          
+          {/* Title Skeleton */}
+          <div className="skeleton bg-gray-200 h-7 w-full rounded mb-3"></div>
+          <div className="skeleton bg-gray-200 h-7 w-4/5 rounded mb-4"></div>
+          
+          {/* Excerpt Skeleton */}
+          <div className="space-y-2">
+            <div className="skeleton bg-gray-200 h-4 w-full rounded"></div>
+            <div className="skeleton bg-gray-200 h-4 w-5/6 rounded"></div>
+            <div className="skeleton bg-gray-200 h-4 w-3/4 rounded"></div>
+          </div>
+        </div>
+        
+        {/* Author Skeleton */}
+        <div className="mt-6 flex items-center">
+          <div className="skeleton bg-gray-200 w-10 h-10 rounded-full mr-3"></div>
+          <div className="space-y-2">
+            <div className="skeleton bg-gray-200 h-4 w-24 rounded"></div>
+            <div className="skeleton bg-gray-200 h-3 w-20 rounded"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+
+  // Section Header Skeleton
+  const SectionHeaderSkeleton = () => (
+    <div className="text-center mb-12 animate-pulse">
+      <div className="skeleton bg-gray-300 h-12 w-80 mx-auto rounded-lg mb-4"></div>
+      <div className="skeleton bg-gray-300 h-5 w-96 mx-auto rounded"></div>
+    </div>
+  );
+
+  if (loading) {
+    return (
+      <section className="py-16 text-text">
+        <div className="container mx-auto px-4">
+          <SectionHeaderSkeleton />
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {[...Array(6)].map((_, index) => (
+              <BlogCardSkeleton key={index} />
+            ))}
+          </div>
+        </div>
+      </section>
+    );
+  }
+
   return (
-    <section className="py-16  text-text">
+    <section className="py-16 text-text">
       <div className="container mx-auto px-4">
         {/* Section Header */}
         <div className="text-center mb-12">

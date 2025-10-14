@@ -7,7 +7,8 @@ import {
   User, Settings, LogOut, Users, Wrench, Tag, Megaphone,
   List, ClipboardList, Star, MessageSquare, WrenchIcon,
   Store, LayoutDashboard, X, PanelLeft, PanelRight,
-  LucideBrainCircuit
+  LucideBrainCircuit,
+  PenLine
 } from "lucide-react";
 import { FaGear } from "react-icons/fa6";
 import useUser from "@/hooks/useUser";
@@ -59,9 +60,9 @@ const Sidebar = ({ isMobileOpen, setIsMobileOpen }) => {
       menuItem("Service Requests", <Users size={20} />, "/dashboard/admin/serviceReq"),
       menuItem("Coupons", <Tag size={20} />, "/dashboard/admin/coupons"),
       menuItem("Announcements", <Megaphone size={20} />, "/dashboard/admin/announcements"),
+      menuItem("Add Blogs", <PenLine size={20} />, "/dashboard/admin/blogs"),
     ],
     mechanic: [
-      menuItem("Service Listings", <List size={20} />, "/dashboard/mechanic/listings"),
       menuItem("Requests", <ClipboardList size={20} />, "/dashboard/mechanic/requests"),
       menuItem("Add Shop", <Store size={20} />, "/dashboard/mechanic/AddMechanicShop"),
     ],

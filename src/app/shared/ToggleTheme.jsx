@@ -26,7 +26,7 @@ const ThemeToggle = () => {
             className="p-2.5 rounded-full bg-base-200 text-base-content hover:bg-base-300 hover:text-primary transition-colors duration-200"
             title={`Switch to ${theme === "light" ? "dark" : "light"} mode`}
         >
-            {theme === "light" ? <Moon size={24} /> : <Sun size={24} />}
+            {theme === "light" ? <Sun size={24} /> : <Moon size={24} />}
         </button>
     );
 };

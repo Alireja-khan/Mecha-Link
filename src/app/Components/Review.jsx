@@ -56,7 +56,7 @@ const reviews = [
     avatar: "https://randomuser.me/api/portraits/men/21.jpg",
     rating: 5,
     comment:
-      "Affordable and reliable service! As a student, I don’t have time to search around, so this app is a lifesaver for quick fixes and maintenance scheduling.",
+      "Affordable and reliable service! As a student, I don't have time to search around, so this app is a lifesaver for quick fixes and maintenance scheduling.",
   },
   {
     name: "Olivia Brown",
@@ -70,9 +70,18 @@ const reviews = [
 
 const ReviewSection = () => {
   const [swiperInstance, setSwiperInstance] = useState(null);
+  const [loading, setLoading] = useState(true);
   const prevRef = useRef(null);
   const nextRef = useRef(null);
   const paginationRef = useRef(null);
+
+  useEffect(() => {
+    // Simulate loading
+    const timer = setTimeout(() => {
+      setLoading(false);
+    }, 1500);
+    return () => clearTimeout(timer);
+  }, []);
 
   useEffect(() => {
     if (
@@ -92,6 +101,77 @@ const ReviewSection = () => {
       swiperInstance.pagination.update();
     }
   }, [swiperInstance]);
+
+  // Review Card Skeleton
+  const ReviewCardSkeleton = () => (
+    <div className="flex flex-col border border-gray-200 bg-white rounded-xl shadow-md p-6 h-full md:h-[360px] animate-pulse">
+      {/* User Profile Skeleton */}
+      <div className="flex items-center mb-4">
+        <div className="skeleton bg-gray-200 w-12 h-12 rounded-full mr-4"></div>
+        <div className="space-y-2">
+          <div className="skeleton bg-gray-200 h-4 w-32 rounded"></div>
+          <div className="skeleton bg-gray-200 h-3 w-24 rounded"></div>
+        </div>
+      </div>
+
+      {/* Rating Skeleton */}
+      <div className="flex items-center mb-4">
+        {[...Array(5)].map((_, i) => (
+          <div key={i} className="skeleton bg-gray-200 w-5 h-5 mr-1 rounded"></div>
+        ))}
+      </div>
+
+      {/* Review Text Skeleton */}
+      <div className="space-y-2 mb-4 flex-1">
+        <div className="skeleton bg-gray-200 h-4 w-full rounded"></div>
+        <div className="skeleton bg-gray-200 h-4 w-full rounded"></div>
+        <div className="skeleton bg-gray-200 h-4 w-3/4 rounded"></div>
+        <div className="skeleton bg-gray-200 h-4 w-1/2 rounded"></div>
+      </div>
+
+      {/* Quote Icon Skeleton */}
+      <div className="flex justify-end mt-auto">
+        <div className="skeleton bg-gray-200 w-10 h-10 rounded"></div>
+      </div>
+    </div>
+  );
+
+  // Section Header Skeleton
+  const SectionHeaderSkeleton = () => (
+    <div className="container mx-auto px-4 text-center mb-10 animate-pulse">
+      <div className="skeleton bg-gray-300 h-12 w-80 mx-auto rounded-lg mb-4"></div>
+      <div className="skeleton bg-gray-300 h-5 w-96 mx-auto rounded"></div>
+    </div>
+  );
+
+  if (loading) {
+    return (
+      <section className="relative">
+        <SectionHeaderSkeleton />
+        <div className="relative py-20 bg-gray-200 animate-pulse">
+          <div className="absolute inset-0 bg-black/60"></div>
+          <div className="relative container mx-auto px-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 pb-16">
+              {[...Array(3)].map((_, index) => (
+                <ReviewCardSkeleton key={index} />
+              ))}
+            </div>
+            
+            {/* Navigation Skeleton */}
+            <div className="flex items-center mt-8 w-fit mx-auto space-x-4">
+              <div className="skeleton bg-gray-300 w-10 h-10 rounded-full"></div>
+              <div className="flex space-x-2">
+                {[...Array(3)].map((_, i) => (
+                  <div key={i} className="skeleton bg-gray-300 w-3 h-3 rounded-full"></div>
+                ))}
+              </div>
+              <div className="skeleton bg-gray-300 w-10 h-10 rounded-full"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section className="relative">
@@ -120,7 +200,7 @@ const ReviewSection = () => {
         <div className="relative container mx-auto px-4">
           <Swiper
             modules={[Navigation, Pagination, A11y, Autoplay]}
-            spaceBetween={50} // reduced gap
+            spaceBetween={50}
             slidesPerView={1}
             loop={true}
             autoplay={{
