@@ -25,6 +25,7 @@ export async function POST(req) {
   }
 }
 
+
 export async function GET(req) {
   try {
     const { searchParams } = new URL(req.url);
@@ -35,7 +36,8 @@ export async function GET(req) {
     const status = searchParams.get("status");
     const admin = searchParams.get("admin");
     const home = searchParams.get("home");
-    const email = searchParams.get("email"); // ✅ NEW: email query parameter
+    const email = searchParams.get("email");
+    const category = searchParams.get("category"); // ✅ NEW: category query added
 
     const collection = await dbConnect(collections.mechanicShops);
 
@@ -92,6 +94,11 @@ export async function GET(req) {
         { ownerName: { $regex: search, $options: "i" } },
         { ownerEmail: { $regex: search, $options: "i" } },
       ];
+    }
+
+    // ✅ 4️⃣ Handle category filter
+    if (category) {
+      matchStage["shop.categories"] = category;
     }
 
     let sortStage = {};
@@ -151,3 +158,4 @@ export async function GET(req) {
     );
   }
 }
+
