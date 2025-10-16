@@ -1,5 +1,6 @@
 "use client";
 
+
 import {
   CheckCircle,
   ArrowRight,
@@ -14,16 +15,19 @@ import {
 import { useState, useEffect } from "react";
 import Image from "next/image";
 
-const HowToWork = () => {
-    const [activeStep, setActiveStep] = useState(null);
-    const [loading, setLoading] = useState(true);
 
-    useEffect(() => {
-        const timer = setTimeout(() => {
-            setLoading(false);
-        }, 2000);
-        return () => clearTimeout(timer);
-    }, []);
+const HowToWork = () => {
+  const [activeStep, setActiveStep] = useState(0);
+  const [loading, setLoading] = useState(true);
+
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setLoading(false);
+    }, 2000);
+    return () => clearTimeout(timer);
+  }, []);
+
 
   const steps = [
     {
@@ -70,170 +74,216 @@ const HowToWork = () => {
     },
   ];
 
-    // Skeleton Components
-    const StepSkeleton = () => (
-        <div className="flex md:flex-row flex-col items-start md:gap-0 gap-4 animate-pulse">
-            {/* Step indicator skeleton */}
-            <div className="flex flex-col items-center mr-6">
-                <div className="skeleton bg-gray-300 w-10 h-10 rounded-full z-10 relative right-0.5"></div>
-                <div className="skeleton bg-gray-200 w-0.5 h-full mt-1 -mb-2"></div>
-            </div>
 
-            {/* Content card skeleton */}
-            <div className="flex-1 rounded-2xl p-6 border border-gray-200 bg-white">
-                <div className="flex flex-col md:flex-row items-center gap-6">
-                    {/* Image skeleton */}
-                    <div className="md:w-1/3 w-full h-40 flex-shrink-0">
-                        <div className="skeleton bg-gray-200 w-full h-full rounded-lg"></div>
-                    </div>
+  // Skeleton Components
+  const StepSkeleton = () => (
+    <div className=" rounded-2xl p-6 shadow-lg border border-gray-100 animate-pulse">
+      <div className="flex items-center gap-4 mb-4">
+        <div className="skeleton bg-gray-300 w-12 h-12 rounded-full"></div>
+        <div className="skeleton bg-gray-300 h-6 w-32 rounded"></div>
+      </div>
+      <div className="skeleton bg-gray-200 h-4 w-full rounded mb-2"></div>
+      <div className="skeleton bg-gray-200 h-4 w-5/6 rounded"></div>
+    </div>
+  );
 
-                    {/* Text content skeleton */}
-                    <div className="md:w-2/3 w-full">
-                        {/* Step Number Badge and Arrow skeleton */}
-                        <div className="flex items-center justify-between mb-3">
-                            <div className="skeleton bg-gray-200 h-6 w-20 rounded-full"></div>
-                            <div className="skeleton bg-gray-200 w-5 h-5 rounded"></div>
-                        </div>
 
-                        <div className="skeleton bg-gray-200 h-px w-full mb-3"></div>
+  const SectionHeaderSkeleton = () => (
+    <div className="text-center mb-16 animate-pulse">
+      <div className="skeleton bg-gray-300 h-12 w-80 mx-auto rounded-lg mb-4"></div>
+      <div className="skeleton bg-gray-300 h-5 w-96 mx-auto rounded"></div>
+    </div>
+  );
 
-                        {/* Title and Description skeleton */}
-                        <div>
-                            <div className="skeleton bg-gray-200 h-8 w-48 rounded mb-2"></div>
-                            <div className="space-y-2">
-                                <div className="skeleton bg-gray-200 h-4 w-full rounded"></div>
-                                <div className="skeleton bg-gray-200 h-4 w-5/6 rounded"></div>
-                                <div className="skeleton bg-gray-200 h-4 w-4/6 rounded"></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    );
 
-    const SectionHeaderSkeleton = () => (
-        <div className="text-center mb-16 animate-pulse">
-            <div className="skeleton bg-gray-300 h-12 w-80 mx-auto rounded-lg mb-4"></div>
-            <div className="skeleton bg-gray-300 h-5 w-96 mx-auto rounded"></div>
-        </div>
-    );
-
-    if (loading) {
-        return (
-            <section className="py-16 font-roboto relative overflow-hidden">
-                <div className="container mx-auto px-4 relative z-10">
-                    <SectionHeaderSkeleton />
-                    
-                    {/* Timeline Steps Skeleton */}
-                    <div className="relative">
-                        <div className="grid grid-cols-1 gap-10">
-                            {[...Array(6)].map((_, index) => (
-                                <StepSkeleton key={index} />
-                            ))}
-                        </div>
-                    </div>
-                </div>
-            </section>
-        );
-    }
-
+  if (loading) {
     return (
-        <section className="py-16 font-roboto relative overflow-hidden">
-            <div className="container mx-auto px-4 relative z-10">
-                {/* Section Header */}
-                <div className="text-center mb-16">
-                    <h2 className="text-4xl md:text-5xl font-bold mb-4 font-roboto-con">
-                        How <span className="text-primary font-caveat inline-block">MechaLink Works</span>
-                    </h2>
-                    <p className="text-base md:text-xl max-w-2xl mx-auto font-nunito-sans">
-                        Follow these steps to understand the complete workflow and get connected with trusted mechanics efficiently.
-                    </p>
-                </div>
+      <section className="py-16 font-roboto bg-gradient-to-br from-orange-50 to-white relative overflow-hidden">
+        <div className="container mx-auto px-4 relative z-10">
+          <SectionHeaderSkeleton />
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {[...Array(6)].map((_, index) => (
+              <StepSkeleton key={index} />
+            ))}
+          </div>
+        </div>
+      </section>
+    );
+  }
 
-        {/* Interactive Timeline Steps */}
-        <div className="relative">
-          {/* Connecting line */}
-          <div className="absolute left-4 top-10 xl:bottom-45 md:bottom-55 w-1 bg-orange-400 hidden md:block"></div>
 
-          <div className="grid grid-cols-1 gap-10">
+  return (
+    <section className="py-16 font-roboto  relative overflow-hidden">
+
+      <div className="container mx-auto px-4 relative z-10">
+        {/* Section Header */}
+        <div className="text-center mb-16">
+          <div className="inline-flex items-center gap-2 bg-primary/10 px-4 py-2 rounded-full mb-6">
+            <BarChart className="w-5 h-5 text-primary" />
+            <span className="text-primary font-semibold text-sm uppercase tracking-wide">
+              Simple Process
+            </span>
+          </div>
+          <h2 className="text-4xl md:text-5xl font-bold mb-4 font-roboto-con">
+            How <span className="text-primary font-caveat inline-block transform rotate-2">MechaLink</span> Works
+          </h2>
+          <p className="text-lg md:text-xl  max-w-2xl mx-auto font-nunito-sans leading-relaxed">
+            Get your vehicle serviced in 6 simple steps. From finding the right mechanic to leaving reviews.
+          </p>
+        </div>
+
+
+        {/* Two Column Layout */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
+          {/* Left Column - Steps Navigation */}
+          <div className="space-y-4">
             {steps.map((step, index) => (
-              <div
+              <button
                 key={index}
-                className="flex md:flex-row flex-col items-start md:gap-0 gap-4 group"
-                onMouseEnter={() => setActiveStep(index)}
-                onMouseLeave={() => setActiveStep(null)}
-              >
-                {/* Step indicator (unchanged) */}
-                <div className="flex flex-col items-center mr-6">
-                  <div
-                    className={`w-10 h-10 rounded-full flex items-center justify-center z-10 relative right-0.5 ${
-                      activeStep === index
-                        ? "bg-primary  scale-110 ring-4 ring-orange-200 "
-                        : " border-2 border-orange-400 bg-white"
-                    } transition-all duration-300`}
-                  >
-                    <div
-                      className={` ${
-                        activeStep === index ? "text-white" : "text-primary"
-                      }`}
-                    >
-                      {step.icon}
-                    </div>
-                  </div>
-                </div>
-
-                {/* Content card with dynamic animation and IMAGE */}
-                <div
-                  className={`flex-1 rounded-2xl p-6 transform transition-all duration-300 ${
-                    activeStep === index
-                      ? "shadow-xl -translate-y-1 border-l-4 border-primary bg-white"
-                      : "shadow-md border border-gray-100"
+                onClick={() => setActiveStep(index)}
+                className={`w-full text-left p-6 rounded-2xl transition-all duration-300 group ${activeStep === index
+                    ? " shadow-xl border-l-4 border-primary transform -translate-y-1"
+                    : "/70 shadow-md border border-gray-100 hover:shadow-lg hover:-translate-y-0.5"
                   }`}
-                >
-                  <div className="flex flex-col md:flex-row items-center gap-6">
-                    {" "}
-                    {/* Added flex-row for image and text layout */}
-                    {/* Image on the left (or top on small screens) */}
-                    <div className="md:w-1/3 w-full h-40 flex-shrink-0">
-                      {/* Using Next.js Image component for optimization */}
-                      <Image
-                        src={step.image}
-                        alt={step.title}
-                        width={500} // Example width
-                        height={300} // Example height, adjust as needed
-                        className="rounded-lg object-cover w-full h-full shadow-sm"
-                      />
-                    </div>
-                    {/* Text content on the right (or bottom on small screens) */}
-                    <div className="md:w-2/3 w-full">
-                      {/* Step Number Badge and Arrow */}
-                      <div className="flex items-center justify-between mb-3">
-                        <span className="font-semibold text-white bg-primary py-1 px-3 rounded-full inline-block shadow-md">
+              >
+                <div className="flex items-center gap-4">
+                  <div
+                    className={`flex-shrink-0 w-12 h-12 rounded-full flex items-center justify-center transition-all duration-300 ${activeStep === index
+                        ? "bg-primary text-white shadow-lg scale-110"
+                        : "bg-orange-100 text-primary group-hover:bg-orange-200"
+                      }`}
+                  >
+                    {step.icon}
+                  </div>
+                  <div className="flex-1">
+                    <div className="flex items-center justify-between mb-2">
+                      <h3
+                        className={`text-xl font-bold transition-colors duration-300 ${activeStep === index ? "text-primary" : ""
+                          }`}
+                      >
+                        {step.title}
+                      </h3>
+                      <div
+                        className={`flex items-center gap-2 transition-all duration-300 ${activeStep === index
+                            ? "opacity-100 translate-x-0"
+                            : "opacity-0 -translate-x-2"
+                          }`}
+                      >
+                        <span className="text-sm font-semibold text-primary bg-orange-100 px-2 py-1 rounded-full">
                           Step {index + 1}
                         </span>
-                        <ArrowRight
-                          className={`w-5 h-5 text-primary transition-transform duration-300 ${
-                            activeStep === index ? "translate-x-1" : ""
-                          }`}
+                        <ArrowRight className="w-4 h-4 text-primary" />
+                      </div>
+                    </div>
+                    <p
+                      className={`text-sm leading-relaxed transition-colors duration-300 ${activeStep === index ? "" : ""
+                        }`}
+                    >
+                      {step.description}
+                    </p>
+                  </div>
+                </div>
+              </button>
+            ))}
+          </div>
+
+
+          {/* Right Column - Active Step Preview */}
+          <div className="sticky top-8">
+            <div className=" rounded-3xl shadow-2xl overflow-hidden border border-gray-100">
+              {/* Step Indicator */}
+              <div className="bg-primary p-6 text-white">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <span className="text-orange-100 text-sm font-semibold uppercase tracking-wide">
+                      Current Step
+                    </span>
+                    <h3 className="text-2xl font-bold mt-1">
+                      {steps[activeStep].title}
+                    </h3>
+                  </div>
+                  <div className="text-right">
+                    <div className="text-3xl font-bold text-orange-100">
+                      {activeStep + 1}
+                    </div>
+                    <div className="text-orange-200 text-sm">of {steps.length}</div>
+                  </div>
+                </div>
+
+                {/* Progress Bar */}
+                <div className="mt-4 w-full bg-orange-300/30 rounded-full h-2">
+                  <div
+                    className="bg-white h-2 rounded-full transition-all duration-500 ease-out"
+                    style={{
+                      width: `${((activeStep + 1) / steps.length) * 100}%`,
+                    }}
+                  ></div>
+                </div>
+              </div>
+
+
+              {/* Step Content */}
+              <div className="p-8">
+                <div className="mb-6">
+                  <div className="w-16 h-16 bg-orange-100 rounded-2xl flex items-center justify-center mb-4 mx-auto">
+                    <div className="text-primary">
+                      {steps[activeStep].icon}
+                    </div>
+                  </div>
+                  <h4 className="text-2xl font-bold text-center  mb-3">
+                    {steps[activeStep].title}
+                  </h4>
+                  <p className=" text-center leading-relaxed">
+                    {steps[activeStep].description}
+                  </p>
+                </div>
+
+
+                {/* Step Image */}
+                <div className="relative rounded-2xl overflow-hidden">
+                  <div className="aspect-video flex items-center justify-center">
+                    <div className="text-center">
+                      <div className="  rounded-full flex items-center justify-center mx-auto mb-3">
+                        <Image
+                          src={steps[activeStep].image}
+                          alt={steps[activeStep].title}
+                          width={600}
+                          height={400}
+                          className="w-full h-full rounded-md object-cover"
                         />
                       </div>
-                      <hr className="mb-3 border-t border-gray-200" />{" "}
-                      {/* Separator Line */}
-                      {/* Title and Description */}
-                      <div>
-                        <h3 className="text-3xl font-bold mb-2">
-                          {step.title}
-                        </h3>
-                        <p className="text-base text-gray-400 leading-relaxed">
-                          {step.description}
+                        <p className="text-primary font-semibold">
+                          Step {activeStep + 1} Preview
                         </p>
-                      </div>
                     </div>
                   </div>
                 </div>
+
+
+                {/* Navigation Dots */}
+                <div className="flex justify-center gap-2 mt-8">
+                  {steps.map((_, index) => (
+                    <button
+                      key={index}
+                      onClick={() => setActiveStep(index)}
+                      className={`w-3 h-3 rounded-full transition-all duration-300 ${activeStep === index
+                          ? "bg-primary scale-125"
+                          : "bg-gray-300 hover:bg-gray-400"
+                        }`}
+                    />
+                  ))}
+                </div>
               </div>
-            ))}
+            </div>
+
+
+            {/* Call to Action */}
+            <div className="mt-6 text-center">
+              <button className="bg-primary text-white px-8 py-4 rounded-2xl font-semibold shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-300 inline-flex items-center gap-2">
+                Get Started Today
+                <ArrowRight className="w-5 h-5" />
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -241,4 +291,8 @@ const HowToWork = () => {
   );
 };
 
+
 export default HowToWork;
+
+
+
