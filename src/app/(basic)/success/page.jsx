@@ -1,8 +1,11 @@
 "use client";
+import Link from "next/link";
 import { useSearchParams } from "next/navigation";
+import { useEffect } from "react";
 
 export default function SuccessPage() {
   const params = useSearchParams();
+  const shopID = params.get("shopID");
 
   const paymentInfo = {
     tran_id: params.get("tran_id"),
@@ -11,8 +14,19 @@ export default function SuccessPage() {
     bank_tran_id: params.get("bank_tran_id"),
     status: params.get("status"),
     cus_name: params.get("cus_name"),
+    paymentStatus: "paid",
+    paymentDate: new Date(),
   };
+  useEffect(() => {
+    fetch(`/api/shops/${shopID}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(paymentInfo),
 
+    });
+  }, [shopID]);
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center p-6">
       <div className="bg-white shadow-lg rounded-xl p-8 w-full max-w-2xl">
@@ -21,7 +35,7 @@ export default function SuccessPage() {
           <p className="text-gray-600 mt-2">Thank you for your purchase, {paymentInfo.cus_name}.</p>
         </div>
 
-        <div className="printable  border rounded-lg p-6 bg-gray-100">
+        <div className=" border rounded-lg p-6 bg-gray-100">
           <h2 className="text-xl font-semibold mb-4 text-gray-800">Invoice Details</h2>
           <div className="space-y-2 text-gray-700">
             <p><strong>Transaction ID:</strong> {paymentInfo.tran_id}</p>
@@ -39,6 +53,12 @@ export default function SuccessPage() {
           >
             Print Invoice
           </button>
+          <Link
+            href={"/dashboard/mechanic/profile"}
+            className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg"
+          >
+            Go to Profile
+          </Link>
         </div>
       </div>
     </div>

@@ -2,7 +2,6 @@ export async function POST(req) {
   const formData = await req.formData();
   const data = Object.fromEntries(formData);
 
-
   const query = new URLSearchParams({
     tran_id: data.tran_id || "",
     amount: data.amount || "",
@@ -10,6 +9,7 @@ export async function POST(req) {
     bank_tran_id: data.bank_tran_id || "",
     status: data.status || "",
     cus_name: data.cus_name || "",
+    shopID: data.value_a
   }).toString();
 
   return new Response(null, {

@@ -9,6 +9,7 @@ import {
     Building, Navigation, Globe, Facebook, Instagram, Twitter,
     ChevronRight, Crown, BadgeCheck, Sparkles
 } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 const MechanicProfile = ({ shopId }) => {
     const { user: loggedInUser, loading: userLoading } = useUser();
@@ -17,6 +18,7 @@ const MechanicProfile = ({ shopId }) => {
     const [reviews, setReviews] = useState([]);
     const [reviewsLoading, setReviewsLoading] = useState(false);
     const [activeTab, setActiveTab] = useState("overview");
+    const router = useRouter();
 
     // Fetch shop data
     useEffect(() => {
@@ -27,13 +29,10 @@ const MechanicProfile = ({ shopId }) => {
                     console.log("No user email available");
                     return;
                 }
-
-                console.log("Fetching shop data for email:", loggedInUser.email);
                 const response = await fetch(`/api/shops?email=${loggedInUser.email}`);
 
                 if (response.ok) {
                     const data = await response.json();
-                    console.log("Shop data received:", data);
 
                     // Handle array response
                     if (Array.isArray(data) && data.length > 0) {
@@ -87,7 +86,6 @@ const MechanicProfile = ({ shopId }) => {
                         return matchesShopId || matchesServiceId || matchesShopObjectId;
                     });
 
-                    console.log("Filtered shop reviews:", shopReviews);
                     setReviews(shopReviews);
                 } else {
                     console.error("Failed to fetch reviews");
@@ -105,9 +103,6 @@ const MechanicProfile = ({ shopId }) => {
         }
     }, [loggedInUser]);
 
-    console.log("Shop Data:", shopData);
-    console.log("Reviews:", reviews);
-    console.log("Reviews Loading:", reviewsLoading);
 
     // Loading and Auth Check
     if (userLoading) {
@@ -214,6 +209,8 @@ const MechanicProfile = ({ shopId }) => {
         }
     };
 
+    const paymentInfo = shopData.paymentInfo;
+
     // Calculate average rating
     const averageRating = reviews.length > 0
         ? (reviews.reduce((sum, review) => sum + (parseFloat(review.rating) || 0), 0) / reviews.length).toFixed(1)
@@ -290,6 +287,30 @@ const MechanicProfile = ({ shopId }) => {
             <span>{label}</span>
         </button>
     );
+
+    const handlePayment = async () => {
+        const res = await fetch("/api/ssl/init", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                ownerName: processedShopData.ownerName,
+                shopName: processedShopData.name,
+                email: processedShopData.email,
+                phone: processedShopData.phone,
+                category: processedShopData.categories[0],
+                amount: 1000,
+                shopID: shopData._id
+            }),
+        });
+
+        const data = await res.json();
+
+        if (data.GatewayPageURL) {
+            router.push(data.GatewayPageURL);
+        } else {
+            alert("Failed to initialize payment!");
+        }
+    };
 
     return (
         <div className="min-h-screen bg-base-200 mx-auto text-base-content">
@@ -396,125 +417,110 @@ const MechanicProfile = ({ shopId }) => {
                     <div className="space-y-6">
                         {/* Payment Section */}
                         <div className="space-y-4">
-                            {/* Payment Status & Button */}
-                            <div className="bg-base-100 rounded-3xl p-6 border border-neutral/40 shadow-lg relative overflow-hidden">
-                                {/* Status Dot Indicator */}
-                                <div className={`absolute top-4 left-4 w-10 h-3 rounded-full ${!processedShopData.paymentStatus || processedShopData.paymentStatus === 'pending'
-                                        ? 'bg-error animate-pulse'
-                                        : processedShopData.paymentStatus === 'paid'
-                                            ? 'bg-success'
-                                            : 'bg-error animate-pulse'
-                                    }`}></div>
+                            {
+                                !paymentInfo ? (
 
-                                <div className="text-center">
-                                    {/* Before Payment */}
-                                    {!processedShopData.paymentStatus || processedShopData.paymentStatus === 'pending' ? (
-                                        <>
-                                            <div className="flex items-center justify-center gap-3 mb-4">
-                                                <Shield className="text-warning" size={24} />
-                                                <span className="text-base-content/70 font-medium">Payment Required</span>
-                                            </div>
-                                            <button className="btn btn-primary btn-lg gap-3 w-full max-w-xs mx-auto hover:scale-105 transition-transform duration-300">
-                                                <span>Pay Now</span>
-                                                <ChevronRight size={18} />
-                                            </button>
-                                            <p className="text-base-content/50 text-sm mt-3">
-                                                Complete payment to activate your shop listing
-                                            </p>
-                                        </>
-                                    ) : processedShopData.paymentStatus === 'paid' ? (
-                                        <>
-                                            <div className="flex items-center justify-center gap-3 mb-4">
-                                                <CheckCircle className="text-success" size={24} />
-                                                <span className="text-success font-semibold">Payment Completed</span>
-                                            </div>
-                                            <div className="bg-success/10 text-success px-4 py-3 rounded-xl border border-success/20">
-                                                <p className="font-medium">Thank you for your payment!</p>
-                                                <p className="text-sm mt-1">Your shop is now active and visible to customers.</p>
-                                            </div>
-                                        </>
-                                    ) : processedShopData.paymentStatus === 'failed' ? (
-                                        <>
-                                            <div className="flex items-center justify-center gap-3 mb-4">
-                                                <Shield className="text-error" size={24} />
-                                                <span className="text-error font-semibold">Payment Failed</span>
-                                            </div>
-                                            <button className="btn btn-error btn-lg gap-3 w-full max-w-xs mx-auto hover:scale-105 transition-transform duration-300">
-                                                <span>Retry Payment</span>
-                                                <ChevronRight size={18} />
-                                            </button>
-                                            <p className="text-base-content/50 text-sm mt-3">
-                                                Please try again or contact support if the issue persists
-                                            </p>
-                                        </>
-                                    ) : null}
-                                </div>
-                            </div>
+                                    <div className="bg-base-100 rounded-3xl p-6 border border-neutral/40 shadow-lg relative overflow-hidden">
+                                        {/* Status Dot Indicator */}
+                                        <div className={`absolute top-4 left-4 w-10 h-3 rounded-full ${!paymentInfo? 'bg-error animate-pulse'
+                                            :  'bg-success'
+                                            }`}></div>
 
-                            {/* Invoice Details Card */}
-                            <div className="bg-base-100 rounded-3xl p-6 border border-neutral/40 shadow-lg">
-                                <h3 className="text-xl font-semibold text-base-content mb-6 flex items-center gap-2">
-                                    <FileText className="text-primary" size={20} />
-                                    Invoice Details
-                                </h3>
-                                <div className="space-y-4">
-                                    <div className="flex justify-between items-center py-2 border-b border-base-300">
-                                        <span className="text-base-content/70 font-medium">Transaction ID:</span>
-                                        <span className="text-base-content font-mono text-sm">tran_1760593966675</span>
-                                    </div>
-                                    <div className="flex justify-between items-center py-2 border-b border-base-300">
-                                        <span className="text-base-content/70 font-medium">Bank Transaction ID:</span>
-                                        <span className="text-base-content font-mono text-sm">251016115311kafG8SEFbwIH9fH</span>
-                                    </div>
-                                    <div className="flex justify-between items-center py-2 border-b border-base-300">
-                                        <span className="text-base-content/70 font-medium">Payment Method:</span>
-                                        <span className="text-base-content font-medium flex items-center gap-2">
-                                            <span className="w-6 h-6 bg-primary/10 rounded-full flex items-center justify-center">
-                                                <span className="text-primary text-xs font-bold">B</span>
-                                            </span>
-                                            BKASH-BKash
-                                        </span>
-                                    </div>
-                                    <div className="flex justify-between items-center py-2 border-b border-base-300">
-                                        <span className="text-base-content/70 font-medium">Amount:</span>
-                                        <span className="text-success font-bold text-lg">৳1000.00</span>
-                                    </div>
-                                    <div className="flex justify-between items-center py-2">
-                                        <span className="text-base-content/70 font-medium">Status:</span>
-                                        <span className={`badge badge-lg font-semibold ${processedShopData.paymentStatus === 'paid'
-                                            ? 'badge-success'
-                                            : processedShopData.paymentStatus === 'failed'
-                                                ? 'badge-error'
-                                                : 'badge-warning'
-                                            }`}>
-                                            {processedShopData.paymentStatus === 'paid'
-                                                ? 'PAID'
-                                                : processedShopData.paymentStatus === 'failed'
-                                                    ? 'FAILED'
-                                                    : 'PENDING'
-                                            }
-                                        </span>
-                                    </div>
-
-                                    {/* Additional payment info for paid status */}
-                                    {processedShopData.paymentStatus === 'paid' && (
-                                        <div className="mt-4 p-4 bg-success/5 rounded-xl border border-success/10">
-                                            <div className="flex justify-between items-center text-sm">
-                                                <span className="text-base-content/70">Paid Date:</span>
-                                                <span className="text-base-content font-medium">
-                                                    {new Date().toLocaleDateString()}
-                                                </span>
-                                            </div>
-                                            <div className="flex justify-between items-center text-sm mt-2">
-                                                <span className="text-base-content/70">Valid Until:</span>
-                                                <span className="text-success font-medium">
-                                                    {new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toLocaleDateString()}
-                                                </span>
-                                            </div>
+                                        <div className="text-center">
+                                            {/* Before Payment */}
+                                            {!paymentInfo ? (
+                                                <>
+                                                    <div className="flex items-center justify-center gap-3 mb-4">
+                                                        <Shield className="text-warning" size={24} />
+                                                        <span className="text-base-content/70 font-medium">Payment Required</span>
+                                                    </div>
+                                                    <button onClick={handlePayment} title="Pay 1000 per shop" className="btn btn-primary btn-lg gap-3 w-full max-w-xs mx-auto hover:scale-105 transition-transform duration-300">
+                                                        <span>Pay 1000</span>
+                                                        <ChevronRight size={18} />
+                                                    </button>
+                                                    <p className="text-base-content/50 text-sm mt-3">
+                                                        Complete payment to activate your shop listing
+                                                    </p>
+                                                </>
+                                            ) : (
+                                                <>
+                                                    <div className="flex items-center justify-center gap-3 mb-4">
+                                                        <CheckCircle className="text-success" size={24} />
+                                                        <span className="text-success font-semibold">Payment Completed</span>
+                                                    </div>
+                                                    <div className="bg-success/10 text-success px-4 py-3 rounded-xl border border-success/20">
+                                                        <p className="font-medium">Thank you for your payment!</p>
+                                                        <p className="text-sm mt-1">Your shop is now active and visible to customers.</p>
+                                                    </div>
+                                                </>
+                                            ) }
                                         </div>
-                                    )}
-                                </div>
-                            </div>
+                                    </div>
+
+                                ) : (
+
+                                    <div className="bg-base-100 rounded-3xl p-6 border border-neutral/40 shadow-lg">
+                                        <h3 className="text-xl font-semibold text-base-content mb-6 flex items-center gap-2">
+                                            <FileText className="text-primary" size={20} />
+                                            Invoice Details
+                                        </h3>
+                                        <div className="space-y-4">
+                                            <div className="flex justify-between items-center py-2 border-b border-base-300">
+                                                <span className="text-base-content/70 font-medium">Transaction ID:</span>
+                                                <span className="text-base-content font-mono text-sm">{paymentInfo.tran_id}</span>
+                                            </div>
+                                            <div className="flex justify-between items-center py-2 border-b border-base-300">
+                                                <span className="text-base-content/70 font-medium">Bank Transaction ID:</span>
+                                                <span className="text-base-content font-mono text-sm">{paymentInfo.bank_tran_id}</span>
+                                            </div>
+                                            <div className="flex justify-between items-center py-2 border-b border-base-300">
+                                                <span className="text-base-content/70 font-medium">Payment Method:</span>
+                                                <span className="text-base-content font-medium flex items-center gap-2">
+                                                    {paymentInfo.card_type}
+                                                </span>
+                                            </div>
+                                            <div className="flex justify-between items-center py-2 border-b border-base-300">
+                                                <span className="text-base-content/70 font-medium">Amount:</span>
+                                                <span className="text-success font-bold text-lg">৳{paymentInfo.amount}</span>
+                                            </div>
+                                            <div className="flex justify-between items-center py-2">
+                                                <span className="text-base-content/70 font-medium">Status:</span>
+                                                <span className={`badge badge-lg font-semibold ${paymentInfo.paymentStatus === 'paid'
+                                                    ? 'badge-success'
+                                                    : paymentInfo.paymentStatus === 'failed'
+                                                        ? 'badge-error'
+                                                        : 'badge-warning'
+                                                    }`}>
+                                                    {paymentInfo.paymentStatus === 'paid'
+                                                        ? 'PAID'
+                                                        : paymentInfo.paymentStatus === 'failed'
+                                                            ? 'FAILED'
+                                                            : 'PENDING'
+                                                    }
+                                                </span>
+                                            </div>
+
+                                            {/* Additional payment info for paid status */}
+                                            {processedShopData.paymentStatus === 'paid' && (
+                                                <div className="mt-4 p-4 bg-success/5 rounded-xl border border-success/10">
+                                                    <div className="flex justify-between items-center text-sm">
+                                                        <span className="text-base-content/70">Paid Date:</span>
+                                                        <span className="text-base-content font-medium">
+                                                            {new Date().toLocaleDateString()}
+                                                        </span>
+                                                    </div>
+                                                    <div className="flex justify-between items-center text-sm mt-2">
+                                                        <span className="text-base-content/70">Valid Until:</span>
+                                                        <span className="text-success font-medium">
+                                                            {new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toLocaleDateString()}
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            )}
+                                        </div>
+                                    </div>
+                                )
+                            }
                         </div>
 
 
