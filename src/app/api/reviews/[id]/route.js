@@ -1,4 +1,4 @@
-// app/api/reviews/[id]/route.js
+
 export async function PATCH(req, { params }) {
     try {
         const { id } = params;
