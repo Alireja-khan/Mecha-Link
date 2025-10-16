@@ -417,8 +417,8 @@ const MechanicProfile = ({ shopId }) => {
                     <div className="space-y-6">
                         {/* Payment Section */}
                         <div className="space-y-4">
-                            {
-                                !paymentInfo ? (
+                            
+                               
 
                                     <div className="bg-base-100 rounded-3xl p-6 border border-neutral/40 shadow-lg relative overflow-hidden">
                                         {/* Status Dot Indicator */}
@@ -457,7 +457,7 @@ const MechanicProfile = ({ shopId }) => {
                                         </div>
                                     </div>
 
-                                ) : (
+                               
 
                                     <div className="bg-base-100 rounded-3xl p-6 border border-neutral/40 shadow-lg">
                                         <h3 className="text-xl font-semibold text-base-content mb-6 flex items-center gap-2">
@@ -467,33 +467,33 @@ const MechanicProfile = ({ shopId }) => {
                                         <div className="space-y-4">
                                             <div className="flex justify-between items-center py-2 border-b border-base-300">
                                                 <span className="text-base-content/70 font-medium">Transaction ID:</span>
-                                                <span className="text-base-content font-mono text-sm">{paymentInfo.tran_id}</span>
+                                                <span className="text-base-content font-mono text-sm">{paymentInfo?.tran_id || "..."}</span>
                                             </div>
                                             <div className="flex justify-between items-center py-2 border-b border-base-300">
                                                 <span className="text-base-content/70 font-medium">Bank Transaction ID:</span>
-                                                <span className="text-base-content font-mono text-sm">{paymentInfo.bank_tran_id}</span>
+                                                <span className="text-base-content font-mono text-sm">{paymentInfo?.bank_tran_id || "..."}</span>
                                             </div>
                                             <div className="flex justify-between items-center py-2 border-b border-base-300">
                                                 <span className="text-base-content/70 font-medium">Payment Method:</span>
                                                 <span className="text-base-content font-medium flex items-center gap-2">
-                                                    {paymentInfo.card_type}
+                                                    {paymentInfo?.card_type || "..."}
                                                 </span>
                                             </div>
                                             <div className="flex justify-between items-center py-2 border-b border-base-300">
                                                 <span className="text-base-content/70 font-medium">Amount:</span>
-                                                <span className="text-success font-bold text-lg">৳{paymentInfo.amount}</span>
+                                                <span className="text-success font-bold text-lg">৳{paymentInfo?.amount || "..."}</span>
                                             </div>
                                             <div className="flex justify-between items-center py-2">
                                                 <span className="text-base-content/70 font-medium">Status:</span>
-                                                <span className={`badge badge-lg font-semibold ${paymentInfo.paymentStatus === 'paid'
+                                                <span className={`badge badge-lg font-semibold ${paymentInfo?.paymentStatus === 'paid'
                                                     ? 'badge-success'
-                                                    : paymentInfo.paymentStatus === 'failed'
+                                                    : paymentInfo?.paymentStatus === 'failed'
                                                         ? 'badge-error'
                                                         : 'badge-warning'
                                                     }`}>
-                                                    {paymentInfo.paymentStatus === 'paid'
+                                                    {paymentInfo?.paymentStatus === 'paid'
                                                         ? 'PAID'
-                                                        : paymentInfo.paymentStatus === 'failed'
+                                                        : paymentInfo?.paymentStatus === 'failed'
                                                             ? 'FAILED'
                                                             : 'PENDING'
                                                     }
@@ -519,8 +519,7 @@ const MechanicProfile = ({ shopId }) => {
                                             )}
                                         </div>
                                     </div>
-                                )
-                            }
+                         
                         </div>
 
 
