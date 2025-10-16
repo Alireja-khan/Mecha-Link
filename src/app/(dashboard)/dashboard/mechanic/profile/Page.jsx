@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from "react";
 import useUser from "@/hooks/useUser";
 import {
-    MapPin, Phone, Mail, Clock, Users, Star, Shield, CheckCircle, 
+    MapPin, Phone, Mail, Clock, Users, Star, Shield, CheckCircle,
     Wrench, Car, Settings, Edit3, Share2, PhoneCall, MessageCircle,
     Calendar, Award, FileText, BarChart3, Eye, Download, Filter,
     Building, Navigation, Globe, Facebook, Instagram, Twitter,
@@ -30,11 +30,11 @@ const MechanicProfile = ({ shopId }) => {
 
                 console.log("Fetching shop data for email:", loggedInUser.email);
                 const response = await fetch(`/api/shops?email=${loggedInUser.email}`);
-                
+
                 if (response.ok) {
                     const data = await response.json();
                     console.log("Shop data received:", data);
-                    
+
                     // Handle array response
                     if (Array.isArray(data) && data.length > 0) {
                         const shop = data[0];
@@ -62,19 +62,19 @@ const MechanicProfile = ({ shopId }) => {
             try {
                 setReviewsLoading(true);
                 console.log("Fetching reviews for shop ID:", shopId);
-                
+
                 const response = await fetch('/api/reviews');
                 if (response.ok) {
                     const allReviews = await response.json();
                     console.log("All reviews received:", allReviews);
-                    
+
                     // Filter reviews for this specific shop
                     const shopReviews = allReviews.filter(review => {
                         // Check multiple possible fields where shop ID might be stored
                         const matchesShopId = review.shopId === shopId.toString();
                         const matchesServiceId = review.serviceId === shopId.toString();
                         const matchesShopObjectId = review.shopId === shopId;
-                        
+
                         console.log(`Review ${review._id}:`, {
                             reviewShopId: review.shopId,
                             reviewServiceId: review.serviceId,
@@ -83,10 +83,10 @@ const MechanicProfile = ({ shopId }) => {
                             matchesServiceId,
                             matchesShopObjectId
                         });
-                        
+
                         return matchesShopId || matchesServiceId || matchesShopObjectId;
                     });
-                    
+
                     console.log("Filtered shop reviews:", shopReviews);
                     setReviews(shopReviews);
                 } else {
@@ -146,7 +146,7 @@ const MechanicProfile = ({ shopId }) => {
                     <Building className="mx-auto text-base-content/40 mb-4" size={64} />
                     <h2 className="text-2xl font-bold text-base-content mb-4">No Shop Found</h2>
                     <p className="text-base-content/70 mb-6">
-                        We couldn't find a shop associated with your account. 
+                        We couldn't find a shop associated with your account.
                         Would you like to create one?
                     </p>
                     <button className="btn btn-primary gap-2">
@@ -166,7 +166,7 @@ const MechanicProfile = ({ shopId }) => {
         email: shopData?.contact?.email || shopData?.ownerEmail || loggedInUser?.email || "Not provided",
         phone: shopData?.shop?.contact?.phone || "Not provided",
         whatsapp: shopData?.contact?.whatsapp,
-        
+
         // Location
         address: {
             street: shopData?.shop?.address?.street || "Address not provided",
@@ -178,7 +178,7 @@ const MechanicProfile = ({ shopId }) => {
             mapUrl: shopData?.shop?.address?.mapUrl || "#",
             coordinates: shopData?.location || null
         },
-        
+
         // Business Details
         description: shopData?.shop?.details || "Professional automotive repair services",
         mechanicCount: shopData?.shop?.mechanicCount || 0,
@@ -187,27 +187,27 @@ const MechanicProfile = ({ shopId }) => {
             close: shopData?.shop.workingHours?.close || "18:00",
             weekend: shopData?.shop.workingHours?.weekend || "Sunday"
         },
-        
+
         // Services
         categories: shopData?.shop.categories || [],
         services: shopData?.shop.vehicleTypes || {},
-        
+
         // Certifications & Social
         certifications: shopData?.certifications || [],
         socialLinks: shopData?.socialLinks || {},
-        
+
         // Status & Metrics
         status: shopData?.status || "pending",
         joinedDate: shopData?.createdAt ? new Date(shopData.createdAt).toLocaleDateString() : "N/A",
         approvedDate: shopData?.approvedAt ? new Date(shopData.approvedAt).toLocaleDateString() : null,
         logo: shopData?.shop.logo,
-        
+
         // Performance Metrics
         metrics: {
-            totalServices: Object.values(shopData?.vehicleTypes || {}).reduce((total, category) => 
+            totalServices: Object.values(shopData?.vehicleTypes || {}).reduce((total, category) =>
                 total + Object.values(category || {}).flat().length, 0
             ),
-            yearsExperience: shopData?.createdAt ? 
+            yearsExperience: shopData?.createdAt ?
                 Math.max(1, new Date().getFullYear() - new Date(shopData.createdAt).getFullYear()) : 1,
             customerSatisfaction: Math.floor(Math.random() * 20) + 80,
             repeatClients: Math.floor(Math.random() * 100) + 50
@@ -215,7 +215,7 @@ const MechanicProfile = ({ shopId }) => {
     };
 
     // Calculate average rating
-    const averageRating = reviews.length > 0 
+    const averageRating = reviews.length > 0
         ? (reviews.reduce((sum, review) => sum + (parseFloat(review.rating) || 0), 0) / reviews.length).toFixed(1)
         : "0.0";
 
@@ -276,7 +276,7 @@ const MechanicProfile = ({ shopId }) => {
 
     // Action Button Component
     const ActionButton = ({ icon: Icon, label, variant = "primary", onClick }) => (
-        <button 
+        <button
             onClick={onClick}
             className={`
                 flex items-center justify-center gap-3 px-6 py-4 rounded-xl font-semibold w-full transition-all duration-300 hover:scale-[1.01] text-center
@@ -294,14 +294,14 @@ const MechanicProfile = ({ shopId }) => {
     return (
         <div className="min-h-screen bg-base-200 mx-auto text-base-content">
             <div className="p-4 md:p-6 lg:p-8 mx-auto">
-                
+
                 {/* Hero Section */}
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
-                    
+
                     {/* Main Profile Card */}
                     <div className="lg:col-span-2 bg-base-100 rounded-3xl p-6 md:p-8 border border-neutral/40 shadow-xl">
                         <div className="flex flex-col md:flex-row justify-center items-center gap-6 md:gap-8">
-                            
+
                             {/* Shop Logo/Image */}
                             <div className="w-56 h-56 md:w-48 md:h-48 lg:w-80 lg:h-80 rounded-2xl border-4 border-base-100 shadow-2xl overflow-hidden bg-gradient-to-br from-primary to-secondary flex-shrink-0">
                                 {processedShopData.logo ? (
@@ -336,13 +336,12 @@ const MechanicProfile = ({ shopId }) => {
                                             {averageRating} ({reviews.length} reviews)
                                         </span>
                                     </div>
-                                    <div className={`inline-flex items-center gap-2 px-4 py-2 rounded-full border font-semibold text-sm ${
-                                        processedShopData.status === "approved" 
-                                            ? "bg-success/10 text-success border-success/20"
-                                            : processedShopData.status === "pending"
+                                    <div className={`inline-flex items-center gap-2 px-4 py-2 rounded-full border font-semibold text-sm ${processedShopData.status === "approved"
+                                        ? "bg-success/10 text-success border-success/20"
+                                        : processedShopData.status === "pending"
                                             ? "bg-warning/10 text-warning border-warning/20"
                                             : "bg-error/10 text-error border-error/20"
-                                    }`}>
+                                        }`}>
                                         {processedShopData.status.charAt(0).toUpperCase() + processedShopData.status.slice(1)}
                                     </div>
                                 </div>
@@ -372,42 +371,13 @@ const MechanicProfile = ({ shopId }) => {
                                         </span>
                                     </div>
                                 </div>
+
+
                             </div>
                         </div>
-                    </div>
-
-                    {/* Quick Stats Sidebar */}
-                    <div className="space-y-6">
-                        {/* Contact Quick Actions */}
-                        <div className="bg-base-100 rounded-3xl p-6 border border-neutral/40 shadow-lg">
-                            <h3 className="text-xl font-semibold text-base-content mb-4">Quick Contact</h3>
-                            <div className="space-y-4">
-                                <ActionButton 
-                                    icon={PhoneCall} 
-                                    label="Call Now" 
-                                    variant="primary"
-                                    onClick={() => window.location.href = `tel:${processedShopData.phone}`}
-                                />
-                                {processedShopData.whatsapp && (
-                                    <ActionButton 
-                                        icon={MessageCircle} 
-                                        label="WhatsApp" 
-                                        variant="secondary"
-                                        onClick={() => window.open(`https://wa.me/${processedShopData.whatsapp}`, '_blank')}
-                                    />
-                                )}
-                                <ActionButton 
-                                    icon={Navigation} 
-                                    label="Get Directions" 
-                                    variant="secondary"
-                                    onClick={() => window.open(processedShopData.address.mapUrl, '_blank')}
-                                />
-                            </div>
-                        </div>
-
                         {/* Certifications */}
                         {processedShopData.certifications.length > 0 && (
-                            <div className="bg-base-100 rounded-3xl p-6 border border-neutral/40 shadow-xl">
+                            <div className="bg-base-100 rounded-3xl p-6 mt-5 border border-neutral/40">
                                 <h2 className="text-xl font-bold text-base-content mb-4">Certifications</h2>
                                 <div className="flex flex-wrap gap-2">
                                     {processedShopData.certifications.map((cert, i) => (
@@ -422,6 +392,134 @@ const MechanicProfile = ({ shopId }) => {
                             </div>
                         )}
                     </div>
+
+                    <div className="space-y-6">
+                        {/* Payment Section */}
+                        <div className="space-y-4">
+                            {/* Payment Status & Button */}
+                            <div className="bg-base-100 rounded-3xl p-6 border border-neutral/40 shadow-lg relative overflow-hidden">
+                                {/* Status Dot Indicator */}
+                                <div className={`absolute top-4 left-4 w-10 h-3 rounded-full ${!processedShopData.paymentStatus || processedShopData.paymentStatus === 'pending'
+                                        ? 'bg-error animate-pulse'
+                                        : processedShopData.paymentStatus === 'paid'
+                                            ? 'bg-success'
+                                            : 'bg-error animate-pulse'
+                                    }`}></div>
+
+                                <div className="text-center">
+                                    {/* Before Payment */}
+                                    {!processedShopData.paymentStatus || processedShopData.paymentStatus === 'pending' ? (
+                                        <>
+                                            <div className="flex items-center justify-center gap-3 mb-4">
+                                                <Shield className="text-warning" size={24} />
+                                                <span className="text-base-content/70 font-medium">Payment Required</span>
+                                            </div>
+                                            <button className="btn btn-primary btn-lg gap-3 w-full max-w-xs mx-auto hover:scale-105 transition-transform duration-300">
+                                                <span>Pay Now</span>
+                                                <ChevronRight size={18} />
+                                            </button>
+                                            <p className="text-base-content/50 text-sm mt-3">
+                                                Complete payment to activate your shop listing
+                                            </p>
+                                        </>
+                                    ) : processedShopData.paymentStatus === 'paid' ? (
+                                        <>
+                                            <div className="flex items-center justify-center gap-3 mb-4">
+                                                <CheckCircle className="text-success" size={24} />
+                                                <span className="text-success font-semibold">Payment Completed</span>
+                                            </div>
+                                            <div className="bg-success/10 text-success px-4 py-3 rounded-xl border border-success/20">
+                                                <p className="font-medium">Thank you for your payment!</p>
+                                                <p className="text-sm mt-1">Your shop is now active and visible to customers.</p>
+                                            </div>
+                                        </>
+                                    ) : processedShopData.paymentStatus === 'failed' ? (
+                                        <>
+                                            <div className="flex items-center justify-center gap-3 mb-4">
+                                                <Shield className="text-error" size={24} />
+                                                <span className="text-error font-semibold">Payment Failed</span>
+                                            </div>
+                                            <button className="btn btn-error btn-lg gap-3 w-full max-w-xs mx-auto hover:scale-105 transition-transform duration-300">
+                                                <span>Retry Payment</span>
+                                                <ChevronRight size={18} />
+                                            </button>
+                                            <p className="text-base-content/50 text-sm mt-3">
+                                                Please try again or contact support if the issue persists
+                                            </p>
+                                        </>
+                                    ) : null}
+                                </div>
+                            </div>
+
+                            {/* Invoice Details Card */}
+                            <div className="bg-base-100 rounded-3xl p-6 border border-neutral/40 shadow-lg">
+                                <h3 className="text-xl font-semibold text-base-content mb-6 flex items-center gap-2">
+                                    <FileText className="text-primary" size={20} />
+                                    Invoice Details
+                                </h3>
+                                <div className="space-y-4">
+                                    <div className="flex justify-between items-center py-2 border-b border-base-300">
+                                        <span className="text-base-content/70 font-medium">Transaction ID:</span>
+                                        <span className="text-base-content font-mono text-sm">tran_1760593966675</span>
+                                    </div>
+                                    <div className="flex justify-between items-center py-2 border-b border-base-300">
+                                        <span className="text-base-content/70 font-medium">Bank Transaction ID:</span>
+                                        <span className="text-base-content font-mono text-sm">251016115311kafG8SEFbwIH9fH</span>
+                                    </div>
+                                    <div className="flex justify-between items-center py-2 border-b border-base-300">
+                                        <span className="text-base-content/70 font-medium">Payment Method:</span>
+                                        <span className="text-base-content font-medium flex items-center gap-2">
+                                            <span className="w-6 h-6 bg-primary/10 rounded-full flex items-center justify-center">
+                                                <span className="text-primary text-xs font-bold">B</span>
+                                            </span>
+                                            BKASH-BKash
+                                        </span>
+                                    </div>
+                                    <div className="flex justify-between items-center py-2 border-b border-base-300">
+                                        <span className="text-base-content/70 font-medium">Amount:</span>
+                                        <span className="text-success font-bold text-lg">৳1000.00</span>
+                                    </div>
+                                    <div className="flex justify-between items-center py-2">
+                                        <span className="text-base-content/70 font-medium">Status:</span>
+                                        <span className={`badge badge-lg font-semibold ${processedShopData.paymentStatus === 'paid'
+                                            ? 'badge-success'
+                                            : processedShopData.paymentStatus === 'failed'
+                                                ? 'badge-error'
+                                                : 'badge-warning'
+                                            }`}>
+                                            {processedShopData.paymentStatus === 'paid'
+                                                ? 'PAID'
+                                                : processedShopData.paymentStatus === 'failed'
+                                                    ? 'FAILED'
+                                                    : 'PENDING'
+                                            }
+                                        </span>
+                                    </div>
+
+                                    {/* Additional payment info for paid status */}
+                                    {processedShopData.paymentStatus === 'paid' && (
+                                        <div className="mt-4 p-4 bg-success/5 rounded-xl border border-success/10">
+                                            <div className="flex justify-between items-center text-sm">
+                                                <span className="text-base-content/70">Paid Date:</span>
+                                                <span className="text-base-content font-medium">
+                                                    {new Date().toLocaleDateString()}
+                                                </span>
+                                            </div>
+                                            <div className="flex justify-between items-center text-sm mt-2">
+                                                <span className="text-base-content/70">Valid Until:</span>
+                                                <span className="text-success font-medium">
+                                                    {new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toLocaleDateString()}
+                                                </span>
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                        </div>
+
+
+                    </div>
+
                 </div>
 
                 {/* Navigation Tabs */}
@@ -431,11 +529,10 @@ const MechanicProfile = ({ shopId }) => {
                             <button
                                 key={tab}
                                 onClick={() => setActiveTab(tab)}
-                                className={`flex items-center gap-2 px-6 py-3 rounded-xl font-semibold whitespace-nowrap transition-all duration-300 ${
-                                    activeTab === tab
-                                        ? "bg-primary text-primary-content shadow-lg"
-                                        : "text-base-content/70 hover:text-base-content hover:bg-base-200"
-                                }`}
+                                className={`flex items-center gap-2 px-6 py-3 rounded-xl font-semibold whitespace-nowrap transition-all duration-300 ${activeTab === tab
+                                    ? "bg-primary text-primary-content shadow-lg"
+                                    : "text-base-content/70 hover:text-base-content hover:bg-base-200"
+                                    }`}
                             >
                                 {tab === "overview" && <BarChart3 size={18} />}
                                 {tab === "services" && <Wrench size={18} />}
@@ -449,10 +546,10 @@ const MechanicProfile = ({ shopId }) => {
 
                 {/* Tab Content */}
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                    
+
                     {/* Main Content Area */}
                     <div className="lg:col-span-2 space-y-8">
-                        
+
                         {/* Overview Tab */}
                         {activeTab === "overview" && (
                             <>
@@ -475,31 +572,31 @@ const MechanicProfile = ({ shopId }) => {
                                     </div>
 
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                        <StatCard 
-                                            icon={Wrench} 
-                                            value={processedShopData.metrics.totalServices} 
-                                            label="Total Services" 
-                                            trend={8} 
+                                        <StatCard
+                                            icon={Wrench}
+                                            value={processedShopData.metrics.totalServices}
+                                            label="Total Services"
+                                            trend={8}
                                         />
-                                        <StatCard 
-                                            icon={Calendar} 
-                                            value={processedShopData.metrics.yearsExperience} 
-                                            label="Years Experience" 
-                                            trend={5} 
+                                        <StatCard
+                                            icon={Calendar}
+                                            value={processedShopData.metrics.yearsExperience}
+                                            label="Years Experience"
+                                            trend={5}
                                             color="secondary"
                                         />
-                                        <StatCard 
-                                            icon={Star} 
-                                            value={`${processedShopData.metrics.customerSatisfaction}%`} 
-                                            label="Customer Satisfaction" 
-                                            trend={12} 
+                                        <StatCard
+                                            icon={Star}
+                                            value={`${processedShopData.metrics.customerSatisfaction}%`}
+                                            label="Customer Satisfaction"
+                                            trend={12}
                                             color="success"
                                         />
-                                        <StatCard 
-                                            icon={Users} 
-                                            value={processedShopData.metrics.repeatClients} 
-                                            label="Repeat Clients" 
-                                            trend={15} 
+                                        <StatCard
+                                            icon={Users}
+                                            value={processedShopData.metrics.repeatClients}
+                                            label="Repeat Clients"
+                                            trend={15}
                                             color="warning"
                                         />
                                     </div>
@@ -533,10 +630,10 @@ const MechanicProfile = ({ shopId }) => {
                                 <h2 className="text-2xl font-bold text-base-content mb-6">Available Services</h2>
                                 <div className="space-y-6">
                                     {Object.entries(processedShopData.services).map(([category, services]) => (
-                                        <ServiceCategory 
-                                            key={category} 
-                                            category={category} 
-                                            services={services} 
+                                        <ServiceCategory
+                                            key={category}
+                                            category={category}
+                                            services={services}
                                         />
                                     ))}
                                     {Object.keys(processedShopData.services).length === 0 && (
@@ -555,7 +652,7 @@ const MechanicProfile = ({ shopId }) => {
                                 <h2 className="text-2xl font-bold text-base-content mb-6">
                                     Customer Reviews ({reviews.length})
                                 </h2>
-                                
+
                                 {reviewsLoading ? (
                                     <div className="text-center py-8">
                                         <span className="loading loading-bars loading-md text-primary"></span>
@@ -640,7 +737,7 @@ const MechanicProfile = ({ shopId }) => {
                                                     <p>{processedShopData.address.division}, {processedShopData.address.country}</p>
                                                     <p>Postal Code: {processedShopData.address.postalCode}</p>
                                                 </div>
-                                                <button 
+                                                <button
                                                     onClick={() => window.open(processedShopData.address.mapUrl, '_blank')}
                                                     className="flex items-center gap-2 text-primary font-semibold mt-4 hover:text-secondary transition-colors duration-300"
                                                 >
@@ -656,7 +753,7 @@ const MechanicProfile = ({ shopId }) => {
                                                 <h3 className="font-semibold text-base-content mb-4">Follow Us</h3>
                                                 <div className="flex gap-3">
                                                     {processedShopData.socialLinks.facebook && (
-                                                        <button 
+                                                        <button
                                                             onClick={() => window.open(processedShopData.socialLinks.facebook, '_blank')}
                                                             className="p-3 bg-base-100 rounded-lg hover:bg-base-300 transition-colors duration-300"
                                                         >
@@ -664,7 +761,7 @@ const MechanicProfile = ({ shopId }) => {
                                                         </button>
                                                     )}
                                                     {processedShopData.socialLinks.instagram && (
-                                                        <button 
+                                                        <button
                                                             onClick={() => window.open(processedShopData.socialLinks.instagram, '_blank')}
                                                             className="p-3 bg-base-100 rounded-lg hover:bg-base-300 transition-colors duration-300"
                                                         >
@@ -672,7 +769,7 @@ const MechanicProfile = ({ shopId }) => {
                                                         </button>
                                                     )}
                                                     {processedShopData.socialLinks.twitter && (
-                                                        <button 
+                                                        <button
                                                             onClick={() => window.open(processedShopData.socialLinks.twitter, '_blank')}
                                                             className="p-3 bg-base-100 rounded-lg hover:bg-base-300 transition-colors duration-300"
                                                         >
@@ -690,7 +787,7 @@ const MechanicProfile = ({ shopId }) => {
 
                     {/* Sidebar */}
                     <div className="space-y-8">
-                        
+
                         {/* Business Hours */}
                         <div className="bg-base-100 rounded-3xl p-6 border border-neutral/40 shadow-xl">
                             <h2 className="text-xl font-bold text-base-content mb-4">Business Hours</h2>
@@ -698,13 +795,12 @@ const MechanicProfile = ({ shopId }) => {
                                 {["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"].map((day) => (
                                     <div key={day} className="flex justify-between items-center p-3 bg-base-200 rounded-xl border border-base-300 transition-colors duration-200 hover:bg-base-300">
                                         <span className="text-base-content font-medium">{day}</span>
-                                        <span className={`font-semibold ${
-                                            day === processedShopData.workingHours.weekend 
-                                                ? "text-error" 
-                                                : "text-success"
-                                        }`}>
-                                            {day === processedShopData.workingHours.weekend 
-                                                ? "Closed" 
+                                        <span className={`font-semibold ${day === processedShopData.workingHours.weekend
+                                            ? "text-error"
+                                            : "text-success"
+                                            }`}>
+                                            {day === processedShopData.workingHours.weekend
+                                                ? "Closed"
                                                 : `${processedShopData.workingHours.open} - ${processedShopData.workingHours.close}`
                                             }
                                         </span>
@@ -718,25 +814,25 @@ const MechanicProfile = ({ shopId }) => {
                             <div className="bg-base-100 rounded-3xl p-6 border border-neutral/40 shadow-xl">
                                 <h2 className="text-xl font-bold text-base-content mb-4">Shop Management</h2>
                                 <div className="space-y-3">
-                                    <ActionButton 
-                                        icon={Edit3} 
-                                        label="Edit Shop Profile" 
-                                        variant="primary" 
+                                    <ActionButton
+                                        icon={Edit3}
+                                        label="Edit Shop Profile"
+                                        variant="primary"
                                     />
-                                    <ActionButton 
-                                        icon={Settings} 
-                                        label="Shop Settings" 
-                                        variant="secondary" 
+                                    <ActionButton
+                                        icon={Settings}
+                                        label="Shop Settings"
+                                        variant="secondary"
                                     />
-                                    <ActionButton 
-                                        icon={BarChart3} 
-                                        label="View Analytics" 
-                                        variant="secondary" 
+                                    <ActionButton
+                                        icon={BarChart3}
+                                        label="View Analytics"
+                                        variant="secondary"
                                     />
-                                    <ActionButton 
-                                        icon={Share2} 
-                                        label="Share Profile" 
-                                        variant="secondary" 
+                                    <ActionButton
+                                        icon={Share2}
+                                        label="Share Profile"
+                                        variant="secondary"
                                     />
                                 </div>
                             </div>
