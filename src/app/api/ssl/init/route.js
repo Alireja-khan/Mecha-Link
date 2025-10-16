@@ -15,23 +15,24 @@ export async function POST(req) {
     fail_url: `${process.env.NEXT_PUBLIC_BASE_URL}/api/ssl/fail`,
     cancel_url: `${process.env.NEXT_PUBLIC_BASE_URL}/api/ssl/cancel`,
     emi_option: 0,
-    cus_name: body.name,
+    cus_name: body.ownerName,
     cus_email: body.email,
     cus_add1: "Dhaka",
     cus_country: "Bangladesh",
     cus_city: "Dhaka",
     cus_postcode: "1000",
     cus_phone: body.phone,
-    product_name: "Medicine Purchase",
-    product_category: "Pharmacy",
+    product_name: "Shop Add",
+    product_category: body.category,
     product_profile: "general",
     shipping_method: "NO",
     num_of_item: 1,
     weight_of_items: 1,
     logistic_pickup_id: 0,
     logistic_delivery_type: "DOMESTIC",
+    value_a: body.shopID
   };
-
+ 
   const response = await fetch("https://sandbox.sslcommerz.com/gwprocess/v4/api.php", {
     method: "POST",
     headers: { "Content-Type": "application/x-www-form-urlencoded" },

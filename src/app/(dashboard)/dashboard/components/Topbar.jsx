@@ -15,6 +15,7 @@ import {
 import useUser from "@/hooks/useUser";
 import NotificationWidget from "@/app/shared/NotificationWidget";
 import ToggleTheme from "../../../shared/ToggleTheme";
+import { useRouter } from "next/navigation";
 
 const transitionClasses = "transition duration-200 ease-in-out";
 
@@ -99,7 +100,7 @@ const PaymentReminder = ({ paymentStatus, onPayClick }) => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  if (paymentStatus === 'paid') {
+  if (paymentStatus) {
     return (
       <div className="relative" ref={tooltipRef}>
         <div
@@ -139,7 +140,7 @@ const PaymentReminder = ({ paymentStatus, onPayClick }) => {
     );
   }
 
-  if (paymentStatus === 'pending' || !paymentStatus) {
+  if (!paymentStatus) {
     return (
       <div className="relative" ref={tooltipRef}>
         <div
@@ -193,64 +194,6 @@ const PaymentReminder = ({ paymentStatus, onPayClick }) => {
     );
   }
 
-  if (paymentStatus === 'failed') {
-    return (
-      <div className="relative" ref={tooltipRef}>
-        <div
-          className="flex items-center gap-2 px-4 py-2 bg-error/20 text-error rounded-xl border border-error/30 hover:bg-error/30 hover:scale-105 transition-all duration-300 cursor-pointer"
-          onClick={onPayClick}
-          onMouseEnter={() => setShowTooltip(true)}
-          onMouseLeave={() => setShowTooltip(false)}
-        >
-          <AlertTriangle size={18} className="text-error" />
-          <span className="text-sm font-semibold">Payment Failed</span>
-          <CreditCard size={16} className="text-error" />
-        </div>
-
-        {/* Tooltip for Failed Payment */}
-        {showTooltip && (
-          <div className="absolute top-full left-1/2 transform -translate-x-1/2 mt-2 w-72 z-50">
-            <div className="bg-base-100 rounded-xl p-4 border border-base-300 shadow-xl">
-              <div className="flex items-center justify-between mb-3">
-                <h3 className="font-bold text-base-content">Payment Failed</h3>
-                <button
-                  onClick={() => setShowTooltip(false)}
-                  className="text-base-content/50 hover:text-base-content"
-                >
-                  <X size={14} />
-                </button>
-              </div>
-              <p className="text-sm text-base-content/70 mb-4">
-                Your last payment attempt failed. Please try again or contact support if the issue persists.
-              </p>
-              <div className="space-y-2 text-sm text-base-content/70 mb-4">
-                <div className="flex items-center gap-2">
-                  <div className="w-2 h-2 bg-warning rounded-full"></div>
-                  <span>Check your payment method details</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <div className="w-2 h-2 bg-warning rounded-full"></div>
-                  <span>Ensure sufficient balance</span>
-                </div>
-              </div>
-              <div className="flex gap-2">
-                <button
-                  onClick={onPayClick}
-                  className="flex-1 btn btn-error btn-sm gap-2 hover:scale-105 transition-transform duration-200"
-                >
-                  <CreditCard size={16} />
-                  Retry Payment
-                </button>
-                <button className="btn btn-outline btn-sm gap-2">
-                  <span>Help</span>
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
-      </div>
-    );
-  }
 
   return null;
 };
@@ -260,6 +203,7 @@ const Topbar = ({ pageTitle = "Dashboard", setIsMobileOpen }) => {
   const { user: loggedInUser } = useUser();
   const [shopData, setShopData] = useState(null);
   const [loading, setLoading] = useState(true);
+  const router = useRouter();
 
   // Fetch shop data for mechanics to check payment status
   useEffect(() => {
@@ -318,7 +262,7 @@ const Topbar = ({ pageTitle = "Dashboard", setIsMobileOpen }) => {
 
   // Handle payment click - navigate to shop profile or payment page
   const handlePayClick = () => {
-    window.location.href = '/mechanic-profile';
+    router.push("/dashboard/mechanic/profile");
   };
 
   return (
@@ -340,7 +284,7 @@ const Topbar = ({ pageTitle = "Dashboard", setIsMobileOpen }) => {
         {/* Payment Reminder for Mechanics */}
         {loggedInUser?.role === 'mechanic' && !loading && (
           <PaymentReminder
-            paymentStatus={shopData?.paymentStatus}
+            paymentStatus={shopData?.paymentInfo}
             onPayClick={handlePayClick}
           />
         )}
