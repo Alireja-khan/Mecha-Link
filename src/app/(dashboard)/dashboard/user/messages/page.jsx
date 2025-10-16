@@ -411,6 +411,11 @@ const ConversationListItem = ({ conv, userId, active, onSelect, onDeleteUser }) 
             <div className={`text-xs text-right flex-shrink-0 w-fit self-start mt-1 ${active || hasUnreadMessages ? "text-primary font-bold" : "text-gray-400"}`}>
                 {timeDisplay}
             </div>
+
+            <div>
+                {hasUnreadMessages && (<div className="h-5 w-5 bg-red-500/80 rounded-full absolute -top-1 -right-1 animate-pulse"></div>)}
+            </div>
+
             <div className="relative z-20 flex-shrink-0" ref={menuRef} onClick={(e) => e.stopPropagation()}>
                 <button
                     onClick={() => setIsMenuOpen(!isMenuOpen)}
