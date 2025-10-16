@@ -48,13 +48,13 @@ const Sidebar = ({ isMobileOpen, setIsMobileOpen }) => {
     menuItem("Dashboard", <LayoutDashboard size={20} />, `/dashboard/${role}`),
     menuItem("Profile", <User size={20} />, `/dashboard/${role}/profile`),
     menuItem("Settings", <Settings size={20} />, `/dashboard/${role}/settings`),
-    menuItem("Reviews", <Star size={20} />, `/dashboard/${role}/reviews`),
     menuItem("Messages", <MessageSquare size={20} />, `/dashboard/${role}/messages`),
     menuItem("Ask AI", <LucideBrainCircuit size={20} />, `/dashboard/${role}/AskAI`),
   ];
 
   const roleMenu = {
     admin: [
+      menuItem("Reviews", <Star size={20} />, `/dashboard/admin/reviews`),
       menuItem("Manage Shops", <Wrench size={20} />, "/dashboard/admin/manageShops"),
       menuItem("Manage Users", <Users size={20} />, "/dashboard/admin/manageUsers"),
       menuItem("Service Requests", <Users size={20} />, "/dashboard/admin/serviceReq"),
@@ -63,6 +63,7 @@ const Sidebar = ({ isMobileOpen, setIsMobileOpen }) => {
       menuItem("Add Blogs", <PenLine size={20} />, "/dashboard/admin/blogs"),
     ],
     mechanic: [
+      menuItem("Reviews", <Star size={20} />, `/dashboard/mechanic/reviews`),
       menuItem("Requests", <ClipboardList size={20} />, "/dashboard/mechanic/requests"),
       menuItem("Add Shop", <Store size={20} />, "/dashboard/mechanic/AddMechanicShop"),
     ],
