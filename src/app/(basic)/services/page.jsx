@@ -99,20 +99,7 @@ const Services = () => {
     </div>
   );
 
-  // Stats Skeleton Component
-  // const StatsSkeleton = () => (
-  //   <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 mb-8 animate-pulse">
-  //     {[...Array(4)].map((_, index) => (
-  //       <div key={index} className="bg-white rounded-2xl shadow-lg p-6 border border-gray-200">
-  //         <div className="skeleton bg-gray-200 h-12 w-12 rounded-xl mb-3"></div>
-  //         <div className="skeleton bg-gray-200 h-6 w-20 rounded mb-2"></div>
-  //         <div className="skeleton bg-gray-200 h-8 w-16 rounded"></div>
-  //       </div>
-  //     ))}
-  //   </div>
-  // );
 
-  // Pagination Skeleton
   const PaginationSkeleton = () => (
     <div className="flex flex-col md:flex-row justify-between mt-8 items-center gap-4 animate-pulse">
       <div className="flex items-center gap-3">
@@ -157,23 +144,7 @@ const Services = () => {
                   Connect with certified mechanics and service shops. Browse ratings, services, and locations to find the perfect match for your needs.
                 </p>
 
-                {/* Quick Actions */}
-                {/* <div className="flex flex-wrap gap-4">
-                  <button
-                    onClick={() => setSortOrder('htl')}
-                    className="bg-white text-orange-600 px-6 py-3 rounded-full font-semibold hover:bg-orange-50 transition-all duration-300 flex items-center gap-2"
-                  >
-                    <Star className="w-5 h-5" />
-                    Top Rated Shops
-                  </button>
-                  <button
-                    onClick={() => setSortOrder('certified')}
-                    className="bg-orange-700 text-white px-6 py-3 rounded-full font-semibold hover:bg-orange-800 transition-all duration-300 flex items-center gap-2"
-                  >
-                    <Award className="w-5 h-5" />
-                    Certified Only
-                  </button>
-                </div> */}
+                
               </div>
 
               {/* Right Illustration/Content */}
@@ -233,44 +204,6 @@ const Services = () => {
               </div>
             </div>
           </div>
-
-          {/* Stats Section */}
-          {/* {loading ? (
-            <StatsSkeleton />
-          ) : (
-            services.length > 0 && (
-              <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-                <div className="bg-white rounded-2xl shadow-lg p-6 border border-gray-200 text-center">
-                  <div className="bg-orange-100 w-12 h-12 rounded-xl flex items-center justify-center mx-auto mb-3">
-                    <Users className="w-6 h-6 text-orange-600" />
-                  </div>
-                  <h3 className="text-gray-600 text-sm font-medium mb-1">Total Shops</h3>
-                  <p className="text-2xl font-bold text-gray-900">{stats.total}</p>
-                </div>
-                <div className="bg-white rounded-2xl shadow-lg p-6 border border-gray-200 text-center">
-                  <div className="bg-orange-100 w-12 h-12 rounded-xl flex items-center justify-center mx-auto mb-3">
-                    <Star className="w-6 h-6 text-orange-600" />
-                  </div>
-                  <h3 className="text-gray-600 text-sm font-medium mb-1">Top Rated</h3>
-                  <p className="text-2xl font-bold text-gray-900">{stats.topRated}</p>
-                </div>
-                <div className="bg-white rounded-2xl shadow-lg p-6 border border-gray-200 text-center">
-                  <div className="bg-orange-100 w-12 h-12 rounded-xl flex items-center justify-center mx-auto mb-3">
-                    <Award className="w-6 h-6 text-orange-600" />
-                  </div>
-                  <h3 className="text-gray-600 text-sm font-medium mb-1">Certified</h3>
-                  <p className="text-2xl font-bold text-gray-900">{stats.certified}</p>
-                </div>
-                <div className="bg-white rounded-2xl shadow-lg p-6 border border-gray-200 text-center">
-                  <div className="bg-orange-100 w-12 h-12 rounded-xl flex items-center justify-center mx-auto mb-3">
-                    <Shield className="w-6 h-6 text-orange-600" />
-                  </div>
-                  <h3 className="text-gray-600 text-sm font-medium mb-1">Active</h3>
-                  <p className="text-2xl font-bold text-gray-900">{stats.active}</p>
-                </div>
-              </div>
-            )
-          )} */}
 
           {/* Loading State */}
           {loading && (

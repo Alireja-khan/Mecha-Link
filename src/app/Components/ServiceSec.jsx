@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from "react";
 import ServiceCard from "./ServiceCard";
 import Link from "next/link";
+import SpecificServices from "./SpecificServices";
 
 export default function ServiceSec() {
   const [services, setServices] = useState([]);
@@ -63,6 +64,9 @@ export default function ServiceSec() {
   return (
     <>
       <section className="py-20">
+        <div>
+          <SpecificServices></SpecificServices>
+        </div>
         <div className="container">
           {loading ? (
             <SectionHeaderSkeleton />
