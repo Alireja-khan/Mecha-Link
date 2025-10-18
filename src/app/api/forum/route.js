@@ -34,11 +34,11 @@ async function getUserFromSession(req) {
   }
 }
 
-// 🟢 CREATE POST - Modified to accept user data from frontend
+// 🟢 CREATE POST - Updated for rich content
 export async function POST(req) {
   try {
     const body = await req.json();
-    const { content, image, authorId, authorName, authorRole, authorImage } = body;
+    const { content, image, authorId, authorName, authorRole, authorImage, category } = body;
 
     if (!content || !authorId) {
       return NextResponse.json({ success: false, message: "Content and author ID are required" }, { status: 400 });
@@ -52,6 +52,7 @@ export async function POST(req) {
       authorImage: authorImage || null,
       content,
       image: image || null,
+      category: category || "general", // Add category support
       likes: [],
       comments: [],
       reports: [],
@@ -65,17 +66,27 @@ export async function POST(req) {
   }
 }
 
-// 🟣 GET ALL POSTS
+// 🟣 GET ALL POSTS - Updated for search and categories
 export async function GET(req) {
   try {
     const { searchParams } = new URL(req.url);
     const search = searchParams.get("search");
+    const category = searchParams.get("category");
 
     const collection = await dbConnect(collections.forumPosts);
     let query = {};
 
+    // Search in content
     if (search) {
-      query.content = { $regex: search, $options: "i" };
+      query.$or = [
+        { content: { $regex: search, $options: "i" } },
+        { authorName: { $regex: search, $options: "i" } }
+      ];
+    }
+
+    // Filter by category
+    if (category && category !== "all") {
+      query.category = category;
     }
 
     const result = await collection.find(query).sort({ createdAt: -1 }).toArray();
