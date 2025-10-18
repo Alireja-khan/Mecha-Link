@@ -1,4 +1,3 @@
-// app/profile/[userId].js
 
 "use client";
 

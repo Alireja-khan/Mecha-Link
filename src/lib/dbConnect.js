@@ -14,6 +14,7 @@ export const collections = {
   notifications: "notifications",
   reviews: "reviews",
   blogs: "blogs",
+  forumPosts: "forumPosts",
 };
 
 let client;
@@ -35,7 +36,7 @@ if (process.env.NODE_ENV === "development") {
   clientPromise = global._mongoClientPromise;
 } else {
   client = new MongoClient(uri, {
-    serverApi: {
+    serverApi: {  
       version: ServerApiVersion.v1,
       strict: true,
       deprecationErrors: true,
