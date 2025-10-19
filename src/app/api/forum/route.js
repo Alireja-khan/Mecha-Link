@@ -5,16 +5,6 @@ import { ObjectId } from "mongodb";
 // Simple helper to get user from session ID
 async function getUserFromSession(req) {
   try {
-    // Get the user ID from the request headers or session
-    const authHeader = req.headers.get('authorization');
-    
-    if (authHeader) {
-      // If you're using bearer token, extract user ID
-      const token = authHeader.replace('Bearer ', '');
-      // You might need to decode JWT here or get user from session
-    }
-    
-    // For now, let's use a simpler approach - get user from query or body
     const { searchParams } = new URL(req.url);
     const userId = searchParams.get("userId");
     
