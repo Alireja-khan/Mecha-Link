@@ -2,12 +2,13 @@
 import { useState } from "react";
 import MDEditor from "@uiw/react-md-editor";
 import { CATEGORIES, CATEGORY_COLORS } from "@/lib/forumConstants";
-import { Heart, MessageCircle, Share, Flag, MoreVertical, Clock, User, Trash2, Edit } from "lucide-react";
+import { Heart, MessageCircle, ThumbsDown, Flag, MoreVertical, Clock, User, Trash2 } from "lucide-react";
 
 const PostCard = ({ post, onUpdate, currentUser }) => {
     const [showCommentForm, setShowCommentForm] = useState(false);
     const [commentText, setCommentText] = useState("");
     const [showOptions, setShowOptions] = useState(false);
+    const [showComments, setShowComments] = useState(false);
 
     const handleLike = async () => {
         if (!currentUser) return;
@@ -30,6 +31,30 @@ const PostCard = ({ post, onUpdate, currentUser }) => {
             }
         } catch (error) {
             console.error("Error liking post:", error);
+        }
+    };
+
+    const handleDislike = async () => {
+        if (!currentUser) return;
+        
+        try {
+            const res = await fetch("/api/forum", {
+                method: "PATCH",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    postId: post._id,
+                    action: "dislike",
+                    userId: currentUser._id,
+                }),
+            });
+
+            if (res.ok) {
+                onUpdate();
+            }
+        } catch (error) {
+            console.error("Error disliking post:", error);
         }
     };
 
@@ -85,7 +110,13 @@ const PostCard = ({ post, onUpdate, currentUser }) => {
         }
     };
 
+    const toggleComments = () => {
+        setShowComments(!showComments);
+        setShowCommentForm(false);
+    };
+
     const isLiked = post.likes.includes(currentUser?._id);
+    const isDisliked = post.dislikes?.includes(currentUser?._id); // Make sure dislikes array exists
 
     // Get first letter for avatar fallback
     const getInitial = (name) => {
@@ -108,6 +139,8 @@ const PostCard = ({ post, onUpdate, currentUser }) => {
         if (diffInHours < 168) return `${Math.floor(diffInHours / 24)}d ago`;
         return date.toLocaleDateString();
     };
+
+    const commentsContainerHeight = "200px";
 
     return (
         <div className="bg-base-100 rounded-3xl p-6 border border-neutral shadow-xl hover:shadow-2xl transition-all duration-300">
@@ -192,10 +225,6 @@ const PostCard = ({ post, onUpdate, currentUser }) => {
                                     <Flag size={16} />
                                     Report
                                 </button>
-                                <button className="flex items-center gap-2 w-full px-4 py-3 text-base-content hover:bg-base-200 rounded-xl transition-colors duration-200">
-                                    <Share size={16} />
-                                    Share
-                                </button>
                             </div>
                         )}
                     </div>
@@ -224,13 +253,18 @@ const PostCard = ({ post, onUpdate, currentUser }) => {
                     <span>{post.likes.length} likes</span>
                 </div>
                 <div className="flex items-center gap-2">
+                    <ThumbsDown size={16} className={isDisliked ? "text-blue-500 fill-blue-500" : ""} />
+                    <span>{post.dislikes?.length || 0} dislikes</span>
+                </div>
+                <div className="flex items-center gap-2">
                     <MessageCircle size={16} />
                     <span>{post.comments.length} comments</span>
                 </div>
             </div>
 
-            {/* Post Actions */}
+            {/* Post Actions - YouTube Style Like/Dislike */}
             <div className="flex items-center gap-2 border-t border-b border-neutral py-4 mb-6">
+                {/* Like Button */}
                 <button
                     onClick={handleLike}
                     disabled={!currentUser}
@@ -241,14 +275,29 @@ const PostCard = ({ post, onUpdate, currentUser }) => {
                     } ${!currentUser ? "opacity-50 cursor-not-allowed" : "hover:scale-105"}`}
                 >
                     <Heart size={18} className={isLiked ? "fill-current" : ""} />
-                    {isLiked ? "Liked" : "Like"}
+                    Like
                 </button>
                 
+                {/* Dislike Button */}
                 <button
-                    onClick={() => setShowCommentForm(!showCommentForm)}
+                    onClick={handleDislike}
                     disabled={!currentUser}
                     className={`flex items-center gap-2 flex-1 justify-center py-3 rounded-xl transition-all duration-300 ${
-                        showCommentForm
+                        isDisliked 
+                        ? "bg-blue-500/10 text-blue-500 border border-blue-500/20" 
+                        : "bg-base-200 text-base-content hover:bg-base-300 border border-transparent"
+                    } ${!currentUser ? "opacity-50 cursor-not-allowed" : "hover:scale-105"}`}
+                >
+                    <ThumbsDown size={18} className={isDisliked ? "fill-current" : ""} />
+                    Dislike
+                </button>
+                
+                {/* Comment Button */}
+                <button
+                    onClick={toggleComments}
+                    disabled={!currentUser}
+                    className={`flex items-center gap-2 flex-1 justify-center py-3 rounded-xl transition-all duration-300 ${
+                        showComments || showCommentForm
                         ? "bg-primary/10 text-primary border border-primary/20" 
                         : "bg-base-200 text-base-content hover:bg-base-300 border border-transparent"
                     } ${!currentUser ? "opacity-50 cursor-not-allowed" : "hover:scale-105"}`}
@@ -256,93 +305,112 @@ const PostCard = ({ post, onUpdate, currentUser }) => {
                     <MessageCircle size={18} />
                     Comment
                 </button>
-                
-                <button
-                    disabled={!currentUser}
-                    className="flex items-center gap-2 flex-1 justify-center py-3 bg-base-200 text-base-content rounded-xl hover:bg-base-300 border border-transparent transition-all duration-300 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                    <Share size={18} />
-                    Share
-                </button>
             </div>
 
             {/* Comments Section */}
-            <div className="space-y-4">
-                {post.comments.map((comment) => (
-                    <div key={comment._id} className="flex gap-4 p-4 bg-base-200 rounded-2xl border border-neutral/50 hover:bg-base-300 transition-colors duration-200">
-                        {/* Comment Avatar */}
-                        <div className="flex-shrink-0">
-                            {comment.userImage ? (
-                                <img
-                                    src={comment.userImage}
-                                    alt={comment.userName}
-                                    className="w-8 h-8 rounded-xl object-cover"
-                                />
-                            ) : (
-                                <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-primary to-orange-600 flex items-center justify-center text-white text-xs font-bold">
-                                    {getInitial(comment.userName)}
+            {(showComments || showCommentForm) && (
+                <div className="space-y-4">
+                    {/* Comments List with Scrollable Container */}
+                    {post.comments.length > 0 && (
+                        <div 
+                            className="space-y-4 overflow-y-auto"
+                            style={{ maxHeight: commentsContainerHeight }}
+                        >
+                            {post.comments.map((comment) => (
+                                <div key={comment._id} className="flex gap-4 p-4 bg-base-200 rounded-2xl border border-neutral/50 hover:bg-base-300 transition-colors duration-200">
+                                    {/* Comment Avatar */}
+                                    <div className="flex-shrink-0">
+                                        {comment.userImage ? (
+                                            <img
+                                                src={comment.userImage}
+                                                alt={comment.userName}
+                                                className="w-8 h-8 rounded-xl object-cover"
+                                            />
+                                        ) : (
+                                            <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-primary to-orange-600 flex items-center justify-center text-white text-xs font-bold">
+                                                {getInitial(comment.userName)}
+                                            </div>
+                                        )}
+                                    </div>
+                                    
+                                    <div className="flex-1 min-w-0">
+                                        <div className="flex items-center gap-2 mb-1">
+                                            <p className="font-semibold text-sm text-base-content">{comment.userName}</p>
+                                            <span className="text-xs text-base-content/50">
+                                                {formatRelativeTime(comment.createdAt)}
+                                            </span>
+                                        </div>
+                                        <p className="text-base-content/80 text-sm leading-relaxed">{comment.text}</p>
+                                    </div>
                                 </div>
-                            )}
+                            ))}
                         </div>
-                        
-                        <div className="flex-1 min-w-0">
-                            <div className="flex items-center gap-2 mb-1">
-                                <p className="font-semibold text-sm text-base-content">{comment.userName}</p>
-                                <span className="text-xs text-base-content/50">
-                                    {formatRelativeTime(comment.createdAt)}
-                                </span>
-                            </div>
-                            <p className="text-base-content/80 text-sm leading-relaxed">{comment.text}</p>
-                        </div>
-                    </div>
-                ))}
+                    )}
 
-                {/* Comment Form */}
-                {showCommentForm && (
-                    <form onSubmit={handleComment} className="flex gap-4 p-4 bg-base-200 rounded-2xl border border-neutral/50">
-                        {/* Current User Avatar */}
-                        <div className="flex-shrink-0">
-                            {currentUser?.profileImage ? (
-                                <img
-                                    src={currentUser.profileImage}
-                                    alt={currentUser.name}
-                                    className="w-8 h-8 rounded-xl object-cover"
-                                />
-                            ) : (
-                                <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-primary to-orange-600 flex items-center justify-center text-white text-xs font-bold">
-                                    {getInitial(currentUser?.name)}
-                                </div>
-                            )}
-                        </div>
-                        
-                        <div className="flex-1">
-                            <input
-                                type="text"
-                                value={commentText}
-                                onChange={(e) => setCommentText(e.target.value)}
-                                placeholder="Write your comment..."
-                                className="w-full px-4 py-3 bg-base-100 border border-neutral rounded-xl focus:outline-none focus:border-primary/50 focus:bg-base-50 text-base-content placeholder-base-content/40"
-                                required
-                            />
-                            <div className="flex justify-end gap-2 mt-3">
-                                <button
-                                    type="button"
-                                    onClick={() => setShowCommentForm(false)}
-                                    className="px-4 py-2 text-base-content/60 hover:text-base-content transition-colors duration-200"
-                                >
-                                    Cancel
-                                </button>
-                                <button
-                                    type="submit"
-                                    className="bg-primary text-primary-content px-6 py-2 rounded-xl font-semibold hover:bg-orange-700 transition-all duration-300 hover:scale-105"
-                                >
-                                    Post Comment
-                                </button>
+                    {/* Comment Form */}
+                    {showCommentForm && (
+                        <form onSubmit={handleComment} className="flex gap-4 p-4 bg-base-200 rounded-2xl border border-neutral/50">
+                            {/* Current User Avatar */}
+                            <div className="flex-shrink-0">
+                                {currentUser?.profileImage ? (
+                                    <img
+                                        src={currentUser.profileImage}
+                                        alt={currentUser.name}
+                                        className="w-8 h-8 rounded-xl object-cover"
+                                    />
+                                ) : (
+                                    <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-primary to-orange-600 flex items-center justify-center text-white text-xs font-bold">
+                                        {getInitial(currentUser?.name)}
+                                    </div>
+                                )}
                             </div>
+                            
+                            <div className="flex-1">
+                                <input
+                                    type="text"
+                                    value={commentText}
+                                    onChange={(e) => setCommentText(e.target.value)}
+                                    placeholder="Write your comment..."
+                                    className="w-full px-4 py-3 bg-base-100 border border-neutral rounded-xl focus:outline-none focus:border-primary/50 focus:bg-base-50 text-base-content placeholder-base-content/40"
+                                    required
+                                />
+                                <div className="flex justify-end gap-2 mt-3">
+                                    <button
+                                        type="button"
+                                        onClick={() => {
+                                            setShowCommentForm(false);
+                                            if (post.comments.length === 0) {
+                                                setShowComments(false);
+                                            }
+                                        }}
+                                        className="px-4 py-2 text-base-content/60 hover:text-base-content transition-colors duration-200"
+                                    >
+                                        Cancel
+                                    </button>
+                                    <button
+                                        type="submit"
+                                        className="bg-primary text-primary-content px-6 py-2 rounded-xl font-semibold hover:bg-orange-700 transition-all duration-300 hover:scale-105"
+                                    >
+                                        Post Comment
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    )}
+
+                    {/* Show Comment Form Button when comments are visible but form isn't */}
+                    {showComments && !showCommentForm && (
+                        <div className="flex justify-center">
+                            <button
+                                onClick={() => setShowCommentForm(true)}
+                                className="bg-primary text-primary-content px-6 py-3 rounded-xl font-semibold hover:bg-orange-700 transition-all duration-300 hover:scale-105"
+                            >
+                                Add a Comment
+                            </button>
                         </div>
-                    </form>
-                )}
-            </div>
+                    )}
+                </div>
+            )}
         </div>
     );
 };

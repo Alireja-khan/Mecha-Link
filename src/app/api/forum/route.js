@@ -87,7 +87,7 @@ export async function GET(req) {
   }
 }
 
-// 🟡 UPDATE (LIKE, COMMENT, REPORT)
+// 🟡 UPDATE (LIKE, DISLIKE, COMMENT, REPORT)
 export async function PATCH(req) {
   try {
     const body = await req.json();
@@ -108,9 +108,24 @@ export async function PATCH(req) {
         if (!userId) {
           return NextResponse.json({ success: false, message: "User ID required for like" }, { status: 400 });
         }
-        update = post.likes.includes(userId)
-          ? { $pull: { likes: userId } }
-          : { $addToSet: { likes: userId } };
+        // Remove from dislikes if user disliked before
+        // Add to likes and remove from dislikes
+        update = {
+          $addToSet: { likes: userId },
+          $pull: { dislikes: userId }
+        };
+        break;
+
+      case "dislike":
+        if (!userId) {
+          return NextResponse.json({ success: false, message: "User ID required for dislike" }, { status: 400 });
+        }
+        // Remove from likes if user liked before
+        // Add to dislikes and remove from likes
+        update = {
+          $addToSet: { dislikes: userId },
+          $pull: { likes: userId }
+        };
         break;
 
       case "comment":
