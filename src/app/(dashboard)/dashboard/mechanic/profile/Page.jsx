@@ -388,7 +388,7 @@ const MechanicProfile = ({ shopId }) => {
                         {/* Certifications */}
                         {processedShopData.certifications.length > 0 && (
                             <div className="bg-base-100 rounded-3xl p-6 mt-5 border border-neutral/40">
-                                <h2 className="text-xl font-bold text-base-content mb-4">Certifications</h2>
+                                <h2 className="text-xl font-extrabold text-base-content mb-4">Certification</h2>
                                 <div className="flex flex-wrap gap-2">
                                     {processedShopData.certifications.map((cert, i) => (
                                         <span
