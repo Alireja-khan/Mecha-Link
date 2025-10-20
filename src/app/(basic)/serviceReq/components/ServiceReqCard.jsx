@@ -3,16 +3,14 @@
 import useUser from "@/hooks/useUser";
 import { Wrench, AlertTriangle, Eye, Clock, Zap, HardHat, User, Mail, CheckCircle, Circle, Phone, MoreVertical, MessageSquare } from "lucide-react";
 import Link from "next/link";
-// The 'Router' import is unnecessary for the Link component
-// import { Router } from "next/router"; 
+
 import React, { useState, useEffect, useRef } from "react";
-// import Loading from "../../../Components/Loading"
+
 
 const ServiceReqCard = ({ request }) => {
   const [userData, setUserData] = useState(null);
   const [loadingUser, setLoadingUser] = useState(false);
   const { user: loggedInUser } = useUser()
-  // const [loading, setLoading] = useState(true);
 
   // Fetch user data when component mounts
   useEffect(() => {
@@ -370,14 +368,6 @@ const ServiceReqCard = ({ request }) => {
       </div>
     );
   }
-
-  // if (loading) {
-  //   return (
-  //     <div className="flex items-center justify-center h-screen">
-  //       <Loading></Loading>
-  //     </div>
-  //   );
-  // }
 
 
   return (

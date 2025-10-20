@@ -14,6 +14,7 @@ export const collections = {
   notifications: "notifications",
   reviews: "reviews",
   blogs: "blogs",
+  payments: "payments",
 };
 
 let client;
