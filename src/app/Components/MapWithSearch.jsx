@@ -127,7 +127,7 @@ export default function MapWithSearch() {
 
   return (
     <section className="py-16 bg-base-100 text-text font-poppins">
-      <div className="container mx-auto px-4">
+      <div className="lg:container mx-auto px-6">
         {/* Section Header */}
         <div className="text-center mb-12">
           <h2 className="text-4xl md:text-5xl font-bold mb-4 font-urbanist text-base-content">

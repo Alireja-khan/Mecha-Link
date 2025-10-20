@@ -86,7 +86,7 @@ export default function Newsletter() {
 
   return (
     <section className="py-12 sm:py-16 lg:py-24 bg-base-100 ">
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-6xl">
+      <div className="lg:container mx-auto px-6 max-w-6xl">
         <div className="flex flex-col lg:flex-row items-center bg-base-100 rounded-3xl shadow-xl overflow-hidden border border-base-content/10">
 
           {/* LEFT SIDE */}
