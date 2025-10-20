@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react";
 import ServiceReqCard from "./components/ServiceReqCard";
 import { Search, Filter, AlertTriangle, TrendingUp, Users, Clock, ArrowRight, Grid, List } from "lucide-react";
-import Loading from "../../Components/Loading"
 
 // Fallback image URL
 const BACKGROUND_IMAGE_URL =

@@ -2,8 +2,8 @@
 
 import React, { useEffect, useState } from "react";
 import ServiceCard from "@/app/Components/ServiceCard";
-import { Search, Filter, Star, MapPin, Users, Award, Shield, Sparkles } from "lucide-react";
-import Loading from "../../Components/Loading"
+import { Search, Filter, MapPin, Sparkles } from "lucide-react";
+
 
 const Services = () => {
   const [totalData, setTotalData] = useState([]);
@@ -27,7 +27,6 @@ const Services = () => {
       .then((res) => res.json())
       .then((data) => {
         setTotalData(data);
-        // Calculate stats from data
         if (data.result) {
           const shops = data.result;
           setStats({
