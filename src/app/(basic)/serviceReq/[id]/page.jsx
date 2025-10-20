@@ -4,12 +4,12 @@ import {
     Phone, MapPin, Wrench, CalendarClock, Clock, User, AlertTriangle,
     DollarSign, MessageCircle, Shield, CheckCircle, XCircle, Mail,
     Map, Image as ImageIcon, Trash2, Star, Navigation, Share2, Users,
-    Calendar, Check, Award, Headset, MessageSquare
+    Calendar, Check, Award, Headset, MessageSquare,
+    X
 } from "lucide-react";
 import { useParams } from "next/navigation";
 import Swal from 'sweetalert2';
 import useUser from "@/hooks/useUser";
-import Loading from "../../../Components/Loading"
 
 const ServiceRequestDetails = () => {
     const [selectedImage, setSelectedImage] = useState(null);
@@ -18,10 +18,20 @@ const ServiceRequestDetails = () => {
     const [loading, setLoading] = useState(true);
     const { id } = useParams();
     const { user: loggedInUser, status } = useUser();
-    
 
-    const customerUserId = request?.userId;
     const currentMechanicId = loggedInUser?._id;
+
+    useEffect(() => {
+        if (selectedImage) {
+            document.body.style.overflow = "hidden";
+        } else {
+            document.body.style.overflow = "auto";
+        }
+
+        return () => {
+            document.body.style.overflow = "auto";
+        };
+    }, [selectedImage]);
 
     useEffect(() => {
         if (!id) return;
@@ -77,12 +87,12 @@ const ServiceRequestDetails = () => {
 
     // Skeleton Components
     const HeroSkeleton = () => (
-        <div className="relative bg-gradient-to-r from-orange-500 via-orange-600 to-red-600 overflow-hidden text-white py-12">
+        <div className="relative bg-gradient-to-r from-primary via-orange-600 to-red-600 overflow-hidden text-white py-12">
             <div className="absolute inset-0 bg-black/10"></div>
             <div className="absolute top-0 left-0 w-72 h-72 bg-white/10 rounded-full -translate-x-1/2 -translate-y-1/2"></div>
             <div className="absolute bottom-0 right-0 w-96 h-96 bg-white/5 rounded-full translate-x-1/3 translate-y-1/3"></div>
 
-            <div className="container relative z-10">
+            <div className="lg:container mx-auto px-6 relative z-10">
                 <div className="flex flex-col lg:flex-row gap-8 items-center">
                     {/* Device Image Skeleton */}
                     <div className="relative h-100 w-200 rounded-2xl overflow-hidden ring-2 ring-white shadow-2xl animate-pulse">
@@ -123,18 +133,18 @@ const ServiceRequestDetails = () => {
     );
 
     const CardSkeleton = ({ title = true, items = 3 }) => (
-        <div className="bg-white rounded-2xl shadow-lg p-8 border border-orange-100 animate-pulse">
+        <div className="bg-base-200 rounded-2xl shadow-lg p-8 border border-neutral animate-pulse">
             {title && (
                 <div className="flex items-center gap-3 mb-6">
-                    <div className="skeleton bg-gray-200 w-10 h-10 rounded-lg"></div>
-                    <div className="skeleton bg-gray-200 h-7 w-48 rounded"></div>
+                    <div className="skeleton bg-base-300 w-10 h-10 rounded-lg"></div>
+                    <div className="skeleton bg-base-300 h-7 w-48 rounded"></div>
                 </div>
             )}
             <div className="space-y-4">
                 {[...Array(items)].map((_, index) => (
                     <div key={index} className="space-y-2">
-                        <div className="skeleton bg-gray-200 h-4 w-32 rounded"></div>
-                        <div className="skeleton bg-gray-200 h-6 w-full rounded"></div>
+                        <div className="skeleton bg-base-300 h-4 w-32 rounded"></div>
+                        <div className="skeleton bg-base-300 h-6 w-full rounded"></div>
                     </div>
                 ))}
             </div>
@@ -142,21 +152,21 @@ const ServiceRequestDetails = () => {
     );
 
     const CustomerCardSkeleton = () => (
-        <div className="bg-white rounded-2xl shadow-lg p-7 border border-orange-100 animate-pulse">
+        <div className="bg-base-200 rounded-2xl shadow-lg p-7 border border-neutral animate-pulse">
             <div className="flex items-center gap-3 mb-6">
-                <div className="skeleton bg-gray-200 w-10 h-10 rounded-lg"></div>
-                <div className="skeleton bg-gray-200 h-7 w-48 rounded"></div>
+                <div className="skeleton bg-base-300 w-10 h-10 rounded-lg"></div>
+                <div className="skeleton bg-base-300 h-7 w-48 rounded"></div>
             </div>
-            
+
             <div className="flex justify-center mb-4">
-                <div className="skeleton bg-gray-200 w-54 h-44 rounded-md"></div>
+                <div className="skeleton bg-base-300 w-54 h-44 rounded-md"></div>
             </div>
 
             <div className="space-y-4">
                 {[...Array(4)].map((_, index) => (
                     <div key={index} className="space-y-2">
-                        <div className="skeleton bg-gray-200 h-3 w-24 rounded"></div>
-                        <div className="skeleton bg-gray-200 h-4 w-full rounded"></div>
+                        <div className="skeleton bg-base-300 h-3 w-24 rounded"></div>
+                        <div className="skeleton bg-base-300 h-4 w-full rounded"></div>
                     </div>
                 ))}
             </div>
@@ -164,7 +174,7 @@ const ServiceRequestDetails = () => {
     );
 
     const ActionCardSkeleton = () => (
-        <div className="bg-gradient-to-br from-orange-500 to-orange-600 rounded-2xl shadow-lg p-7 text-white animate-pulse">
+        <div className="bg-gradient-to-br from-primary to-orange-600 rounded-2xl shadow-lg p-7 text-white animate-pulse">
             <div className="flex items-center gap-4 mb-5">
                 <div className="skeleton bg-white/30 w-12 h-12 rounded-xl"></div>
                 <div className="skeleton bg-white/30 h-6 w-32 rounded"></div>
@@ -173,13 +183,13 @@ const ServiceRequestDetails = () => {
         </div>
     );
 
-    if (loading) {
+    if (loading || !request) {
         return (
-            <div className="min-h-screen bg-gradient-to-br from-orange-50 to-white">
+            <div className="min-h-screen bg-base-100">
                 <HeroSkeleton />
-                
+
                 {/* Main Content Skeleton */}
-                <div className="container py-8">
+                <div className="lg:container mx-auto px-6 py-8">
                     <div className="grid lg:grid-cols-3 gap-8">
                         {/* Left Column - Main Content */}
                         <div className="lg:col-span-2 space-y-8">
@@ -201,14 +211,6 @@ const ServiceRequestDetails = () => {
         );
     }
 
-    if (!request) {
-        return (
-            <div className="flex items-center justify-center h-screen">
-                <Loading></Loading>
-            </div>
-        );
-    }
-
     const statusConfig = {
         pending: {
             color: "bg-yellow-100 text-yellow-800 border-yellow-200",
@@ -218,7 +220,7 @@ const ServiceRequestDetails = () => {
         },
         accepted: {
             color: "bg-orange-100 text-orange-800 border-orange-200",
-            gradient: "from-orange-500 to-orange-600",
+            gradient: "from-primary to-orange-600",
             icon: CheckCircle,
             label: "Accepted"
         },
@@ -230,7 +232,7 @@ const ServiceRequestDetails = () => {
         },
         completed: {
             color: "bg-green-100 text-green-800 border-green-200",
-            gradient: "from-green-500 to-green-600",
+            gradient: "from-success to-green-600",
             icon: Shield,
             label: "Completed"
         },
@@ -246,10 +248,10 @@ const ServiceRequestDetails = () => {
     const StatusIcon = statusInfo.icon;
 
     const urgencyConfig = {
-        low: { color: "text-green-600 bg-green-50 border-green-200", label: "Low Priority" },
-        medium: { color: "text-yellow-600 bg-yellow-50 border-yellow-200", label: "Medium Priority" },
-        high: { color: "text-orange-600 bg-orange-50 border-orange-200", label: "High Priority" },
-        emergency: { color: "text-red-600 bg-red-50 border-red-200", label: "Emergency" }
+        low: { color: "text-success bg-success/20 border-success", label: "Low Priority" },
+        medium: { color: "text-warning bg-warning/20 border-warning", label: "Medium Priority" },
+        high: { color: "text-primary bg-primary/20 border-primary", label: "High Priority" },
+        emergency: { color: "text-error bg-error/20 border-error", label: "Emergency" }
     };
 
     const urgencyInfo = urgencyConfig[request.serviceDetails?.urgency] || urgencyConfig.medium;
@@ -262,7 +264,8 @@ const ServiceRequestDetails = () => {
     const showCallButton = (loggedInUserRole === 'mechanic' || loggedInUserRole === 'admin' || loggedInUserRole === 'shop') && !isCustomerViewingOwnRequest;
 
     // Get device image - use first problem image or a placeholder
-    const deviceImage = request.serviceDetails?.images?.[0] || null;
+    const deviceImages = request.serviceDetails?.images || [];
+
 
     const handleAcceptRequest = async () => {
         if (loggedInUserRole !== 'mechanic' && loggedInUserRole !== 'shop') {
@@ -479,27 +482,50 @@ const ServiceRequestDetails = () => {
         }
     };
 
-    
-
     return (
-        <div className="min-h-screen bg-gradient-to-br from-orange-50 to-white">
+        <div className="min-h-screen bg-base-100">
             {/* Hero Section with Device Image */}
-            <div className="relative bg-gradient-to-r from-orange-500 via-orange-600 to-red-600 overflow-hidden text-white py-12">
+            <div className="relative bg-gradient-to-r from-primary via-orange-600 to-red-600 overflow-hidden text-white py-12">
                 {/* Background Pattern */}
                 <div className="absolute inset-0 bg-black/10"></div>
                 <div className="absolute top-0 left-0 w-72 h-72 bg-white/10 rounded-full -translate-x-1/2 -translate-y-1/2"></div>
                 <div className="absolute bottom-0 right-0 w-96 h-96 bg-white/5 rounded-full translate-x-1/3 translate-y-1/3"></div>
 
-                <div className="container relative z-10">
+                <div className="lg:container mx-auto px-6 relative z-10">
                     <div className="flex flex-col lg:flex-row gap-8 items-center">
                         {/* Device Image */}
-                        {deviceImage && (
-                            <div className="relative h-100 w-200 rounded-2xl overflow-hidden ring-2 ring-white shadow-2xl">
-                                <img
-                                    src={deviceImage}
-                                    alt="Device requiring service"
-                                    className="w-full h-full object-cover"
-                                />
+                        {deviceImages.length > 0 && (
+                            <div className="">
+                                {/* Dynamic Grid */}
+                                <div
+                                    className={`grid gap-4 sm:h-100 h-80 md:w-200 w-full ${deviceImages.length === 1
+                                        ? "grid-cols-1"
+                                        : deviceImages.length === 2
+                                            ? "grid-cols-2"
+                                            : deviceImages.length === 3
+                                                ? "grid-cols-3"
+                                                : "grid-cols-4"
+                                        }`}
+                                >
+                                    {deviceImages.map((img, index) => (
+                                        <div
+                                            key={index}
+                                            className="relative rounded-xl border-2 border-white overflow-hidden ring-1 ring-neutral/50 shadow-lg cursor-pointer transition-transform duration-300 hover:scale-[1.01]"
+                                            onClick={() => setSelectedImage(img)}
+                                        >
+                                            <img
+                                                src={img}
+                                                alt={`Device requiring service ${index + 1}`}
+                                                className="w-full h-full object-cover"
+                                            />
+                                            <div className="absolute inset-0 bg-black/10 opacity-0 hover:opacity-100 flex items-center justify-center transition-opacity">
+                                                <span className="text-white font-bold text-lg p-2 bg-black/50 rounded-lg">
+                                                    View Full Image
+                                                </span>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
                             </div>
                         )}
 
@@ -548,7 +574,7 @@ const ServiceRequestDetails = () => {
                                 {showMessagingButton && (
                                     <button
                                         onClick={handleMessageContact}
-                                        className="flex items-center gap-3 bg-green-500 backdrop-blur-sm text-white px-8 py-4 rounded-xl font-bold hover:bg-green-600 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-1 min-w-[160px] justify-center"
+                                        className="flex items-center gap-3 bg-success backdrop-blur-sm text-white px-8 py-4 rounded-xl font-bold hover:bg-green-600 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-1 min-w-[160px] justify-center"
                                     >
                                         <MessageSquare className="w-5 h-5" />
                                         <span>Message</span>
@@ -571,15 +597,15 @@ const ServiceRequestDetails = () => {
             </div>
 
             {/* Main Content */}
-            <div className="container py-8">
+            <div className="lg:container mx-auto px-6 py-8">
                 <div className="grid lg:grid-cols-3 gap-8">
                     {/* Left Column - Main Content */}
                     <div className="lg:col-span-2 space-y-8">
                         {/* Service Information Card */}
-                        <div className="bg-white rounded-2xl shadow-lg p-8 border border-orange-100">
-                            <h2 className="text-2xl font-bold mb-6 text-gray-800 flex items-center gap-3">
-                                <div className="bg-orange-100 p-2 rounded-lg">
-                                    <Wrench className="w-6 h-6 text-orange-600" />
+                        <div className="bg-base-200 rounded-2xl shadow-lg p-8 border border-neutral">
+                            <h2 className="text-2xl font-bold mb-6 text-base-content flex items-center gap-3">
+                                <div className="bg-primary/20 p-2 rounded-lg">
+                                    <Wrench className="w-6 h-6 text-primary" />
                                 </div>
                                 Service Information
                             </h2>
@@ -599,10 +625,10 @@ const ServiceRequestDetails = () => {
                         </div>
 
                         {/* Problem Details Card */}
-                        <div className="bg-white rounded-2xl shadow-lg p-8 border border-orange-100">
-                            <h2 className="text-2xl font-bold mb-6 text-gray-800 flex items-center gap-3">
-                                <div className="bg-orange-100 p-2 rounded-lg">
-                                    <AlertTriangle className="w-6 h-6 text-orange-600" />
+                        <div className="bg-base-200 rounded-2xl shadow-lg p-8 border border-neutral">
+                            <h2 className="text-2xl font-bold mb-6 text-base-content flex items-center gap-3">
+                                <div className="bg-primary/20 p-2 rounded-lg">
+                                    <AlertTriangle className="w-6 h-6 text-primary" />
                                 </div>
                                 Problem Details
                             </h2>
@@ -617,8 +643,8 @@ const ServiceRequestDetails = () => {
                                 <DetailItem label="Problem Title" value={request.serviceDetails?.problemTitle} largeValue />
 
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-600 mb-3">Description</label>
-                                    <p className="text-gray-700 bg-orange-50 p-5 rounded-xl border border-orange-200 text-base leading-relaxed shadow-inner">
+                                    <label className="block text-sm font-medium text-base-content/60 mb-3">Description</label>
+                                    <p className="text-base-content bg-primary/10 p-5 rounded-xl border border-primary text-base leading-relaxed shadow-inner">
                                         {request.serviceDetails?.description || "No detailed description provided by the customer."}
                                     </p>
                                 </div>
@@ -628,10 +654,10 @@ const ServiceRequestDetails = () => {
                         </div>
 
                         {/* Service Location Card */}
-                        <div className="bg-white rounded-2xl shadow-lg p-8 border border-orange-100">
-                            <h2 className="text-2xl font-bold mb-6 text-gray-800 flex items-center gap-3">
-                                <div className="bg-orange-100 p-2 rounded-lg">
-                                    <MapPin className="w-6 h-6 text-orange-600" />
+                        <div className="bg-base-200 rounded-2xl shadow-lg p-8 border border-neutral">
+                            <h2 className="text-2xl font-bold mb-6 text-base-content flex items-center gap-3">
+                                <div className="bg-primary/20 p-2 rounded-lg">
+                                    <MapPin className="w-6 h-6 text-primary" />
                                 </div>
                                 Service Location
                             </h2>
@@ -640,7 +666,7 @@ const ServiceRequestDetails = () => {
                                 <DetailItem label="Address" value={request.location?.address} largeValue />
                                 <button
                                     onClick={handleOpenMaps}
-                                    className="flex items-center mt-5 gap-3 bg-gradient-to-r from-orange-500 to-orange-600 text-white py-4 px-8 rounded-xl font-bold hover:from-orange-600 hover:to-orange-700 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 w-full justify-center"
+                                    className="flex items-center mt-5 gap-3 bg-gradient-to-r from-primary to-orange-600 text-white py-4 px-8 rounded-xl font-bold hover:from-orange-600 hover:to-orange-700 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 w-full justify-center"
                                 >
                                     <Navigation className="w-5 h-5" />
                                     Get Directions
@@ -649,10 +675,10 @@ const ServiceRequestDetails = () => {
                         </div>
 
                         {/* Request Timeline Card */}
-                        <div className="bg-white rounded-2xl shadow-lg p-8 border border-orange-100">
-                            <h2 className="text-2xl font-bold mb-6 text-gray-800 flex items-center gap-3">
-                                <div className="bg-orange-100 p-2 rounded-lg">
-                                    <Clock className="w-6 h-6 text-orange-600" />
+                        <div className="bg-base-200 rounded-2xl shadow-lg p-8 border border-neutral">
+                            <h2 className="text-2xl font-bold mb-6 text-base-content flex items-center gap-3">
+                                <div className="bg-primary/20 p-2 rounded-lg">
+                                    <Clock className="w-6 h-6 text-primary" />
                                 </div>
                                 Request Timeline
                             </h2>
@@ -691,10 +717,10 @@ const ServiceRequestDetails = () => {
                     {/* Right Column - Sidebar */}
                     <div className="space-y-8">
                         {/* Customer Information Card */}
-                        <div className="bg-white rounded-2xl shadow-lg p-7 border border-orange-100">
-                            <h3 className="text-xl font-bold mb-6 text-gray-800 flex items-center gap-3">
-                                <div className="bg-orange-100 p-2 rounded-lg">
-                                    <User className="w-6 h-6 text-orange-600" />
+                        <div className="bg-base-200 rounded-2xl shadow-lg p-7 border border-neutral">
+                            <h3 className="text-xl font-bold mb-6 text-base-content flex items-center gap-3">
+                                <div className="bg-primary/20 p-2 rounded-lg">
+                                    <User className="w-6 h-6 text-primary" />
                                 </div>
                                 Customer Information
                             </h3>
@@ -725,8 +751,8 @@ const ServiceRequestDetails = () => {
                                 {displayUser?.address && <DetailItem label="Address" value={displayUser.address} largeValue />}
                                 {displayUser?.bio && <DetailItem label="Bio" value={displayUser.bio} largeValue />}
 
-                                <div className="pt-4 border-t border-orange-200 space-y-2">
-                                    <h3 className="text-sm font-semibold text-gray-600">Request Contact</h3>
+                                <div className="pt-4 mt-4 border-t border-neutral space-y-2">
+                                    <h3 className="text-sm font-semibold text-base-content/60">Request Contact</h3>
                                     <DetailItem label="Service Phone" value={request.contactInfo?.phoneNumber} icon={Phone} />
                                     <DetailItem
                                         label="Alternate Phone"
@@ -744,10 +770,10 @@ const ServiceRequestDetails = () => {
                         </div>
 
                         {/* Schedule & Budget Card */}
-                        <div className="bg-white rounded-2xl shadow-lg p-7 border border-orange-100">
-                            <h3 className="text-xl font-bold mb-6 text-gray-800 flex items-center gap-3">
-                                <div className="bg-orange-100 p-2 rounded-lg">
-                                    <CalendarClock className="w-6 h-6 text-orange-600" />
+                        <div className="bg-base-200 rounded-2xl shadow-lg p-7 border border-neutral">
+                            <h3 className="text-xl font-bold mb-6 text-base-content flex items-center gap-3">
+                                <div className="bg-primary/20 p-2 rounded-lg">
+                                    <CalendarClock className="w-6 h-6 text-primary" />
                                 </div>
                                 Schedule & Budget
                             </h3>
@@ -773,7 +799,7 @@ const ServiceRequestDetails = () => {
                                         request.preferredSchedule.flexibility.slice(1) : "Flexible"
                                     }
                                 />
-                                <div className="pt-3 border-t border-orange-200">
+                                <div className="pt-3 mt-3 border-t border-neutral">
                                     <DetailItem
                                         label="Estimated Budget"
                                         value={request.estimatedBudget ?
@@ -787,7 +813,7 @@ const ServiceRequestDetails = () => {
 
                         {/* Service Action Cards */}
                         {(loggedInUserRole === 'mechanic' || loggedInUserRole === 'shop') && request.status === 'pending' && (
-                            <div className="bg-gradient-to-br from-orange-500 to-orange-600 rounded-2xl shadow-lg p-7 text-white">
+                            <div className="bg-gradient-to-br from-primary to-orange-600 rounded-2xl shadow-lg p-7 text-white">
                                 <div className="flex items-center gap-4 mb-5">
                                     <div className="bg-white/20 p-3 rounded-xl">
                                         <CheckCircle className="w-6 h-6" />
@@ -805,7 +831,7 @@ const ServiceRequestDetails = () => {
                         )}
 
                         {request.status === 'in-progress' && isShopOwnerAcceptedRequest && (
-                            <div className="bg-gradient-to-br from-green-500 to-green-600 rounded-2xl shadow-lg p-7 text-white">
+                            <div className="bg-gradient-to-br from-success to-green-600 rounded-2xl shadow-lg p-7 text-white">
                                 <div className="flex items-center gap-4 mb-5">
                                     <div className="bg-white/20 p-3 rounded-xl">
                                         <Shield className="w-6 h-6" />
@@ -826,24 +852,24 @@ const ServiceRequestDetails = () => {
                         )}
 
                         {request.status !== 'pending' && request.status !== 'in-progress' && (
-                            <div className="bg-white rounded-2xl shadow-lg border border-orange-100 p-7">
+                            <div className="bg-base-200 rounded-2xl shadow-lg border border-neutral p-7">
                                 <div className="flex items-center gap-4 mb-6">
-                                    <div className="bg-orange-100 p-3 rounded-xl">
-                                        <Shield className="w-6 h-6 text-orange-600" />
+                                    <div className="bg-primary/20 p-3 rounded-xl">
+                                        <Shield className="w-6 h-6 text-primary" />
                                     </div>
-                                    <h3 className="text-xl font-bold text-gray-800">Request Status</h3>
+                                    <h3 className="text-xl font-bold text-base-content">Request Status</h3>
                                 </div>
                                 <div className="space-y-3">
-                                    <p className="text-sm text-gray-600">
-                                        Current Status: <span className="font-semibold text-gray-800">{statusInfo.label}</span>
+                                    <p className="text-sm text-base-content/60">
+                                        Current Status: <span className="font-semibold text-base-content/80">{statusInfo.label}</span>
                                     </p>
                                     {request.acceptedDate && (
-                                        <p className="text-sm text-gray-600">
+                                        <p className="text-sm text-base-content/80">
                                             Accepted on: {new Date(request.acceptedDate).toLocaleDateString()}
                                         </p>
                                     )}
                                     {request.completedDate && (
-                                        <p className="text-sm text-gray-600">
+                                        <p className="text-sm text-base-content/80">
                                             Completed on: {new Date(request.completedDate).toLocaleDateString()}
                                         </p>
                                     )}
@@ -857,18 +883,21 @@ const ServiceRequestDetails = () => {
             {/* Image Modal */}
             {selectedImage && (
                 <div
-                    className="fixed inset-0 bg-black/90 flex items-center justify-center z-50 p-4 transition-opacity duration-300"
+                    className="fixed inset-0 bg-black/80 backdrop-blur-md flex items-center justify-center z-[9999] p-4 transition-opacity duration-300"
                     onClick={() => setSelectedImage(null)}
                 >
-                    <div className="max-w-6xl max-h-full" onClick={(e) => e.stopPropagation()}>
+                    <div
+                        className="max-w-6xl max-h-full"
+                        onClick={(e) => e.stopPropagation()}
+                    >
                         <div className="flex justify-between items-center mb-4">
                             <h3 className="text-white text-lg font-semibold">Problem Image</h3>
                             <button
                                 onClick={() => setSelectedImage(null)}
-                                className="text-white hover:text-orange-400 transition-colors text-3xl p-2 rounded-full hover:bg-white/10"
+                                className="text-white hover:text-orange-400 transition-colors text-3xl h-8 w-8 flex items-center justify-center rounded-full hover:bg-white/10 cursor-pointer"
                                 aria-label="Close image modal"
                             >
-                                ×
+                                <X className="w-5 h-5" />
                             </button>
                         </div>
                         <img
@@ -876,7 +905,7 @@ const ServiceRequestDetails = () => {
                             alt="Enlarged problem view"
                             className="max-w-full max-h-[80vh] object-contain rounded-xl shadow-2xl"
                             onError={(e) => {
-                                e.target.style.display = 'none';
+                                e.target.style.display = "none";
                             }}
                         />
                     </div>
@@ -887,19 +916,14 @@ const ServiceRequestDetails = () => {
 };
 
 // Updated DetailItem component to match the style
-const DetailItem = ({ label, value, icon: Icon, capitalize = false, largeValue = false }) => (
-    <div className="group hover:bg-orange-50  py-3 px-4 rounded-xl transition-colors duration-200 border border-orange-500">
-        <label className="block text-sm font-semibold text-gray-600 uppercase tracking-wider mb-2">
+const DetailItem = ({ label, value, capitalize = false, largeValue = false }) => (
+    <div className="group hover:bg-base-100/60  py-3 px-4 rounded-xl transition-colors duration-200 border border-neutral bg-base-100">
+        <label className="block text-sm font-semibold text-base-content uppercase tracking-wider mb-2">
             {label}
         </label>
         <div className="flex items-start gap-3">
-            {Icon && (
-                <div className="bg-orange-100 p-2 rounded-lg group-hover:bg-orange-200 transition-colors flex-shrink-0">
-                    <Icon className="w-4 h-4 text-orange-600" />
-                </div>
-            )}
-            <span className={`${capitalize ? 'capitalize' : ''} ${largeValue ? 'break-words text-base font-medium text-gray-800' : 'text-sm text-gray-700'} leading-relaxed flex-1`}>
-                {value || <span className="text-gray-400 italic">Not provided</span>}
+            <span className={`${capitalize ? 'capitalize' : ''} ${largeValue ? 'break-words text-base font-medium text-base-content/80' : 'text-sm text-base-content/60'} leading-relaxed flex-1`}>
+                {value || <span className="text-base-content/50 italic">Not provided</span>}
             </span>
         </div>
     </div>
@@ -907,21 +931,21 @@ const DetailItem = ({ label, value, icon: Icon, capitalize = false, largeValue =
 
 // Updated TimelineItem component
 const TimelineItem = ({ date, title, description, active = false, pending = false }) => {
-    const dotColor = active ? 'bg-orange-500 ring-orange-200' : pending ? 'bg-gray-300 ring-gray-100' : 'bg-green-500 ring-green-200';
-    const lineColor = pending ? 'bg-gray-200' : 'bg-orange-200';
-    const textColor = active ? 'text-gray-800 font-semibold' : 'text-gray-600';
+    const dotColor = active ? 'bg-primary ring-secondary' : pending ? 'bg-base-content ring-base-content/60' : 'bg-success ring-success/40';
+    const lineColor = pending ? 'bg-base-content/40' : 'bg-secondary/40';
+    const textColor = active ? 'text-base-content font-semibold' : 'text-base-content/60';
 
     return (
         <div className="flex gap-4 relative">
             <div className="flex flex-col items-center">
-                <div className={`w-4 h-4 rounded-full ${dotColor} ring-4 z-10`} />
-                <div className={`w-0.5 h-full ${lineColor} mt-1 -mb-2`} />
+                <div className={`h-4 w-3.5 rounded-full ${dotColor} ring-2 z-10`} />
+                <div className={`w-0.5 h-full ${lineColor} -mb-2`} />
             </div>
             <div className="flex-1 pb-4">
                 <p className={`text-base ${textColor} mb-1`}>{title}</p>
-                <p className="text-sm text-gray-500 mb-2">{description}</p>
+                <p className="text-sm text-base-content/50 mb-2">{description}</p>
                 {date && (
-                    <p className="text-xs text-gray-400">
+                    <p className="text-xs text-base-content/30">
                         {new Date(date).toLocaleDateString()} · {new Date(date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                     </p>
                 )}

@@ -1,25 +1,21 @@
 "use client";
 
-
 import {
-  CheckCircle,
   ArrowRight,
-  MapPin,
-  User,
-  CalendarCheck,
-  MessageCircle,
-  CreditCard,
-  Star,
   BarChart,
+  CalendarCheck,
+  CreditCard,
+  MapPin,
+  MessageCircle,
+  Star,
+  User,
 } from "lucide-react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
-
 
 const HowToWork = () => {
   const [activeStep, setActiveStep] = useState(0);
   const [loading, setLoading] = useState(true);
-
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -27,7 +23,6 @@ const HowToWork = () => {
     }, 2000);
     return () => clearTimeout(timer);
   }, []);
-
 
   const steps = [
     {
@@ -74,32 +69,81 @@ const HowToWork = () => {
     },
   ];
 
+  const ActiveStepContent = ({ step, index, totalSteps, isActive }) => {
+    const contentRef = useRef(null);
+    const [height, setHeight] = useState('0px');
 
-  // Skeleton Components
+    useEffect(() => {
+      if (contentRef.current) {
+        setHeight(isActive ? `${contentRef.current.scrollHeight}px` : '0px');
+      }
+    }, [isActive, step]);
+
+    return (
+      <div
+        ref={contentRef}
+        style={{ maxHeight: height }}
+        className="overflow-hidden transition-[max-height] duration-500 ease-in-out lg:hidden"
+      >
+        <div className="mt-4 p-4 border-t border-gray-200">
+          <div className="mb-4">
+            <p className="text-sm leading-relaxed mb-4 text-gray-700">
+              {step.description}
+            </p>
+          </div>
+
+          <div className="relative rounded-xl overflow-hidden shadow-lg border border-gray-100">
+            <div className="aspect-video flex items-center justify-center bg-gray-50 p-4">
+              <Image
+                src={step.image}
+                alt={step.title}
+                width={600}
+                height={400}
+                className="w-full h-auto rounded-md object-cover max-w-[300px] sm:max-w-[400px]"
+              />
+            </div>
+          </div>
+
+          <div className="flex justify-between items-center mt-4">
+            <span className="text-primary text-xs font-semibold">
+              Step {index + 1} of {totalSteps}
+            </span>
+            <div className="w-3/4 bg-orange-300/30 rounded-full h-1.5">
+              <div
+                className="bg-primary h-1.5 rounded-full transition-all duration-500 ease-out"
+                style={{
+                  width: `${((index + 1) / totalSteps) * 100}%`,
+                }}
+              ></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
   const StepSkeleton = () => (
     <div className=" rounded-2xl p-6 shadow-lg border border-gray-100 animate-pulse">
       <div className="flex items-center gap-4 mb-4">
-        <div className="skeleton bg-gray-300 w-12 h-12 rounded-full"></div>
-        <div className="skeleton bg-gray-300 h-6 w-32 rounded"></div>
+        <div className="bg-gray-300 w-12 h-12 rounded-full"></div>
+        <div className="bg-gray-300 h-6 w-32 rounded"></div>
       </div>
-      <div className="skeleton bg-gray-200 h-4 w-full rounded mb-2"></div>
-      <div className="skeleton bg-gray-200 h-4 w-5/6 rounded"></div>
+      <div className="bg-gray-200 h-4 w-full rounded mb-2"></div>
+      <div className="bg-gray-200 h-4 w-5/6 rounded"></div>
     </div>
   );
-
 
   const SectionHeaderSkeleton = () => (
     <div className="text-center mb-16 animate-pulse">
-      <div className="skeleton bg-gray-300 h-12 w-80 mx-auto rounded-lg mb-4"></div>
-      <div className="skeleton bg-gray-300 h-5 w-96 mx-auto rounded"></div>
+      <div className="bg-gray-300 h-12 w-80 mx-auto rounded-lg mb-4"></div>
+      <div className="bg-gray-300 h-5 w-96 mx-auto rounded"></div>
     </div>
   );
-
 
   if (loading) {
     return (
       <section className="py-16 font-roboto bg-gradient-to-br from-orange-50 to-white relative overflow-hidden">
-        <div className="container mx-auto px-4 relative z-10">
+        <div className="lg:container mx-auto px-4 relative z-10">
           <SectionHeaderSkeleton />
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {[...Array(6)].map((_, index) => (
@@ -111,12 +155,9 @@ const HowToWork = () => {
     );
   }
 
-
   return (
-    <section className="py-16 font-roboto  relative overflow-hidden">
-
-      <div className="container mx-auto px-4 relative z-10">
-        {/* Section Header */}
+    <section className="py-16 font-roboto relative overflow-hidden">
+      <div className="lg:container mx-auto px-6 relative z-10">
         <div className="text-center mb-16">
           <div className="inline-flex items-center gap-2 bg-primary/10 px-4 py-2 rounded-full mb-6">
             <BarChart className="w-5 h-5 text-primary" />
@@ -127,71 +168,78 @@ const HowToWork = () => {
           <h2 className="text-4xl md:text-5xl font-bold mb-4 font-roboto-con">
             How <span className="text-primary font-caveat inline-block transform rotate-2">MechaLink</span> Works
           </h2>
-          <p className="text-lg md:text-xl  max-w-2xl mx-auto font-nunito-sans leading-relaxed">
+          <p className="text-lg md:text-xl max-w-2xl mx-auto font-nunito-sans leading-relaxed">
             Get your vehicle serviced in 6 simple steps. From finding the right mechanic to leaving reviews.
           </p>
         </div>
 
-
-        {/* Two Column Layout */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
-          {/* Left Column - Steps Navigation */}
           <div className="space-y-4">
-            {steps.map((step, index) => (
-              <button
-                key={index}
-                onClick={() => setActiveStep(index)}
-                className={`w-full text-left p-6 rounded-2xl transition-all duration-300 group ${activeStep === index
-                    ? " shadow-xl border-l-4 border-primary transform -translate-y-1"
-                    : "/70 shadow-md border border-gray-100 hover:shadow-lg hover:-translate-y-0.5"
-                  }`}
-              >
-                <div className="flex items-center gap-4">
-                  <div
-                    className={`flex-shrink-0 w-12 h-12 rounded-full flex items-center justify-center transition-all duration-300 ${activeStep === index
-                        ? "bg-primary text-white shadow-lg scale-110"
-                        : "bg-orange-100 text-primary group-hover:bg-orange-200"
-                      }`}
+            {steps.map((step, index) => {
+              const isActive = activeStep === index;
+              return (
+                <div
+                  key={index}
+                  className={`rounded-2xl transition-all bg-base-200 duration-300 ${isActive
+                      ? "shadow-xl border-l-4 border-primary transform lg:-translate-y-1"
+                      : "shadow-md border border-neutral hover:shadow-lg hover:lg:-translate-y-0.5"
+                    }`}
+                >
+                  <button
+                    onClick={() => setActiveStep(isActive ? -1 : index)}
+                    className={`w-full text-left p-6 transition-all duration-300 ${isActive && 'pb-4 lg:pb-6'}`}
                   >
-                    {step.icon}
-                  </div>
-                  <div className="flex-1">
-                    <div className="flex items-center justify-between mb-2">
-                      <h3
-                        className={`text-xl font-bold transition-colors duration-300 ${activeStep === index ? "text-primary" : ""
-                          }`}
-                      >
-                        {step.title}
-                      </h3>
+                    <div className="flex items-center gap-4">
                       <div
-                        className={`flex items-center gap-2 transition-all duration-300 ${activeStep === index
-                            ? "opacity-100 translate-x-0"
-                            : "opacity-0 -translate-x-2"
+                        className={`flex-shrink-0 w-12 h-12 rounded-full flex items-center justify-center transition-all duration-300 ${isActive
+                            ? "bg-primary text-white shadow-lg scale-110"
+                            : "bg-orange-100 text-primary group-hover:bg-orange-200"
                           }`}
                       >
-                        <span className="text-sm font-semibold text-primary bg-orange-100 px-2 py-1 rounded-full">
-                          Step {index + 1}
-                        </span>
-                        <ArrowRight className="w-4 h-4 text-primary" />
+                        {step.icon}
+                      </div>
+                      <div className="flex-1">
+                        <div className="flex items-center justify-between mb-2">
+                          <h3
+                            className={`text-xl font-bold transition-colors duration-300 ${isActive ? "text-primary" : ""
+                              }`}
+                          >
+                            {step.title}
+                          </h3>
+                          <div
+                            className={`flex items-center gap-2 transition-all duration-300 ${isActive
+                                ? "opacity-100 translate-x-0"
+                                : "opacity-0 -translate-x-2"
+                              }`}
+                          >
+                            <span className="text-sm font-semibold text-primary bg-orange-100 px-2 py-1 rounded-full">
+                              Step {index + 1}
+                            </span>
+                            <ArrowRight className="w-4 h-4 text-primary" />
+                          </div>
+                        </div>
+                        <p
+                          className={`text-sm leading-relaxed transition-colors duration-300 text-base-content/60 hidden lg:block`}
+                        >
+                          {step.description}
+                        </p>
                       </div>
                     </div>
-                    <p
-                      className={`text-sm leading-relaxed transition-colors duration-300 ${activeStep === index ? "" : ""
-                        }`}
-                    >
-                      {step.description}
-                    </p>
-                  </div>
+                  </button>
+
+                  <ActiveStepContent
+                    step={step}
+                    index={index}
+                    totalSteps={steps.length}
+                    isActive={isActive}
+                  />
                 </div>
-              </button>
-            ))}
+              );
+            })}
           </div>
 
-
-          {/* Right Column - Active Step Preview */}
-          <div className="sticky top-8">
-            <div className=" rounded-3xl shadow-2xl overflow-hidden border border-gray-100">
-              {/* Step Indicator */}
+          <div className="hidden lg:block lg:sticky lg:top-8 flex-1">
+            <div className=" rounded-3xl shadow-2xl overflow-hidden border border-neutral">
               <div className="bg-primary p-6 text-white">
                 <div className="flex items-center justify-between">
                   <div>
@@ -210,7 +258,6 @@ const HowToWork = () => {
                   </div>
                 </div>
 
-                {/* Progress Bar */}
                 <div className="mt-4 w-full bg-orange-300/30 rounded-full h-2">
                   <div
                     className="bg-white h-2 rounded-full transition-all duration-500 ease-out"
@@ -221,8 +268,6 @@ const HowToWork = () => {
                 </div>
               </div>
 
-
-              {/* Step Content */}
               <div className="p-8">
                 <div className="mb-6">
                   <div className="w-16 h-16 bg-orange-100 rounded-2xl flex items-center justify-center mb-4 mx-auto">
@@ -230,37 +275,31 @@ const HowToWork = () => {
                       {steps[activeStep].icon}
                     </div>
                   </div>
-                  <h4 className="text-2xl font-bold text-center  mb-3">
+                  <h4 className="text-2xl font-bold text-center mb-3">
                     {steps[activeStep].title}
                   </h4>
-                  <p className=" text-center leading-relaxed">
+                  <p className=" text-center leading-relaxed text-base-content/60">
                     {steps[activeStep].description}
                   </p>
                 </div>
 
-
-                {/* Step Image */}
                 <div className="relative rounded-2xl overflow-hidden">
                   <div className="aspect-video flex items-center justify-center">
                     <div className="text-center">
-                      <div className="  rounded-full flex items-center justify-center mx-auto mb-3">
-                        <Image
-                          src={steps[activeStep].image}
-                          alt={steps[activeStep].title}
-                          width={600}
-                          height={400}
-                          className="w-600 h-100 rounded-md object-cover"
-                        />
-                      </div>
-                        <p className="text-primary font-semibold">
-                          Step {activeStep + 1} Preview
-                        </p>
+                      <Image
+                        src={steps[activeStep].image}
+                        alt={steps[activeStep].title}
+                        width={600}
+                        height={400}
+                        className="w-600 h-100 rounded-md object-cover"
+                      />
+                      <p className="text-primary font-semibold mt-3">
+                        Step {activeStep + 1} Preview
+                      </p>
                     </div>
                   </div>
                 </div>
 
-
-                {/* Navigation Dots */}
                 <div className="flex justify-center gap-2 mt-8">
                   {steps.map((_, index) => (
                     <button
@@ -268,7 +307,7 @@ const HowToWork = () => {
                       onClick={() => setActiveStep(index)}
                       className={`w-3 h-3 rounded-full transition-all duration-300 ${activeStep === index
                           ? "bg-primary scale-125"
-                          : "bg-gray-300 hover:bg-gray-400"
+                          : "bg-base-200 hover:bg-base-300"
                         }`}
                     />
                   ))}
@@ -276,8 +315,6 @@ const HowToWork = () => {
               </div>
             </div>
 
-
-            {/* Call to Action */}
             <div className="mt-6 text-center">
               <button className="bg-primary text-white px-8 py-4 rounded-2xl font-semibold shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-300 inline-flex items-center gap-2">
                 Get Started Today
@@ -291,8 +328,4 @@ const HowToWork = () => {
   );
 };
 
-
 export default HowToWork;
-
-
-

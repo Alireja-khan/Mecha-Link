@@ -67,77 +67,68 @@ const Services = () => {
 
   // Service Card Skeleton Component
   const ServiceCardSkeleton = () => (
-    <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-6 animate-pulse">
+    // Used base-100 for background and base-300 for the skeleton parts
+    <div className="bg-base-100 rounded-2xl shadow-xl border border-base-300 p-6 animate-pulse">
       {/* Image Skeleton */}
-      <div className="skeleton bg-gray-200 h-48 w-full rounded-2xl mb-4"></div>
-      
+      <div className="skeleton bg-base-300 h-48 w-full rounded-2xl mb-4"></div>
+
       {/* Title Skeleton */}
-      <div className="skeleton bg-gray-200 h-6 w-3/4 rounded mb-3"></div>
-      
+      <div className="skeleton bg-base-300 h-6 w-3/4 rounded mb-3"></div>
+
       {/* Rating Skeleton */}
       <div className="flex items-center gap-2 mb-3">
-        <div className="skeleton bg-gray-200 h-5 w-5 rounded-full"></div>
-        <div className="skeleton bg-gray-200 h-4 w-16 rounded"></div>
+        <div className="skeleton bg-base-300 h-5 w-5 rounded-full"></div>
+        <div className="skeleton bg-base-300 h-4 w-16 rounded"></div>
       </div>
-      
+
       {/* Location Skeleton */}
       <div className="flex items-center gap-2 mb-4">
-        <div className="skeleton bg-gray-200 h-4 w-4 rounded"></div>
-        <div className="skeleton bg-gray-200 h-4 w-32 rounded"></div>
+        <div className="skeleton bg-base-300 h-4 w-4 rounded"></div>
+        <div className="skeleton bg-base-300 h-4 w-32 rounded"></div>
       </div>
-      
+
       {/* Services Skeleton */}
       <div className="space-y-2 mb-4">
-        <div className="skeleton bg-gray-200 h-3 w-full rounded"></div>
-        <div className="skeleton bg-gray-200 h-3 w-5/6 rounded"></div>
-        <div className="skeleton bg-gray-200 h-3 w-4/6 rounded"></div>
+        <div className="skeleton bg-base-300 h-3 w-full rounded"></div>
+        <div className="skeleton bg-base-300 h-3 w-5/6 rounded"></div>
+        <div className="skeleton bg-base-300 h-3 w-4/6 rounded"></div>
       </div>
-      
+
       {/* Button Skeleton */}
-      <div className="skeleton bg-gray-200 h-10 w-full rounded-xl"></div>
+      <div className="skeleton bg-base-300 h-10 w-full rounded-xl"></div>
     </div>
   );
-
-  // Stats Skeleton Component
-  // const StatsSkeleton = () => (
-  //   <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 mb-8 animate-pulse">
-  //     {[...Array(4)].map((_, index) => (
-  //       <div key={index} className="bg-white rounded-2xl shadow-lg p-6 border border-gray-200">
-  //         <div className="skeleton bg-gray-200 h-12 w-12 rounded-xl mb-3"></div>
-  //         <div className="skeleton bg-gray-200 h-6 w-20 rounded mb-2"></div>
-  //         <div className="skeleton bg-gray-200 h-8 w-16 rounded"></div>
-  //       </div>
-  //     ))}
-  //   </div>
-  // );
 
   // Pagination Skeleton
   const PaginationSkeleton = () => (
     <div className="flex flex-col md:flex-row justify-between mt-8 items-center gap-4 animate-pulse">
       <div className="flex items-center gap-3">
-        <div className="skeleton bg-gray-200 h-4 w-24 rounded"></div>
-        <div className="skeleton bg-gray-200 h-10 w-20 rounded-lg"></div>
+        <div className="skeleton bg-base-300 h-4 w-24 rounded"></div>
+        <div className="skeleton bg-base-300 h-10 w-20 rounded-lg"></div>
       </div>
       <div className="flex justify-center items-center gap-2">
-        <div className="skeleton bg-gray-200 h-10 w-24 rounded-lg"></div>
+        <div className="skeleton bg-base-300 h-10 w-24 rounded-lg"></div>
         {[...Array(5)].map((_, i) => (
-          <div key={i} className="skeleton bg-gray-200 h-10 w-10 rounded-lg"></div>
+          <div key={i} className="skeleton bg-base-300 h-10 w-10 rounded-lg"></div>
         ))}
-        <div className="skeleton bg-gray-200 h-10 w-20 rounded-lg"></div>
+        <div className="skeleton bg-base-300 h-10 w-20 rounded-lg"></div>
       </div>
     </div>
   );
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    // Base background is base-200 (replaces bg-gray-50)
+    <div className="min-h-screen bg-base-200">
       {/* Modern Banner for Shops - Same color theme and height */}
-      <section className="relative bg-gradient-to-r from-orange-500 via-orange-600 to-red-600 py-16 overflow-hidden">
+      {/* The banner uses a custom gradient for visual flair, keeping the original orange/red scheme which is fine for a striking banner. 
+      However, I've adjusted the text/bg colors within the banner to be more theme-aware (e.g., text-white/text-primary-content). */}
+      <section className="relative bg-gradient-to-r from-primary via-orange-600 to-red-600 py-16 overflow-hidden">
         {/* Background Pattern */}
         <div className="absolute inset-0 bg-black/10"></div>
         <div className="absolute top-0 left-0 w-72 h-72 bg-white/10 rounded-full -translate-x-1/2 -translate-y-1/2"></div>
         <div className="absolute bottom-0 right-0 w-96 h-96 bg-white/5 rounded-full translate-x-1/3 translate-y-1/3"></div>
 
-        <div className="container mx-auto px-6 relative z-10">
+        <div className="lg:container mx-auto px-6 relative z-10">
           <div className="max-w-6xl mx-auto">
             <div className="flex flex-col lg:flex-row items-center justify-between gap-12">
               {/* Left Content */}
@@ -155,24 +146,6 @@ const Services = () => {
                 <p className="text-xl text-orange-100 mb-8 leading-relaxed max-w-2xl">
                   Connect with certified mechanics and service shops. Browse ratings, services, and locations to find the perfect match for your needs.
                 </p>
-
-                {/* Quick Actions */}
-                {/* <div className="flex flex-wrap gap-4">
-                  <button
-                    onClick={() => setSortOrder('htl')}
-                    className="bg-white text-orange-600 px-6 py-3 rounded-full font-semibold hover:bg-orange-50 transition-all duration-300 flex items-center gap-2"
-                  >
-                    <Star className="w-5 h-5" />
-                    Top Rated Shops
-                  </button>
-                  <button
-                    onClick={() => setSortOrder('certified')}
-                    className="bg-orange-700 text-white px-6 py-3 rounded-full font-semibold hover:bg-orange-800 transition-all duration-300 flex items-center gap-2"
-                  >
-                    <Award className="w-5 h-5" />
-                    Certified Only
-                  </button>
-                </div> */}
               </div>
 
               {/* Right Illustration/Content */}
@@ -198,31 +171,36 @@ const Services = () => {
       </section>
 
       <section>
-        <div className="container mx-auto px-4 md:px-6 lg:px-8 -mt-8 pb-10 relative z-20">
+        <div className="lg:container mx-auto px-4 md:px-6 lg:px-8 -mt-8 pb-10 relative z-20">
           {/* Search & Sort Card */}
-          <div className="bg-white rounded-2xl shadow-xl p-6 mb-8 border border-gray-200">
+          {/* Card background is base-100, borders are base-300 */}
+          <div className="bg-base-100 rounded-2xl shadow-xl p-6 mb-8 border border-base-300">
             <div className="flex flex-col md:flex-row justify-between items-center gap-4">
               {/* Search */}
               <div className="flex-1 w-full">
                 <div className="relative">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                  {/* Text color is base-content/40 (was gray-400) */}
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-base-content/40 w-5 h-5" />
                   <input
                     type="search"
                     placeholder="Search shops, mechanics, or locations..."
                     value={searchTerm}
                     onChange={handleSearch}
-                    className="w-full bg-gray-50 placeholder-gray-500 pl-10 pr-4 py-3 rounded-xl border-2 border-gray-200 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all duration-300"
+                    // Input uses base-200 background (was gray-50) and primary focus
+                    className="w-full bg-base-200 placeholder-base-content/70 pl-10 pr-4 py-3 rounded-xl border-2 border-base-300 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-300"
                   />
                 </div>
               </div>
 
               {/* Sort */}
               <div className="flex items-center gap-3 w-full md:w-auto">
-                <Filter className="text-gray-600 w-5 h-5" />
+                {/* Text color is base-content/70 (was gray-600) */}
+                <Filter className="text-base-content/70 w-5 h-5" />
                 <select
                   value={sortOrder}
                   onChange={handleSort}
-                  className="px-4 py-3 bg-gray-50 rounded-xl border-2 border-gray-200 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all duration-300 w-full md:w-auto"
+                  // Select uses base-200 background (was gray-50) and primary focus
+                  className="px-4 py-3 bg-base-200 rounded-xl border-2 border-base-300 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-300 w-full md:w-auto"
                 >
                   <option value="">All Shops</option>
                   <option value="htl">Rating: High to Low</option>
@@ -233,45 +211,7 @@ const Services = () => {
             </div>
           </div>
 
-          {/* Stats Section */}
-          {/* {loading ? (
-            <StatsSkeleton />
-          ) : (
-            services.length > 0 && (
-              <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-                <div className="bg-white rounded-2xl shadow-lg p-6 border border-gray-200 text-center">
-                  <div className="bg-orange-100 w-12 h-12 rounded-xl flex items-center justify-center mx-auto mb-3">
-                    <Users className="w-6 h-6 text-orange-600" />
-                  </div>
-                  <h3 className="text-gray-600 text-sm font-medium mb-1">Total Shops</h3>
-                  <p className="text-2xl font-bold text-gray-900">{stats.total}</p>
-                </div>
-                <div className="bg-white rounded-2xl shadow-lg p-6 border border-gray-200 text-center">
-                  <div className="bg-orange-100 w-12 h-12 rounded-xl flex items-center justify-center mx-auto mb-3">
-                    <Star className="w-6 h-6 text-orange-600" />
-                  </div>
-                  <h3 className="text-gray-600 text-sm font-medium mb-1">Top Rated</h3>
-                  <p className="text-2xl font-bold text-gray-900">{stats.topRated}</p>
-                </div>
-                <div className="bg-white rounded-2xl shadow-lg p-6 border border-gray-200 text-center">
-                  <div className="bg-orange-100 w-12 h-12 rounded-xl flex items-center justify-center mx-auto mb-3">
-                    <Award className="w-6 h-6 text-orange-600" />
-                  </div>
-                  <h3 className="text-gray-600 text-sm font-medium mb-1">Certified</h3>
-                  <p className="text-2xl font-bold text-gray-900">{stats.certified}</p>
-                </div>
-                <div className="bg-white rounded-2xl shadow-lg p-6 border border-gray-200 text-center">
-                  <div className="bg-orange-100 w-12 h-12 rounded-xl flex items-center justify-center mx-auto mb-3">
-                    <Shield className="w-6 h-6 text-orange-600" />
-                  </div>
-                  <h3 className="text-gray-600 text-sm font-medium mb-1">Active</h3>
-                  <p className="text-2xl font-bold text-gray-900">{stats.active}</p>
-                </div>
-              </div>
-            )
-          )} */}
-
-          {/* Loading State */}
+          {/* Loading State - Skeletons already updated */}
           {loading && (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
               {[...Array(8)].map((_, index) => (
@@ -282,14 +222,15 @@ const Services = () => {
 
           {/* Empty State */}
           {!loading && services.length === 0 && (
-            <div className="text-center py-16 rounded-2xl shadow-lg border border-gray-200 bg-white">
-              <div className="w-24 h-24 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <MapPin className="w-12 h-12 text-orange-500" />
+            <div className="text-center py-16 rounded-2xl shadow-lg border border-base-300 bg-base-100">
+              {/* Background is accent (light theme) or another suitable color */}
+              <div className="w-24 h-24 bg-accent rounded-full flex items-center justify-center mx-auto mb-4">
+                <MapPin className="w-12 h-12 text-primary" />
               </div>
-              <p className="text-2xl text-orange-500 font-bold mb-2">
+              <p className="text-2xl text-primary font-bold mb-2">
                 No Shops Found
               </p>
-              <p className="text-gray-500 max-w-md mx-auto">
+              <p className="text-base-content/70 max-w-md mx-auto">
                 We couldn't find any service shops matching your criteria. Try adjusting your search filters.
               </p>
             </div>
@@ -299,6 +240,7 @@ const Services = () => {
           {!loading && services.length > 0 && (
             <>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                {/* ServiceCard component will need to use DaisyUI semantic colors for full dynamism */}
                 {services.map((service) => (
                   <ServiceCard key={service._id} service={service} />
                 ))}
@@ -308,13 +250,14 @@ const Services = () => {
               <div className="flex flex-col md:flex-row justify-between mt-8 items-center gap-4">
                 {/* Items per page */}
                 <div className="flex items-center gap-3">
-                  <label htmlFor="itemsPerPage" className="text-gray-600 font-medium">
+                  <label htmlFor="itemsPerPage" className="text-base-content/70 font-medium">
                     Show per page:
                   </label>
                   <select
                     value={itemsPerPage}
                     onChange={handleItemsPerPage}
-                    className="px-4 py-2 bg-white rounded-lg border-2 border-gray-300 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all duration-300"
+                    // Select uses base-100 background and primary focus
+                    className="px-4 py-2 bg-base-100 rounded-lg border-2 border-base-300 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-300"
                   >
                     <option value="12">12</option>
                     <option value="24">24</option>
@@ -326,7 +269,8 @@ const Services = () => {
                 {/* Page buttons */}
                 <div className="flex justify-center items-center gap-2">
                   <button
-                    className="px-4 py-2 border border-orange-500 text-orange-500 rounded-lg hover:bg-orange-500 hover:text-white transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                    // Standard button using border-primary and text-primary
+                    className="px-4 py-2 border border-primary text-primary rounded-lg hover:bg-primary hover:text-primary-content transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
                     disabled={currentPage === 1}
                     onClick={() => handlePageChange(currentPage - 1)}
                   >
@@ -337,8 +281,10 @@ const Services = () => {
                     <button
                       key={i}
                       className={`px-4 py-2 border rounded-lg transition-all duration-300 ${currentPage === i + 1
-                          ? "bg-orange-500 text-white border-orange-500"
-                          : "border-gray-300 text-gray-600 hover:bg-orange-50 hover:border-orange-500"
+                        // Active page uses primary/primary-content
+                        ? "bg-primary text-primary-content border-primary"
+                        // Inactive page uses base-300 border and base-content text with a hover effect
+                        : "border-base-300 text-base-content hover:bg-accent/50 hover:border-primary"
                         }`}
                       onClick={() => handlePageChange(i + 1)}
                     >
@@ -347,7 +293,7 @@ const Services = () => {
                   ))}
 
                   <button
-                    className="px-4 py-2 border border-orange-500 text-orange-500 rounded-lg hover:bg-orange-500 hover:text-white transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="px-4 py-2 border border-primary text-primary rounded-lg hover:bg-primary hover:text-primary-content transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
                     disabled={currentPage === totalPage}
                     onClick={() => handlePageChange(currentPage + 1)}
                   >
@@ -358,7 +304,7 @@ const Services = () => {
             </>
           )}
 
-          {/* Pagination Skeleton for loading state */}
+          {/* Pagination Skeleton for loading state - already updated */}
           {loading && <PaginationSkeleton />}
         </div>
       </section>
