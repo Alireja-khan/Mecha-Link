@@ -6,7 +6,7 @@ import useUser from "@/hooks/useUser";
 
 export default function HeroModern() {
   const [loading, setLoading] = useState(true);
-  const { user: loggedInUser } = useUser();
+  const { user: loggedInUser, status } = useUser();
 
   useEffect(() => {
     const timer = setTimeout(() => {
