@@ -30,7 +30,8 @@ export async function POST(req) {
     weight_of_items: 1,
     logistic_pickup_id: 0,
     logistic_delivery_type: "DOMESTIC",
-    value_a: body.shopID
+    value_a: body.shopID,
+    value_b: body.purpose
   };
  
   const response = await fetch("https://sandbox.sslcommerz.com/gwprocess/v4/api.php", {

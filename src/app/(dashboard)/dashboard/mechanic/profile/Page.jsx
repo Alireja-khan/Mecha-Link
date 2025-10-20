@@ -26,7 +26,6 @@ const MechanicProfile = ({ shopId }) => {
             try {
                 setLoading(true);
                 if (!loggedInUser?.email) {
-                    console.log("No user email available");
                     return;
                 }
                 const response = await fetch(`/api/shops?email=${loggedInUser.email}`);
@@ -60,12 +59,10 @@ const MechanicProfile = ({ shopId }) => {
         const fetchShopReviews = async (shopId) => {
             try {
                 setReviewsLoading(true);
-                console.log("Fetching reviews for shop ID:", shopId);
 
                 const response = await fetch('/api/reviews');
                 if (response.ok) {
                     const allReviews = await response.json();
-                    console.log("All reviews received:", allReviews);
 
                     // Filter reviews for this specific shop
                     const shopReviews = allReviews.filter(review => {
@@ -73,15 +70,6 @@ const MechanicProfile = ({ shopId }) => {
                         const matchesShopId = review.shopId === shopId.toString();
                         const matchesServiceId = review.serviceId === shopId.toString();
                         const matchesShopObjectId = review.shopId === shopId;
-
-                        console.log(`Review ${review._id}:`, {
-                            reviewShopId: review.shopId,
-                            reviewServiceId: review.serviceId,
-                            shopId,
-                            matchesShopId,
-                            matchesServiceId,
-                            matchesShopObjectId
-                        });
 
                         return matchesShopId || matchesServiceId || matchesShopObjectId;
                     });
@@ -299,7 +287,8 @@ const MechanicProfile = ({ shopId }) => {
                 phone: processedShopData.phone,
                 category: processedShopData.categories[0],
                 amount: 1000,
-                shopID: shopData._id
+                shopID: shopData._id,
+                purpose: "Shop Add"
             }),
         });
 

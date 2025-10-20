@@ -31,6 +31,7 @@
     "next": "15.5.3",
     "next-auth": "^5.0.0-beta.29",
     "nodemailer": "^6.10.1",
+    "print-js": "^1.6.0",
     "react": "19.1.0",
     "react-countup": "^6.5.3",
     "react-dom": "19.1.0",

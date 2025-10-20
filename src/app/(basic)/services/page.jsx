@@ -1,9 +1,9 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-// Assuming ServiceCard is designed to use DaisyUI/Tailwind semantic classes internally
-import ServiceCard from "@/app/Components/ServiceCard"; 
-import { Search, Filter, Star, MapPin, Users, Award, Shield, Sparkles } from "lucide-react";
+import ServiceCard from "@/app/Components/ServiceCard";
+import { Search, Filter, MapPin, Sparkles } from "lucide-react";
+
 
 const Services = () => {
   const [totalData, setTotalData] = useState([]);
@@ -27,7 +27,6 @@ const Services = () => {
       .then((res) => res.json())
       .then((data) => {
         setTotalData(data);
-        // Calculate stats from data
         if (data.result) {
           const shops = data.result;
           setStats({
