@@ -57,6 +57,7 @@ export default function Header() {
     { href: "/services", label: "Mechanic Shops" },
     { href: "/serviceReq", label: "Service Requests" },
     { href: "/about", label: "About" },
+    { href: "/forum", label: "Forum" },
   ];
 
   const dashboardLink =

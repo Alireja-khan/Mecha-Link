@@ -24,10 +24,8 @@ export default function Home() {
             <MapWithSearch />
             <BlogSection />
             <Newsletter />
+            
         </>
     );
 
 }
-
-
-// bg-[#2A2D38]

@@ -7,8 +7,7 @@ import { Store } from "lucide-react";
 
 export default function HeroModern() {
   const [loading, setLoading] = useState(true);
-  // Assuming useUser returns { user: null | { role: 'admin' | 'mechanic' | 'user', ... } }
-  const { user: loggedInUser } = useUser();
+  const { user: loggedInUser, status } = useUser();
 
   useEffect(() => {
     // Simulate a slight loading delay (e.g., for fetching user data or assets)
