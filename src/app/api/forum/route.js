@@ -24,11 +24,11 @@ async function getUserFromSession(req) {
   }
 }
 
-// 🟢 CREATE POST - Updated for rich content
+// 🟢 CREATE POST - Updated for multiple images
 export async function POST(req) {
   try {
     const body = await req.json();
-    const { content, image, authorId, authorName, authorRole, authorImage, category } = body;
+    const { content, images, authorId, authorName, authorRole, authorImage, category } = body;
 
     if (!content || !authorId) {
       return NextResponse.json({ success: false, message: "Content and author ID are required" }, { status: 400 });
@@ -41,9 +41,10 @@ export async function POST(req) {
       authorRole: authorRole || "user",
       authorImage: authorImage || null,
       content,
-      image: image || null,
-      category: category || "general", // Add category support
+      images: images || [], // Save images array instead of single image
+      category: category || "general",
       likes: [],
+      dislikes: [], // Make sure dislikes array exists
       comments: [],
       reports: [],
       createdAt: new Date(),

@@ -3,12 +3,67 @@ import { useState } from "react";
 import MDEditor from "@uiw/react-md-editor";
 import { CATEGORIES, CATEGORY_COLORS } from "@/lib/forumConstants";
 import { Heart, MessageCircle, ThumbsDown, Flag, MoreVertical, Clock, User, Trash2 } from "lucide-react";
+import Swal from "sweetalert2";
 
 const PostCard = ({ post, onUpdate, currentUser }) => {
     const [showCommentForm, setShowCommentForm] = useState(false);
     const [commentText, setCommentText] = useState("");
     const [showOptions, setShowOptions] = useState(false);
     const [showComments, setShowComments] = useState(false);
+
+    // SweetAlert2 Configuration
+    const swalOptions = {
+        confirmButtonColor: 'var(--color-success)',
+        background: 'var(--color-base-100)',
+        color: 'var(--color-base-content)',
+        cancelButtonColor: 'var(--color-error)',
+    };
+
+    const showSuccessAlert = (title, message) => {
+        Swal.fire({
+            ...swalOptions,
+            title: title,
+            text: message,
+            icon: 'success',
+            iconColor: 'var(--color-success)'
+        });
+    };
+
+    const showErrorAlert = (title, message) => {
+        Swal.fire({
+            ...swalOptions,
+            title: title,
+            text: message,
+            icon: 'error',
+            iconColor: 'var(--color-error)'
+        });
+    };
+
+    const showConfirmDialog = (title, text, confirmButtonText = 'Yes, proceed') => {
+        return Swal.fire({
+            ...swalOptions,
+            title: title,
+            text: text,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: confirmButtonText,
+            cancelButtonText: 'Cancel',
+            reverseButtons: true,
+            iconColor: 'var(--color-warning)'
+        });
+    };
+
+    const showLoadingAlert = (title, text) => {
+        Swal.fire({
+            ...swalOptions,
+            title: title,
+            text: text,
+            allowOutsideClick: false,
+            didOpen: () => {
+                Swal.showLoading();
+            },
+        });
+    };
 
     const handleLike = async () => {
         if (!currentUser) return;
@@ -91,22 +146,34 @@ const PostCard = ({ post, onUpdate, currentUser }) => {
     const handleDelete = async () => {
         if (!currentUser || currentUser.role !== 'admin') return;
         
-        if (!confirm("Are you sure you want to delete this post?")) return;
+        const result = await showConfirmDialog(
+            'Are you sure?',
+            "You won't be able to revert this!",
+            'Yes, delete it!'
+        );
 
-        try {
-            const res = await fetch(`/api/forum?id=${post._id}&userId=${currentUser._id}`, {
-                method: "DELETE",
-            });
+        if (result.isConfirmed) {
+            try {
+                showLoadingAlert('Deleting...', 'Please wait while we delete the post');
 
-            const data = await res.json();
-            if (data.success) {
-                onUpdate();
-            } else {
-                alert(data.message || "Failed to delete post");
+                const res = await fetch(`/api/forum?id=${post._id}&userId=${currentUser._id}`, {
+                    method: "DELETE",
+                });
+
+                const data = await res.json();
+                if (data.success) {
+                    Swal.close();
+                    await showSuccessAlert('Deleted!', 'The post has been deleted.');
+                    onUpdate();
+                } else {
+                    Swal.close();
+                    await showErrorAlert('Error!', data.message || 'Failed to delete post');
+                }
+            } catch (error) {
+                console.error("Error deleting post:", error);
+                Swal.close();
+                await showErrorAlert('Error!', 'Error deleting post');
             }
-        } catch (error) {
-            console.error("Error deleting post:", error);
-            alert("Error deleting post");
         }
     };
 
@@ -116,7 +183,7 @@ const PostCard = ({ post, onUpdate, currentUser }) => {
     };
 
     const isLiked = post.likes.includes(currentUser?._id);
-    const isDisliked = post.dislikes?.includes(currentUser?._id); // Make sure dislikes array exists
+    const isDisliked = post.dislikes?.includes(currentUser?._id);
 
     // Get first letter for avatar fallback
     const getInitial = (name) => {
@@ -184,10 +251,6 @@ const PostCard = ({ post, onUpdate, currentUser }) => {
                                 <Clock size={14} />
                                 <span>{formatRelativeTime(post.createdAt)}</span>
                             </div>
-                            <div className="flex items-center gap-1">
-                                <User size={14} />
-                                <span>{post.authorRole}</span>
-                            </div>
                         </div>
                     </div>
                 </div>
@@ -245,6 +308,23 @@ const PostCard = ({ post, onUpdate, currentUser }) => {
                     />
                 </div>
             </div>
+
+            {/* Post Images */}
+            {post.images && post.images.length > 0 && (
+                <div className="mb-6">
+                    <div className="grid grid-cols-1 gap-3">
+                        {post.images.map((image, index) => (
+                            <div key={index} className="flex justify-center">
+                                <img 
+                                    src={image} 
+                                    alt={`Post image ${index + 1}`}
+                                    className="max-w-full max-h-96 rounded-2xl object-cover border border-neutral/30 shadow-lg"
+                                />
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            )}
 
             {/* Post Stats */}
             <div className="flex items-center gap-6 text-sm text-base-content/60 mb-6">

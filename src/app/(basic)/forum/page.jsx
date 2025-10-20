@@ -19,6 +19,7 @@ export default function ForumPage() {
     const [selectedCategory, setSelectedCategory] = useState("all");
     const [searchQuery, setSearchQuery] = useState("");
     const [showFilters, setShowFilters] = useState(false);
+    const [uploadedImages, setUploadedImages] = useState([]);
 
     // Redirect if not authenticated
     useEffect(() => {
@@ -58,7 +59,7 @@ export default function ForumPage() {
         }
     }, [status, searchQuery, selectedCategory]);
 
-    // Create new post
+    // Modify the post submission to include images
     const handleCreatePost = async (e) => {
         e.preventDefault();
         if (!newPostContent.trim() || !currentUser) return;
@@ -71,6 +72,7 @@ export default function ForumPage() {
                 },
                 body: JSON.stringify({
                     content: newPostContent,
+                    images: uploadedImages, // Send ALL uploaded images
                     authorId: currentUser._id,
                     authorName: currentUser.name,
                     authorRole: currentUser.role,
@@ -82,6 +84,7 @@ export default function ForumPage() {
             const data = await res.json();
             if (data.success) {
                 setNewPostContent("");
+                setUploadedImages([]); // Clear uploaded images
                 setShowPostForm(false);
                 setSelectedCategory("all");
                 fetchPosts();
@@ -101,7 +104,7 @@ export default function ForumPage() {
 
     return (
         <div className="min-h-screen bg-base-200 py-8">
-            <div className="max-w-2xl mx-auto px-4">
+            <div className="max-w-3xl mx-auto px-4">
                 {/* Create Post Button - Facebook Style */}
                 <div className="bg-base-100 rounded-2xl p-4 border border-neutral/50 shadow-sm mb-6">
                     <div className="flex items-center gap-4">
@@ -161,8 +164,27 @@ export default function ForumPage() {
                                     value={newPostContent}
                                     onChange={setNewPostContent}
                                     placeholder="What's on your mind?"
+                                    onImagesChange={setUploadedImages}
                                 />
                             </div>
+
+                            {/* Image Preview */}
+                            {/* {uploadedImages.length > 0 && (
+                                <div className="mb-4">
+                                    <p className="text-sm text-gray-600 mb-2">Uploaded Images:</p>
+                                    <div className="flex gap-2">
+                                        {uploadedImages.map((image, index) => (
+                                            <div key={index} className="relative">
+                                                <img 
+                                                    src={image} 
+                                                    alt="Uploaded" 
+                                                    className="w-20 h-20 object-cover rounded-lg"
+                                                />
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            )} */}
 
                             {/* Category Selection */}
                             <div className="mb-4">
@@ -186,6 +208,7 @@ export default function ForumPage() {
                                     onClick={() => {
                                         setShowPostForm(false);
                                         setNewPostContent("");
+                                        setUploadedImages([]);
                                         setSelectedCategory("all");
                                     }}
                                     className="px-6 py-2 bg-base-200 text-base-content rounded-lg font-medium hover:bg-base-300 transition-colors duration-200"

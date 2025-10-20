@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { writeFile } from "fs/promises";
+import { writeFile, mkdir } from "fs/promises";
 import path from "path";
 
 export async function POST(request) {
@@ -23,6 +23,16 @@ export async function POST(request) {
     // Save to public/uploads directory
     const uploadDir = path.join(process.cwd(), "public/uploads");
     const filepath = path.join(uploadDir, filename);
+
+    // Create directory if it doesn't exist
+    try {
+      await mkdir(uploadDir, { recursive: true });
+    } catch (error) {
+      // Directory might already exist, continue
+      if (error.code !== 'EEXIST') {
+        throw error;
+      }
+    }
 
     // In production, you might want to use cloud storage like AWS S3, Cloudinary, etc.
     await writeFile(filepath, buffer);
