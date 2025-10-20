@@ -140,21 +140,21 @@ const BlogSection = () => {
           {blogs.map((post, index) => (
             <div
               key={index}
-              className="group flex flex-col rounded-xl overflow-hidden bg-base-200 shadow-md hover:shadow-xl transition-shadow duration-300 border border-neutral"
+              className="group flex flex-col rounded-xl overflow-hidden bg-base-200 p-3 shadow-md hover:shadow-xl transition-shadow duration-300 border border-neutral"
             >
               {post.image && (
                 <div
-                  className="flex-shrink-0 cursor-pointer rounded-lg p-3 overflow-hidden"
+                  className="flex-shrink-0 cursor-pointer rounded-lg overflow-hidden"
                   onClick={() => handleViewDetailClick(post._id)}
                 >
                   <img
                     src={post.image}
                     alt={post.title}
-                    className="w-full h-full object-cover aspect-[6/4]  rounded-lg group-hover:scale-105 transition-transform duration-300"
+                    className="w-full h-full object-cover aspect-[6/4] group-hover:scale-105 rounded-lg  transition-transform duration-300"
                   />
                 </div>
               )}
-              <div className="p-6 flex flex-col justify-between flex-grow">
+              <div className="p-3 flex flex-col justify-between flex-grow">
                 <div>
                   <div className="flex items-center justify-between mb-3">
                     <span className="text-xs font-semibold uppercase px-3 py-1 rounded-full bg-primary text-white">
