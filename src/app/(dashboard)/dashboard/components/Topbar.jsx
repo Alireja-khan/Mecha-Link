@@ -1,20 +1,23 @@
 "use client";
 
-
 import React, { useState, useEffect, useRef } from "react";
 import {
   Users,
   Wrench,
   ClipboardList,
   Menu,
+  AlertTriangle,
+  CheckCircle,
+  CreditCard,
+  Sparkles,
+  X,
 } from "lucide-react";
 import useUser from "@/hooks/useUser";
 import NotificationWidget from "@/app/shared/NotificationWidget";
 import ToggleTheme from "../../../shared/ToggleTheme";
-
+import { useRouter } from "next/navigation";
 
 const transitionClasses = "transition duration-200 ease-in-out";
-
 
 // ✅ User Dropdown Component
 const UserDropdown = ({ loggedInUser, roleConfig }) => {
@@ -81,9 +84,153 @@ const UserDropdown = ({ loggedInUser, roleConfig }) => {
   );
 };
 
+// ✅ Payment Reminder Component for Mechanics with Tooltip
+const PaymentReminder = ({ paymentStatus, onPayClick }) => {
+  const [showTooltip, setShowTooltip] = useState(false);
+  const tooltipRef = useRef(null);
+
+  // Close tooltip when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (tooltipRef.current && !tooltipRef.current.contains(event.target)) {
+        setShowTooltip(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  if (paymentStatus) {
+    return (
+      <div className="relative" ref={tooltipRef}>
+        <div
+          className="flex items-center gap-2 px-4 py-2 bg-success/20 text-success rounded-xl border border-success/30 cursor-help"
+          onMouseEnter={() => setShowTooltip(true)}
+          onMouseLeave={() => setShowTooltip(false)}
+        >
+          <Sparkles size={18} className="text-success" />
+          <span className="text-sm font-semibold">Shop Active! 🎉</span>
+          <CheckCircle size={16} className="text-success" />
+        </div>
+
+        {/* Tooltip for Paid Status */}
+        {showTooltip && (
+          <div className="absolute top-full left-1/2 transform -translate-x-1/2 mt-2 w-64 z-50">
+            <div className="bg-base-100 rounded-xl p-4 border border-base-300 shadow-xl">
+              <div className="flex items-center justify-between mb-2">
+                <h3 className="font-bold text-base-content">Payment Verified</h3>
+                <button
+                  onClick={() => setShowTooltip(false)}
+                  className="text-base-content/50 hover:text-base-content"
+                >
+                  <X size={14} />
+                </button>
+              </div>
+              <p className="text-sm text-base-content/70 mb-3">
+                Your shop is fully activated and visible to customers. Thank you for your payment!
+              </p>
+              <div className="flex items-center gap-2 text-success text-sm">
+                <CheckCircle size={16} />
+                <span>Valid until: {new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toLocaleDateString()}</span>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  if (!paymentStatus) {
+    return (
+      <div className="relative" ref={tooltipRef}>
+        <div
+          className="flex items-center gap-2 px-4 py-2 bg-error/20 text-error rounded-xl border border-error/30 hover:bg-error/30 hover:scale-105 transition-all duration-300 animate-pulse cursor-pointer"
+          onClick={onPayClick}
+          onMouseEnter={() => setShowTooltip(true)}
+          onMouseLeave={() => setShowTooltip(false)}
+        >
+          <AlertTriangle size={18} className="text-error" />
+          <span className="text-sm font-semibold">Payment Required</span>
+          <CreditCard size={16} className="text-error" />
+        </div>
+
+        {/* Tooltip for Pending Payment */}
+        {showTooltip && (
+          <div className="absolute top-full left-1/2 transform -translate-x-1/2 mt-2 w-72 z-50">
+            <div className="bg-base-100 rounded-xl p-4 border border-base-300 shadow-2xl">
+              <div className="flex items-center justify-between mb-3">
+                <h3 className="font-bold text-base-content">Complete Your Payment</h3>
+                {/* <button
+                  onClick={() => setShowTooltip(false)}
+                  className="text-base-content/50 hover:text-base-content"
+                >
+                  <X size={14} />
+                </button> */}
+              </div>
+              <p className="text-sm text-base-content/70 mb-4">
+                Activate your shop listing by completing the payment. Your shop will be visible to customers after payment verification.
+              </p>
+              <div className="space-y-2 text-sm text-base-content/70">
+                <div className="flex items-center gap-2">
+                  <div className="w-2 h-2 bg-error rounded-full"></div>
+                  <span>Amount: <strong className="text-base-content">৳1000.00</strong></span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="w-2 h-2 bg-error rounded-full"></div>
+                  <span>One-time activation fee</span>
+                </div>
+              </div>
+              {/* <button
+                onClick={onPayClick}
+                className="w-full mt-4 btn btn-error btn-sm gap-2 hover:scale-105 transition-transform duration-200"
+              >
+                <CreditCard size={16} />
+                Pay Now - ৳1000.00
+              </button> */}
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  }
+
+
+  return null;
+};
+
 // ✅ Updated Topbar with increased size
 const Topbar = ({ pageTitle = "Dashboard", setIsMobileOpen }) => {
   const { user: loggedInUser } = useUser();
+  const [shopData, setShopData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const router = useRouter();
+
+  // Fetch shop data for mechanics to check payment status
+  useEffect(() => {
+    const fetchShopData = async () => {
+      if (loggedInUser?.role === 'mechanic' && loggedInUser?.email) {
+        try {
+          setLoading(true);
+          const response = await fetch(`/api/shops?email=${loggedInUser.email}`);
+          if (response.ok) {
+            const data = await response.json();
+            // Handle array response
+            if (Array.isArray(data) && data.length > 0) {
+              setShopData(data[0]);
+            } else {
+              setShopData(data);
+            }
+          }
+        } catch (error) {
+          console.error("Error fetching shop data:", error);
+        } finally {
+          setLoading(false);
+        }
+      }
+    };
+
+    fetchShopData();
+  }, [loggedInUser]);
 
   const getRoleStyles = (role) => {
     switch (role) {
@@ -111,9 +258,12 @@ const Topbar = ({ pageTitle = "Dashboard", setIsMobileOpen }) => {
     }
   };
 
-
   const roleConfig = loggedInUser ? getRoleStyles(loggedInUser.role) : null;
 
+  // Handle payment click - navigate to shop profile or payment page
+  const handlePayClick = () => {
+    router.push("/dashboard/mechanic/profile");
+  };
 
   return (
     <header className="sticky top-0 z-15 flex items-center justify-between px-4 sm:px-8 md:px-10 py-3 sm:py-2.5 border-b border-neutral bg-base-100">
@@ -130,13 +280,19 @@ const Topbar = ({ pageTitle = "Dashboard", setIsMobileOpen }) => {
         </h1>
       </div>
 
+      <div className="flex items-center gap-3">
+        {/* Payment Reminder for Mechanics */}
+        {loggedInUser?.role === 'mechanic' && !loading && (
+          <PaymentReminder
+            paymentStatus={shopData?.paymentInfo}
+            onPayClick={handlePayClick}
+          />
+        )}
 
-
-      <div className="flex items-center gap-5">
         <ToggleTheme />
+
         {/* Notification Widget */}
         {loggedInUser && <NotificationWidget loggedInUser={loggedInUser} />}
-
 
         {roleConfig && (
           <button
@@ -147,7 +303,6 @@ const Topbar = ({ pageTitle = "Dashboard", setIsMobileOpen }) => {
             <span className="hidden md:block">{roleConfig.actionText}</span>
           </button>
         )}
-
 
         {loggedInUser && (
           <UserDropdown
@@ -160,6 +315,4 @@ const Topbar = ({ pageTitle = "Dashboard", setIsMobileOpen }) => {
   );
 };
 
-
 export default Topbar;
-

@@ -92,3 +92,22 @@ export async function DELETE(req, { params }) {
     );
   }
 }
+
+
+export async function PUT(req, { params }) {
+  try {
+    const { id } = await params;
+    const data = await req.json();
+    const collection = await dbConnect(collections.mechanicShops);
+
+    const result = await collection.updateOne({ _id: new ObjectId(id) }, { $set: { paymentInfo: { ...data } } } );
+    return NextResponse.json(result);
+  } catch (error) {
+    console.error("Error updating mechanic shop:", error);
+    return NextResponse.json(
+      { error: "Failed to update mechanic shop" },
+      { status: 500 }
+    );
+  }
+  
+}

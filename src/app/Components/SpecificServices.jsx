@@ -48,9 +48,9 @@ export default function SpecificServices(){
 
 
     return (
-        <section className="py-16">
+        <section className="py-10">
       <div className="container mx-auto text-center">
-        <h2 className="text-4xl font-bold mb-10">
+        <h2 className="text-5xl font-bold mb-10">
           Explore by <span className="text-primary">Category</span>
         </h2>
 
@@ -59,7 +59,7 @@ export default function SpecificServices(){
             <Link
               key={cat.slug}
               href={`/category?category=${encodeURIComponent(cat.slug)}`}
-              className=" flex flex-col items-center gap-3 p-6 rounded-2xl shadow hover:shadow-lg transition-all border border-gray-100"
+              className=" flex flex-col items-center gap-3 p-3 md:p-6 rounded-2xl shadow hover:shadow-lg transition-all border border-gray-100"
             >
               {cat.icon}
               <span className="font-semibold ">{cat.name}</span>

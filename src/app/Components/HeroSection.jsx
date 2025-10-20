@@ -106,9 +106,9 @@ export default function HeroModern() {
                 Find a Mechanic
               </button>
             </Link>
-            <button className="border-2 border-primary text-primary hover:bg-accent px-8 py-4 rounded-xl hover:border-primary hover:text-primary transition-all duration-300 w-full sm:w-auto font-medium shadow-sm hover:shadow-md">
-              Become a Partner
-            </button>
+            <Link href="/become-a-mechanic" className="border-2 border-primary text-primary hover:bg-accent px-8 py-4 rounded-xl hover:border-primary hover:text-primary transition-all duration-300 w-full sm:w-auto font-medium shadow-sm hover:shadow-md">
+              Become a Mechanic
+            </Link>
           </div>
 
           {/* Trust Indicators */}

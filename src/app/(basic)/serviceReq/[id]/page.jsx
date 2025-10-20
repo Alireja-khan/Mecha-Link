@@ -394,22 +394,51 @@ const ServiceRequestDetails = () => {
             return;
         }
 
-        const userData = displayUser || request.user;
-
-        const chatPayload = {
-            serviceRequestId: request._id,
-            customerId: request.userId,
-            customerName: userData?.name || userData?.userName || "Not Provided",
-            customerEmail: userData?.email || request.userEmail,
-            customerProfileImage: userData?.profileImage || null,
-            mechanicId: loggedInUser._id,
-            mechanicName: loggedInUser.name || "Not Provided",
-            mechanicEmail: loggedInUser.email,
-            messages: [],
-            mechanicProfileImage: loggedInUser.profileImage || null,
-        };
-
         try {
+            const loggedInUserRole = loggedInUser.role?.toLowerCase();
+
+            // 1️⃣ Fetch all chats of the logged-in user
+            const res = await fetch(`/api/chats?userId=${loggedInUser._id}`);
+            if (!res.ok) throw new Error('Failed to fetch chats');
+            const userChats = await res.json();
+
+            const customerId = request.userId;
+            const mechanicId = loggedInUser._id;
+
+            // 2️⃣ Check if a chat already exists with these participants
+            const existingChat = userChats.find(chat =>
+                chat.participants?.some(p => p.userId === customerId) &&
+                chat.participants?.some(p => p.userId === mechanicId)
+            );
+
+            if (existingChat) {
+                // Redirect to existing chat
+                window.location.href = `/dashboard/${loggedInUserRole}/messages`;
+                return;
+            }
+
+            // 3️⃣ Build new chat structure
+            const chatPayload = {
+                participants: [
+                    {
+                        userId: loggedInUser?._id,
+                        name: loggedInUser?.name || "User",
+                        email: loggedInUser?.email,
+                        profileImage: loggedInUser?.profileImage || ""
+                    },
+                    {
+                        userId: request?.userId,
+                        name: request?.user?.name || request.userName || "Customer",
+                        email: request?.user?.email || request.userEmail,
+                        profileImage: request?.user?.profileImage || ""
+                    }
+                ],
+                messages: [],
+                createdAt: new Date().toISOString(),
+                serviceRequestId: request._id
+            };
+
+            // 4️⃣ Create chat
             const apiResponse = await fetch('/api/chats', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },

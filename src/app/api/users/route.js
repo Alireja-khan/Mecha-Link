@@ -4,19 +4,29 @@ import bcrypt from "bcrypt";
 import {ObjectId} from "mongodb";
 
 export async function GET(request) {
-  const {searchParams} = new URL(request.url);
+  const { searchParams } = new URL(request.url);
   const email = searchParams.get("email");
+  const id = searchParams.get("id"); // ✅ new: support id
   const collection = await dbConnect(collections.users);
 
-  // ✅ Hide sensitive fields (password, otp, otpExpiresAt)
-  const result = await collection.findOne(
-    {email},
-    {projection: {otp: 0, otpExpiresAt: 0}}
-  );
+  let query = {};
+  if (email) query.email = email;
+  else if (id) query._id = new ObjectId(id);
+
+  if (!Object.keys(query).length) {
+    return NextResponse.json(
+      { success: false, message: "Please provide email or id" },
+      { status: 400 }
+    );
+  }
+
+  // ✅ Hide sensitive fields
+  const result = await collection.findOne(query, {
+    projection: { otp: 0, otpExpiresAt: 0, password: 0 },
+  });
 
   return NextResponse.json(result);
 }
-
 export async function POST(req, res) {
   const data = await req.json();
   const collection = await dbConnect(collections.users);

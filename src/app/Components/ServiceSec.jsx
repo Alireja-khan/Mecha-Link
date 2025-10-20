@@ -72,10 +72,10 @@ export default function ServiceSec() {
             <SectionHeaderSkeleton />
           ) : (
             <div className="text-center mb-10 max-w-2xl mx-auto">
-              <h2 className="text-5xl font-bold text-center">
+              <h2 className="md:text-5xl text-4xl font-bold text-center">
                 Trusted <span className="text-primary">Mechanics</span> Near You
               </h2>
-              <p className="text-lg  mt-4">
+              <p className="md:text-lg text-medium mt-4">
                 MechaLink connects you with verified mechanics nearby – making
                 vehicle repairs and services faster, easier, and more reliable.
               </p>

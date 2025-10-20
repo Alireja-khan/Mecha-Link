@@ -1,13 +1,17 @@
 "use client";
 
-import { Wrench, AlertTriangle, Eye, Clock, Zap, HardHat, User, Mail, CheckCircle, Circle } from "lucide-react";
+import useUser from "@/hooks/useUser";
+import { Wrench, AlertTriangle, Eye, Clock, Zap, HardHat, User, Mail, CheckCircle, Circle, Phone, MoreVertical, MessageSquare } from "lucide-react";
 import Link from "next/link";
-import { useState, useEffect } from "react";
+// The 'Router' import is unnecessary for the Link component
+// import { Router } from "next/router"; 
+import React, { useState, useEffect, useRef } from "react";
 // import Loading from "../../../Components/Loading"
 
 const ServiceReqCard = ({ request }) => {
   const [userData, setUserData] = useState(null);
   const [loadingUser, setLoadingUser] = useState(false);
+  const { user: loggedInUser } = useUser()
   // const [loading, setLoading] = useState(true);
 
   // Fetch user data when component mounts
@@ -17,10 +21,12 @@ const ServiceReqCard = ({ request }) => {
 
       setLoadingUser(true);
       try {
+        // Assuming your backend API is at /api/users?email=...
         const response = await fetch(`/api/users?email=${encodeURIComponent(request.userEmail)}`);
         if (response.ok) {
           const user = await response.json();
-          setUserData(user);
+          // Adjust if your API returns an array or different structure
+          setUserData(Array.isArray(user) ? user[0] : user); 
         }
       } catch (error) {
         console.error("Error fetching user data:", error);
@@ -168,67 +174,189 @@ const ServiceReqCard = ({ request }) => {
   );
 
   // User info component
+
   const UserInfo = () => {
-    if (loadingUser) {
-      return (
-        <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg animate-pulse">
-          <div className="w-10 h-10 bg-gray-200 rounded-full"></div>
-          <div className="space-y-2">
-            <div className="h-4 bg-gray-200 rounded w-24"></div>
-            <div className="h-3 bg-gray-200 rounded w-32"></div>
-          </div>
-        </div>
-      );
-    }
+    const [dropdownOpen, setDropdownOpen] = useState(false);
+    const dropdownRef = useRef(null);
 
-    if (!userData) {
-      return (
-        <div className="flex items-center gap-3 p-3 bg-orange-50 truncate rounded-lg border border-orange-200">
-          <div className="w-10 h-10 bg-orange-100 rounded-full flex items-center justify-center">
-            <User className="w-5 h-5 text-orange-400" />
-          </div>
-          <div>
-            <p className="font-medium text-orange-800">Customer</p>
-            <p className="text-sm text-orange-600 flex items-center truncate gap-1">
-              <Mail className="w-3 h-3" />
-              {request?.userEmail || "No email"}
-            </p>
-          </div>
-        </div>
-      );
-    }
+    // Chat state
+    const [loadingChat, setLoadingChat] = useState(false);
 
-    return (
-      <div className="flex items-center gap-3 p-3 bg-white rounded-lg border border-primary shadow-sm">
-        {userData.profileImage ? (
-          <img
-            src={userData.profileImage}
-            alt={userData.name || "Customer"}
-            className="w-10 h-10 rounded-full object-cover border-2 border-orange-200"
-            onError={(e) => {
-              e.target.style.display = 'none';
-              e.target.nextSibling.style.display = 'flex';
-            }}
-          />
-        ) : null}
-        <div className={`${userData.profileImage ? '' : 'w-10 h-10 bg-orange-100 rounded-full flex items-center justify-center'}`}
-          style={{ display: userData.profileImage ? 'none' : 'flex' }}>
-          <User className="w-5 h-5 text-orange-500" />
-        </div>
-        <div className="flex-1 min-w-0">
-          <p className="font-semibold text-gray-900 truncate">
-            {userData.name || userData.userName || "Customer"}
-          </p>
-          <p className="text-sm text-gray-600 flex items-center gap-1 truncate">
-            <Mail className="w-3 h-3 flex-shrink-0" />
-            {userData.email || request?.userEmail}
-          </p>
-          {userData.phone && (
-            <p className="text-xs text-gray-500 mt-1">
-              📞 {userData.phone}
-            </p>
+    // -------------------
+    // Avatar Helper
+    // -------------------
+    const Avatar = ({ src, alt, fallbackLetter, className = '' }) => {
+      const [imageError, setImageError] = useState(false);
+      useEffect(() => { setImageError(false); }, [src]);
+
+      const showImage = src && !imageError;
+      const sizeClass = 'w-10 h-10';
+
+      return (
+        <div className={`${sizeClass} rounded-full overflow-hidden flex items-center justify-center ${className}`}>
+          {showImage ? (
+            <img
+              src={src}
+              alt={alt}
+              className="w-full h-full object-cover"
+              onError={() => setImageError(true)}
+            />
+          ) : (
+            <div className="w-full h-full bg-orange-100 text-orange-500 font-medium text-lg flex items-center justify-center">
+              {fallbackLetter || <User className="w-5 h-5" />}
+            </div>
           )}
         </div>
+      );
+    };
+
+    // -------------------
+    // Close dropdown on outside click
+    // -------------------
+    useEffect(() => {
+      const handleClickOutside = (event) => {
+        if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+          setDropdownOpen(false);
+        }
+      };
+      document.addEventListener("mousedown", handleClickOutside);
+      return () => document.removeEventListener("mousedown", handleClickOutside);
+    }, []);
+
+    // -------------------
+    // Loading State
+    // -------------------
+    if (loadingUser) {
+      return (
+        <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl shadow-inner border border-gray-100 animate-pulse">
+          <div className="w-10 h-10 bg-gray-200 rounded-full"></div>
+          <div className="space-y-1">
+            <div className="h-4 bg-gray-200 rounded w-28"></div>
+            <div className="h-3 bg-gray-200 rounded w-40"></div>
+          </div>
+        </div>
+      );
+    }
+
+    const userId = userData?._id || userData?.userId // Use '_id' or 'userId' for the profile link
+    const name = userData?.name || userData?.userName || "Customer";
+    const email = userData?.email || "no-email@example.com";
+    const profileImage = userData?.profileImage;
+    const phone = userData?.phone;
+    const fallbackLetter = name[0]?.toUpperCase();
+
+    // -------------------
+    // Missing User
+    // -------------------
+    if (!userData) {
+      return (
+        <div className="flex items-center gap-3 p-3 bg-orange-50 truncate rounded-xl border border-orange-200">
+          <Avatar fallbackLetter={<User className="w-5 h-5" />} alt="Default user" />
+          <div className="flex-1 min-w-0">
+            <p className="font-semibold text-orange-800">New Customer</p>
+            <p className="text-sm text-orange-600 flex items-center truncate gap-1" title={email}>
+              <Mail className="w-3 h-3 flex-shrink-0" />
+              {email}
+            </p>
+          </div>
+        </div>
+      );
+    }
+
+    // -------------------
+    // Message User Handler
+    // -------------------
+    const handleMessageUser = async () => {
+      try {
+        setLoadingChat(true);
+
+        const targetUserId = userData?._id || userData?.userId;
+        const loggedInUserId = loggedInUser?._id || loggedInUser?.userId;
+
+        const payload = {
+          participants: [
+            { userId: targetUserId, email, name, profileImage },
+            { userId: loggedInUserId, email: loggedInUser.email, name: loggedInUser.name, profileImage: loggedInUser.profileImage },
+          ],
+        };
+
+        const postRes = await fetch(`/api/chats`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
+
+        const result = await postRes.json();
+        // Assuming the loggedInUser role dictates the dashboard path
+        const userRole = loggedInUser?.role?.toLowerCase() || 'user'; 
+        window.location.href = `/dashboard/${userRole}/messages`
+      } catch (err) {
+        console.error(err);
+        alert("Failed to open chat.");
+      } finally {
+        setLoadingChat(false);
+        setDropdownOpen(false);
+      }
+    };
+
+    // -------------------
+    // Render Full User Info
+    // -------------------
+    return (
+      <div className="relative" ref={dropdownRef}>
+        <div className="flex items-center gap-3 p-3 bg-white rounded-xl border border-gray-200 shadow-lg">
+          <Avatar src={profileImage} alt={name} fallbackLetter={fallbackLetter} className="border-2 border-orange-200" />
+
+          <div className="flex-1 min-w-0">
+            <p className="font-bold text-gray-900 truncate" title={name}>{name}</p>
+            <div className="flex flex-col gap-0.5 text-sm">
+              <p className="text-gray-600 flex items-center gap-1 truncate" title={email}>
+                <Mail className="w-3 h-3 flex-shrink-0" /> {email}
+              </p>
+              {phone && (
+                <p className="text-xs text-gray-500 flex items-center gap-1 truncate" title={phone}>
+                  <Phone className="w-3 h-3 flex-shrink-0" /> {phone}
+                </p>
+              )}
+            </div>
+          </div>
+
+          <button
+            className="p-0.5 rounded-full text-gray-500 hover:bg-gray-100 transition-colors focus:outline-none focus:ring-2 focus:ring-primary"
+            onClick={() => setDropdownOpen(!dropdownOpen)}
+          >
+            <MoreVertical className="w-5 h-5" />
+          </button>
+        </div>
+
+        {dropdownOpen && (
+          <div className="absolute right-0 top-full mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-xl z-20 overflow-hidden">
+            <button
+              className="w-full flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 focus:outline-none focus:bg-gray-100 transition-colors"
+              onClick={handleMessageUser}
+              disabled={loadingChat}
+            >
+              <MessageSquare className="w-4 h-4 mr-3 text-primary" />
+              {loadingChat ? "Loading chat..." : "Send Message"}
+            </button>
+            
+            {/* -------------------------------------------------- */}
+            {/* UPDATED: Link to Dynamic Profile Page */}
+            {/* -------------------------------------------------- */}
+            {userId && (
+              <Link
+                href={`/profile/${userId}`}
+                onClick={() => setDropdownOpen(false)} // Close dropdown on click
+                className="w-full flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 focus:outline-none focus:bg-gray-100 transition-colors"
+              >
+                <User className="w-4 h-4 mr-3 text-primary" />
+                View Profile
+              </Link>
+            )}
+            {/* -------------------------------------------------- */}
+
+          </div>
+        )}
       </div>
     );
   };
