@@ -210,7 +210,7 @@ const PostCard = ({ post, onUpdate, currentUser }) => {
     const commentsContainerHeight = "200px";
 
     return (
-        <div className="bg-base-100 rounded-3xl p-6 border border-neutral shadow-xl hover:shadow-2xl transition-all duration-300">
+        <div className="bg-base-100 rounded-3xl p-6 border border-neutral  transition-all duration-300">
             {/* Post Header */}
             <div className="flex items-start justify-between mb-6">
                 <div className="flex items-center gap-4">

@@ -3,15 +3,17 @@ import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import useUser from '@/hooks/useUser';
-import { Search, Filter, Image as ImageIcon, MessageSquare, Users, TrendingUp } from 'lucide-react';
-import MarkdownEditor from "@/app/components/MarkdownEditor";
-import PostCard from "@/app/components/PostCard";
-import { CATEGORIES } from "@/lib/forumConstants";
+import { Menu, X } from 'lucide-react';
+import ForumSidebar from './ForumSidebar';
+import ForumContent from './ForumContent';
+import { CATEGORIES, CATEGORY_COLORS } from "@/lib/forumConstants";
 
 export default function ForumPage() {
     const { data: session, status } = useSession();
     const { user: currentUser, isLoading: userLoading } = useUser();
     const router = useRouter();
+    
+    // State management
     const [posts, setPosts] = useState([]);
     const [loading, setLoading] = useState(true);
     const [newPostContent, setNewPostContent] = useState("");
@@ -20,6 +22,20 @@ export default function ForumPage() {
     const [searchQuery, setSearchQuery] = useState("");
     const [showFilters, setShowFilters] = useState(false);
     const [uploadedImages, setUploadedImages] = useState([]);
+    const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+    const [activeSort, setActiveSort] = useState("latest");
+    const [stats, setStats] = useState({
+        totalPosts: 0,
+        totalComments: 0,
+        activeUsers: 0,
+        totalPages: 1,
+        currentPage: 1
+    });
+    const [pagination, setPagination] = useState({
+        page: 1,
+        limit: 10,
+        hasMore: true
+    });
 
     // Redirect if not authenticated
     useEffect(() => {
@@ -29,13 +45,18 @@ export default function ForumPage() {
     }, [status, router]);
 
     // Fetch posts with filters
-    const fetchPosts = async () => {
+    const fetchPosts = async (page = 1, append = false) => {
         try {
+            if (!append) setLoading(true);
+            
             let url = "/api/forum";
             const params = new URLSearchParams();
             
             if (searchQuery) params.append("search", searchQuery);
             if (selectedCategory !== "all") params.append("category", selectedCategory);
+            if (activeSort) params.append("sort", activeSort);
+            params.append("page", page);
+            params.append("limit", pagination.limit);
             
             if (params.toString()) {
                 url += `?${params.toString()}`;
@@ -43,8 +64,27 @@ export default function ForumPage() {
 
             const res = await fetch(url);
             const data = await res.json();
+            
             if (data.success) {
-                setPosts(data.posts);
+                if (append) {
+                    setPosts(prev => [...prev, ...data.posts]);
+                } else {
+                    setPosts(data.posts);
+                }
+                
+                // Update stats and pagination
+                setStats(prev => ({
+                    ...prev,
+                    totalPosts: data.stats?.totalPosts || 0,
+                    totalPages: data.stats?.totalPages || 1,
+                    currentPage: data.stats?.currentPage || 1
+                }));
+                
+                setPagination(prev => ({
+                    ...prev,
+                    page: data.stats?.currentPage || 1,
+                    hasMore: data.stats?.hasNextPage || false
+                }));
             }
         } catch (error) {
             console.error("Error fetching posts:", error);
@@ -53,13 +93,35 @@ export default function ForumPage() {
         }
     };
 
+    // Calculate forum statistics from posts
+    const calculateStats = (posts) => {
+        const totalPosts = posts.length;
+        const totalComments = posts.reduce((sum, post) => sum + (post.comments?.length || 0), 0);
+        const uniqueAuthors = new Set(posts.map(post => post.authorId)).size;
+        const totalLikes = posts.reduce((sum, post) => sum + (post.likes?.length || 0), 0);
+        
+        setStats(prev => ({
+            ...prev,
+            totalPosts,
+            totalComments,
+            activeUsers: uniqueAuthors,
+            totalLikes
+        }));
+    };
+
+    // Fetch posts on component mount and when filters change
     useEffect(() => {
         if (status === "authenticated") {
-            fetchPosts();
+            fetchPosts(1, false);
         }
-    }, [status, searchQuery, selectedCategory]);
+    }, [status, searchQuery, selectedCategory, activeSort]);
 
-    // Modify the post submission to include images
+    // Update stats when posts change
+    useEffect(() => {
+        calculateStats(posts);
+    }, [posts]);
+
+    // Handle post creation
     const handleCreatePost = async (e) => {
         e.preventDefault();
         if (!newPostContent.trim() || !currentUser) return;
@@ -72,7 +134,7 @@ export default function ForumPage() {
                 },
                 body: JSON.stringify({
                     content: newPostContent,
-                    images: uploadedImages, // Send ALL uploaded images
+                    images: uploadedImages,
                     authorId: currentUser._id,
                     authorName: currentUser.name,
                     authorRole: currentUser.role,
@@ -84,168 +146,164 @@ export default function ForumPage() {
             const data = await res.json();
             if (data.success) {
                 setNewPostContent("");
-                setUploadedImages([]); // Clear uploaded images
+                setUploadedImages([]);
                 setShowPostForm(false);
                 setSelectedCategory("all");
-                fetchPosts();
+                fetchPosts(1, false); // Refresh posts
             }
         } catch (error) {
             console.error("Error creating post:", error);
         }
     };
 
-    if (status === "loading" || loading || userLoading) {
+    // Load more posts
+    const loadMorePosts = () => {
+        if (pagination.hasMore && !loading) {
+            fetchPosts(pagination.page + 1, true);
+        }
+    };
+
+    // Popular categories with post counts
+    const popularCategories = CATEGORIES.map(category => ({
+        ...category,
+        count: posts.filter(post => post.category === category.value).length,
+        color: CATEGORY_COLORS[category.value] || CATEGORY_COLORS.general
+    })).filter(cat => cat.count > 0)
+      .sort((a, b) => b.count - a.count)
+      .slice(0, 6);
+
+    // Recent active users - FIXED
+    const recentUsers = Object.values(
+        posts.reduce((acc, post) => {
+        if (!acc[post.authorId]) {
+            acc[post.authorId] = {
+            id: post.authorId,
+            name: post.authorName,
+            image: post.authorImage,
+            role: post.authorRole,
+            postCount: posts.filter(p => p.authorId === post.authorId).length
+            };
+        }
+        return acc;
+        }, {})
+    ).slice(0, 8);
+
+    // Top contributors (users with most posts) - FIXED
+    const topContributors = Object.entries(
+        posts.reduce((acc, post) => {
+        if (!acc[post.authorId]) {
+            acc[post.authorId] = {
+            id: post.authorId,
+            name: post.authorName,
+            image: post.authorImage,
+            role: post.authorRole,
+            postCount: 0
+            };
+        }
+        acc[post.authorId].postCount++;
+        return acc;
+        }, {})
+    )
+    .map(([_, user]) => user)
+    .sort((a, b) => b.postCount - a.postCount)
+    .slice(0, 5);
+
+    // Loading state
+    if (status === "loading" || (userLoading && !currentUser)) {
         return (
             <div className="min-h-screen flex items-center justify-center bg-base-200">
-                <span className="loading loading-bars loading-lg text-primary"></span>
+                <div className="text-center">
+                    <span className="loading loading-bars loading-lg text-primary"></span>
+                    <p className="mt-4 text-base-content/60">Loading forum...</p>
+                </div>
             </div>
         );
     }
 
     return (
-        <div className="min-h-screen bg-base-200 py-8">
-            <div className="max-w-3xl mx-auto px-4">
-                {/* Create Post Button - Facebook Style */}
-                <div className="bg-base-100 rounded-2xl p-4 border border-neutral/50 shadow-sm mb-6">
-                    <div className="flex items-center gap-4">
-                        {/* User Avatar */}
-                        <div className="flex-shrink-0">
-                            {currentUser?.profileImage ? (
-                                <img
-                                    src={currentUser.profileImage}
-                                    alt={currentUser.name}
-                                    className="w-10 h-10 rounded-full object-cover border-2 border-primary/20"
-                                />
-                            ) : (
-                                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary to-orange-600 flex items-center justify-center text-white font-bold text-sm">
-                                    {currentUser?.name?.charAt(0) || "U"}
-                                </div>
-                            )}
-                        </div>
-                        
-                        {/* Create Post Input */}
-                        <button
-                            onClick={() => setShowPostForm(true)}
-                            className="flex-1 text-left p-3 bg-base-200 rounded-full border border-neutral/30 hover:bg-base-300 transition-colors duration-200 text-base-content/60"
-                        >
-                            What's on your mind, {currentUser?.name?.split(' ')[0]}?
-                        </button>
-                    </div>
+        <div className="min-h-screen bg-base-200">
+            {/* Mobile Menu Button */}
+            <div className="lg:hidden fixed top-4 left-4 z-50">
+                <button
+                    onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                    className="btn btn-square btn-primary shadow-lg"
+                >
+                    {mobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
+                </button>
+            </div>
+
+            <div className="max-w-7xl mx-auto px-4 py-6 h-screen flex gap-6">
+                {/* Sidebar - Desktop */}
+                <div className="hidden lg:block w-80 flex-shrink-0">
+                    <ForumSidebar 
+                        currentUser={currentUser}
+                        stats={stats}
+                        popularCategories={popularCategories}
+                        recentUsers={recentUsers}
+                        topContributors={topContributors}
+                        onCategorySelect={setSelectedCategory}
+                        selectedCategory={selectedCategory}
+                        onCreatePost={() => setShowPostForm(true)}
+                        onSortChange={setActiveSort}
+                        activeSort={activeSort}
+                    />
                 </div>
 
-                {/* Create Post Form */}
-                {showPostForm && (
-                    <div className="bg-base-100 rounded-2xl border border-neutral/50 shadow-lg mb-6">
-                        <div className="p-4 border-b border-neutral/30">
-                            <h2 className="text-xl font-bold text-base-content text-center">Create Post</h2>
+                {/* Mobile Sidebar Overlay */}
+                {mobileMenuOpen && (
+                    <div className="lg:hidden fixed inset-0 z-40">
+                        <div 
+                            className="absolute inset-0 bg-black bg-opacity-50"
+                            onClick={() => setMobileMenuOpen(false)}
+                        ></div>
+                        <div className="absolute left-0 top-0 h-full w-80 bg-base-100 overflow-y-auto">
+                            <ForumSidebar 
+                                currentUser={currentUser}
+                                stats={stats}
+                                popularCategories={popularCategories}
+                                recentUsers={recentUsers}
+                                topContributors={topContributors}
+                                onCategorySelect={(category) => {
+                                    setSelectedCategory(category);
+                                    setMobileMenuOpen(false);
+                                }}
+                                selectedCategory={selectedCategory}
+                                onCreatePost={() => {
+                                    setShowPostForm(true);
+                                    setMobileMenuOpen(false);
+                                }}
+                                onSortChange={setActiveSort}
+                                activeSort={activeSort}
+                            />
                         </div>
-                        <form onSubmit={handleCreatePost} className="p-4">
-                            {/* User Info */}
-                            <div className="flex items-center gap-3 mb-4">
-                                {currentUser?.profileImage ? (
-                                    <img
-                                        src={currentUser.profileImage}
-                                        alt={currentUser.name}
-                                        className="w-8 h-8 rounded-full object-cover"
-                                    />
-                                ) : (
-                                    <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary to-orange-600 flex items-center justify-center text-white text-xs font-bold">
-                                        {currentUser?.name?.charAt(0) || "U"}
-                                    </div>
-                                )}
-                                <div>
-                                    <p className="font-semibold text-base-content text-sm">{currentUser?.name}</p>
-                                </div>
-                            </div>
-
-                            {/* Markdown Editor */}
-                            <div className="mb-4">
-                                <MarkdownEditor
-                                    value={newPostContent}
-                                    onChange={setNewPostContent}
-                                    placeholder="What's on your mind?"
-                                    onImagesChange={setUploadedImages}
-                                />
-                            </div>
-
-                            {/* Image Preview */}
-                            {/* {uploadedImages.length > 0 && (
-                                <div className="mb-4">
-                                    <p className="text-sm text-gray-600 mb-2">Uploaded Images:</p>
-                                    <div className="flex gap-2">
-                                        {uploadedImages.map((image, index) => (
-                                            <div key={index} className="relative">
-                                                <img 
-                                                    src={image} 
-                                                    alt="Uploaded" 
-                                                    className="w-20 h-20 object-cover rounded-lg"
-                                                />
-                                            </div>
-                                        ))}
-                                    </div>
-                                </div>
-                            )} */}
-
-                            {/* Category Selection */}
-                            <div className="mb-4">
-                                <select
-                                    value={selectedCategory}
-                                    onChange={(e) => setSelectedCategory(e.target.value)}
-                                    className="w-full p-3 border border-neutral/30 rounded-xl bg-base-200/50 focus:bg-base-100 focus:border-primary/50 focus:outline-none text-base-content text-sm"
-                                >
-                                    <option value="all">Add Category</option>
-                                    {CATEGORIES.map((category) => (
-                                        <option key={category.value} value={category.value}>
-                                            {category.label}
-                                        </option>
-                                    ))}
-                                </select>
-                            </div>
-                            
-                            <div className="flex justify-end gap-3 pt-4 border-t border-neutral/30">
-                                <button
-                                    type="button"
-                                    onClick={() => {
-                                        setShowPostForm(false);
-                                        setNewPostContent("");
-                                        setUploadedImages([]);
-                                        setSelectedCategory("all");
-                                    }}
-                                    className="px-6 py-2 bg-base-200 text-base-content rounded-lg font-medium hover:bg-base-300 transition-colors duration-200"
-                                >
-                                    Cancel
-                                </button>
-                                <button
-                                    type="submit"
-                                    className="bg-primary text-primary-content px-6 py-2 rounded-lg font-medium hover:bg-orange-700 transition-colors duration-200"
-                                    disabled={!newPostContent.trim()}
-                                >
-                                    Post
-                                </button>
-                            </div>
-                        </form>
                     </div>
                 )}
 
-                {/* Posts List */}
-                <div className="space-y-4">
-                    {posts.length === 0 ? (
-                        <div className="bg-base-100 rounded-2xl p-8 text-center border border-neutral/50 shadow-sm">
-                            <MessageSquare size={32} className="mx-auto text-base-content/30 mb-3" />
-                            <p className="text-base-content/60 text-sm">No posts yet</p>
-                            <p className="text-base-content/40 text-xs mt-1">Be the first to share something!</p>
-                        </div>
-                    ) : (
-                        posts.map((post) => (
-                            <PostCard 
-                                key={post._id}
-                                post={post}
-                                onUpdate={fetchPosts}
-                                currentUser={currentUser}
-                            />
-                        ))
-                    )}
-                </div>
+                {/* Main Content */}
+                <ForumContent
+                  currentUser={currentUser}
+                  posts={posts}
+                  loading={loading}
+                  newPostContent={newPostContent}
+                  setNewPostContent={setNewPostContent}
+                  showPostForm={showPostForm}
+                  setShowPostForm={setShowPostForm}
+                  selectedCategory={selectedCategory}
+                  setSelectedCategory={setSelectedCategory}
+                  searchQuery={searchQuery}
+                  setSearchQuery={setSearchQuery}
+                  showFilters={showFilters}
+                  setShowFilters={setShowFilters}
+                  uploadedImages={uploadedImages}
+                  setUploadedImages={setUploadedImages}
+                  activeSort={activeSort}
+                  setActiveSort={setActiveSort}
+                  stats={stats}
+                  pagination={pagination}
+                  handleCreatePost={handleCreatePost}
+                  loadMorePosts={loadMorePosts}
+                  fetchPosts={fetchPosts}
+                />
             </div>
         </div>
     );
