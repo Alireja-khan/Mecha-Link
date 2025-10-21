@@ -1,9 +1,9 @@
 "use client";
-import { Search, Filter, Image as ImageIcon, MessageSquare, Hash, Plus, X, ChevronDown, ChevronUp } from 'lucide-react';
-import MarkdownEditor from "@/app/components/MarkdownEditor";
-import PostCard from "@/app/components/PostCard";
+import { Search, Filter, Image as ImageIcon, MessageSquare, Hash, X, ChevronDown, ChevronUp } from 'lucide-react';
 import { CATEGORIES, CATEGORY_COLORS } from "@/lib/forumConstants";
 import PostSkeleton from './PostSkeleton';
+import MarkdownEditor from '@/app/Components/MarkdownEditor';
+import PostCard from '@/app/Components/PostCard';
 
 export const ForumContent = ({
   currentUser,
@@ -145,7 +145,6 @@ const CreatePostForm = ({
   setNewPostContent,
   selectedCategory,
   setSelectedCategory,
-  uploadedImages,
   setUploadedImages,
   setShowPostForm,
   handleCreatePost

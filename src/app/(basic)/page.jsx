@@ -7,7 +7,7 @@ import WhyChooseUs from "../Components/WhyChooseUs";
 import HowItWork from "../Components/HowItWork";
 import HeroSection from "../Components/HeroSection";
 import BlogSection from "../Components/BlogSection";
-import MapWithSearch from "../Components/MapWithSearch";
+import Map from "../Components/Map";
 
 
 export default function Home() {
@@ -21,7 +21,7 @@ export default function Home() {
             <WhyChooseUs />
             <HowItWork />
             <ReviewSection />
-            <MapWithSearch />
+            <Map />
             <BlogSection />
             <Newsletter />
             
