@@ -3,17 +3,36 @@ import { useState } from "react";
 import axios from "axios";
 import { UploadCloud } from "lucide-react";
 import toast from "react-hot-toast";
+import Swal from "sweetalert2";
+import { useRouter } from "next/navigation";
 import { uploadImageToImgbb } from "@/lib/uploadImgbb";
 import Button from "@/app/shared/Button";
+import useUser from "@/hooks/useUser";
 
 const Advertise = () => {
+  const { user } = useUser(); // ✅ Get logged-in mechanic info
+  const router = useRouter();
+
+  // 🔹 Form State
   const [formData, setFormData] = useState({
     title: "",
     description: "",
     bannerImage: "",
+    duration: "1", // default 1 day
   });
+
   const [loading, setLoading] = useState(false);
   const [preview, setPreview] = useState(null);
+
+  // 🔹 Ad Pricing
+  const adPricing = {
+    "1": 100,
+    "3": 250,
+    "5": 400,
+    "7": 590,
+    "15": 1250,
+    "30": 2000,
+  };
 
   // 🔹 Handle image upload
   const handleImageUpload = async (e) => {
@@ -52,11 +71,17 @@ const Advertise = () => {
     }));
   };
 
-  // 🔹 Submit Ad using Axios
+  // 🔹 Submit Ad
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     if (!formData.bannerImage) {
       toast.error("Please upload a banner image first!");
+      return;
+    }
+
+    if (!user?.email) {
+      toast.error("User email not found! Please log in again.");
       return;
     }
 
@@ -66,19 +91,36 @@ const Advertise = () => {
       title: formData.title,
       description: formData.description,
       bannerImage: formData.bannerImage,
+      shopEmail: user.email,
       status: "pending",
       isPaid: false,
+      duration: parseInt(formData.duration),
+      price: adPricing[formData.duration],
     };
 
     try {
       const res = await axios.post("/api/ads", adData);
-console.log(res);
+
       if (res.status === 201) {
-        toast.success("Your ad has been submitted successfully!");
+        // Show Swal success message
+        await Swal.fire({
+          title: "Ad Submitted Successfully!",
+          text: `Your ad for ${formData.duration} day(s) is submitted. Proceed to payment.`,
+          icon: "success",
+          confirmButtonText: "Go to Profile",
+          timer: 4000,
+          timerProgressBar: true,
+        });
+
+        // Redirect to profile/payment page
+        router.push("/dashboard/mechanic/profile"); 
+
+        // Reset form
         setFormData({
           title: "",
           description: "",
           bannerImage: "",
+          duration: "1",
         });
         setPreview(null);
       } else {
@@ -92,8 +134,6 @@ console.log(res);
     }
   };
 
-  
-
   return (
     <div className="max-w-6xl mx-auto space-y-8 p-6 md:p-10">
       {/* 🔹 Live Hero Preview */}
@@ -105,11 +145,14 @@ console.log(res);
               <h2 className="text-3xl md:text-5xl font-extrabold">
                 {formData.title || "Ad Title Preview"}
               </h2>
-              <p className="mt-4 text-lg md:text-xl mb-4">
+              <p className="mt-4 text-lg md:text-xl mb-2">
                 {formData.description ||
                   "Ad description preview will appear here."}
               </p>
-              <Button>Browse Shop</Button>
+              <p className="text-sm md:text-base font-medium text-gray-600">
+                {`Duration: ${formData.duration} day(s) - Price: ${adPricing[formData.duration]} Tk`}
+              </p>
+              <Button className="mt-4">Browse Shop</Button>
             </div>
 
             {/* Right: Banner Image */}
@@ -147,6 +190,20 @@ console.log(res);
             />
           </div>
 
+          {/* Shop Email (auto-filled & disabled) */}
+          <div>
+            <label className="block text-sm font-semibold mb-1">
+              Your Shop Email
+            </label>
+            <input
+              type="email"
+              name="shopEmail"
+              value={user?.email || ""}
+              disabled
+              className="input input-bordered w-full text-base-content bg-base-200/40"
+            />
+          </div>
+
           {/* Description */}
           <div>
             <label className="block text-sm font-semibold mb-1">
@@ -161,6 +218,26 @@ console.log(res);
               rows={4}
               className="textarea textarea-bordered w-full resize-none text-base-content"
             />
+          </div>
+
+          {/* Ad Duration */}
+          <div>
+            <label className="block text-sm font-semibold mb-1">
+              Select Ad Duration
+            </label>
+            <select
+              name="duration"
+              value={formData.duration}
+              onChange={handleChange}
+              className="input input-bordered w-full text-base-content"
+            >
+              <option value="1">1 Day - {adPricing["1"]} Tk</option>
+              <option value="3">3 Days - {adPricing["3"]} Tk</option>
+              <option value="5">5 Days - {adPricing["5"]} Tk</option>
+              <option value="7">7 Days - {adPricing["7"]} Tk</option>
+              <option value="15">15 Days - {adPricing["15"]} Tk</option>
+              <option value="30">30 Days - {adPricing["30"]} Tk</option>
+            </select>
           </div>
 
           {/* Banner Upload */}
@@ -197,8 +274,6 @@ console.log(res);
               />
             </label>
           </div>
-
-          
 
           {/* Submit Button */}
           <button

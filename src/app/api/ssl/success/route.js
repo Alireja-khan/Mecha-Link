@@ -38,7 +38,7 @@ export async function POST(req) {
   return new Response(null, {
     status: 302,
     headers: {
-      Location: `${process.env.NEXT_PUBLIC_BASE_URL}/success?shopID=${data.value_a}`,
+      Location: `${process.env.NEXT_PUBLIC_BASE_URL}/success?shopID=${data.value_a}&trxn=${data.tran_id}`,
     },
   });
 }
