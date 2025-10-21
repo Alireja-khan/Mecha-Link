@@ -61,6 +61,7 @@ const Sidebar = ({ isMobileOpen, setIsMobileOpen }) => {
       menuItem("Coupons", <Tag size={20} />, "/dashboard/admin/coupons"),
       menuItem("Announcements", <Megaphone size={20} />, "/dashboard/admin/announcements"),
       menuItem("Add Blogs", <PenLine size={20} />, "/dashboard/admin/blogs"),
+      menuItem("Revenue Report", <PenLine size={20} />, "/dashboard/admin/revenue"),
     ],
     mechanic: [
       menuItem("Reviews", <Star size={20} />, `/dashboard/mechanic/reviews`),

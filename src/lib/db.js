@@ -13,6 +13,5 @@ export default async function dbConnect(collectionName) {
     db = client.db(process.env.DB_NAME);
     console.log("✅ MongoDB Connected");
   }
-
   return db.collection(collectionName);
 }
