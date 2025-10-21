@@ -6,16 +6,16 @@ import { useState, useEffect } from "react";
 import { Search, MapPin, Loader2, Filter } from "lucide-react";
 import Link from "next/link";
 
-import markerIcon2x from "leaflet/dist/images/marker-icon-2x.png";
-import markerIcon from "leaflet/dist/images/marker-icon.png";
-import markerShadow from "leaflet/dist/images/marker-shadow.png";
 import { MapContainer, Marker, Popup, TileLayer, useMap } from "react-leaflet";
 
-delete L.Icon.Default.prototype._getIconUrl;
-L.Icon.Default.mergeOptions({
-  iconRetinaUrl: markerIcon2x,
-  iconUrl: markerIcon,
-  shadowUrl: markerShadow,
+
+const customIcon = new L.Icon({
+  iconUrl: "/marker-icon-2x.png",
+  shadowUrl: "/marker-shadow.png",
+  iconSize: [25, 35],
+  iconAnchor: [12, 20],
+  popupAnchor: [1, -34],
+  shadowSize: [38, 38],
 });
 
 function FitBounds({ mechanicShops }) {
@@ -199,6 +199,7 @@ export default function MapWithSearch() {
                   <Marker
                     key={shop._id}
                     position={[shop.latitude, shop.longitude]}
+                    icon={customIcon}
                   >
                     <Popup className=" w-50">
                       <Link href={`/services/${shop._id}`}>
