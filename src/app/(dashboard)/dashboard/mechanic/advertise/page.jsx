@@ -10,21 +10,22 @@ import Button from "@/app/shared/Button";
 import useUser from "@/hooks/useUser";
 
 const Advertise = () => {
-  const { user } = useUser(); // ✅ Get logged-in mechanic info
+  const { user } = useUser();
   const router = useRouter();
 
-  // 🔹 Form State
   const [formData, setFormData] = useState({
     title: "",
     description: "",
     bannerImage: "",
-    duration: "1", // default 1 day
+    startDate: "",
+    endDate: "",
+    duration: 1,
   });
 
   const [loading, setLoading] = useState(false);
   const [preview, setPreview] = useState(null);
 
-  // 🔹 Ad Pricing
+  // 🔹 Base Pricing Table
   const adPricing = {
     "1": 100,
     "3": 250,
@@ -32,6 +33,47 @@ const Advertise = () => {
     "7": 590,
     "15": 1250,
     "30": 2000,
+  };
+
+  // 🔹 Handle Input
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
+  // 🔹 Handle Dates & Auto Calculate Duration
+  const handleDateChange = (e) => {
+    const { name, value } = e.target;
+    const updated = { ...formData, [name]: value };
+
+    // Calculate days difference if both dates selected
+    if (updated.startDate && updated.endDate) {
+      const start = new Date(updated.startDate);
+      const end = new Date(updated.endDate);
+      const diffTime = end - start;
+      const diffDays = Math.max(Math.ceil(diffTime / (1000 * 60 * 60 * 24)), 1);
+
+      updated.duration = diffDays;
+    }
+
+    setFormData(updated);
+  };
+
+  // 🔹 Dynamic price calculation
+  const getDynamicPrice = (days) => {
+    if (adPricing[days]) return adPricing[days];
+    const closestLower = Object.keys(adPricing)
+      .map(Number)
+      .reverse()
+      .find((d) => d <= days);
+    if (closestLower) {
+      const ratio = days / closestLower;
+      return Math.round(adPricing[closestLower] * ratio);
+    }
+    return 100; // default fallback
   };
 
   // 🔹 Handle image upload
@@ -62,15 +104,6 @@ const Advertise = () => {
     }
   };
 
-  // 🔹 Handle input changes
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-  };
-
   // 🔹 Submit Ad
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -80,10 +113,17 @@ const Advertise = () => {
       return;
     }
 
+    if (!formData.startDate || !formData.endDate) {
+      toast.error("Please select both start and end dates!");
+      return;
+    }
+
     if (!user?.email) {
       toast.error("User email not found! Please log in again.");
       return;
     }
+
+    const price = getDynamicPrice(formData.duration);
 
     setLoading(true);
 
@@ -95,32 +135,32 @@ const Advertise = () => {
       status: "pending",
       isPaid: false,
       duration: parseInt(formData.duration),
-      price: adPricing[formData.duration],
+      price,
+      startDate: formData.startDate,
+      endDate: formData.endDate,
     };
 
     try {
       const res = await axios.post("/api/ads", adData);
 
       if (res.status === 201) {
-        // Show Swal success message
         await Swal.fire({
           title: "Ad Submitted Successfully!",
-          text: `Your ad for ${formData.duration} day(s) is submitted. Proceed to payment.`,
+          text: `Your ad is set for ${formData.duration} day(s) — total price ${price} Tk.`,
           icon: "success",
           confirmButtonText: "Go to Profile",
           timer: 4000,
           timerProgressBar: true,
         });
 
-        // Redirect to profile/payment page
-        router.push("/dashboard/mechanic/profile"); 
-
-        // Reset form
+        router.push("/dashboard/mechanic/profile");
         setFormData({
           title: "",
           description: "",
           bannerImage: "",
-          duration: "1",
+          startDate: "",
+          endDate: "",
+          duration: 1,
         });
         setPreview(null);
       } else {
@@ -140,22 +180,16 @@ const Advertise = () => {
       {preview && (
         <section className="relative py-10 md:py-16">
           <div className="flex flex-col lg:flex-row items-center gap-8 rounded-2xl shadow-lg overflow-hidden border border-base-200 p-4 md:p-6">
-            {/* Left: Title & Description */}
             <div className="flex-1 text-center lg:text-left">
               <h2 className="text-3xl md:text-5xl font-extrabold">
                 {formData.title || "Ad Title Preview"}
               </h2>
               <p className="mt-4 text-lg md:text-xl mb-2">
-                {formData.description ||
-                  "Ad description preview will appear here."}
+                {formData.description || "Ad description preview will appear here."}
               </p>
-              <p className="text-sm md:text-base font-medium text-gray-600">
-                {`Duration: ${formData.duration} day(s) - Price: ${adPricing[formData.duration]} Tk`}
-              </p>
+              
               <Button className="mt-4">Browse Shop</Button>
             </div>
-
-            {/* Right: Banner Image */}
             <div className="flex-1 relative w-full h-64 md:h-80">
               <img
                 src={preview}
@@ -176,9 +210,7 @@ const Advertise = () => {
         <form onSubmit={handleSubmit} className="space-y-5">
           {/* Title */}
           <div>
-            <label className="block text-sm font-semibold mb-1">
-              Advertisement Title
-            </label>
+            <label className="block text-sm font-semibold mb-1">Advertisement Title</label>
             <input
               type="text"
               name="title"
@@ -190,25 +222,9 @@ const Advertise = () => {
             />
           </div>
 
-          {/* Shop Email (auto-filled & disabled) */}
-          <div>
-            <label className="block text-sm font-semibold mb-1">
-              Your Shop Email
-            </label>
-            <input
-              type="email"
-              name="shopEmail"
-              value={user?.email || ""}
-              disabled
-              className="input input-bordered w-full text-base-content bg-base-200/40"
-            />
-          </div>
-
           {/* Description */}
           <div>
-            <label className="block text-sm font-semibold mb-1">
-              Description
-            </label>
+            <label className="block text-sm font-semibold mb-1">Description</label>
             <textarea
               name="description"
               value={formData.description}
@@ -220,31 +236,41 @@ const Advertise = () => {
             />
           </div>
 
-          {/* Ad Duration */}
-          <div>
-            <label className="block text-sm font-semibold mb-1">
-              Select Ad Duration
-            </label>
-            <select
-              name="duration"
-              value={formData.duration}
-              onChange={handleChange}
-              className="input input-bordered w-full text-base-content"
-            >
-              <option value="1">1 Day - {adPricing["1"]} Tk</option>
-              <option value="3">3 Days - {adPricing["3"]} Tk</option>
-              <option value="5">5 Days - {adPricing["5"]} Tk</option>
-              <option value="7">7 Days - {adPricing["7"]} Tk</option>
-              <option value="15">15 Days - {adPricing["15"]} Tk</option>
-              <option value="30">30 Days - {adPricing["30"]} Tk</option>
-            </select>
+          {/* Start and End Dates */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-semibold mb-1">Start Date</label>
+              <input
+                type="date"
+                name="startDate"
+                value={formData.startDate}
+                onChange={handleDateChange}
+                required
+                className="input input-bordered w-full"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-semibold mb-1">End Date</label>
+              <input
+                type="date"
+                name="endDate"
+                value={formData.endDate}
+                onChange={handleDateChange}
+                required
+                className="input input-bordered w-full"
+              />
+            </div>
+          </div>
+
+          {/* Duration & Price Summary */}
+          <div className="bg-base-200/40 rounded-xl p-3 text-center text-sm font-medium">
+            Showing ad for <b>{formData.duration}</b> day(s). Total price:{" "}
+            <b>{getDynamicPrice(formData.duration)} Tk</b>
           </div>
 
           {/* Banner Upload */}
           <div>
-            <label className="block text-sm font-semibold mb-1">
-              Upload Banner Image
-            </label>
+            <label className="block text-sm font-semibold mb-1">Upload Banner Image</label>
             <label
               htmlFor="bannerImage"
               className="flex flex-col items-center justify-center border-2 border-dashed rounded-xl p-4 cursor-pointer hover:border-primary transition"
@@ -258,9 +284,7 @@ const Advertise = () => {
               ) : (
                 <>
                   <UploadCloud size={32} className="mb-2" />
-                  <p className="text-sm text-center">
-                    Click or drag an image to upload
-                  </p>
+                  <p className="text-sm text-center">Click or drag an image to upload</p>
                 </>
               )}
               <input
@@ -275,7 +299,7 @@ const Advertise = () => {
             </label>
           </div>
 
-          {/* Submit Button */}
+          {/* Submit */}
           <button
             type="submit"
             disabled={loading}
