@@ -1,5 +1,5 @@
-import dbConnect, { collections } from "@/lib/dbConnect";
-import { NextResponse } from "next/server";
+import dbConnect, {collections} from "@/lib/dbConnect";
+import {NextResponse} from "next/server";
 
 // ✅ Create a new Advertisement
 export async function POST(req) {
@@ -12,21 +12,43 @@ export async function POST(req) {
       status,
       isPaid,
       shopEmail,
-      duration,
+      startDate,
+      endDate,
       price,
     } = body;
 
     // 🛑 Validate required fields
-    if (!title || !description || !bannerImage || !shopEmail || !duration || !price) {
+    if (
+      !title ||
+      !description ||
+      !bannerImage ||
+      !shopEmail ||
+      !startDate ||
+      !endDate ||
+      !price
+    ) {
       return NextResponse.json(
         { error: "Missing required fields" },
         { status: 400 }
       );
     }
 
+    // 🧮 Calculate duration in days
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+    const duration =
+      Math.ceil((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24)) + 1; // include both days
+
+    if (duration <= 0) {
+      return NextResponse.json(
+        { error: "End date must be after start date" },
+        { status: 400 }
+      );
+    }
+
     const collection = await dbConnect(collections.ads);
 
-    // 🆕 Create new ad document with duration and price
+    // 🆕 Create new ad document
     const newAd = {
       title,
       description,
@@ -34,28 +56,37 @@ export async function POST(req) {
       shopEmail,
       status: status || "pending",
       isPaid: isPaid || false,
-      duration: parseInt(duration), // store as number
-      price: parseInt(price), // store as number
+      startDate: start,
+      endDate: end,
+      duration,
+      price: parseInt(price),
       createdAt: new Date(),
     };
 
     const result = await collection.insertOne(newAd);
 
     return NextResponse.json(
-      { message: "Ad created successfully", adId: result.insertedId },
+      {
+        message: "Ad created successfully",
+        adId: result.insertedId,
+        duration,
+      },
       { status: 201 }
     );
   } catch (error) {
     console.error("Error creating ad:", error);
-    return NextResponse.json({ error: "Failed to create ad" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Failed to create ad" },
+      { status: 500 }
+    );
   }
 }
 
 // ✅ Get all ads
 export async function GET(req) {
   try {
-    const { searchParams } = new URL(req.url);
-    const email = searchParams.get("email"); // get ?email= from query
+    const {searchParams} = new URL(req.url);
+    const email = searchParams.get("email");  
 
     const adsCollection = await dbConnect(collections.ads);
     const shopsCollection = await dbConnect(collections.mechanicShops);
@@ -65,17 +96,18 @@ export async function GET(req) {
       query.shopEmail = email;
     }
 
-    const ads = await adsCollection.find(query).sort({ createdAt: -1 }).toArray();
+    const ads = await adsCollection.find(query).sort({createdAt: -1}).toArray();
 
     const adsWithShopId = await Promise.all(
       ads.map(async (ad) => {
         const shop = await shopsCollection.findOne({
           "shop.contact.email": ad.shopEmail,
         });
+        
         return {
           ...ad,
           shopId: shop?._id || null,
-          shopName: shop?.shopName || null,
+          shopName: shop?.shop?.shopName || null,
         };
       })
     );
@@ -83,6 +115,6 @@ export async function GET(req) {
     return NextResponse.json(adsWithShopId);
   } catch (error) {
     console.error("Error fetching ads:", error);
-    return NextResponse.json({ error: "Failed to fetch ads" }, { status: 500 });
+    return NextResponse.json({error: "Failed to fetch ads"}, {status: 500});
   }
 }

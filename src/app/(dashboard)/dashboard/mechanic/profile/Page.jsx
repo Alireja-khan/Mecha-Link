@@ -35,11 +35,13 @@ import {
   Crown,
   BadgeCheck,
   Sparkles,
+  Trash2,
 } from "lucide-react";
 import {useRouter} from "next/navigation";
 import toast from "react-hot-toast";
 import Button from "@/app/shared/Button";
 import Swal from "sweetalert2";
+import axios from "axios";
 
 const MechanicProfile = ({shopId}) => {
   const {user: loggedInUser, loading: userLoading} = useUser();
@@ -139,6 +141,34 @@ const MechanicProfile = ({shopId}) => {
       fetchAds();
     }
   }, [loggedInUser]);
+  const handleDelete = async (id, title) => {
+    const result = await Swal.fire({
+      title: `Delete "${title}"?`,
+      text: "This action cannot be undone!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "#3085d6",
+      confirmButtonText: "Yes, delete it!",
+    });
+console.log(id,title);
+    if (result.isConfirmed) {
+      try {
+        const res = await axios.delete(`/api/ads/${id}`);
+
+        if (res.status === 200) {
+          setAdsData((prev) => prev.filter((ad) => ad._id !== id));
+          Swal.fire("Deleted!", "Your ad has been deleted.", "success");
+        } else {
+          Swal.fire("Error", "Failed to delete the ad.", "error");
+        }
+      } catch (error) {
+        console.error("Delete error:", error);
+        Swal.fire("Error", "Something went wrong.", "error");
+      }
+    }
+  };
+
   // Loading and Auth Check
   if (userLoading) {
     return (
@@ -661,7 +691,7 @@ const MechanicProfile = ({shopId}) => {
             adsData.map((ad) => (
               <div
                 key={ad._id}
-                className="flex flex-col md:flex-row items-center md:items-start gap-4 mb-6 p-4 border rounded-2xl shadow-sm hover:shadow-md transition"
+                className="flex flex-col md:flex-row items-center md:items-start gap-4 mb-6 p-4 border border-gray-50 rounded-2xl shadow-sm hover:shadow-md transition"
               >
                 {/* Banner Image */}
                 <img
@@ -678,7 +708,9 @@ const MechanicProfile = ({shopId}) => {
                     Duration: {ad.duration} {ad.duration > 1 ? "days" : "day"} |
                     Price: {ad.price} Tk
                   </p>
-                  <p className="text-gray-600 mt-1">Status: <span>{ad.status}</span></p>
+                  <p className="text-gray-600 mt-1">
+                    Status: <span>{ad.status}</span>
+                  </p>
                   <p className="text-sm mt-1">
                     Payment Status:{" "}
                     <span
@@ -693,25 +725,40 @@ const MechanicProfile = ({shopId}) => {
                   </p>
                 </div>
 
-                {/* Pay Now Button */}
-                {ad.isPaid || (
-                  <Button  onClick={async () => {
-              const result = await Swal.fire({
-                title: `Pay ${ad.price} Tk for "${ad.title}"?`,
-                icon: "question",
-                showCancelButton: true,
-                confirmButtonText: "Yes, Pay Now",
-                cancelButtonText: "Cancel",
-              });
+                {/* Action Buttons */}
+                <div className="flex flex-col md:flex-row gap-2">
+                  {!ad.isPaid && (
+                    <Button
+                      onClick={async () => {
+                        const result = await Swal.fire({
+                          title: `Pay ${ad.price} Tk for "${ad.title}"?`,
+                          icon: "question",
+                          showCancelButton: true,
+                          confirmButtonText: "Yes, Pay Now",
+                          cancelButtonText: "Cancel",
+                        });
 
-              if (result.isConfirmed) {
-                // Here you can call your payment API
-                Swal.fire("Paid!", "Your payment was successful.", "success");
-              }
-            }}>
-                    Pay Now
+                        if (result.isConfirmed) {
+                          Swal.fire(
+                            "Paid!",
+                            "Your payment was successful.",
+                            "success"
+                          );
+                        }
+                      }}
+                    >
+                      Pay Now
+                    </Button>
+                  )}
+
+                  {/* Delete Button */}
+                  <Button
+                    className="bg-red-500 hover:bg-red-600 text-white btn-sm"
+                    onClick={() => handleDelete(ad._id, ad.title)}
+                  >
+                    <Trash2 />
                   </Button>
-                )}
+                </div>
               </div>
             ))
           )}
