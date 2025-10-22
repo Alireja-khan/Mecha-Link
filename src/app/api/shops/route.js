@@ -75,21 +75,19 @@ export async function GET(req) {
     // ✅ 3️⃣ Build query pipeline for general fetching
     let matchStage = {};
 
-    // For admin panel, show all shops. For public, only show approved shops
-    if (!admin) {
-      matchStage.status = "approved";
-    }
+    if (!admin) matchStage.status = "approved";
+    if (status && status !== "all") matchStage.status = status;
 
-    if (status && status !== "all") {
-      matchStage.status = status;
+    // ✅ ADDED: category filtering (exact match)
+    if (category) {
+      matchStage["shop.categories"] = category;
     }
 
     if (search) {
       matchStage.$or = [
         { "shop.shopName": { $regex: search, $options: "i" } },
-        { "shop.categories": { $regex: search, $options: "i" } },
-        { "shop.address.street": { $regex: search, $options: "i" } },
         { "shop.address.city": { $regex: search, $options: "i" } },
+        { "ownerName": { $regex: search, $options: "i" } },
         { "shop.address.country": { $regex: search, $options: "i" } },
         { ownerName: { $regex: search, $options: "i" } },
         { ownerEmail: { $regex: search, $options: "i" } },
@@ -147,10 +145,7 @@ export async function GET(req) {
       },
     ];
 
-    if (Object.keys(sortStage).length) {
-      pipeline.push({ $sort: sortStage });
-    }
-
+    if (Object.keys(sortStage).length) pipeline.push({ $sort: sortStage });
     if (limit > 0) {
       pipeline.push({ $skip: (page - 1) * limit });
       pipeline.push({ $limit: limit });

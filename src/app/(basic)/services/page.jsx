@@ -99,6 +99,7 @@ const Services = () => {
     </div>
   );
 
+
   // Pagination Skeleton
   const PaginationSkeleton = () => (
     <div className="flex flex-col md:flex-row justify-between mt-8 items-center gap-4 animate-pulse">
@@ -146,6 +147,8 @@ const Services = () => {
                 <p className="text-xl text-orange-100 mb-8 leading-relaxed max-w-2xl">
                   Connect with certified mechanics and service shops. Browse ratings, services, and locations to find the perfect match for your needs.
                 </p>
+
+                
               </div>
 
               {/* Right Illustration/Content */}
