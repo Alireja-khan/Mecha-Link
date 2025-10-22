@@ -53,7 +53,7 @@ export default function PartDetailPage() {
     // Buy now logic here
   };
 
-  const increaseQuantity = () => {
+const increaseQuantity = () => {
     if (quantity < part.quantity) {
       setQuantity(quantity + 1);
     }
