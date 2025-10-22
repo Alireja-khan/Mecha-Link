@@ -9,6 +9,7 @@ import { useEffect, useRef, useState } from "react";
 import { FaGear } from "react-icons/fa6";
 import { AiOutlineMenuFold, AiOutlineMenuUnfold } from "react-icons/ai";
 import ToggleTheme from "../shared/ToggleTheme";
+import label from "daisyui/components/label";
 
 export default function Header() {
   const [scrolled, setScrolled] = useState(false);
@@ -50,13 +51,15 @@ export default function Header() {
     { href: "/services", label: "Mechanic Shops" },
     { href: "/serviceReq", label: "Service Requests" },
     { href: "/about", label: "About" },
+    { href: "/forum", label: "Forum" },
+    { href: "/market", label: "Market"}
   ];
 
   return (
     <header
       className={`sticky top-0 w-full z-50 transition-all duration-300 ${scrolled
-          ? "bg-base-100/95 backdrop-blur-md shadow-sm py-3"
-          : "bg-transparent backdrop-blur-sm py-4"
+        ? "bg-base-100/95 backdrop-blur-md shadow-sm py-3"
+        : "bg-transparent backdrop-blur-sm py-4"
         }`}
     >
       <div className="container mx-auto px-2 md:px-3 flex justify-between items-center text-base-content">
@@ -94,9 +97,13 @@ export default function Header() {
               <ToggleTheme />
             </div>
 
-            {status === "loading" && !loggedInUser ? (
+            {status === "loading" && (
               <span className="loading loading-spinner loading-xs"></span>
-            ) : loggedInUser ? (
+            )}
+            {status === "authenticated" && !loggedInUser && (
+              <span className="loading loading-spinner loading-xs"></span>
+            )}
+            {loggedInUser && (
               <div className="relative" ref={dropdownRef}>
                 <button
                   className="flex items-center space-x-2 focus:outline-none"
@@ -166,7 +173,8 @@ export default function Header() {
                   </div>
                 )}
               </div>
-            ) : (
+            )}
+            {status === "unauthenticated" && !loggedInUser && (
               <>
                 <Link
                   href="/login"
@@ -210,8 +218,8 @@ export default function Header() {
                 <Link
                   href={item.href}
                   className={`block px-2 py-2 rounded hover:bg-base-300 ${pathname === item.href
-                      ? "text-primary font-semibold"
-                      : ""
+                    ? "text-primary font-semibold"
+                    : ""
                     }`}
                   onClick={() => setDrawerOpen(false)}
                 >

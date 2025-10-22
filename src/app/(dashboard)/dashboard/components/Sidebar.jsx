@@ -61,11 +61,13 @@ const Sidebar = ({ isMobileOpen, setIsMobileOpen }) => {
       menuItem("Coupons", <Tag size={20} />, "/dashboard/admin/coupons"),
       menuItem("Announcements", <Megaphone size={20} />, "/dashboard/admin/announcements"),
       menuItem("Add Blogs", <PenLine size={20} />, "/dashboard/admin/blogs"),
+      menuItem("Add Parts", <PenLine size={20} />, "/dashboard/admin/AddSpareParts")
     ],
     mechanic: [
       menuItem("Reviews", <Star size={20} />, `/dashboard/mechanic/reviews`),
       menuItem("Requests", <ClipboardList size={20} />, "/dashboard/mechanic/requests"),
       menuItem("Add Shop", <Store size={20} />, "/dashboard/mechanic/AddMechanicShop"),
+      menuItem("Add Parts", <Store size={20} />, "/dashboard/mechanic/AddSpareParts"),
     ],
     user: [
       menuItem("Service Request", <WrenchIcon size={20} />, "/dashboard/user/addServiceRequest"),

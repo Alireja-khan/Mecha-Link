@@ -2,19 +2,96 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useState, useEffect } from "react";
+import useUser from "@/hooks/useUser";
 
 export default function HeroModern() {
   const [loading, setLoading] = useState(true);
+  const { user: loggedInUser, status } = useUser();
 
   useEffect(() => {
-    // Simulate loading for hero section
     const timer = setTimeout(() => {
       setLoading(false);
     }, 1000);
     return () => clearTimeout(timer);
   }, []);
 
-  // Hero Skeleton Component
+  // Get role-specific buttons
+  const getRoleBasedButtons = () => {
+    if (!loggedInUser) {
+      // Show all buttons for non-logged in users
+      return (
+        <>
+          {/* For Users */}
+          <div className="mt-10 flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
+            <div className="skeleton bg-gray-300 h-12 w-40 rounded-xl"></div>
+            <div className="skeleton bg-gray-300 h-12 w-48 rounded-xl"></div>
+          </div>
+
+        </>
+      );
+    }
+
+    switch (loggedInUser.role) {
+      case "admin":
+        return (
+          <div className="mt-10 flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
+            <Link href="/dashboard/admin/manageShops">
+              <button className="bg-primary text-white px-8 py-4 rounded-xl hover:bg-secondary transition-all duration-300 w-full sm:w-auto font-medium shadow-lg hover:shadow-xl transform hover:-translate-y-1">
+                Manage Mechanic Shops
+              </button>
+            </Link>
+            <Link href="/dashboard/admin/manageUsers" className="border-2 border-primary text-primary hover:bg-accent px-8 py-4 rounded-xl hover:border-primary hover:text-primary transition-all duration-300 w-full sm:w-auto font-medium shadow-sm hover:shadow-md">
+              Manage Users
+            </Link>
+          </div>
+        );
+
+      case "mechanic":
+        return (
+          <div className="mt-10 flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
+            <Link href="/serviceReq">
+              <button className="bg-primary text-white px-8 py-4 rounded-xl hover:bg-secondary transition-all duration-300 w-full sm:w-auto font-medium shadow-lg hover:shadow-xl transform hover:-translate-y-1">
+                Explore Requests
+              </button>
+            </Link>
+            <Link href="/dashboard/mechanic/AddMechanicShop" className="border-2 border-primary text-primary hover:bg-accent px-8 py-4 rounded-xl hover:border-primary hover:text-primary transition-all duration-300 w-full sm:w-auto font-medium shadow-sm hover:shadow-md">
+              Register Your Shop
+            </Link>
+          </div>
+        );
+
+      case "user":
+        return (
+          <div className="mt-10 flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
+            <Link href="/services">
+              <button className="bg-primary text-white px-8 py-4 rounded-xl hover:bg-secondary transition-all duration-300 w-full sm:w-auto font-medium shadow-lg hover:shadow-xl transform hover:-translate-y-1">
+                Find a Mechanic
+              </button>
+            </Link>
+            <Link href="/dashboard/user/addServiceRequest" className="border-2 border-primary text-primary hover:bg-accent px-8 py-4 rounded-xl hover:border-primary hover:text-primary transition-all duration-300 w-full sm:w-auto font-medium shadow-sm hover:shadow-md">
+              Post Your Problem
+            </Link>
+          </div>
+        );
+
+      default:
+        return (
+          <div className="mt-10 flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
+            <Link href="/services">
+              <button className="bg-primary text-white px-8 py-4 rounded-xl hover:bg-secondary transition-all duration-300 w-full sm:w-auto font-medium shadow-lg hover:shadow-xl transform hover:-translate-y-1">
+                Find a Mechanic
+              </button>
+            </Link>
+            <Link href="/dashboard/user/addServiceRequest" className="border-2 border-primary text-primary hover:bg-accent px-8 py-4 rounded-xl hover:border-primary hover:text-primary transition-all duration-300 w-full sm:w-auto font-medium shadow-sm hover:shadow-md">
+              Post Your Problem
+            </Link>
+          </div>
+        );
+    }
+  };
+
+
+  // Hero Skeleton Component (unchanged)
   const HeroSkeleton = () => (
     <section className="relative py-20 md:py-20">
       <div className="container mx-auto px-6 lg:px-12 flex flex-col-reverse lg:flex-row items-center gap-16 max-w-7xl">
@@ -25,7 +102,7 @@ export default function HeroModern() {
             <div className="skeleton bg-gray-300 h-12 w-3/4 mx-auto lg:mx-0 rounded-lg"></div>
             <div className="skeleton bg-gray-300 h-12 w-4/5 mx-auto lg:mx-0 rounded-lg"></div>
           </div>
-          
+
           {/* Description Skeleton */}
           <div className="space-y-2 mb-10">
             <div className="skeleton bg-gray-300 h-4 w-full rounded"></div>
@@ -44,8 +121,8 @@ export default function HeroModern() {
             <div className="flex items-center">
               <div className="flex -space-x-3 mr-2">
                 {[...Array(4)].map((_, index) => (
-                  <div 
-                    key={index} 
+                  <div
+                    key={index}
                     className="skeleton bg-gray-300 h-8 w-8 rounded-full border-2 border-white"
                   ></div>
                 ))}
@@ -86,30 +163,32 @@ export default function HeroModern() {
   return (
     <section className="relative py-20 md:py-20">
       <div className="container mx-auto px-6 lg:px-12 flex flex-col-reverse lg:flex-row items-center gap-16 max-w-7xl">
-        
+
         {/* Text Content */}
         <div className="flex-1 text-center lg:text-left">
           <h1 className="text-4xl sm:text-5xl xl:text-6xl font-extrabold leading-tight">
             Connect with <span className="text-primary">Trusted Mechanics</span>{" "}
             <br className="hidden sm:block" /> Anytime, Anywhere
           </h1>
-          <p className="mt-6 text-lg sm:text-xl max-w-2xl mx-auto lg:mx-0">
-            MechaLink helps vehicle owners find verified mechanics, book
-            services instantly, and track repairs—all in one platform. Reliable.
-            Fast. Hassle-free.
-          </p>
+          
 
-          {/* Buttons */}
-          <div className="mt-10 flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
-            <Link href="/services">
-              <button className="bg-primary text-white px-8 py-4 rounded-xl hover:bg-secondary transition-all duration-300 w-full sm:w-auto font-medium shadow-lg hover:shadow-xl transform hover:-translate-y-1">
-                Find a Mechanic
-              </button>
-            </Link>
-            <Link href="/become-a-mechanic" className="border-2 border-primary text-primary hover:bg-accent px-8 py-4 rounded-xl hover:border-primary hover:text-primary transition-all duration-300 w-full sm:w-auto font-medium shadow-sm hover:shadow-md">
-              Become a Mechanic
-            </Link>
-          </div>
+          {/* Dynamic Role-Based Buttons */}
+          {getRoleBasedButtons()}
+
+          {/* User Status Indicator */}
+          {/* {loggedInUser && (
+            <div className="mt-6 flex items-center justify-center lg:justify-start gap-2 text-sm text-gray-600">
+              <div className={`w-2 h-2 rounded-full ${
+                loggedInUser.role === 'admin' ? 'bg-green-500' :
+                loggedInUser.role === 'mechanic' ? 'bg-green-500' :
+                'bg-green-500'
+              }`}></div>
+              <span>
+                Logged in as <strong>{loggedInUser.role.charAt(0).toUpperCase() + loggedInUser.role.slice(1)}</strong>
+                {loggedInUser.name && ` • ${loggedInUser.name}`}
+              </span>
+            </div>
+          )} */}
 
           {/* Trust Indicators */}
           <div className="mt-10 flex flex-wrap items-center justify-center lg:justify-start gap-6 text-sm">
@@ -140,7 +219,7 @@ export default function HeroModern() {
         <div className="flex-1 relative">
           <div className="relative rounded-3xl overflow-hidden shadow-2xl border-8 border-white transform hover:scale-[1.02] transition-all duration-500">
             <Image
-              src="https://i.ibb.co.com/1fnb83Qs/pexels-chevanon-1108101.jpg" 
+              src="https://i.ibb.co.com/1fnb83Qs/pexels-chevanon-1108101.jpg"
               alt="Mechanic working illustration"
               width={600}
               height={400}

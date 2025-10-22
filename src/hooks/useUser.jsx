@@ -5,8 +5,8 @@ import { useState, useEffect } from "react";
 
 export default function useUser() {
   const [user, setUser] = useState(null);
-  const {data: session, status} = useSession()
-  
+  const { data: session, status } = useSession();
+
   useEffect(() => {
     if (!session?.user?.email) return;
     (async () => {
@@ -15,5 +15,5 @@ export default function useUser() {
     })();
   }, [session?.user?.email]);
 
-  return {user, status};
+  return { user, status };
 }
