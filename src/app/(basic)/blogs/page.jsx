@@ -5,7 +5,7 @@ import {Calendar, Eye, Heart} from "lucide-react";
 import Link from "next/link";
 import Button from "@/app/shared/Button";
 
-const BlogSection = () => {
+const Blogs = () => {
   const [blogs, setBlogs] = useState([]);
   const [allBlogs, setAllBlogs] = useState([]); // store all blogs
   const [loading, setLoading] = useState(true);
@@ -119,4 +119,4 @@ const BlogSection = () => {
   );
 };
 
-export default BlogSection;
+export default Blogs;
