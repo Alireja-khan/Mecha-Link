@@ -8,10 +8,10 @@ export const CATEGORIES = [
 ];
 
 export const CATEGORY_COLORS = {
-  'car-issues': 'bg-red-100 text-red-800',
-  'bike-issues': 'bg-orange-100 text-orange-800',
-  'tips': 'bg-green-100 text-green-800',
-  'questions': 'bg-blue-100 text-blue-800',
-  'reviews': 'bg-purple-100 text-purple-800',
-  'general': 'bg-gray-100 text-gray-800',
+  'car-issues': 'bg-error/20 text-error',
+  'bike-issues': 'bg-primary/20 text-primary',
+  'tips': 'bg-success/20 text-success',
+  'questions': 'bg-info/20 text-info',
+  'reviews': 'bg-purple-500/20 text-purple-500',
+  'general': 'bg-base-300 text-gray-800',
 };

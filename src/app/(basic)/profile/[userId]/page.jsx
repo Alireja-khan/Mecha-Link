@@ -268,7 +268,7 @@ const DynamicProfilePage = () => {
   if (isLoading) {
     return (
       <div className="min-h-screen flex justify-center font-sans">
-        <div className="w-full xl:container p-4 md:p-8 mx-auto">
+        <div className="w-full lg:container p-4 md:p-8 mx-auto">
           <ProfileSkeleton />
         </div>
       </div>
@@ -299,7 +299,7 @@ const DynamicProfilePage = () => {
 
 
   return (
-    <div className="min-h-screen xl:container mx-auto p-4 md:p-8 flex justify-center font-san">
+    <div className="min-h-screen lg:container mx-auto p-4 md:p-8 flex justify-center font-san">
       <div className="w-full bg-base-100 shadow-xl rounded-2xl overflow-hidden">
 
         {/* Profile Header and Image Area */}
