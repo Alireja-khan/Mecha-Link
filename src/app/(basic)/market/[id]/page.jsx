@@ -12,6 +12,7 @@ import {
 import Link from "next/link";
 import { toast } from "react-hot-toast";
 import Image from "next/image";
+import useUser from "@/hooks/useUser"; // Import the useUser hook
 
 export default function PartDetailPage() {
   const params = useParams();
@@ -21,6 +22,10 @@ export default function PartDetailPage() {
   const [error, setError] = useState("");
   const [selectedImage, setSelectedImage] = useState(0);
   const [quantity, setQuantity] = useState(1);
+  const [addingToCart, setAddingToCart] = useState(false);
+  
+  // Use the useUser hook to get current user
+  const { user, status } = useUser();
 
   const fetchPart = async () => {
     try {
@@ -43,9 +48,41 @@ export default function PartDetailPage() {
     }
   }, [id]);
 
-  const handleAddToCart = () => {
-    toast.success(`Added ${quantity} ${part.partsName} to cart`);
-    // Add to cart logic here
+  const handleAddToCart = async () => {
+    if (!user) {
+      toast.error("Please login to add items to cart");
+      return;
+    }
+
+    if (!part) return;
+
+    try {
+      setAddingToCart(true);
+      
+      const cartItem = {
+        userEmail: user.email,
+        partId: part._id,
+        partsName: part.partsName,
+        price: part.price,
+        quantity: quantity,
+        image: part.images || "",
+        brand: part.brands,
+        category: part.category
+      };
+
+      const response = await axios.post('/api/cart', cartItem);
+      
+      if (response.data.success) {
+        toast.success(`Added ${quantity} ${part.partsName} to cart`);
+      } else {
+        toast.error(response.data.message || "Failed to add to cart");
+      }
+    } catch (error) {
+      console.error("Error adding to cart:", error);
+      toast.error("Failed to add item to cart");
+    } finally {
+      setAddingToCart(false);
+    }
   };
 
   const handleBuyNow = () => {
@@ -53,7 +90,7 @@ export default function PartDetailPage() {
     // Buy now logic here
   };
 
-const increaseQuantity = () => {
+  const increaseQuantity = () => {
     if (quantity < part.quantity) {
       setQuantity(quantity + 1);
     }
@@ -239,10 +276,20 @@ const increaseQuantity = () => {
               <div className="flex gap-3 mb-6">
                 <button
                   onClick={handleAddToCart}
-                  className="flex-1 bg-secondary text-white py-4 rounded-lg font-semibold hover:bg-secondary/90 transition-colors flex items-center justify-center gap-2"
+                  disabled={addingToCart || status === "loading"}
+                  className="flex-1 bg-secondary text-white py-4 rounded-lg font-semibold hover:bg-secondary/90 transition-colors flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  <FaShoppingCart />
-                  Add to Cart
+                  {addingToCart ? (
+                    <>
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                      Adding...
+                    </>
+                  ) : (
+                    <>
+                      <FaShoppingCart />
+                      Add to Cart
+                    </>
+                  )}
                 </button>
                 <button
                   onClick={handleBuyNow}

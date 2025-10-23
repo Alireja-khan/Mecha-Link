@@ -6,8 +6,8 @@ import ServiceSec from "../Components/ServiceSec";
 import WhyChooseUs from "../Components/WhyChooseUs";
 import HowItWork from "../Components/HowItWork";
 import HeroSection from "../Components/HeroSection";
+import BlogSection from "../Components/BlogSection";
 import Map from "../Components/Map";
-import BlogSection from "./blogs/page";
 
 
 export default function Home() {
@@ -29,6 +29,3 @@ export default function Home() {
     );
 
 }
-
-
-// bg-[#2A2D38]

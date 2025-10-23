@@ -14,10 +14,13 @@ export const collections = {
   notifications: "notifications",
   reviews: "reviews",
   blogs: "blogs",
+  payments: "payments",
   forumPosts: "forumPosts",
   spareParts: "spareParts",
   partsCategories: "partsCategories",
-  brands: "brands"
+  brands: "brands",
+  cart: "cart",
+  ads: "ads",
 };
 
 let client;
@@ -39,7 +42,7 @@ if (process.env.NODE_ENV === "development") {
   clientPromise = global._mongoClientPromise;
 } else {
   client = new MongoClient(uri, {
-    serverApi: {  
+    serverApi: {
       version: ServerApiVersion.v1,
       strict: true,
       deprecationErrors: true,

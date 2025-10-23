@@ -21,12 +21,12 @@ const AboutPage = () => {
 
   // Skeleton Components
   const BannerSkeleton = () => (
-    <section className="relative bg-gradient-to-r from-orange-500 via-orange-600 to-red-600 py-16 overflow-hidden">
+    <section className="relative bg-gradient-to-r from-primary via-primary to-red-600 py-16 overflow-hidden">
       <div className="absolute inset-0 bg-black/10"></div>
       <div className="absolute top-0 left-0 w-72 h-72 bg-white/10 rounded-full -translate-x-1/2 -translate-y-1/2"></div>
       <div className="absolute bottom-0 right-0 w-96 h-96 bg-white/5 rounded-full translate-x-1/3 translate-y-1/3"></div>
       
-      <div className="container mx-auto px-6 relative z-10">
+      <div className="lg:container mx-auto px-6 relative z-10">
         <div className="max-w-6xl mx-auto">
           <div className="flex flex-col lg:flex-row items-center justify-between gap-12">
             {/* Left Content Skeleton */}
@@ -82,13 +82,13 @@ const AboutPage = () => {
   const SectionHeaderSkeleton = ({ titleWidth = "w-48", descriptionWidth = "w-64" }) => (
     <div className="text-center md:mb-16 animate-pulse">
       <div className={`skeleton bg-gray-200 h-10 ${titleWidth} mx-auto mb-4 rounded`}></div>
-      <div className="skeleton bg-orange-500 h-1 w-20 mx-auto"></div>
+      <div className="skeleton bg-primary h-1 w-20 mx-auto"></div>
       <div className={`skeleton bg-gray-200 h-4 ${descriptionWidth} mx-auto mt-4 rounded`}></div>
     </div>
   );
 
   const StorySectionSkeleton = () => (
-    <section className="container mx-auto px-6 py-5 lg:py-20">
+    <section className="lg:container mx-auto px-6 py-5 lg:py-20">
       <SectionHeaderSkeleton titleWidth="w-32" descriptionWidth="w-96" />
       <div className="grid xl:grid-cols-2 gap-16 items-center">
         <div className="w-full lg:w-full lg:flex items-center justify-center animate-pulse">
@@ -111,7 +111,7 @@ const AboutPage = () => {
 
   const MissionVisionSkeleton = () => (
     <section className="py-20">
-      <div className="container mx-auto px-6">
+      <div className="lg:container mx-auto px-6">
         <SectionHeaderSkeleton titleWidth="w-56" />
         <div className="grid md:grid-cols-2 gap-10 animate-pulse">
           {[...Array(2)].map((_, index) => (
@@ -132,7 +132,7 @@ const AboutPage = () => {
 
   const FeaturesSkeleton = () => (
     <section className="py-20">
-      <div className="container mx-auto px-6">
+      <div className="lg:container mx-auto px-6">
         <SectionHeaderSkeleton titleWidth="w-64" descriptionWidth="w-96" />
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 animate-pulse">
           {[...Array(6)].map((_, index) => (
@@ -152,7 +152,7 @@ const AboutPage = () => {
 
   const TechnologySkeleton = () => (
     <section className="py-20 bg-gradient-to-r from-gray-900 to-gray-800 text-white">
-      <div className="container mx-auto px-6">
+      <div className="lg:container mx-auto px-6">
         <SectionHeaderSkeleton titleWidth="w-40" descriptionWidth="w-80" />
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 text-center animate-pulse">
           {[...Array(4)].map((_, index) => (
@@ -171,7 +171,7 @@ const AboutPage = () => {
 
   const FounderSkeleton = () => (
     <section className="py-20">
-      <div className="container mx-auto px-6">
+      <div className="lg:container mx-auto px-6">
         <SectionHeaderSkeleton titleWidth="w-56" descriptionWidth="w-96" />
         <div className="grid md:grid-cols-2 gap-10 items-center animate-pulse">
           <div className="border-2 border-gray-200 p-8 rounded-2xl shadow-md">
@@ -220,12 +220,12 @@ const AboutPage = () => {
   );
 
   const TeamMemberSkeleton = ({ featured = false }) => (
-    <div className={`group rounded-2xl overflow-hidden shadow-md border-2 ${featured ? 'border-orange-500' : 'border-gray-200'} animate-pulse`}>
+    <div className={`group rounded-2xl overflow-hidden shadow-md border-2 ${featured ? 'border-primary' : 'border-gray-200'} animate-pulse`}>
       <div className="skeleton bg-gray-200 h-72 w-full"></div>
       <div className="p-6 text-center">
         {featured && (
           <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
-            <div className="skeleton bg-orange-500 h-6 w-20 rounded-full"></div>
+            <div className="skeleton bg-primary h-6 w-20 rounded-full"></div>
           </div>
         )}
         <div className="skeleton bg-gray-200 h-6 w-32 mx-auto mb-2 rounded"></div>
@@ -241,7 +241,7 @@ const AboutPage = () => {
 
   const TeamSkeleton = () => (
     <section className="py-20">
-      <div className="container mx-auto px-6">
+      <div className="lg:container mx-auto px-6">
         <SectionHeaderSkeleton titleWidth="w-32" descriptionWidth="w-80" />
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           <TeamMemberSkeleton featured={true} />
@@ -254,7 +254,7 @@ const AboutPage = () => {
   );
 
   const CTASkeleton = () => (
-    <section className="py-20 bg-gradient-to-r from-orange-500 to-amber-600 text-white">
+    <section className="py-20 bg-gradient-to-r from-primary to-amber-600 text-white">
       <div className="max-w-4xl mx-auto px-6 text-center animate-pulse">
         <div className="skeleton bg-white/30 h-10 w-80 mx-auto mb-6 rounded"></div>
         <div className="space-y-3 mb-10">
@@ -288,13 +288,13 @@ const AboutPage = () => {
   return (
     <div className="">
       {/* Modern Interactive Banner - Matching Other Components */}
-      <section className="relative bg-gradient-to-r from-orange-500 via-orange-600 to-red-600 py-16 overflow-hidden">
+      <section className="relative bg-gradient-to-r from-primary via-primary to-red-600 py-16 overflow-hidden">
         {/* Background Pattern */}
         <div className="absolute inset-0 bg-black/10"></div>
         <div className="absolute top-0 left-0 w-72 h-72 bg-white/10 rounded-full -translate-x-1/2 -translate-y-1/2"></div>
         <div className="absolute bottom-0 right-0 w-96 h-96 bg-white/5 rounded-full translate-x-1/3 translate-y-1/3"></div>
         
-        <div className="container mx-auto px-6 relative z-10">
+        <div className="lg:container mx-auto px-6 relative z-10">
           <div className="max-w-6xl mx-auto">
             <div className="flex flex-col lg:flex-row items-center justify-between gap-12">
               {/* Left Content */}
@@ -314,28 +314,28 @@ const AboutPage = () => {
 
                 {/* Quick Stats */}
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-                  <div className="bg-white/90 backdrop-blur-sm rounded-xl p-4 border border-white text-black">
+                  <div className="bg-base-100/90 backdrop-blur-sm rounded-xl p-4 border border-neutral text-base-content">
                     <Users className="w-6 h-6 mx-auto mb-2" />
                     <div className="text-xl font-bold">
                       <CountUp end={500} suffix="+" duration={5} />
                     </div>
                     <div className="text-xs opacity-90">Verified Mechanics</div>
                   </div>
-                  <div className="bg-white/90 backdrop-blur-sm rounded-xl p-4 border border-white text-black">
+                  <div className="bg-base-100/90 backdrop-blur-sm rounded-xl p-4 border border-neutral text-base-content">
                     <Heart className="w-6 h-6 mx-auto mb-2" />
                     <div className="text-xl font-bold">
                       <CountUp end={10000} suffix="+" duration={5} />
                     </div>
                     <div className="text-xs opacity-90">Happy Customers</div>
                   </div>
-                  <div className="bg-white/90 backdrop-blur-sm rounded-xl p-4 border border-white text-black">
+                  <div className="bg-base-100/90 backdrop-blur-sm rounded-xl p-4 border border-neutral text-base-content">
                     <Wrench className="w-6 h-6 mx-auto mb-2" />
                     <div className="text-xl font-bold">
                       <CountUp end={15000} suffix="+" duration={5} />
                     </div>
                     <div className="text-xs opacity-90">Services Done</div>
                   </div>
-                  <div className="bg-white/90 backdrop-blur-sm rounded-xl p-4 border border-white text-black">
+                  <div className="bg-base-100/90 backdrop-blur-sm rounded-xl p-4 border border-neutral text-base-content">
                     <Star className="w-6 h-6 mx-auto mb-2" />
                     <div className="text-xl font-bold">
                       <CountUp end={95} suffix="%" duration={5} />
@@ -346,7 +346,7 @@ const AboutPage = () => {
 
                 {/* Quick Actions */}
                 <div className="flex flex-wrap gap-4">
-                  <button className="bg-white text-orange-600 px-6 py-3 rounded-full font-semibold hover:bg-orange-50 transition-all duration-300 flex items-center gap-2">
+                  <button className="bg-white text-primary px-6 py-3 rounded-full font-semibold hover:bg-orange-50 transition-all duration-300 flex items-center gap-2">
                     <Rocket className="w-5 h-5" />
                     Our Mission
                   </button>
@@ -362,7 +362,7 @@ const AboutPage = () => {
                 <div className="relative">
                   <div className="w-80 h-80 bg-white/10 backdrop-blur-sm rounded-3xl border-2 border-white/20 flex items-center justify-center">
                     <div className="text-center p-8">
-                      <div className="w-16 h-16 bg-orange-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                      <div className="w-16 h-16 bg-primary rounded-full flex items-center justify-center mx-auto mb-4">
                         <Wrench className="w-8 h-8 text-white" />
                       </div>
                       <h3 className="text-white text-xl font-semibold mb-2">Innovation Driven</h3>
@@ -382,11 +382,11 @@ const AboutPage = () => {
       </section>
 
       {/* Rest of your existing content */}
-      <section className="container mx-auto px-6 py-5 lg:py-20">
+      <section className="lg:container mx-auto px-6 py-5 lg:py-20">
         <div className="text-center md:mb-16">
-          <h2 className="text-4xl font-bold mb-4">Our Story</h2>
-          <div className="w-20 h-1 bg-orange-500 mx-auto"></div>
-          <p className="max-w-2xl mx-auto mt-4 text-gray-400">
+          <h2 className="text-4xl font-bold mb-4 text-base-content">Our Story</h2>
+          <div className="w-20 h-1 bg-primary mx-auto"></div>
+          <p className="max-w-2xl mx-auto mt-4 text-base-content/60">
             How a simple idea transformed into a revolutionary platform for automotive services
           </p>
         </div>
@@ -399,7 +399,7 @@ const AboutPage = () => {
               className="h-80 md:h-[400px] lg:h-[500px] w-auto"
             />
           </div>
-          <div>
+          <div className="text-base-content">
             <h3 className="text-2xl font-semibold mb-6">
               Bridging the Gap Between Mechanics and Customers
             </h3>
@@ -409,7 +409,7 @@ const AboutPage = () => {
             <p className="text-lg leading-relaxed mb-6">
               Our platform combines the best elements of modern technology with deep industry knowledge to create a seamless experience. From intuitive booking systems to secure payment processing, we've built every component with both mechanics and customers in mind.
             </p>
-            <div className="p-6 rounded-xl border-l-4 border-orange-500 shadow-2xl">
+            <div className="p-6 rounded-xl border-l-4 border-primary bg-base-200 shadow-2xl">
               <p className="font-medium">
                 "Our mission is to empower mechanics with better tools and provide customers with transparency, quality service, and peace of mind."
               </p>
@@ -420,16 +420,16 @@ const AboutPage = () => {
 
       {/* Mission & Vision */}
       <section className="py-20">
-        <div className="container mx-auto px-6">
+        <div className="lg:container mx-auto px-6">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold mb-4">Our Core Philosophy</h2>
-            <div className="w-20 h-1 bg-orange-500 mx-auto"></div>
+            <div className="w-20 h-1 bg-primary mx-auto"></div>
           </div>
 
           <div className="grid md:grid-cols-2 gap-10">
-            <div className="p-8 rounded-2xl shadow-lg hover:shadow-xl transition">
-              <div className="inline-flex items-center justify-center w-16 h-16 bg-orange-100 rounded-2xl mb-6">
-                <Target className="w-8 h-8 text-orange-600" />
+            <div className="p-8 rounded-2xl shadow-lg hover:shadow-xl transition bg-base-200 border border-neutral">
+              <div className="inline-flex items-center justify-center w-16 h-16 bg-primary/20 rounded-2xl mb-6">
+                <Target className="w-8 h-8 text-primary" />
               </div>
               <h3 className="text-2xl font-semibold mb-4">Our Mission</h3>
               <p className="">
@@ -437,9 +437,9 @@ const AboutPage = () => {
               </p>
             </div>
 
-            <div className="p-8 rounded-2xl shadow-lg hover:shadow-xl transition">
-              <div className="inline-flex items-center justify-center w-16 h-16 bg-orange-100 rounded-2xl mb-6">
-                <Rocket className="w-8 h-8 text-orange-600" />
+            <div className="p-8 rounded-2xl shadow-lg hover:shadow-xl transition bg-base-200 border border-neutral">
+              <div className="inline-flex items-center justify-center w-16 h-16 bg-primary/20 rounded-2xl mb-6">
+                <Rocket className="w-8 h-8 text-primary" />
               </div>
               <h3 className="text-2xl font-semibold mb-4">Our Vision</h3>
               <p className="">
@@ -452,19 +452,19 @@ const AboutPage = () => {
 
       {/* Key Features */}
       <section className="py-20">
-        <div className="container mx-auto px-6">
+        <div className="lg:container mx-auto px-6">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold mb-4">Why Choose MechaLink?</h2>
-            <div className="w-20 h-1 bg-orange-500 mx-auto"></div>
-            <p className="max-w-2xl mx-auto mt-4 text-gray-400">
+            <div className="w-20 h-1 bg-primary mx-auto"></div>
+            <p className="max-w-2xl mx-auto mt-4 text-base-content/60">
               Our platform offers unique advantages for both mechanics and customers
             </p>
           </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            <div className="p-6 rounded-xl hover:shadow-md transition border border-primary">
-              <div className="inline-flex items-center justify-center w-12 h-12 bg-orange-100 rounded-xl mb-4">
-                <Shield className="w-6 h-6 text-orange-600" />
+            <div className="p-6 rounded-xl hover:shadow-md transition border border-neutral bg-base-200">
+              <div className="inline-flex items-center justify-center w-12 h-12 bg-primary/20 rounded-xl mb-4">
+                <Shield className="w-6 h-6 text-primary" />
               </div>
               <h3 className="text-xl font-semibold mb-2">
                 Verified Professionals
@@ -474,9 +474,9 @@ const AboutPage = () => {
               </p>
             </div>
 
-            <div className="p-6 rounded-xl hover:shadow-md transition border border-primary">
-              <div className="inline-flex items-center justify-center w-12 h-12 bg-orange-100 rounded-xl mb-4">
-                <MapPin className="w-6 h-6 text-orange-600" />
+            <div className="p-6 rounded-xl hover:shadow-md transition border border-neutral bg-base-200">
+              <div className="inline-flex items-center justify-center w-12 h-12 bg-primary/20 rounded-xl mb-4">
+                <MapPin className="w-6 h-6 text-primary" />
               </div>
               <h3 className="text-xl font-semibold mb-2">
                 Location-Based Search
@@ -486,9 +486,9 @@ const AboutPage = () => {
               </p>
             </div>
 
-            <div className="p-6 rounded-xl hover:shadow-md transition border border-primary">
-              <div className="inline-flex items-center justify-center w-12 h-12 bg-orange-100 rounded-xl mb-4">
-                <CreditCard className="w-6 h-6 text-orange-600" />
+            <div className="p-6 rounded-xl hover:shadow-md transition border border-neutral bg-base-200">
+              <div className="inline-flex items-center justify-center w-12 h-12 bg-primary/20 rounded-xl mb-4">
+                <CreditCard className="w-6 h-6 text-primary" />
               </div>
               <h3 className="text-xl font-semibold mb-2">
                 Secure Payments
@@ -498,9 +498,9 @@ const AboutPage = () => {
               </p>
             </div>
 
-            <div className="p-6 rounded-xl hover:shadow-md transition border border-primary">
-              <div className="inline-flex items-center justify-center w-12 h-12 bg-orange-100 rounded-xl mb-4">
-                <MessageCircle className="w-6 h-6 text-orange-600" />
+            <div className="p-6 rounded-xl hover:shadow-md transition border border-neutral bg-base-200">
+              <div className="inline-flex items-center justify-center w-12 h-12 bg-primary/20 rounded-xl mb-4">
+                <MessageCircle className="w-6 h-6 text-primary" />
               </div>
               <h3 className="text-xl font-semibold mb-2">
                 Real-Time Communication
@@ -510,9 +510,9 @@ const AboutPage = () => {
               </p>
             </div>
 
-            <div className="p-6 rounded-xl hover:shadow-md transition border border-primary">
-              <div className="inline-flex items-center justify-center w-12 h-12 bg-orange-100 rounded-xl mb-4">
-                <Clock className="w-6 h-6 text-orange-600" />
+            <div className="p-6 rounded-xl hover:shadow-md transition border border-neutral bg-base-200">
+              <div className="inline-flex items-center justify-center w-12 h-12 bg-primary/20 rounded-xl mb-4">
+                <Clock className="w-6 h-6 text-primary" />
               </div>
               <h3 className="text-xl font-semibold mb-2">
                 Service Tracking
@@ -522,9 +522,9 @@ const AboutPage = () => {
               </p>
             </div>
 
-            <div className="p-6 rounded-xl hover:shadow-md transition border border-primary">
-              <div className="inline-flex items-center justify-center w-12 h-12 bg-orange-100 rounded-xl mb-4">
-                <TrendingUp className="w-6 h-6 text-orange-600" />
+            <div className="p-6 rounded-xl hover:shadow-md transition border border-neutral bg-base-200">
+              <div className="inline-flex items-center justify-center w-12 h-12 bg-primary/20 rounded-xl mb-4">
+                <TrendingUp className="w-6 h-6 text-primary" />
               </div>
               <h3 className="text-xl font-semibold mb-2">
                 Business Growth
@@ -538,56 +538,56 @@ const AboutPage = () => {
       </section>
 
       {/* Technology Stack */}
-      <section className="py-20 bg-gradient-to-r from-gray-900 to-gray-800 text-white">
-        <div className="container mx-auto px-6">
+      {/* <section className="py-20 text-base-content">
+        <div className="lg:container mx-auto px-6">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold mb-4">Our Technology</h2>
-            <div className="w-20 h-1 bg-orange-500 mx-auto"></div>
-            <p className="max-w-2xl mx-auto mt-4 text-gray-300">
+            <div className="w-20 h-1 bg-primary mx-auto"></div>
+            <p className="max-w-2xl mx-auto mt-4 text-base-content/60">
               Built with cutting-edge technologies for performance, security, and scalability
             </p>
           </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 text-center">
-            <div className="p-6 bg-white/5 rounded-xl backdrop-blur-sm">
-              <div className="text-2xl font-bold text-orange-500 mb-2">
+            <div className="p-6 bg-base-200 rounded-xl backdrop-blur-sm">
+              <div className="text-2xl font-bold text-primary mb-2">
                 Next.js
               </div>
-              <p className="text-gray-300">
+              <p className="text-base-content/60">
                 React framework for server-side rendering
               </p>
             </div>
 
-            <div className="p-6 bg-white/5 rounded-xl backdrop-blur-sm">
-              <div className="text-2xl font-bold text-orange-500 mb-2">
+            <div className="p-6 bg-base-200 rounded-xl backdrop-blur-sm">
+              <div className="text-2xl font-bold text-primary mb-2">
                 Node.js
               </div>
-              <p className="text-gray-300">
+              <p className="text-base-content/60">
                 Runtime environment for backend services
               </p>
             </div>
 
-            <div className="p-6 bg-white/5 rounded-xl backdrop-blur-sm">
-              <div className="text-2xl font-bold text-orange-500 mb-2">
+            <div className="p-6 bg-base-200 rounded-xl backdrop-blur-sm">
+              <div className="text-2xl font-bold text-primary mb-2">
                 MongoDB
               </div>
-              <p className="text-gray-300">
+              <p className="text-base-content/60">
                 NoSQL database for flexible data storage
               </p>
             </div>
 
-            <div className="p-6 bg-white/5 rounded-xl backdrop-blur-sm">
-              <div className="text-2xl font-bold text-orange-500 mb-2">
+            <div className="p-6 bg-base-200 rounded-xl backdrop-blur-sm">
+              <div className="text-2xl font-bold text-primary mb-2">
                 Firebase
               </div>
-              <p className="text-gray-300">
+              <p className="text-base-content/60">
                 Authentication and real-time database
               </p>
             </div>
           </div>
 
           <div className="mt-12 text-center">
-            <button className="inline-flex items-center text-orange-500 font-semibold group">
+            <button className="inline-flex items-center text-primary font-semibold group">
               View Technical Documentation
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -604,32 +604,32 @@ const AboutPage = () => {
             </button>
           </div>
         </div>
-      </section>
+      </section> */}
 
       {/* Founder Section */}
       <section className="py-20">
-        <div className="container mx-auto px-6">
+        <div className="lg:container mx-auto px-6">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold mb-4">Leadership Team</h2>
-            <div className="w-20 h-1 bg-orange-500 mx-auto"></div>
-            <p className="max-w-2xl mx-auto mt-4 text-gray-400">
+            <div className="w-20 h-1 bg-primary mx-auto"></div>
+            <p className="max-w-2xl mx-auto mt-4 text-base-content/60">
               Passionate individuals driving innovation in the automotive service industry
             </p>
           </div>
 
           <div className="grid md:grid-cols-2 gap-10 items-center">
-            <div className="border-2 border-primary p-8 rounded-2xl shadow-md">
+            <div className="border-2 border-neutral p-8 rounded-2xl shadow-md bg-base-200">
               <div className="flex items-center mb-6">
                 <img
                   src="https://i.ibb.co.com/PvHZ1B8w/Jhankar-Vai.jpg"
                   alt="Founder"
-                  className="w-20 h-20 rounded-full object-cover mr-6 border-4 border-white shadow"
+                  className="w-20 h-20 rounded-full object-cover mr-6 border-4 border-neutral shadow"
                 />
                 <div>
                   <h3 className="text-2xl font-semibold">
                     Jhankar Mahbub
                   </h3>
-                  <p className="text-orange-600">Founder & Lead Developer</p>
+                  <p className="text-primary">Founder & Lead Developer</p>
                   <div className="flex mt-2">
                     {[1, 2, 3, 4, 5].map((star) => (
                       <Star
@@ -640,13 +640,13 @@ const AboutPage = () => {
                   </div>
                 </div>
               </div>
-              <p className="text-gray-400 mb-6">
+              <p className="text-base-content/60 mb-6">
                 With a passion for technology and innovation, Alireja founded MechaLink to bridge the gap between skilled mechanics and customers seeking reliable services. His vision drives the project forward with excellence and dedication.
               </p>
               <div className="flex space-x-3">
                 <a
                   href="#"
-                  className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center hover:bg-orange-500 text-black transition hover:animate-spin"
+                  className="w-10 h-10 rounded-full bg-base-100 flex items-center justify-center hover:bg-primary text-base-content/80 transition hover:animate-spin"
                 >
                   <svg
                     className="w-5 h-5"
@@ -663,7 +663,7 @@ const AboutPage = () => {
                 </a>
                 <a
                   href="#"
-                  className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center hover:bg-orange-500 text-black hover:animate-spin transition"
+                  className="w-10 h-10 rounded-full bg-base-100 flex items-center justify-center hover:bg-primary text-base-content/80 transition hover:animate-spin"
                 >
                   <svg
                     className="w-5 h-5"
@@ -676,7 +676,7 @@ const AboutPage = () => {
                 </a>
                 <a
                   href="#"
-                  className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center hover:bg-orange-500 text-black hover:animate-spin transition"
+                  className="w-10 h-10 rounded-full bg-base-100 flex items-center justify-center hover:bg-primary text-base-content/80 transition hover:animate-spin"
                 >
                   <svg
                     className="w-5 h-5"
@@ -695,22 +695,22 @@ const AboutPage = () => {
             </div>
 
             <div>
-              <h3 className="text-2xl font-semibold mb-6">
+              <h3 className="text-2xl font-semibold mb-6 text-base-content">
                 From Vision to Reality
               </h3>
-              <p className="text-lg text-gray-400 mb-6">
+              <p className="text-lg text-base-content/60 mb-6">
                 Jhankar assembled a team of passionate developers and industry experts to bring MechaLink to life. His leadership has fostered a culture of innovation and excellence that continues to drive the platform forward.
               </p>
-              <div className="flex items-center text-gray-400">
-                <Award className="w-5 h-5 text-orange-500 mr-2" />
+              <div className="flex items-center text-base-content/60">
+                <Award className="w-5 h-5 text-primary mr-2" />
                 <span>10+ Years in Software Development</span>
               </div>
-              <div className="flex items-center text-gray-400 mt-2">
-                <Zap className="w-5 h-5 text-orange-500 mr-2" />
+              <div className="flex items-center text-base-content/60 mt-2">
+                <Zap className="w-5 h-5 text-primary mr-2" />
                 <span>Expert in React & Next.js Ecosystems</span>
               </div>
-              <div className="flex items-center text-gray-400 mt-2">
-                <Calendar className="w-5 h-5 text-orange-500 mr-2" />
+              <div className="flex items-center text-base-content/60 mt-2">
+                <Calendar className="w-5 h-5 text-primary mr-2" />
                 <span>Founded MechaLink in 2023</span>
               </div>
             </div>
@@ -720,11 +720,11 @@ const AboutPage = () => {
 
       {/* Team Section */}
       <section className="py-20">
-        <div className="container mx-auto px-6">
+        <div className="lg:container mx-auto px-6">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold mb-4">Our Team</h2>
-            <div className="w-20 h-1 bg-orange-500 mx-auto"></div>
-            <p className="max-w-2xl mx-auto mt-4 text-gray-400">
+            <div className="w-20 h-1 bg-primary mx-auto"></div>
+            <p className="max-w-2xl mx-auto mt-4 text-base-content/60">
               Talented individuals working together to revolutionize automotive services
             </p>
           </div>
@@ -789,19 +789,19 @@ const AboutPage = () => {
             ].map((person, i) => (
               <div
                 key={i}
-                className={`group rounded-2xl overflow-hidden shadow-md hover:shadow-lg transition transform hover:-translate-y-2 ${person.featured ? "md:order-first border-2 border-orange-500" : "border-2 border-orange-500"}`}
+                className={`group bg-base-200 rounded-2xl overflow-hidden shadow-md hover:shadow-lg transition transform hover:-translate-y-2 ${person.featured ? "md:order-first border-4 border-primary" : "border-2 border-neutral"}`}
               >
-                <div className="h-118 overflow-hidden">
+                <div className="h-100 p-3 overflow-hidden">
                   <img
                     src={person.image}
                     alt={person.name}
-                    className="w-full h-full object-cover object-top"
+                    className="w-full h-full rounded-xl object-cover object-top"
                   />
                 </div>
                 <div className="p-6 text-center relative">
                   {person.featured && (
-                    <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10">
-                      <span className="bg-orange-500 text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg">
+                    <div className="absolute -top-6 left-1/2 transform -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10">
+                      <span className="bg-primary text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg">
                         Team Lead
                       </span>
                     </div>
@@ -809,22 +809,22 @@ const AboutPage = () => {
                   <h3 className="text-xl font-semibold mb-1">{person.name}</h3>
                   <p className="text-gray-400 mb-4">{person.role}</p>
                   <div className="flex justify-center items-center space-x-3">
-                    <a href={person.facebook_profile} target="_blank" className="cursor-pointer hover:text-orange-500 transition">
+                    <a href={person.facebook_profile} target="_blank" className="cursor-pointer hover:text-primary transition">
                       <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                         <path fillRule="evenodd" d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z" clipRule="evenodd" />
                       </svg>
                     </a>
-                    <a href={person.linkedin_profile} target="_blank" className="hover:text-orange-500 transition">
+                    <a href={person.linkedin_profile} target="_blank" className="hover:text-primary transition">
                       <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                         <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.761 0 5-2.239 5-5v-14c0-2.761-2.239-5-5-5zm-11.75 19h-3v-9h3v9zm-1.5-10.25c-.966 0-1.75-.784-1.75-1.75s.784-1.75 1.75-1.75 1.75.784 1.75 1.75-.784 1.75-1.75 1.75zm13.25 10.25h-3v-4.75c0-1.133-.022-2.591-1.578-2.591-1.578 0-1.818 1.231-1.818 2.503v4.838h-3v-9h2.879v1.233h.041c.401-.762 1.381-1.563 2.842-1.563 3.037 0 3.598 2 3.598 4.599v5.731z" />
                       </svg>
                     </a>
-                    <a href={person.github_profile} target="_blank" className="hover:text-orange-500 transition">
+                    <a href={person.github_profile} target="_blank" className="hover:text-primary transition">
                       <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                         <path fillRule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" clipRule="evenodd" />
                       </svg>
                     </a>
-                    <a href={person.portfolio} target="_blank" className="hover:text-orange-500 transition">
+                    <a href={person.portfolio} target="_blank" className="hover:text-primary transition">
                       <Globe size={24} />
                     </a>
                   </div>
@@ -836,7 +836,7 @@ const AboutPage = () => {
       </section>
 
       {/* CTA Section */}
-      <section className="py-20 bg-gradient-to-r from-orange-500 to-amber-600 text-white">
+      <section className="py-20 bg-gradient-to-r from-primary to-amber-600 text-white">
         <div className="max-w-4xl mx-auto px-6 text-center">
           <h2 className="text-4xl font-bold mb-6">
             Join the MechaLink Revolution
@@ -845,7 +845,7 @@ const AboutPage = () => {
             Whether you're a vehicle owner seeking reliable service or a mechanic looking to grow your business, MechaLink offers the perfect platform to connect, transact, and thrive.
           </p>
           <div className="flex flex-col sm:flex-row justify-center gap-4">
-            <button className="bg-white text-orange-600 font-semibold px-8 py-4 rounded-full shadow-lg hover:bg-gray-100 transition transform hover:-translate-y-1">
+            <button className="bg-white text-primary font-semibold px-8 py-4 rounded-full shadow-lg hover:bg-gray-100 transition transform hover:-translate-y-1">
               Sign Up as Customer
             </button>
             <button className="bg-transparent border-2 border-white text-white font-semibold px-8 py-4 rounded-full hover:bg-white/10 transition">
