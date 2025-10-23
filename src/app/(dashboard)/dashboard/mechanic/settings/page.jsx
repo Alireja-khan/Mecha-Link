@@ -52,7 +52,6 @@ export default function MechanicSettings() {
         const response = await fetch(`/api/shops?email=${loggedInUser.email}`);
         if (response.ok) {
           const data = await response.json();
-          console.log("Shop data for settings:", data);
           
           if (Array.isArray(data) && data.length > 0) {
             const shop = data[0];
@@ -145,7 +144,6 @@ export default function MechanicSettings() {
 
       const data = await res.json();
       if (res.ok) {
-        console.log(`✅ Updated successfully:`, data);
         alert(successMessage);
       } else {
         alert(data.message || `Failed to update ${activeTab}`);

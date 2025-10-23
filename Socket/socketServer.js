@@ -25,7 +25,6 @@ async function start() {
     const coupons = await dbConnect(collections.coupons);
     const users = await dbConnect(collections.users);
 
-    console.log("✅ Connected to MongoDB collections");
 
     // -----------------------------
     // Helper: push notification
@@ -183,7 +182,6 @@ async function start() {
     // Socket.IO connections
     // -----------------------------
     io.on("connection", (socket) => {
-      console.log("⚡ User connected:", socket.id);
 
       socket.on("joinChat", (chatId) => socket.join(chatId));
       socket.on("sendMessage", (msg) =>
@@ -196,8 +194,7 @@ async function start() {
         socket.to(chatId).emit("stopTyping", chatId, senderId)
       );
       socket.on("disconnect", () =>
-        console.log("❌ User disconnected:", socket.id)
-      );
+      "");
     });
 
     // -----------------------------
@@ -212,7 +209,6 @@ async function start() {
       const host = process.env.PORT
         ? `https://mechalink-socket-server-production.up.railway.app/`
         : `http://localhost:${PORT}`;
-      console.log(`✅ Socket.IO server running on ${host}`);
     });
   } catch (err) {
     console.error("❌ Server error:", err);

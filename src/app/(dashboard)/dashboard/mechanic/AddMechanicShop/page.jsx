@@ -429,7 +429,6 @@ export default function MechanicShop() {
             updatedAt: new Date().toISOString(),
         };
 
-        console.log("Submitting Payload:", payload);
 
         try {
             const res = await axios.post("/api/shops", payload);
