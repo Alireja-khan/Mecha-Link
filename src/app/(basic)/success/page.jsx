@@ -275,7 +275,7 @@ export default function SuccessPage() {
       // Use the refined printStyles here
       style: printStyles, 
       documentTitle: `Invoice-${paymentInfo.tran_id}`,
-      onPrintDialogClose: () => console.log("Print dialog closed"),
+      onPrintDialogClose: () => {},
     });
   };
 

@@ -27,7 +27,6 @@ export default function MyShopPage() {
         }
       };
       fetchShop();
-      console.log(shop);
     }
   }, [user, userLoading]);
 
