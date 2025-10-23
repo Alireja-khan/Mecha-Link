@@ -20,33 +20,24 @@ const MechanicDashboardOverview = () => {
 
   setLoading(true);
   try {
-    console.log("Fetching dashboard data for user:", loggedInUser._id);
-    console.log("User email:", loggedInUser.email);
 
     // ✅ FIXED: Fetch shop data using user email
     let shopData = null;
     try {
       const shopRes = await fetch(`/api/shops?email=${loggedInUser.email}`);
-      console.log("Shop response status:", shopRes.status);
       
       if (shopRes.ok) {
         shopData = await shopRes.json();
-        console.log("Raw shop data from API:", shopData);
         
         // ✅ Handle array response (your API returns array)
         if (Array.isArray(shopData) && shopData.length > 0) {
           shopData = shopData[0]; // Take the first shop
-          console.log("First shop data:", shopData);
         } else if (Array.isArray(shopData) && shopData.length === 0) {
-          console.log("No shops found for this user");
           shopData = null;
         } else {
-          console.log("Unexpected shop data format:", typeof shopData);
         }
       } else {
-        console.log("No shop found or error:", shopRes.status);
         const errorText = await shopRes.text();
-        console.log("Error response:", errorText);
         shopData = null;
       }
     } catch (shopError) {
@@ -57,26 +48,19 @@ const MechanicDashboardOverview = () => {
     // ✅ Set shop data (could be null if no shop found)
     setShopData(shopData);
 
-    console.log("Final shop data to be set:", shopData);
 
     // Get the actual shop ID from shop data
     const shopId = shopData?._id;
-    console.log("Shop ID:", shopId);
 
     // Fetch service requests for this shop
     let requestsData = [];
     try {
-      console.log("Fetching service requests for shop ID:", loggedInUser._id);
       const requestsRes = await fetch(`/api/service-request/shop/${loggedInUser._id}`);
-      console.log("Service requests response status:", requestsRes.status);
       
       if (requestsRes.ok) {
         requestsData = await requestsRes.json();
-        console.log("Service requests data:", requestsData);
       } else {
-        console.log("No service requests found or error:", requestsRes.status);
         const errorText = await requestsRes.text();
-        console.log("Error response:", errorText);
       }
     } catch (error) {
       console.error("Error fetching service requests:", error);
@@ -87,22 +71,17 @@ const MechanicDashboardOverview = () => {
     // Fetch all reviews
     let allReviews = [];
     try {
-      console.log("Fetching all reviews...");
       const reviewsRes = await fetch('/api/reviews');
-      console.log("Reviews response status:", reviewsRes.status);
       
       if (reviewsRes.ok) {
         allReviews = await reviewsRes.json();
-        console.log("All reviews data:", allReviews);
       } else {
-        console.log("No reviews found or error:", reviewsRes.status);
       }
     } catch (error) {
       console.error("Error fetching reviews:", error);
     }
 
     // Filter reviews by shop ID - FIXED: Use the actual shop ID from shop data
-    console.log("Filtering reviews for shop ID:", shopId);
     const shopReviews = allReviews.filter(review => {
       // Check if review belongs to this shop using shopId field
       const matchesShop = shopId && review.shopId === shopId.toString();
@@ -110,20 +89,9 @@ const MechanicDashboardOverview = () => {
       const matchesUserShop = review.shopId === loggedInUser._id;
       const matchesService = review.serviceId === shopId;
       
-      console.log(`Review ${review._id}:`, {
-        reviewShopId: review.shopId,
-        reviewServiceId: review.serviceId,
-        shopId,
-        userId: loggedInUser._id,
-        matchesShop,
-        matchesUserShop,
-        matchesService
-      });
-      
       return matchesShop || matchesUserShop || matchesService;
     });
     
-    console.log("Shop reviews after filtering:", shopReviews);
     setRecentReviews(Array.isArray(shopReviews) ? shopReviews.slice(-5).reverse() : []);
 
     // Calculate performance stats
@@ -144,7 +112,6 @@ const MechanicDashboardOverview = () => {
                    req.cost || 
                    0;
         const costValue = parseFloat(cost) || 0;
-        console.log(`Request ${req._id} cost:`, cost, "parsed:", costValue);
         return sum + costValue;
       }, 0);
 
@@ -156,7 +123,6 @@ const MechanicDashboardOverview = () => {
     const shopReviewsArray = Array.isArray(shopReviews) ? shopReviews : [];
     const totalRatings = shopReviewsArray.reduce((sum, review) => {
       const rating = parseFloat(review.rating) || 0;
-      console.log(`Review ${review._id} rating:`, rating);
       return sum + rating;
     }, 0);
     const averageRating = shopReviewsArray.length > 0 ? totalRatings / shopReviewsArray.length : 0;
@@ -172,12 +138,10 @@ const MechanicDashboardOverview = () => {
       totalReviews: shopReviewsArray.length
     };
 
-    console.log("Final performance stats:", stats);
     setPerformanceStats(stats);
 
     // Generate revenue data for chart
     const monthlyRevenue = generateMonthlyRevenue(requestsArray);
-    console.log("Revenue data:", monthlyRevenue);
     setRevenueData(monthlyRevenue);
 
   } catch (error) {

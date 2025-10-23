@@ -198,7 +198,7 @@ const BookingComponent = ({ onBookingComplete }) => {
               ))}
               <div
                 className="p-5 border border-dashed border-gray-300 rounded-xl flex flex-col items-center justify-center cursor-pointer hover:bg-gray-50 transition-all shadow-md"
-                onClick={() => console.log("Add new vehicle")}
+                
               >
                 <Plus className="w-6 h-6 text-gray-500" />
                 <p className="text-sm mt-2 font-medium text-gray-600">Add New Vehicle</p>

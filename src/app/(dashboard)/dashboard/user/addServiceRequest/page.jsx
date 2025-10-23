@@ -108,7 +108,6 @@ const ServiceRequest = () => {
   // LOG USER ID, NAME, AND EMAIL ON PAGE LOAD (unchanged)
   // ------------------------------------------
   useEffect(() => {
-    // console.log(loggedInUser?.user?._id);
   }, [session, loggedInUser]);
   // ------------------------------------------
 
@@ -163,7 +162,6 @@ const ServiceRequest = () => {
     }
   };
 
-  // console.log(loggedInUser); // Kept for debugging, though not ideal in production
 
   const onSubmit = async (data) => {
     if (!location.address || !location.latitude || !location.longitude) {
@@ -234,7 +232,6 @@ const ServiceRequest = () => {
         completedDate: null,
       };
 
-      // console.log("Submitting data:", formData);
 
       const res = await fetch("/api/service-request", {
         method: "POST",

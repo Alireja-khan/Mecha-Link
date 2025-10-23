@@ -62,7 +62,6 @@ export default function ServiceCard({ service }) {
       const result = await res.json();
       if (!res.ok) throw new Error(result.error || "Failed to create chat");
 
-      console.log("Chat created or found:", result);
 
       // Redirect to messages page
       const userRole = loggedInUser?.role?.toLowerCase() || "user";

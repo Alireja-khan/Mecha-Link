@@ -48,7 +48,6 @@ export async function PUT(req, { params }) {
     const { id } = await params;
     const body = await req.json();
 
-    console.log(id)
 
     const collection = await dbConnect(collections.serviceRequests);
 

@@ -28,7 +28,6 @@ async function triggerSocketEmit(chatId, action, data) {
             const errorBody = await res.text();
             console.error("Failed to push event to socket server. Status:", res.status, "Body:", errorBody);
         } else {
-            console.log(`[API] Successfully triggered socket event: ${action} for chat ${chatId}`);
         }
     } catch (err) {
         console.error("Error connecting to socket server:", err.message);
