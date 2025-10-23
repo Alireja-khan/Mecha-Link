@@ -2,7 +2,26 @@ import { NextResponse } from "next/server";
 import { ObjectId } from "mongodb";
 import dbConnect, { collections } from "@/lib/dbConnect";
 
-// ✅ PATCH — update ad status
+
+export async function GET(req, { params }) {
+  const { id } = await params;
+   if (!id || !ObjectId.isValid(id)) {
+    return NextResponse.json(
+      { message: "Invalid or missing ID" },
+      { status: 400 }
+    );
+  }
+
+
+  const collection = await dbConnect(collections.ads);
+  const ad = await collection.findOne({ _id: new ObjectId(id) });
+  if (!ad) {
+    return NextResponse.json({ message: "Ad not found" }, { status: 404 });
+  }
+  return NextResponse.json(ad);
+
+}
+
 export async function PATCH(req, { params }) {
   try {
     const { id } = params;

@@ -18,6 +18,7 @@ export async function GET(req) {
             { ownerName: { $regex: search, $options: "i" } },
             { ownerEmail: { $regex: search, $options: "i" } },
             { purpose: { $regex: search, $options: "i" } },
+            { tran_id: { $regex: search, $options: "i" } },
           ],
         }
       : {};
