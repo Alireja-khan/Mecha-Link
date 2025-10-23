@@ -28,7 +28,6 @@ export default function Newsletter() {
         setLoading(false);
         if (result.isConfirmed) {
           setTimeout(() => {
-            console.log("Unsubscribed:", email);
             Swal.fire({
               title: "Unsubscribed",
               text: `${email} has been removed from our newsletter.`,
@@ -44,7 +43,6 @@ export default function Newsletter() {
     } else {
       setTimeout(() => {
         setLoading(false);
-        console.log("Subscribed:", email);
         Swal.fire({
           title: "Welcome 🎉",
           text: `Thanks for subscribing, ${email}! Stay tuned for updates.`,

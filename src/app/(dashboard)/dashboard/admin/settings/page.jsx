@@ -132,7 +132,6 @@ export default function AdminSettings() {
 
       const data = await res.json();
       if (res.ok) {
-        console.log(`✅ Updated successfully:`, data);
         alert(successMessage);
       } else {
         alert(data.message || `Failed to update ${activeTab}`);

@@ -7,8 +7,6 @@ export default function DashboardRedirect() {
   const router = useRouter();
 
   const {user: loggedInUser, status} = useUser();
-  
-    console.log(loggedInUser);
 
   const role = loggedInUser?.role; // "admin" | "mechanic" | "user"
       if (role === "admin") router.push("/dashboard/admin");
