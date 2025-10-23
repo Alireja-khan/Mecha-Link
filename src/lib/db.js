@@ -12,6 +12,5 @@ export default async function dbConnect(collectionName) {
     await client.connect();
     db = client.db(process.env.DB_NAME);
   }
-
   return db.collection(collectionName);
 }

@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from "react";
 import ServiceCard from "./ServiceCard";
 import Link from "next/link";
+import SpecificServices from "./SpecificServices";
 
 export default function ServiceSec() {
   const [services, setServices] = useState([]);
@@ -52,16 +53,19 @@ export default function ServiceSec() {
 
   return (
     <>
-      <section className="py-12 sm:py-16 lg:py-20">
-        <div className="lg:container mx-auto px-6">
+      <section className="py-20">
+        <div>
+          <SpecificServices></SpecificServices>
+        </div>
+        <div className="container">
           {loading ? (
             <SectionHeaderSkeleton />
           ) : (
             <div className="text-center mb-10 max-w-2xl mx-auto">
-              <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-center leading-tight">
+              <h2 className="md:text-5xl text-4xl font-bold text-center">
                 Trusted <span className="text-primary">Mechanics</span> Near You
               </h2>
-              <p className="text-base sm:text-lg mt-3 sm:mt-4 text-base-content">
+              <p className="md:text-lg text-medium mt-4">
                 MechaLink connects you with verified mechanics nearby – making
                 vehicle repairs and services faster, easier, and more reliable.
               </p>

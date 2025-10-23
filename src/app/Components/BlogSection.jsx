@@ -51,7 +51,6 @@ const BlogSection = () => {
     router.push(`/blogs/${id}`);
   };
 
-
   const BlogCardSkeleton = () => (
     <div className="flex flex-col rounded-xl overflow-hidden shadow-md animate-pulse">
       <div className="skeleton bg-gray-200 w-full h-48"></div>
@@ -179,12 +178,19 @@ const BlogSection = () => {
                 <div className="mt-6 flex items-center justify-between text-sm md:text-base text-text/70">
                   <div className="flex items-center">
                     <div className="w-10 h-10 rounded-full flex items-center justify-center mr-3 bg-secondary/20 text-secondary overflow-hidden">
-                      <Image
-                        src={post.userImage}
-                        alt={post.author}
-                        width={50}
-                        height={50}
-                      ></Image>
+                      {post.userImage ? (
+                        <Image
+                          src={post.userImage}
+                          alt={post.author}
+                          width={50}
+                          height={50}
+                          className="object-cover"
+                        />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center bg-secondary/30 text-secondary font-semibold text-sm">
+                          {post.author ? post.author.charAt(0).toUpperCase() : 'U'}
+                        </div>
+                      )}
                     </div>
                     <div className="flex-1">
                       <p className="font-medium font-urbanist">{post.author}</p>

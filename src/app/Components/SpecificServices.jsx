@@ -1,0 +1,72 @@
+
+import Link from "next/link";
+import react from "react";
+
+import {
+  Car,
+  Bike,
+  Truck,
+  Wrench,
+  Fan,
+  Sparkles,
+} from "lucide-react";
+
+export default function SpecificServices(){
+
+  const categories = [
+  {
+    name: "Car Service & Repair",
+    slug: "Car Service & Repair",
+    icon: <Car className="w-8 h-8 text-orange-500" />, // 🚗 Car repair related
+  },
+  {
+    name: "Motorcycle Service & Repair",
+    slug: "Motorcycle Service & Repair",
+    icon: <Bike className="w-8 h-8 text-orange-500" />, // 🏍️ Motorcycle repair
+  },
+  {
+    name: "Truck/Commercial Vehicle Service",
+    slug: "Truck/Commercial Vehicle Service",
+    icon: <Truck className="w-8 h-8 text-orange-500" />, // 🚚 Truck or heavy vehicle
+  },
+  {
+    name: "Home Appliance Repair",
+    slug: "Home Appliance Repair",
+    icon: <Wrench className="w-8 h-8 text-orange-500" />, // 🧰 Tools / repair
+  },
+  {
+    name: "HVAC & Cooling Specialist",
+    slug: "HVAC & Cooling Specialist",
+    icon: <Fan className="w-8 h-8 text-orange-500" />, // 🌬️ Air / cooling system
+  },
+  {
+    name: "Car Detailing & Accessories",
+    slug: "Car Detailing & Accessories",
+    icon: <Sparkles className="w-8 h-8 text-orange-500" />, // ✨ Clean / detailing
+  },
+]
+
+
+    return (
+        <section className="py-10">
+      <div className="container mx-auto text-center">
+        <h2 className="text-5xl font-bold mb-10">
+          Explore by <span className="text-primary">Category</span>
+        </h2>
+
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-6">
+          {categories.map((cat) => (
+            <Link
+              key={cat.slug}
+              href={`/category?category=${encodeURIComponent(cat.slug)}`}
+              className=" flex flex-col items-center gap-3 p-3 md:p-6 rounded-2xl shadow hover:shadow-lg transition-all border border-gray-100"
+            >
+              {cat.icon}
+              <span className="font-semibold ">{cat.name}</span>
+            </Link>
+          ))}
+        </div>
+      </div>
+    </section>
+    )
+}

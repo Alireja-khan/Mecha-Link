@@ -31,14 +31,32 @@ export async function POST(req) {
   const paymentCollection = await dbConnect(collections.payments);
   await paymentCollection.insertOne(payload);
 
-  const {shopName, ownerEmail, ownerName, ...rest} = payload
-  await collection.updateOne({ _id: new ObjectId(data.value_a) }, { $set: { paymentInfo: rest } });
+  if (data.value_b === "Shop Add") {
+    const { shopName, ownerEmail, ownerName, ...rest } = payload
+    await collection.updateOne({ _id: new ObjectId(data.value_a) }, { $set: { paymentInfo: rest } });
+  }
+
+  if (data.value_b === "Ads") {
+    const adPayload = {
+      isPaid: true,
+      paymentInfo: {
+        tran_id: data.tran_id || "",
+        amount: data.amount || "",
+        card_type: data.card_type || "",
+        bank_tran_id: data.bank_tran_id || "",
+        paymentDate: new Date(),
+        paymentStatus: "paid",
+      }
+    }
+    const adsCollection = await dbConnect(collections.ads);
+    await adsCollection.updateOne({ _id: new ObjectId(data.value_c) }, { $set: adPayload });
+  }
 
 
   return new Response(null, {
     status: 302,
     headers: {
-      Location: `${process.env.NEXT_PUBLIC_BASE_URL}/success?shopID=${data.value_a}`,
+      Location: `${process.env.NEXT_PUBLIC_BASE_URL}/success?shopID=${data.value_a}&trxn=${data.tran_id}`,
     },
   });
 }
