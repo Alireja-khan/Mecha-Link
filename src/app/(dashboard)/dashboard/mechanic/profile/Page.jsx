@@ -1,6 +1,6 @@
 "use client";
 
-import React, {useEffect, useState} from "react";
+import React, { useEffect, useState } from "react";
 import useUser from "@/hooks/useUser";
 import {
   MapPin,
@@ -12,39 +12,30 @@ import {
   Shield,
   CheckCircle,
   Wrench,
-  Car,
   Settings,
   Edit3,
   Share2,
-  PhoneCall,
-  MessageCircle,
   Calendar,
-  Award,
   FileText,
   BarChart3,
-  Eye,
   Download,
   Filter,
   Building,
   Navigation,
-  Globe,
   Facebook,
   Instagram,
   Twitter,
   ChevronRight,
-  Crown,
   BadgeCheck,
-  Sparkles,
   Trash2,
 } from "lucide-react";
-import {useRouter} from "next/navigation";
-import toast from "react-hot-toast";
+import { useRouter } from "next/navigation";
 import Button from "@/app/shared/Button";
 import Swal from "sweetalert2";
 import axios from "axios";
 
-const MechanicProfile = ({shopId}) => {
-  const {user: loggedInUser, loading: userLoading} = useUser();
+const MechanicProfile = ({ shopId }) => {
+  const { user: loggedInUser, loading: userLoading } = useUser();
   const [shopData, setShopData] = useState(null);
   const [adsData, setAdsData] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -52,7 +43,7 @@ const MechanicProfile = ({shopId}) => {
   const [reviewsLoading, setReviewsLoading] = useState(false);
   const [activeTab, setActiveTab] = useState("overview");
   const router = useRouter();
-  console.log(adsData);
+
   // Fetch shop data
   useEffect(() => {
     const fetchShopData = async () => {
@@ -151,7 +142,6 @@ const MechanicProfile = ({shopId}) => {
       cancelButtonColor: "#3085d6",
       confirmButtonText: "Yes, delete it!",
     });
-console.log(id,title);
     if (result.isConfirmed) {
       try {
         const res = await axios.delete(`/api/ads/${id}`);
@@ -282,10 +272,10 @@ console.log(id,title);
       ),
       yearsExperience: shopData?.createdAt
         ? Math.max(
-            1,
-            new Date().getFullYear() -
-              new Date(shopData.createdAt).getFullYear()
-          )
+          1,
+          new Date().getFullYear() -
+          new Date(shopData.createdAt).getFullYear()
+        )
         : 1,
       customerSatisfaction: Math.floor(Math.random() * 20) + 80,
       repeatClients: Math.floor(Math.random() * 100) + 50,
@@ -298,15 +288,15 @@ console.log(id,title);
   const averageRating =
     reviews.length > 0
       ? (
-          reviews.reduce(
-            (sum, review) => sum + (parseFloat(review.rating) || 0),
-            0
-          ) / reviews.length
-        ).toFixed(1)
+        reviews.reduce(
+          (sum, review) => sum + (parseFloat(review.rating) || 0),
+          0
+        ) / reviews.length
+      ).toFixed(1)
       : "0.0";
 
   // Stat Card Component
-  const StatCard = ({icon: Icon, value, label, trend, color = "primary"}) => {
+  const StatCard = ({ icon: Icon, value, label, trend, color = "primary" }) => {
     const colorClasses = {
       primary: {
         bg: "bg-primary/10",
@@ -347,11 +337,10 @@ console.log(id,title);
           </div>
           {trend && (
             <span
-              className={`px-2 py-1 rounded-full text-xs font-bold ${
-                trend > 0
+              className={`px-2 py-1 rounded-full text-xs font-bold ${trend > 0
                   ? "bg-success/20 text-success"
                   : "bg-error/20 text-error"
-              }`}
+                }`}
             >
               {trend > 0 ? "↑" : "↓"} {Math.abs(trend)}%
             </span>
@@ -364,7 +353,7 @@ console.log(id,title);
   };
 
   // Service Category Component
-  const ServiceCategory = ({category, services}) => (
+  const ServiceCategory = ({ category, services }) => (
     <div className="bg-base-200 rounded-xl p-6 border border-base-300">
       <h4 className="text-lg font-bold text-base-content mb-4 flex items-center gap-2">
         <Wrench className="text-primary" size={20} />
@@ -394,16 +383,15 @@ console.log(id,title);
   );
 
   // Action Button Component
-  const ActionButton = ({icon: Icon, label, variant = "primary", onClick}) => (
+  const ActionButton = ({ icon: Icon, label, variant = "primary", onClick }) => (
     <button
       onClick={onClick}
       className={`
                 flex items-center justify-center gap-3 px-6 py-4 rounded-xl font-semibold w-full transition-all duration-300 hover:scale-[1.01] text-center
-                ${
-                  variant === "primary"
-                    ? "bg-primary text-primary-content hover:bg-primary/90 shadow-lg hover:shadow-xl"
-                    : "bg-base-200 text-base-content border border-base-300 hover:border-primary hover:bg-base-300"
-                }
+                ${variant === "primary"
+          ? "bg-primary text-primary-content hover:bg-primary/90 shadow-lg hover:shadow-xl"
+          : "bg-base-200 text-base-content border border-base-300 hover:border-primary hover:bg-base-300"
+        }
             `}
     >
       <Icon size={20} />
@@ -411,19 +399,21 @@ console.log(id,title);
     </button>
   );
 
-  const handlePayment = async () => {
+  const handlePayment = async (purpose, price, adID = null) => {
+  
     const res = await fetch("/api/ssl/init", {
       method: "POST",
-      headers: {"Content-Type": "application/json"},
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         ownerName: processedShopData.ownerName,
         shopName: processedShopData.name,
         email: processedShopData.email,
         phone: processedShopData.phone,
         category: processedShopData.categories[0],
-        amount: 1000,
-        shopID: shopData._id,
-        purpose: "Shop Add",
+        amount:price,
+        shopID: shopData._id || null,
+        adID,
+        purpose,
       }),
     });
 
@@ -483,13 +473,12 @@ console.log(id,title);
                     </span>
                   </div>
                   <div
-                    className={`inline-flex items-center gap-2 px-4 py-2 rounded-full border font-semibold text-sm ${
-                      processedShopData.status === "approved"
+                    className={`inline-flex items-center gap-2 px-4 py-2 rounded-full border font-semibold text-sm ${processedShopData.status === "approved"
                         ? "bg-success/10 text-success border-success/20"
                         : processedShopData.status === "pending"
-                        ? "bg-warning/10 text-warning border-warning/20"
-                        : "bg-error/10 text-error border-error/20"
-                    }`}
+                          ? "bg-warning/10 text-warning border-warning/20"
+                          : "bg-error/10 text-error border-error/20"
+                      }`}
                   >
                     {processedShopData.status.charAt(0).toUpperCase() +
                       processedShopData.status.slice(1)}
@@ -549,9 +538,8 @@ console.log(id,title);
               <div className="bg-base-100 rounded-3xl p-6 border border-neutral/40 shadow-lg relative overflow-hidden">
                 {/* Status Dot Indicator */}
                 <div
-                  className={`absolute top-4 left-4 w-10 h-3 rounded-full ${
-                    !paymentInfo ? "bg-error animate-pulse" : "bg-success"
-                  }`}
+                  className={`absolute top-4 left-4 w-10 h-3 rounded-full ${!paymentInfo ? "bg-error animate-pulse" : "bg-success"
+                    }`}
                 ></div>
 
                 <div className="text-center">
@@ -565,7 +553,7 @@ console.log(id,title);
                         </span>
                       </div>
                       <button
-                        onClick={handlePayment}
+                        onClick={() => handlePayment("Shop Add", 1000)}
                         title="Pay 1000 per shop"
                         className="btn btn-primary btn-lg gap-3 w-full max-w-xs mx-auto hover:scale-105 transition-transform duration-300"
                       >
@@ -640,19 +628,18 @@ console.log(id,title);
                       Status:
                     </span>
                     <span
-                      className={`badge badge-lg font-semibold ${
-                        paymentInfo?.paymentStatus === "paid"
+                      className={`badge badge-lg font-semibold ${paymentInfo?.paymentStatus === "paid"
                           ? "badge-success"
                           : paymentInfo?.paymentStatus === "failed"
-                          ? "badge-error"
-                          : "badge-warning"
-                      }`}
+                            ? "badge-error"
+                            : "badge-warning"
+                        }`}
                     >
                       {paymentInfo?.paymentStatus === "paid"
                         ? "PAID"
                         : paymentInfo?.paymentStatus === "failed"
-                        ? "FAILED"
-                        : "PENDING"}
+                          ? "FAILED"
+                          : "PENDING"}
                     </span>
                   </div>
 
@@ -682,6 +669,8 @@ console.log(id,title);
             </div>
           </div>
         </div>
+
+
         <div className="bg-base-100 rounded-3xl p-4 mb-8 border border-neutral/40 shadow-lg">
           <h2 className="text-2xl font-semibold mb-4">Your Ads</h2>
 
@@ -739,11 +728,7 @@ console.log(id,title);
                         });
 
                         if (result.isConfirmed) {
-                          Swal.fire(
-                            "Paid!",
-                            "Your payment was successful.",
-                            "success"
-                          );
+                          handlePayment("Ads", ad.price, ad._id);
                         }
                       }}
                     >
@@ -771,11 +756,10 @@ console.log(id,title);
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab)}
-                className={`flex items-center gap-2 px-6 py-3 rounded-xl font-semibold whitespace-nowrap transition-all duration-300 ${
-                  activeTab === tab
+                className={`flex items-center gap-2 px-6 py-3 rounded-xl font-semibold whitespace-nowrap transition-all duration-300 ${activeTab === tab
                     ? "bg-primary text-primary-content shadow-lg"
                     : "text-base-content/70 hover:text-base-content hover:bg-base-200"
-                }`}
+                  }`}
               >
                 {tab === "overview" && <BarChart3 size={18} />}
                 {tab === "services" && <Wrench size={18} />}
@@ -949,8 +933,8 @@ console.log(id,title);
                               <p className="text-base-content/70 text-sm">
                                 {review.createdAt
                                   ? new Date(
-                                      review.createdAt
-                                    ).toLocaleDateString()
+                                    review.createdAt
+                                  ).toLocaleDateString()
                                   : "Recent"}
                               </p>
                             </div>
@@ -1156,11 +1140,10 @@ console.log(id,title);
                   >
                     <span className="text-base-content font-medium">{day}</span>
                     <span
-                      className={`font-semibold ${
-                        day === processedShopData.workingHours.weekend
+                      className={`font-semibold ${day === processedShopData.workingHours.weekend
                           ? "text-error"
                           : "text-success"
-                      }`}
+                        }`}
                     >
                       {day === processedShopData.workingHours.weekend
                         ? "Closed"

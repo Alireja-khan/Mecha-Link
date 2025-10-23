@@ -11,6 +11,7 @@ export default function SuccessPage() {
   const shopID = params.get("shopID");
   const trxn = params.get("trxn");
   const [paymentInfo, setPaymentInfo] = useState({});
+  const [ad, setAd] = useState({});
   const [printJS, setPrintJS] = useState(null);
 
  useEffect(() => {
@@ -18,8 +19,13 @@ export default function SuccessPage() {
   }, []);
 
   useEffect(() => {
-    fetch(`/api/payment/${shopID}`).then((res) => res.json()).then((data) => { setPaymentInfo(data) }).catch((err) => console.error("Payment fetch error:", err));
-  }, [shopID]);
+    fetch(`/api/ads/${paymentInfo?.adID}`).then((res) => res.json()).then((data) => { setAd(data) }).catch((err) => console.error("Payment fetch error:", err));
+  }, [paymentInfo]);
+
+
+  useEffect(()=>{
+        fetch(`/api/payment/${trxn}`).then((res) => res.json()).then((data) => { setPaymentInfo(data) }).catch((err) => console.error("Payment fetch error:", err));
+  },[])
 
   const handleDownloadPDF = () => {
       if (!printJS) return;
@@ -110,6 +116,9 @@ export default function SuccessPage() {
               <p><strong>Amount:</strong> ৳{paymentInfo.amount}</p>
               <p><strong>Status:</strong> {paymentInfo.status}</p>
               <p><strong>Purpose:</strong> {paymentInfo.purpose}</p>
+              {
+                ad.title && <p><strong>Ad Title:</strong> {ad.title}</p>
+              }
               <p><strong>Payment Date:</strong> {new Date(paymentInfo.paymentDate).toLocaleString()}</p>
             </div>
           </div>

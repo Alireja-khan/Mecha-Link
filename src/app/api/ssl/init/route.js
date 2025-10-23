@@ -2,6 +2,12 @@ import { NextResponse } from "next/server";
 
 export async function POST(req) {
   const body = await req.json();
+  let product_name = "";
+  if(body.purpose === "Shop Add") {
+    product_name = "Shop Add";
+  }else if(body.purpose === "Ads") {
+    product_name = "Ads";
+  }
 
   const transactionId = `tran_${Date.now()}`;
 
@@ -22,7 +28,7 @@ export async function POST(req) {
     cus_city: "Dhaka",
     cus_postcode: "1000",
     cus_phone: body.phone,
-    product_name: "Shop Add",
+    product_name,
     product_category: body.category,
     product_profile: "general",
     shipping_method: "NO",
@@ -31,7 +37,8 @@ export async function POST(req) {
     logistic_pickup_id: 0,
     logistic_delivery_type: "DOMESTIC",
     value_a: body.shopID,
-    value_b: body.purpose
+    value_b: body.purpose,
+    value_c: body.adID
   };
  
   const response = await fetch("https://sandbox.sslcommerz.com/gwprocess/v4/api.php", {
