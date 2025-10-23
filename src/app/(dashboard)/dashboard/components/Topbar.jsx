@@ -16,6 +16,7 @@ import useUser from "@/hooks/useUser";
 import NotificationWidget from "@/app/shared/NotificationWidget";
 import ToggleTheme from "../../../shared/ToggleTheme";
 import { useRouter } from "next/navigation";
+import CartIcon from "@/app/shared/cartIcon";
 
 const transitionClasses = "transition duration-200 ease-in-out";
 
@@ -289,6 +290,7 @@ const Topbar = ({ pageTitle = "Dashboard", setIsMobileOpen }) => {
           />
         )}
 
+        <CartIcon/>
         <ToggleTheme />
 
         {/* Notification Widget */}

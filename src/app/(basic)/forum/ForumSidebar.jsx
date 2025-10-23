@@ -25,7 +25,7 @@ export const ForumSidebar = ({
                       [-webkit-overflow-scrolling:touch]
                       [&::-webkit-scrollbar]:hidden">
         {/* User Profile Card with Quick Actions */}
-        <div className="bg-base-100 rounded-2xl p-6 border border-neutral/50 shadow-sm">
+        <div className="bg-base-200 rounded-2xl p-6 border border-neutral/50 shadow-lg">
           <div className="text-center">
             <div className="flex justify-center mb-4">
               {currentUser?.profileImage ? (
@@ -80,7 +80,7 @@ export const ForumSidebar = ({
 
 // Sub-components for sidebar
 const QuickSortOptions = ({ activeSort, onSortChange }) => (
-  <div className="bg-base-100 rounded-2xl p-6 border border-neutral/50 shadow-sm">
+  <div className="bg-base-200 rounded-2xl p-6 border border-neutral/50 shadow-lg">
     <h3 className="font-bold text-lg text-base-content mb-4 flex items-center gap-2">
       <BarChart3 size={20} />
       Sort By
@@ -111,7 +111,7 @@ const QuickSortOptions = ({ activeSort, onSortChange }) => (
 );
 
 const ForumStats = ({ stats }) => (
-  <div className="bg-base-100 rounded-2xl p-6 border border-neutral/50 shadow-sm">
+  <div className="bg-base-200 rounded-2xl p-6 border border-neutral/50 shadow-lg">
     <h3 className="font-bold text-lg text-base-content mb-4 flex items-center gap-2">
       <TrendingUp size={20} />
       Forum Stats
@@ -138,7 +138,7 @@ const ForumStats = ({ stats }) => (
 );
 
 const PopularCategories = ({ popularCategories, selectedCategory, onCategorySelect }) => (
-  <div className="bg-base-100 rounded-2xl p-6 border border-neutral/50 shadow-sm">
+  <div className="bg-base-200 rounded-2xl p-6 border border-neutral/50 shadow-lg">
     <h3 className="font-bold text-lg text-base-content mb-4 flex items-center gap-2">
       <Hash size={20} />
       Popular Categories
@@ -155,10 +155,10 @@ const PopularCategories = ({ popularCategories, selectedCategory, onCategorySele
           }`}
         >
           <div className="flex items-center gap-2">
-            <div className={`w-3 h-3 rounded-full ${category.color.split(' ')[0]} shadow-sm`}></div>
+            <div className={`w-3 h-3 rounded-full ${category.color.split(' ')[0]} shadow-lg`}></div>
             <span className="text-sm font-medium group-hover:text-base-content">{category.label}</span>
           </div>
-          <span className="text-xs bg-base-100 px-2 py-1 rounded-full font-semibold shadow-sm">
+          <span className="text-xs bg-base-200 px-2 py-1 rounded-full font-semibold shadow-lg">
             {category.count}
           </span>
         </button>
@@ -168,7 +168,7 @@ const PopularCategories = ({ popularCategories, selectedCategory, onCategorySele
 );
 
 const TopContributors = ({ topContributors }) => (
-  <div className="bg-base-100 rounded-2xl p-6 border border-neutral/50 shadow-sm">
+  <div className="bg-base-200 rounded-2xl p-6 border border-neutral/50 shadow-lg">
     <h3 className="font-bold text-lg text-base-content mb-4 flex items-center gap-2">
       <Award size={20} />
       Top Contributors
@@ -212,7 +212,7 @@ const TopContributors = ({ topContributors }) => (
 );
 
 const RecentActiveUsers = ({ recentUsers }) => (
-  <div className="bg-base-100 rounded-2xl p-6 border border-neutral/50 shadow-sm">
+  <div className="bg-base-200 rounded-2xl p-6 border border-neutral/50 shadow-lg">
     <h3 className="font-bold text-lg text-base-content mb-4 flex items-center gap-2">
       <Users size={20} />
       Active Now
@@ -225,14 +225,14 @@ const RecentActiveUsers = ({ recentUsers }) => (
               <img
                 src={user.image}
                 alt={user.name}
-                className="w-10 h-10 rounded-full object-cover border-2 border-transparent group-hover:border-primary transition-colors duration-200 shadow-sm"
+                className="w-10 h-10 rounded-full object-cover border-2 border-transparent group-hover:border-primary transition-colors duration-200 shadow-lg"
               />
             ) : (
-              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary to-orange-600 flex items-center justify-center text-white font-bold text-sm group-hover:scale-110 transition-transform duration-200 shadow-sm">
+              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary to-orange-600 flex items-center justify-center text-white font-bold text-sm group-hover:scale-110 transition-transform duration-200 shadow-lg">
                 {user.name?.charAt(0) || "U"}
               </div>
             )}
-            <div className="absolute -bottom-1 -right-1 w-3 h-3 bg-success rounded-full border-2 border-base-100 shadow-sm"></div>
+            <div className="absolute -bottom-1 -right-1 w-3 h-3 bg-success rounded-full border-2 border-base-100 shadow-lg"></div>
           </div>
         </div>
       ))}
@@ -241,7 +241,7 @@ const RecentActiveUsers = ({ recentUsers }) => (
 );
 
 const QuickActions = () => (
-  <div className="bg-base-100 rounded-2xl p-6 border border-neutral/50 shadow-sm">
+  <div className="bg-base-200 rounded-2xl p-6 border border-neutral/50">
     <h3 className="font-bold text-lg text-base-content mb-4">Quick Actions</h3>
     <div className="space-y-2">
       <button className="w-full flex items-center gap-3 p-3 bg-base-200 rounded-xl hover:bg-base-300 transition-colors duration-200 text-left group">

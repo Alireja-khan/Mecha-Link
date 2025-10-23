@@ -31,7 +31,6 @@ export const ForumContent = ({
 }) => {
   return (
     <div className="flex-1 min-w-0 flex flex-col">
-      {/* Search and Filter Bar */}
       <div className="flex flex-col sm:flex-row gap-3 mb-5">
         <div className="relative flex-1 min-w-[250px]">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-base-content/40" size={20} />
@@ -40,23 +39,20 @@ export const ForumContent = ({
             placeholder="Search posts, users, comments..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-10 pr-4 py-3 bg-base-200 border border-neutral/30 rounded-xl focus:outline-none focus:border-primary/50 focus:bg-base-100 text-base-content placeholder-base-content/40"
+            className="w-full pl-10 pr-4 py-3 bg-base-200 border border-neutral/30 rounded-xl focus:outline-none focus:border-primary/50 focus:bg-base-200 text-base-content placeholder-base-content/40"
           />
         </div>
       </div>
 
-      {/* Scrollable Content Area with hidden scrollbar */}
       <div className="flex-1 overflow-y-auto
                       [-ms-overflow-style:none] 
                       [scrollbar-width:none]
                       [-webkit-overflow-scrolling:touch]
                       [&::-webkit-scrollbar]:hidden">
-        {/* Create Post Button - Enhanced */}
         {!showPostForm && (
           <CreatePostButton currentUser={currentUser} setShowPostForm={setShowPostForm} />
         )}
 
-        {/* Create Post Form */}
         {showPostForm && (
           <CreatePostForm
             currentUser={currentUser}
@@ -71,7 +67,6 @@ export const ForumContent = ({
           />
         )}
 
-        {/* Posts Header with Sorting */}
         <PostsHeader 
           selectedCategory={selectedCategory}
           posts={posts}
@@ -82,12 +77,10 @@ export const ForumContent = ({
           setShowFilters={setShowFilters}
         />
 
-        {/* Additional Filters */}
         {showFilters && (
           <CategoryFilters selectedCategory={selectedCategory} setSelectedCategory={setSelectedCategory} />
         )}
 
-        {/* Posts List */}
         <PostsList
           posts={posts}
           loading={loading}
@@ -105,9 +98,8 @@ export const ForumContent = ({
   );
 };
 
-// Sub-components for ForumContent
 const CreatePostButton = ({ currentUser, setShowPostForm }) => (
-  <div className="bg-base-100 rounded-2xl p-4 border border-neutral/50 shadow-sm mb-6">
+  <div className="bg-base-200 rounded-2xl p-4 border border-neutral/50 shadow-sm mb-6">
     <div className="flex items-center gap-4">
       <div className="flex-shrink-0">
         {currentUser?.profileImage ? (
@@ -125,7 +117,7 @@ const CreatePostButton = ({ currentUser, setShowPostForm }) => (
       
       <button
         onClick={() => setShowPostForm(true)}
-        className="flex-1 text-left p-4 bg-base-200 rounded-xl border border-neutral/30 hover:bg-base-300 transition-all duration-200 text-base-content/60 hover:text-base-content"
+        className="flex-1 text-left p-4 bg-base-100 rounded-xl border border-neutral/30 hover:bg-base-300 transition-all duration-200 text-base-content/60 hover:text-base-content"
       >
         <div className="flex items-center justify-between">
           <span>What's on your mind, {currentUser?.name?.split(' ')[0]}?</span>
@@ -145,11 +137,12 @@ const CreatePostForm = ({
   setNewPostContent,
   selectedCategory,
   setSelectedCategory,
+  uploadedImages,
   setUploadedImages,
   setShowPostForm,
   handleCreatePost
 }) => (
-  <div className="bg-base-100 rounded-2xl border border-neutral/50 shadow-lg mb-6 animate-fade-in">
+  <div className="bg-base-200 rounded-2xl border border-neutral/50 shadow-lg mb-6 animate-fade-in">
     <div className="p-4 border-b border-neutral/30 flex justify-between items-center">
       <h2 className="text-xl font-bold text-base-content">Create Post</h2>
       <button
@@ -158,7 +151,7 @@ const CreatePostForm = ({
           setNewPostContent("");
           setUploadedImages([]);
         }}
-        className="p-2 hover:bg-base-200 rounded-lg transition-colors"
+        className="p-2 hover:bg-base-100 rounded-lg transition-colors"
       >
         <X size={20} />
       </button>
@@ -187,6 +180,7 @@ const CreatePostForm = ({
           value={newPostContent}
           onChange={setNewPostContent}
           placeholder="What's on your mind? Share your thoughts, questions, or experiences..."
+          uploadedImages={uploadedImages}
           onImagesChange={setUploadedImages}
         />
       </div>
@@ -195,7 +189,7 @@ const CreatePostForm = ({
         <select
           value={selectedCategory}
           onChange={(e) => setSelectedCategory(e.target.value)}
-          className="w-full p-3 border border-neutral/30 rounded-xl bg-base-200/50 focus:bg-base-100 focus:border-primary/50 focus:outline-none text-base-content text-sm"
+          className="w-full p-3 border border-neutral/30 rounded-xl bg-base-100/50 focus:bg-base-200 focus:border-primary/50 focus:outline-none text-base-content text-sm"
         >
           <option value="all">Select Category</option>
           {CATEGORIES.map((category) => (
@@ -215,7 +209,7 @@ const CreatePostForm = ({
             setUploadedImages([]);
             setSelectedCategory("all");
           }}
-          className="px-6 py-2 bg-base-200 text-base-content rounded-lg font-medium hover:bg-base-300 transition-colors duration-200"
+          className="px-6 py-2 bg-base-100 text-base-content rounded-lg font-medium hover:bg-base-300 transition-colors duration-200"
         >
           Cancel
         </button>
@@ -249,7 +243,7 @@ const PostsHeader = ({ selectedCategory, posts, stats, activeSort, setActiveSort
       <select
         value={activeSort}
         onChange={(e) => setActiveSort(e.target.value)}
-        className="px-4 py-2 bg-base-100 border border-neutral/30 rounded-xl focus:outline-none focus:border-primary/50 text-base-content text-sm"
+        className="px-4 py-2 bg-base-200 border border-neutral/30 rounded-xl focus:outline-none focus:border-primary/50 text-base-content text-sm"
       >
         <option value="latest">Latest</option>
         <option value="oldest">Oldest</option>
@@ -264,7 +258,7 @@ const PostsHeader = ({ selectedCategory, posts, stats, activeSort, setActiveSort
         className={`px-4 py-2 border rounded-xl transition-colors duration-200 flex items-center gap-2 ${
           showFilters 
             ? 'bg-primary text-primary-content border-primary' 
-            : 'bg-base-100 border-neutral/30 text-base-content hover:bg-base-200'
+            : 'bg-base-200 border-neutral/30 text-base-content hover:bg-base-100'
         }`}
       >
         <Filter size={16} />
@@ -276,7 +270,7 @@ const PostsHeader = ({ selectedCategory, posts, stats, activeSort, setActiveSort
 );
 
 const CategoryFilters = ({ selectedCategory, setSelectedCategory }) => (
-  <div className="bg-base-100 rounded-2xl p-6 border border-neutral/30 shadow-sm mb-6">
+  <div className="bg-base-200 rounded-2xl p-6 border border-neutral/30 shadow-sm mb-6">
     <h3 className="font-semibold text-base-content mb-4">Filter by Category</h3>
     <div className="flex flex-wrap gap-2">
       <button
@@ -284,7 +278,7 @@ const CategoryFilters = ({ selectedCategory, setSelectedCategory }) => (
         className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
           selectedCategory === "all"
             ? 'bg-primary text-primary-content border-2 border-primary shadow-lg'
-            : 'bg-base-200 text-base-content/70 border border-neutral/30 hover:bg-base-300'
+            : 'bg-base-100 text-base-content/70 border border-neutral/30 hover:bg-base-300'
         }`}
       >
         All Categories
@@ -296,7 +290,7 @@ const CategoryFilters = ({ selectedCategory, setSelectedCategory }) => (
           className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
             selectedCategory === category.value
               ? CATEGORY_COLORS[category.value] + ' border-2 border-primary shadow-lg'
-              : 'bg-base-200 text-base-content/70 border border-neutral/30 hover:bg-base-300'
+              : 'bg-base-100 text-base-content/70 border border-neutral/30 hover:bg-base-300'
           }`}
         >
           {category.label}
@@ -320,10 +314,9 @@ const PostsList = ({
 }) => (
   <div className="space-y-6">
     {loading && posts.length === 0 ? (
-      // Show skeletons when loading initial posts
       [...Array(3)].map((_, index) => <PostSkeleton key={index} />)
     ) : posts.length === 0 ? (
-      <div className="bg-base-100 rounded-2xl p-12 text-center border border-neutral/50 shadow-sm">
+      <div className="bg-base-200 rounded-2xl p-12 text-center border border-neutral/50 shadow-sm">
         <MessageSquare size={48} className="mx-auto text-base-content/20 mb-4" />
         <h3 className="text-lg font-semibold text-base-content mb-2">No posts found</h3>
         <p className="text-base-content/60 mb-6">
@@ -350,7 +343,6 @@ const PostsList = ({
           />
         ))}
         
-        {/* Load More Button */}
         {pagination.hasMore && (
           <div className="text-center mt-8">
             <button

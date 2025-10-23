@@ -61,20 +61,20 @@ const MarkdownEditor = ({ value, onChange, placeholder = "What's on your mind?",
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
-        className="w-full h-48 p-4 border border-gray-300 rounded-lg resize-none focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
+        className="w-full h-48 p-4 border border-neutral bg-base-100 rounded-lg resize-none focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
       />
       
       {/* Uploaded Images Preview */}
       {uploadedImages.length > 0 && (
-        <div className="border border-gray-300 rounded-lg p-4 bg-gray-50">
-          <h4 className="text-sm font-medium text-gray-700 mb-2">Uploaded Images:</h4>
+        <div className="border border-neutral rounded-lg p-4 bg-base-100">
+          <h4 className="text-sm font-medium text-base-content mb-2">Uploaded Images:</h4>
           <div className="flex flex-wrap gap-3">
             {uploadedImages.map((image, index) => (
               <div key={index} className="relative group">
                 <img 
                   src={image} 
                   alt={`Uploaded ${index}`}
-                  className="w-20 h-20 object-cover rounded-lg border border-gray-300"
+                  className="w-20 h-20 object-cover rounded-lg border border-base-300"
                 />
                 <button
                   type="button"
@@ -83,7 +83,7 @@ const MarkdownEditor = ({ value, onChange, placeholder = "What's on your mind?",
                 >
                   <X size={12} />
                 </button>
-                <div className="text-xs text-gray-500 mt-1 truncate w-20">
+                <div className="text-xs text-base-content/60 mt-1 truncate w-20">
                   Image {index + 1}
                 </div>
               </div>
@@ -98,13 +98,13 @@ const MarkdownEditor = ({ value, onChange, placeholder = "What's on your mind?",
           type="button"
           onClick={handleImageUpload}
           disabled={isUploading}
-          className="flex items-center gap-2 px-4 py-2 text-sm bg-white border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 transition-colors"
+          className="flex items-center gap-2 px-4 py-2 text-sm bg-base-100 border border-neutral rounded-lg hover:bg-base-200/50 disabled:opacity-50 transition-colors"
         >
           <ImageIcon size={16} />
           {isUploading ? "Uploading..." : "Add Image"}
         </button>
         
-        <div className="text-sm text-gray-500">
+        <div className="text-sm text-base-content/60">
           {uploadedImages.length} image(s) attached
         </div>
       </div>

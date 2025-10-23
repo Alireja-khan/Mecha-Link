@@ -177,7 +177,7 @@ const WhyChooseUs = () => {
                 className={`p-4 mb-4 sm:mb-6 rounded-full text-primary shadow-inner z-10 transition-colors duration-300
                   ${index === 0 
                     ? "bg-white/10 text-base-content group-hover:bg-white/20" 
-                    : "bg-primary/20 group-hover:bg-primary group-hover:text-base-content"
+                    : "bg-primary/20 group-hover:bg-primary group-hover:text-white"
                   }
                 `}>
                 {reason.icon}

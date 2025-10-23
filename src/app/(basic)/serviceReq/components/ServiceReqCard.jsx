@@ -16,12 +16,14 @@ import {
   MessageSquare,
 } from "lucide-react";
 import Link from "next/link";
+
 import React, { useState, useEffect, useRef } from "react";
+
 
 const ServiceReqCard = ({ request }) => {
   const [userData, setUserData] = useState(null);
   const [loadingUser, setLoadingUser] = useState(false);
-  const { user: loggedInUser } = useUser();
+  const { user: loggedInUser } = useUser()
 
   useEffect(() => {
     const fetchUserData = async () => {
