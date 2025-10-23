@@ -9,6 +9,7 @@ import { useEffect, useRef, useState } from "react";
 import { FaGear } from "react-icons/fa6";
 import ToggleTheme from "../shared/ToggleTheme";
 import label from "daisyui/components/label";
+import CartIcon from "../shared/cartIcon";
 
 const MobileDrawerBackdrop = ({ isOpen, onClick }) => {
   return (
@@ -106,6 +107,7 @@ export default function Header() {
           </nav>
 
           <div className="flex gap-4 items-center">
+            <CartIcon></CartIcon>
             <div className="hidden md:block">
               <ToggleTheme />
             </div>

@@ -4,17 +4,21 @@ import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
-  User, Settings, LogOut, Users, Wrench, Tag, Megaphone,
-   ClipboardList, Star, MessageSquare, WrenchIcon,
+  User, Settings, LogOut, Wrench, Megaphone,
+  ClipboardList, Star, MessageSquare,
   Store, LayoutDashboard, X, PanelLeft, PanelRight,
   LucideBrainCircuit,
-  PenLine,
-  MegaphoneIcon,
-  ListChecks,
+  Building2,
+    Ticket,
+  NotebookPen,
+  ScrollText,
+  BarChart3,
+  ClipboardCheck,
+  Radio,
+  UserIcon,
 } from "lucide-react";
 import { FaGear } from "react-icons/fa6";
 import useUser from "@/hooks/useUser";
-import { FaBroadcastTower } from "react-icons/fa";
 
 const menuItem = (name, icon, href) => ({ name, icon, href });
 
@@ -58,24 +62,26 @@ const Sidebar = ({ isMobileOpen, setIsMobileOpen }) => {
   const roleMenu = {
     admin: [
       menuItem("Reviews", <Star size={20} />, `/dashboard/admin/reviews`),
-      menuItem("Manage Shops", <Wrench size={20} />, "/dashboard/admin/manageShops"),
-      menuItem("Manage Users", <Users size={20} />, "/dashboard/admin/manageUsers"),
-      menuItem("Service Requests", <Users size={20} />, "/dashboard/admin/serviceReq"),
-      menuItem("Coupons", <Tag size={20} />, "/dashboard/admin/coupons"),
+      menuItem("Manage Shops", <Building2 size={20} />, "/dashboard/admin/manageShops"),
+      menuItem("Manage Users", <UserIcon size={20} />, "/dashboard/admin/manageUsers"),
+      menuItem("Service Requests", <ClipboardList size={20} />, "/dashboard/admin/serviceReq"),
+      menuItem("Coupons", <Ticket size={20} />, "/dashboard/admin/coupons"),
       menuItem("Announcements", <Megaphone size={20} />, "/dashboard/admin/announcements"),
-      menuItem("Add Blogs", <PenLine size={20} />, "/dashboard/admin/blogs"),
-      menuItem("Add Parts", <PenLine size={20} />, "/dashboard/admin/AddSpareParts"),
-      menuItem("All Ads", <ListChecks size={20} />, "/dashboard/admin/allAds"),
-      menuItem("Revenue Report", <PenLine size={20} />, "/dashboard/admin/revenue"),
+      menuItem("Add Blogs", <NotebookPen size={20} />, "/dashboard/admin/blogs"),
+      menuItem("Add Parts", <Wrench size={20} />, "/dashboard/admin/AddSpareParts"),
+      menuItem("All Ads", <ScrollText size={20} />, "/dashboard/admin/allAds"),
+      menuItem("Revenue Report", <BarChart3 size={20} />, "/dashboard/admin/revenue"),
     ],
+
     mechanic: [
       menuItem("Reviews", <Star size={20} />, `/dashboard/mechanic/reviews`),
-      menuItem("Requests", <ClipboardList size={20} />, "/dashboard/mechanic/requests"),
+      menuItem("Requests", <ClipboardCheck size={20} />, "/dashboard/mechanic/requests"),
       menuItem("Add Shop", <Store size={20} />, "/dashboard/mechanic/AddMechanicShop"),
-      menuItem("Advertise", <MegaphoneIcon size={20} />, "/dashboard/mechanic/advertise"),
+      menuItem("Advertise", <Radio size={20} />, "/dashboard/mechanic/advertise"),
     ],
+
     user: [
-      menuItem("Service Request", <WrenchIcon size={20} />, "/dashboard/user/addServiceRequest"),
+      menuItem("Service Request", <Wrench size={20} />, "/dashboard/user/addServiceRequest"),
     ],
   };
 
