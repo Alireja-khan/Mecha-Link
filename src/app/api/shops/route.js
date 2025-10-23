@@ -41,27 +41,25 @@ export async function GET(req) {
 
     const collection = await dbConnect(collections.mechanicShops);
 
-    // ✅ 1️⃣ If email query is provided, return that specific user's shop(s)
-    if (email) {
-      const shops = await collection
-        .find({
-          $or: [
-            { ownerEmail: email },
-            { userEmail: email },
-            { "shop.ownerEmail": email },
-          ],
-        })
-        .toArray();
+// ✅ If email query is provided, return only one shop for that email
+if (email) {
+  const shop = await collection.findOne({
+    $or: [
+      { ownerEmail: email },
+      { userEmail: email },
+      { "shop.ownerEmail": email },
+    ],
+  });
 
-      if (!shops.length) {
-        return NextResponse.json(
-          { message: "No shop found for this email" },
-          { status: 404 }
-        );
-      }
+  if (!shop) {
+    return NextResponse.json(
+      { message: "No shop found for this email" },
+      { status: 404 }
+    );
+  }
 
-      return NextResponse.json(shops);
-    }
+  return NextResponse.json(shop);
+}
 
     // ✅ 2️⃣ Handle home page request (approved + limited to 6)
     if (home) {

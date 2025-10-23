@@ -8,6 +8,7 @@ import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { FaGear } from "react-icons/fa6";
 import ToggleTheme from "../shared/ToggleTheme";
+import label from "daisyui/components/label";
 
 const MobileDrawerBackdrop = ({ isOpen, onClick }) => {
   return (
@@ -58,6 +59,7 @@ export default function Header() {
     { href: "/serviceReq", label: "Service Requests" },
     { href: "/about", label: "About" },
     { href: "/forum", label: "Forum" },
+    { href: "/market", label: "Market"}
   ];
 
   const dashboardLink =

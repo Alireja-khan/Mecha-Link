@@ -16,6 +16,10 @@ export const collections = {
   blogs: "blogs",
   payments: "payments",
   forumPosts: "forumPosts",
+  spareParts: "spareParts",
+  partsCategories: "partsCategories",
+  brands: "brands",
+  cart: "cart",
   ads: "ads",
 };
 
