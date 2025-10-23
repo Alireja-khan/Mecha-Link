@@ -108,7 +108,6 @@ async function handleFiltersRequest() {
     const categoriesCollection = await dbConnect(collections.partsCategories);
     const brandsCollection = await dbConnect("brands");
 
-    // console.log("🔍 Fetching categories and brands from collections...");
 
     // Get all categories with their subcategories
     const categoriesData = await categoriesCollection.find({}).toArray();
@@ -124,10 +123,6 @@ async function handleFiltersRequest() {
     const brandsData = await brandsCollection.find({}).sort({ name: 1 }).toArray();
     const brands = brandsData.map(brand => brand.name);
 
-    // console.log("✅ Filters data:", {
-    //   categories: categories.map(c => c.name),
-    //   brands
-    // });
 
     return NextResponse.json({
       categories,
