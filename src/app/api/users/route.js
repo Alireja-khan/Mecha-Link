@@ -4,7 +4,7 @@ import bcrypt from "bcrypt";
 import {ObjectId} from "mongodb";
 
 export async function GET(request) {
-  const { searchParams } = new URL(request.url);
+  const {searchParams} = new URL(request.url);
   const email = searchParams.get("email");
   const id = searchParams.get("id"); // ✅ new: support id
   const collection = await dbConnect(collections.users);
@@ -15,14 +15,14 @@ export async function GET(request) {
 
   if (!Object.keys(query).length) {
     return NextResponse.json(
-      { success: false, message: "Please provide email or id" },
-      { status: 400 }
+      {success: false, message: "Please provide email or id"},
+      {status: 400}
     );
   }
 
   // ✅ Hide sensitive fields
   const result = await collection.findOne(query, {
-    projection: { otp: 0, otpExpiresAt: 0, password: 0 },
+    projection: {otp: 0, otpExpiresAt: 0, password: 0},
   });
 
   return NextResponse.json(result);
@@ -99,6 +99,46 @@ export async function DELETE(req) {
     return NextResponse.json({success: true, message: "Notification deleted"});
   } catch (err) {
     console.error("❌ Failed to delete notification:", err);
+    return NextResponse.json(
+      {success: false, message: "Server error"},
+      {status: 500}
+    );
+  }
+}
+
+// delete all notifications for a user
+export async function PUT(req) {
+  try {
+    const {email} = await req.json();
+    console.log(email);
+    if (!email) {
+      return NextResponse.json(
+        {success: false, message: "Email is required"},
+        {status: 400}
+      );
+    }
+
+    const collection = await dbConnect(collections.users);
+
+    // Set notifications to an empty array
+    const result = await collection.updateOne(
+      {email},
+      {$set: {notifications: []}}
+    );
+
+    if (result.modifiedCount === 0) {
+      return NextResponse.json(
+        {success: false, message: "User not found or already empty"},
+        {status: 404}
+      );
+    }
+
+    return NextResponse.json({
+      success: true,
+      message: "All notifications deleted successfully",
+    });
+  } catch (err) {
+    console.error("❌ Failed to delete all notifications:", err);
     return NextResponse.json(
       {success: false, message: "Server error"},
       {status: 500}
