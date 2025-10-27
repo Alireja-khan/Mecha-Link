@@ -48,8 +48,8 @@ export default function SpecificServices() {
 
 
   return (
-    <section className="py-10">
-      <div className="container mx-auto text-center">
+    <section className="mb-16 py-10">
+      <div className="lg:container px-6 mx-auto text-center">
         <h2 className="text-5xl font-bold mb-10">
           Explore by <span className="text-primary">Category</span>
         </h2>

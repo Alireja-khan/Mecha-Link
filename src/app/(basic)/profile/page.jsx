@@ -210,7 +210,7 @@ const Profile = () => {
                     <div className="absolute bottom-0 right-0 w-96 h-96 bg-white/5 rounded-full translate-x-1/3 translate-y-1/3"></div>
 
                     {/* Profile Image/Avatar (Circular Overlap) */}
-                    <div className={`z-50 absolute ${bottomOffsetClass}`}>
+                    <div className={`z-40 absolute ${bottomOffsetClass}`}>
                         <img
                             className={`${imageSizeClasses} rounded-xl border-4 border-white object-cover shadow-2xl transition-transform duration-300 hover:scale-[1.02] ring-4 ring-primary/30`}
                             src={userData.profileImage}
