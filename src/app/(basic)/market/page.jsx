@@ -10,9 +10,10 @@ import {
   Search,
   AlertTriangle,
   TrendingUp,
-  Users,
-  Clock,
   ArrowRight,
+  CheckCircle,
+  Package,
+  AlertOctagon,
 } from "lucide-react";
 import SpareCard from "@/app/Components/SpareCard";
 
@@ -39,16 +40,21 @@ export default function SpareMarketplace() {
     brands: []
   });
 
+  const [inventoryStats, setInventoryStats] = useState({
+    inStock: 0,
+    lowInStock: 0,
+    outOfStock: 0,
+  });
+
   const stats = {
     totalParts: totalCount,
-    uniqueBrands: filterOptions.brands.length,
-    majorCategories: filterOptions.categories.length,
-    featured: 120,
+    inStock: inventoryStats.inStock,
+    lowInStock: inventoryStats.lowInStock,
+    outOfStock: inventoryStats.outOfStock,
   };
 
   const fetchFilterOptions = useCallback(async () => {
     try {
-      // NOTE: This API endpoint is assumed to be correct based on usage: /api/spareParts?filters=true
       const response = await axios.get("/api/spareParts?filters=true");
       setFilterOptions(response.data);
     } catch (error) {
@@ -64,18 +70,38 @@ export default function SpareMarketplace() {
         limit: itemsPerPage.toString(),
         sortBy: sortOrder,
         searchTerm: searchTerm,
-        // Only include filters if they are not "all"
         ...(filters.category !== "all" && { category: filters.category }),
         ...(filters.subCategory !== "all" && { subCategory: filters.subCategory }),
         ...(filters.brand !== "all" && { brand: filters.brand })
       });
 
-      // NOTE: This API endpoint is assumed to be correct based on usage: /api/spareParts?...
       const res = await axios.get(`/api/spareParts?${params}`);
 
-      setParts(res.data.spareParts || []);
+      const fetchedParts = res.data.spareParts || [];
+      setParts(fetchedParts);
       setTotalPages(res.data.totalPages || 1);
       setTotalCount(res.data.totalCount || 0);
+
+      // ------------------------------------------------------------------
+      // UPDATED LOGIC: Calculate Inventory Stats based on the badge rules
+      // Note: This logic only calculates stats for the currently visible parts on the page.
+      // For accurate totals, you would need a separate API endpoint to return global inventory counts.
+      // ------------------------------------------------------------------
+      const newStats = fetchedParts.reduce((acc, part) => {
+        const quantity = part.quantity || 0;
+        if (quantity > 10) {
+          acc.inStock += 1;
+        } else if (quantity > 0) {
+          acc.lowInStock += 1;
+        } else {
+          acc.outOfStock += 1;
+        }
+        return acc;
+      }, { inStock: 0, lowInStock: 0, outOfStock: 0 });
+
+      setInventoryStats(newStats);
+      // ------------------------------------------------------------------
+
     } catch (err) {
       setError("Failed to fetch spare parts");
     } finally {
@@ -83,45 +109,53 @@ export default function SpareMarketplace() {
     }
   }, [currentPage, itemsPerPage, sortOrder, filters, searchTerm]);
 
-  // Fetch filter options on mount
   useEffect(() => {
     fetchFilterOptions();
   }, [fetchFilterOptions]);
 
-  // Fetch parts whenever filters, sort, page, limit, or search term changes
   useEffect(() => {
     fetchParts();
   }, [currentPage, itemsPerPage, filters, sortOrder, searchTerm, fetchParts]);
+
+  useEffect(() => {
+    if (showFilters) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [showFilters]);
 
   const handleFilterChange = (filterType, value) => {
     setFilters(prev => {
       const newFilters = { ...prev, [filterType]: value };
       if (filterType === "category") {
-        // Reset subCategory when main category changes
         newFilters.subCategory = "all";
       }
       return newFilters;
     });
-    setCurrentPage(1); // Reset to first page on filter change
+    setCurrentPage(1);
   };
 
   const handleSort = (e) => {
     setSortOrder(e.target.value);
-    setCurrentPage(1); // Reset to first page on sort change
+    setCurrentPage(1);
   };
 
   const handleSearch = (e) => {
     setSearchTerm(e.target.value);
-    setCurrentPage(1); // Reset to first page on search
+    setCurrentPage(1);
   };
 
   const handleItemsPerPage = (e) => {
     setItemsPerPage(parseInt(e.target.value));
-    setCurrentPage(1); // Reset to first page on limit change
+    setCurrentPage(1);
   };
 
   const handlePageChange = (page) => {
-    // Only change if page is a number and is different from current page
     if (typeof page === 'number' && page !== currentPage) {
       setCurrentPage(page);
     }
@@ -148,12 +182,8 @@ export default function SpareMarketplace() {
     setShowFilters(false);
   };
 
-  // =========================================================================
-  // UI Components
-  // =========================================================================
-
   const Button = ({ children, onClick, className = '', variant = 'primary', size = 'default', disabled = false, type = 'button' }) => {
-    let baseStyle = "flex items-center justify-center font-poppins font-semibold transition-all duration-300 rounded-full shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2";
+    let baseStyle = "flex items-center justify-center font-poppins font-semibold mx-auto transition-all duration-300 rounded-full shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2";
 
     if (size === 'sm') baseStyle += ' px-4 py-2 text-sm';
     else if (size === 'block') baseStyle += ' w-full py-3 text-base';
@@ -169,7 +199,7 @@ export default function SpareMarketplace() {
 
     return (
       <button
-        type={type} // <-- Added type="button" by default
+        type={type}
         onClick={onClick}
         className={`${baseStyle} ${className}`}
         disabled={disabled}
@@ -191,8 +221,6 @@ export default function SpareMarketplace() {
           if (starIdx <= fullStars) {
             return <Star key={starIdx} className="text-warning fill-warning h-3 w-3" />;
           }
-          // Note: Full implementation would handle half stars with a different icon,
-          // but for simplicity and using only the imported Star icon, we'll mark the rest as empty.
           return <Star key={starIdx} className="text-base-300 stroke-base-300 h-3 w-3" />;
         })}
       </div>
@@ -297,7 +325,6 @@ export default function SpareMarketplace() {
       return '';
     }
 
-    // Add hidden class for pages not currently visible on small screens
     if (page !== 1 && page !== totalPages && page !== currentPage) {
       return 'hidden sm:inline-block';
     }
@@ -308,7 +335,6 @@ export default function SpareMarketplace() {
   return (
     <div className="bg-base-100 min-h-screen font-poppins">
 
-      {/* Hero Section */}
       <section className="relative bg-gradient-to-r from-primary via-orange-600 to-red-600 py-16 overflow-hidden">
         <div className="absolute inset-0 bg-black/10"></div>
         <div className="absolute top-0 left-0 w-72 h-72 bg-white/10 rounded-full -translate-x-1/2 -translate-y-1/2"></div>
@@ -333,31 +359,31 @@ export default function SpareMarketplace() {
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
                 <div className="bg-base-100/90 backdrop-blur-sm rounded-xl p-4 border border-base-300 text-base-content">
                   <div className="h-10 w-10 flex mb-2 items-center justify-center rounded-full bg-secondary/15 mx-auto">
-                    <Users className="w-6 h-6 text-primary" />
+                    <Package className="w-6 h-6 text-primary" />
                   </div>
                   <div className="text-2xl font-bold font-urbanist">{stats.totalParts}</div>
                   <div className="text-sm opacity-90 font-poppins">Total Parts</div>
                 </div>
                 <div className="bg-base-100/90 backdrop-blur-sm rounded-xl p-4 border border-base-300 text-base-content">
-                  <div className="h-10 w-10 flex mb-2 items-center justify-center rounded-full bg-secondary/15 mx-auto">
-                    <Clock className="w-6 h-6 text-primary" />
+                  <div className="h-10 w-10 flex mb-2 items-center justify-center rounded-full bg-success/15 mx-auto">
+                    <CheckCircle className="w-6 h-6 text-success" />
                   </div>
-                  <div className="text-2xl font-bold font-urbanist">{stats.uniqueBrands}</div>
-                  <div className="text-sm opacity-90 font-poppins">Unique Brands</div>
+                  <div className="text-2xl font-bold font-urbanist">{stats.inStock}</div>
+                  <div className="text-sm opacity-90 font-poppins">In Stock</div>
                 </div>
                 <div className="bg-base-100/90 backdrop-blur-sm rounded-xl p-4 border border-base-300 text-base-content">
-                  <div className="h-10 w-10 flex mb-2 items-center justify-center rounded-full bg-secondary/15 mx-auto">
-                    <TrendingUp className="w-6 h-6 text-primary" />
+                  <div className="h-10 w-10 flex mb-2 items-center justify-center rounded-full bg-warning/15 mx-auto">
+                    <AlertTriangle className="w-6 h-6 text-warning" />
                   </div>
-                  <div className="text-2xl font-bold font-urbanist">{stats.majorCategories}</div>
-                  <div className="text-sm opacity-90 font-poppins">Categories</div>
+                  <div className="text-2xl font-bold font-urbanist">{stats.lowInStock}</div>
+                  <div className="text-sm opacity-90 font-poppins">Low Stock</div>
                 </div>
                 <div className="bg-base-100/90 backdrop-blur-sm rounded-xl p-4 border border-base-300 text-base-content">
-                  <div className="h-10 w-10 flex mb-2 items-center justify-center rounded-full bg-secondary/15 mx-auto">
-                    <AlertTriangle className="w-6 h-6 text-primary" />
+                  <div className="h-10 w-10 flex mb-2 items-center justify-center rounded-full bg-error/15 mx-auto">
+                    <AlertOctagon className="w-6 h-6 text-error" />
                   </div>
-                  <div className="text-2xl font-bold font-urbanist">{stats.featured}</div>
-                  <div className="text-sm opacity-90 font-poppins">Featured Deals</div>
+                  <div className="text-2xl font-bold font-urbanist">{stats.outOfStock}</div>
+                  <div className="text-sm opacity-90 font-poppins">Out of Stock</div>
                 </div>
               </div>
             )}
@@ -384,11 +410,9 @@ export default function SpareMarketplace() {
         </div>
       </section>
 
-      {/* Main Content & Sidebar */}
       <section>
         <div className="container mx-auto px-6 -mt-8 pb-10 relative z-20">
 
-          {/* Search and Sort Bar */}
           <div className="bg-base-200 rounded-2xl shadow-xl p-6 mb-8 border border-neutral">
             <div className="flex flex-col md:flex-row justify-between items-center gap-4">
 
@@ -406,17 +430,6 @@ export default function SpareMarketplace() {
               </div>
 
               <div className="flex items-center gap-4 w-full md:w-auto">
-
-                <Button
-                  onClick={() => setShowFilters(!showFilters)}
-                  className="md:hidden flex-shrink-0"
-                  variant="neutral"
-                  size="sm"
-                >
-                  <Filter className="w-4 h-4 mr-1" />
-                  More
-                </Button>
-
                 <div className="flex items-center gap-2">
                   <Filter className="text-base-content/60 w-5 h-5" />
                   <StyledSelect
@@ -430,12 +443,21 @@ export default function SpareMarketplace() {
                     <option value="name">Name: A to Z</option>
                   </StyledSelect>
                 </div>
+
+                <Button
+                  onClick={() => setShowFilters(!showFilters)}
+                  className="md:hidden flex-shrink-0"
+                  variant="neutral"
+                  size="sm"
+                >
+                  <Filter className="w-4 h-4 mr-1" />
+                  More
+                </Button>
               </div>
             </div>
           </div>
 
           <div className="flex flex-col lg:flex-row gap-8">
-            {/* Desktop Filters Sidebar */}
             <aside className="hidden lg:block w-72 bg-base-200 border border-base-300 rounded-2xl shadow-lg p-6 h-fit sticky top-24">
               <div className="flex items-center gap-2 mb-6">
                 <Filter className="text-primary h-6 w-6" />
@@ -496,10 +518,8 @@ export default function SpareMarketplace() {
               </div>
             </aside>
 
-            {/* Main Parts Display Area */}
             <main className="flex-1">
 
-              {/* Result Count Header */}
               <div className="py-2 mb-4 border-b border-base-300">
                 <p className="text-base-content/80 text-base font-medium font-poppins">
                   Showing <span className="font-bold text-base-content">{(currentPage - 1) * itemsPerPage + 1}-{Math.min(currentPage * itemsPerPage, totalCount)}</span> of{" "}
@@ -507,7 +527,6 @@ export default function SpareMarketplace() {
                 </p>
               </div>
 
-              {/* Content Area (Error, Loading, No Results, or Parts Grid) */}
               {error ? (
                 <div className="text-center py-16 rounded-2xl shadow-lg border border-neutral bg-base-200">
                   <div className="w-24 h-24 bg-error/20 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -560,7 +579,6 @@ export default function SpareMarketplace() {
               ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
                   {parts.map((part) => (
-                    // SpareCard is assumed to be a functional component from the import
                     <SpareCard
                       RatingStars={RatingStars}
                       key={part._id}
@@ -570,7 +588,6 @@ export default function SpareMarketplace() {
                 </div>
               )}
 
-              {/* Pagination Controls */}
               {loading ? (
                 <PaginationSkeleton />
               ) : (
@@ -594,9 +611,8 @@ export default function SpareMarketplace() {
                     </div>
 
                     <div className="flex flex-wrap justify-center items-center gap-2">
-                      {/* Previous Page Button */}
                       <button
-                        type="button" // ⬅️ IMPORTANT: Prevents full page reload
+                        type="button"
                         className="md:h-10 md:w-10 h-10 w-10 flex items-center justify-center border border-primary text-primary rounded-lg hover:bg-primary hover:text-white transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed gap-2"
                         disabled={currentPage === 1}
                         onClick={() => handlePageChange(currentPage - 1)}
@@ -604,14 +620,13 @@ export default function SpareMarketplace() {
                         <ArrowRight className="w-4 h-4 rotate-180" />
                       </button>
 
-                      {/* Page Number Buttons */}
                       {visiblePages.map((page, index) =>
                         page === '...' ? (
                           <span key={`ellipsis-${index}`} className={`p-1.5 text-base-content ${getPageClass(page)}`}>...</span>
                         ) : (
                           <button
                             key={page}
-                            type="button" // ⬅️ IMPORTANT: Prevents full page reload
+                            type="button"
                             className={`
                                             md:h-10 md:w-10 h-10 w-10 border rounded-lg transition-all duration-300 text-sm sm:text-base
                                             ${page === currentPage
@@ -627,9 +642,8 @@ export default function SpareMarketplace() {
                         )
                       )}
 
-                      {/* Next Page Button */}
                       <button
-                        type="button" // ⬅️ IMPORTANT: Prevents full page reload
+                        type="button"
                         className="md:h-10 md:w-10 h-10 w-10 flex items-center justify-center border border-primary text-primary rounded-lg hover:bg-primary hover:text-white transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed gap-2"
                         disabled={currentPage === totalPages}
                         onClick={() => handlePageChange(currentPage + 1)}
@@ -646,10 +660,9 @@ export default function SpareMarketplace() {
         </div>
       </section>
 
-      {/* Mobile Filters Modal/Sidebar */}
       {showFilters && (
         <div
-          className="lg:hidden fixed inset-0 z-50 transition-opacity duration-300 bg-black bg-opacity-50"
+          className="lg:hidden fixed inset-0 z-50 transition-opacity duration-300 bg-black/50 backdrop-blur-md"
           onClick={() => setShowFilters(false)}
         >
           <div
@@ -659,7 +672,7 @@ export default function SpareMarketplace() {
             <div className="p-5 border-b border-base-300 flex justify-between items-center sticky top-0 bg-base-100 z-10">
               <h3 className="font-urbanist text-xl font-bold">Filters</h3>
               <button
-                type="button" // Added type="button"
+                type="button"
                 onClick={() => setShowFilters(false)}
                 className="text-base-content hover:text-primary p-2 rounded-full hover:bg-base-200 transition-colors"
               >

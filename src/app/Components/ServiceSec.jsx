@@ -57,7 +57,7 @@ export default function ServiceSec() {
         <div>
           <SpecificServices></SpecificServices>
         </div>
-        <div className="container">
+        <div className="lg:container px-6 mx-auto">
           {loading ? (
             <SectionHeaderSkeleton />
           ) : (

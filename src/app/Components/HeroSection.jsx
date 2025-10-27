@@ -54,7 +54,7 @@ export default function HeroModern() {
 
   // Enhanced Default Hero Component
   const DefaultHero = () => (
-    <section className="relative py-12 md:py-18 bg-gradient-to-br from-base-100 via-base-100 to-primary/5 overflow-hidden">
+    <section className="relative py-12 md:py-18 bg-gradient-to-br from-base-100 via-base-100 to-primary/5">
       {/* Background decorative elements */}
       <div className="absolute top-10 left-10 w-72 h-72 bg-primary/10 rounded-full blur-3xl"></div>
       <div className="absolute bottom-10 right-10 w-96 h-96 bg-secondary/10 rounded-full blur-3xl"></div>
@@ -101,11 +101,6 @@ export default function HeroModern() {
                       alt={`customer ${index + 1}`}
                       className="h-10 w-10 rounded-full border-2 border-base-100 object-cover shadow-sm"
                     />
-                    {index === 3 && (
-                      <div className="absolute inset-0 bg-primary/20 rounded-full border-2 border-base-100 flex items-center justify-center">
-                        <span className="text-xs font-bold text-primary">20k+</span>
-                      </div>
-                    )}
                   </div>
                 ))}
               </div>

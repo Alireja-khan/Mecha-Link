@@ -1,5 +1,15 @@
 import dbConnect, { collections } from "@/lib/dbConnect";
 import { NextResponse } from "next/server";
+import { ObjectId } from "mongodb"; // Import ObjectId for MongoDB _id operations
+
+// Helper to check if a string is a valid ObjectId
+const isValidObjectId = (id) => {
+  try {
+    return new ObjectId(id).toHexString() === id;
+  } catch (e) {
+    return false;
+  }
+};
 
 export async function GET(req) {
   try {
@@ -7,15 +17,13 @@ export async function GET(req) {
     const userEmail = searchParams.get('userEmail');
 
     if (!userEmail) {
-      return NextResponse.json(
-        { error: "User email is required" },
-        { status: 400 }
-      );
+      // Return empty array if no userEmail is provided (for non-logged-in users)
+      return NextResponse.json([]);
     }
 
     const collection = await dbConnect(collections.cart);
     const cartItems = await collection.find({ userEmail }).sort({ addedAt: -1 }).toArray();
-    
+
     return NextResponse.json(cartItems);
   } catch (error) {
     return NextResponse.json({ error: error.message }, { status: 500 });
@@ -27,47 +35,40 @@ export async function POST(req) {
     const data = await req.json();
     const { userEmail, partId, partsName, price, quantity, image, brand, category } = data;
 
-    // Validate required fields
     if (!userEmail || !partId || !partsName || !price) {
-      return NextResponse.json(
-        { error: "Missing required fields" },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
     }
 
+    const actualQuantity = quantity > 0 ? quantity : 1;
     const collection = await dbConnect(collections.cart);
 
-    // Check if item already exists in cart for this user
-    const existingCartItem = await collection.findOne({
-      userEmail,
-      partId
-    });
+    const existingCartItem = await collection.findOne({ userEmail, partId });
 
     if (existingCartItem) {
-      // Update quantity if item already exists
+      // Update to exact quantity instead of adding
       const result = await collection.updateOne(
         { _id: existingCartItem._id },
-        { 
-          $set: { 
-            quantity: existingCartItem.quantity + quantity,
+        {
+          $set: {
+            quantity: actualQuantity,
             updatedAt: new Date()
-          } 
+          }
         }
       );
 
       return NextResponse.json({
         success: true,
-        message: "Cart item quantity updated",
-        updated: result.modifiedCount > 0
+        action: "update",
+        newQuantity: actualQuantity,
+        message: "Cart item quantity updated successfully"
       });
     } else {
-      // Create new cart item
       const cartItemData = {
         userEmail,
         partId,
         partsName,
         price,
-        quantity,
+        quantity: actualQuantity,
         image: image || "",
         brand: brand || "",
         category: category || "",
@@ -76,11 +77,13 @@ export async function POST(req) {
       };
 
       const result = await collection.insertOne(cartItemData);
-      
+
       return NextResponse.json({
         success: true,
+        action: "add",
+        newQuantity: actualQuantity,
         insertedId: result.insertedId,
-        message: "Item added to cart successfully",
+        message: "Item added to cart successfully"
       });
     }
   } catch (error) {
@@ -88,21 +91,29 @@ export async function POST(req) {
   }
 }
 
+// DELETE: Removes an item using its unique MongoDB _id
 export async function DELETE(req) {
   try {
     const { searchParams } = new URL(req.url);
-    const userEmail = searchParams.get('userEmail');
-    const partId = searchParams.get('partId');
+    const itemId = searchParams.get('_id'); // Get _id from query parameters
 
-    if (!userEmail || !partId) {
+    if (!itemId) {
       return NextResponse.json(
-        { error: "User email and part ID are required" },
+        { error: "Item ID (_id) is required" },
         { status: 400 }
       );
     }
 
+    if (!isValidObjectId(itemId)) {
+      return NextResponse.json({ error: "Invalid item ID format" }, { status: 400 });
+    }
+
     const collection = await dbConnect(collections.cart);
-    const result = await collection.deleteOne({ userEmail, partId });
+
+    // Use ObjectId to query and delete the specific document
+    const result = await collection.deleteOne({
+      _id: new ObjectId(itemId)
+    });
 
     if (result.deletedCount === 0) {
       return NextResponse.json(
@@ -120,14 +131,16 @@ export async function DELETE(req) {
   }
 }
 
+// PUT: Updates the quantity of an item using its unique MongoDB _id
 export async function PUT(req) {
   try {
     const data = await req.json();
-    const { userEmail, partId, quantity } = data;
+    // Expecting _id and quantity in the request body
+    const { _id, quantity } = data;
 
-    if (!userEmail || !partId || quantity === undefined) {
+    if (!_id || quantity === undefined) {
       return NextResponse.json(
-        { error: "User email, part ID and quantity are required" },
+        { error: "Item ID (_id) and quantity are required" },
         { status: 400 }
       );
     }
@@ -139,14 +152,20 @@ export async function PUT(req) {
       );
     }
 
+    if (!isValidObjectId(_id)) {
+      return NextResponse.json({ error: "Invalid item ID format" }, { status: 400 });
+    }
+
     const collection = await dbConnect(collections.cart);
+
+    // Use ObjectId to find and update the specific document
     const result = await collection.updateOne(
-      { userEmail, partId },
-      { 
-        $set: { 
+      { _id: new ObjectId(_id) },
+      {
+        $set: {
           quantity,
           updatedAt: new Date()
-        } 
+        }
       }
     );
 
