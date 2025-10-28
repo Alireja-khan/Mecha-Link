@@ -7,7 +7,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { io } from "socket.io-client";
 
-const SOCKET_URL = 'http://localhost:3001';
+const SOCKET_URL = 'https://socket-server-0r34.onrender.com/';
 
 let socket;
 

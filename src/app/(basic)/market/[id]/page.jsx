@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useState, useMemo } from "react";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import axios from "axios";
 import {
   Star,
@@ -15,12 +15,12 @@ import {
   UserCircle,
   Send,
   Tag,
-  DollarSign,
-  Warehouse,
   ClipboardList,
   MessageSquare,
   InfoIcon,
 } from "lucide-react";
+import { TbCurrencyTaka } from "react-icons/tb";
+
 import Link from "next/link";
 import { toast } from "react-hot-toast";
 import Image from "next/image";
@@ -29,7 +29,7 @@ import Loader from "../../loading";
 import { io } from "socket.io-client";
 import Swal from "sweetalert2";
 
-const SOCKET_URL = 'http://localhost:3001';
+const SOCKET_URL = 'https://socket-server-0r34.onrender.com/';
 let socket;
 
 const RatingStars = ({ rating = 0, reviewCount = 0 }) => {
@@ -302,8 +302,8 @@ const ProductTabs = ({ part, reviews, fetchReviews, loadingReviews }) => {
             key={tab.id}
             onClick={() => setActiveTab(tab.id)}
             className={`flex items-center space-x-2 py-3 px-6 text-lg font-semibold transition-all duration-300 whitespace-nowrap focus:outline-none ${activeTab === tab.id
-                ? "text-primary border-b-2 border-primary"
-                : "text-base-content/70 hover:text-base-content"
+              ? "text-primary border-b-2 border-primary"
+              : "text-base-content/70 hover:text-base-content"
               }`}
           >
             <tab.icon className="w-5 h-5" />
@@ -347,6 +347,7 @@ const DetailItem = ({ label, value, icon: Icon }) => (
 export default function PartDetailPage() {
   const params = useParams();
   const id = params.id;
+  const router = useRouter();
   const [part, setPart] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -535,13 +536,15 @@ export default function PartDetailPage() {
   };
 
   const handleBuyNow = () => {
-    if (!part) return;
+    if (!part || !id) return;
 
     if (!user) {
       toast.error("Please login to proceed to checkout");
       return;
     }
-    toast.success(`Redirecting to checkout for ${quantity}x ${part.partsName}...`);
+
+    const checkoutUrl = `/checkout?partId=${id}&qty=${quantity}`;
+    router.push(checkoutUrl);
   };
 
   const increaseQuantity = () => {
@@ -692,8 +695,8 @@ export default function PartDetailPage() {
                         key={index}
                         onClick={() => setSelectedImageIndex(index)}
                         className={`w-14 h-14 sm:w-20 sm:h-20 border-3 rounded-xl overflow-hidden relative transition-all duration-200 transform hover:scale-105 ${selectedImageIndex === index
-                            ? "border-primary ring-4 ring-primary/40 border-4"
-                            : "border border-base-300 hover:border-base-content/50"
+                          ? "border-primary ring-4 ring-primary/40 border-4"
+                          : "border border-base-300 hover:border-base-content/50"
                           }`}
                       >
                         <Image
@@ -748,8 +751,8 @@ export default function PartDetailPage() {
                 <div className="flex items-end justify-between mb-4">
                   <div className="flex flex-col">
                     <span className="text-6xl font-extrabold text-primary transition-colors duration-300">
-                      <DollarSign className="inline w-12 h-12 align-bottom mr-1" />
-                      {finalPrice.toFixed(2)}
+                      <TbCurrencyTaka className="inline w-16 h-16 align-bottom mr-1" />
+                      {finalPrice}
                     </span>
                   </div>
                 </div>

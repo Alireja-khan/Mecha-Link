@@ -1,25 +1,78 @@
 "use client";
 import Link from "next/link";
 import React, { useState, useEffect, useCallback } from "react";
-import { ShoppingCart, Eye, Tag, CheckCircle } from "lucide-react"; // Imported CheckCircle
+import { ShoppingCart, Eye, Tag, CheckCircle, Star } from "lucide-react"; // Import Star for local RatingStars
 import axios from "axios";
 import toast from "react-hot-toast";
 import useUser from "@/hooks/useUser";
 import { io } from "socket.io-client";
+import { TbCurrencyTaka } from "react-icons/tb";
 
-const SOCKET_URL = 'http://localhost:3001';
+const SOCKET_URL = 'https://socket-server-0r34.onrender.com/';
 let socket;
 
-function SpareCard({ part, RatingStars }) {
+// --- Local RatingStars Component (Replicated for clarity, assuming it's passed or defined globally) ---
+// It's best to define this once and import it, but for a complete example, we'll include a simple one.
+const RatingStars = ({ rating = 0 }) => {
+  if (rating === 0) return <span className="text-base-content/70 text-xs">No rating</span>;
+
+  // Simple rounding for card display
+  const roundedRating = Math.round(rating); 
+
+  return (
+    <div className="flex items-center space-x-0.5 text-warning text-sm">
+      {[...Array(5)].map((_, i) => (
+        <Star 
+          key={i} 
+          className={`w-3 h-3 ${i < roundedRating ? 'fill-current' : 'text-base-300'}`} 
+        />
+      ))}
+      <span className="text-base-content font-semibold text-xs ml-1">
+        {rating.toFixed(1)}
+      </span>
+    </div>
+  );
+};
+
+// --- Updated SpareCard Component ---
+function SpareCard({ part }) {
   const [isAddingToCart, setIsAddingToCart] = useState(false);
-  // NEW STATES
   const [isInCart, setIsInCart] = useState(false);
   const [cartItemQuantity, setCartItemQuantity] = useState(0);
   const [checkingCartStatus, setCheckingCartStatus] = useState(true);
+  
+  const [averageRating, setAverageRating] = useState(null); 
+
+  const [loadingRating, setLoadingRating] = useState(true); 
 
   const { user, status } = useUser();
   const userEmail = user?.email;
   const defaultQuantity = 1;
+
+  const fetchAverageRating = useCallback(async (partId) => {
+    if (!partId) return;
+
+    try {
+      setLoadingRating(true);
+      // The same API used in PartDetailPage is used here to get the average
+      const response = await axios.get(`/api/spareParts/${partId}/reviews`);
+      
+      // Update the state with the average rating
+      setAverageRating(response.data.averageRating || 0);
+    } catch (error) {
+      console.error("Failed to fetch average rating:", error);
+      setAverageRating(0); // Default to 0 on error
+    } finally {
+      setLoadingRating(false);
+    }
+  }, []);
+  
+  // --- useEffect to Fetch Average Rating on Load ---
+  useEffect(() => {
+    if (part?._id) {
+      fetchAverageRating(part._id);
+    }
+  }, [part?._id, fetchAverageRating]);
 
   // --- Cart Status Check Function (Memoized for efficiency) ---
   const checkIfPartInCart = useCallback(async () => {
@@ -38,7 +91,6 @@ function SpareCard({ part, RatingStars }) {
 
       if (existingItem) {
         setIsInCart(true);
-        // Display actual quantity in cart
         setCartItemQuantity(existingItem.quantity); 
       } else {
         setIsInCart(false);
@@ -55,13 +107,12 @@ function SpareCard({ part, RatingStars }) {
   // --- Socket Initialization and Listener ---
   useEffect(() => {
     if (!socket) {
+      // NOTE: Using the provided SOCKET_URL
       socket = io(SOCKET_URL, { transports: ['websocket', 'polling'] });
     }
 
     const handleCartUpdate = (data) => {
-      // Re-check only if the update is relevant to the current user
       if (data.userEmail === userEmail) {
-        // Debounce or optimize if this causes excessive re-renders in a large list
         checkIfPartInCart();
       }
     };
@@ -82,7 +133,6 @@ function SpareCard({ part, RatingStars }) {
     if (part && status === 'authenticated') {
         checkIfPartInCart();
     }
-    // If status becomes unauthenticated, reset cart state
     if (status === 'unauthenticated') {
         setIsInCart(false);
         setCartItemQuantity(0);
@@ -104,7 +154,6 @@ function SpareCard({ part, RatingStars }) {
       );
     };
 
-    // Use the first image if it's an array, otherwise use the string
     const finalSrc = Array.isArray(src) ? src[0] : src;
 
     return (
@@ -113,7 +162,7 @@ function SpareCard({ part, RatingStars }) {
   };
 
   const handleAddToCart = async (e) => {
-    e.preventDefault(); // Prevent navigating if the card is wrapped in a link
+    e.preventDefault(); 
 
     if (!userEmail || status !== 'authenticated') {
         toast.error("Please log in to add items to your cart.");
@@ -127,7 +176,7 @@ function SpareCard({ part, RatingStars }) {
 
       const imageToSend = Array.isArray(part.images) ? part.images[0] : part.images;
       const finalPrice = part.price;
-      const quantity = defaultQuantity; // Always adds 1 by default on the card
+      const quantity = defaultQuantity; 
 
       const cartItem = {
         userEmail: user.email,
@@ -155,7 +204,6 @@ function SpareCard({ part, RatingStars }) {
           toast.success(`Added ${quantity} ${part.partsName} to cart!`);
         }
         
-        // Update local state and trigger re-check via socket
         setIsInCart(true);
         setCartItemQuantity(qty);
 
@@ -216,7 +264,12 @@ function SpareCard({ part, RatingStars }) {
             <Tag className="w-3 h-3" />
             <span className="font-poppins uppercase tracking-wider">{part.brands || "Generic"}</span>
           </div>
-          {RatingStars && <RatingStars rating={part.rating} />}
+          {/* Use the fetched averageRating here */}
+          {loadingRating ? (
+            <div className="w-16 h-4 bg-base-300 rounded animate-pulse"></div>
+          ) : (
+            <RatingStars rating={averageRating} />
+          )}
         </div>
 
         <h3 className="font-urbanist text-xl font-bold leading-tight text-base-content line-clamp-2 mt-1">
@@ -232,8 +285,8 @@ function SpareCard({ part, RatingStars }) {
         <div className="flex items-center justify-between">
 
           <div className="flex items-baseline gap-1">
-            <span className="text-2xl font-extrabold font-urbanist text-primary">
-              ${Number(part.price || 0).toFixed(2)}
+            <span className="text-2xl font-extrabold font-urbanist text-primary flex items-center justify-center">
+              <TbCurrencyTaka size={30}/>{Number(part.price || 0)}
             </span>
           </div>
 

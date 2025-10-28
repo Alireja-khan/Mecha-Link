@@ -6,7 +6,7 @@ import { toast } from "react-hot-toast";
 import axios from "axios";
 import { uploadImageToImgbb } from "@/lib/uploadImgbb";
 import {
-  Plus, Search, Edit, Trash, Tag, Percent, DollarSign, Package, MessageSquare, X, Check, Eye,
+  Plus, Search, Edit, Trash, Tag, Percent, Package, MessageSquare, X, Check, Eye,
   Box,
   Calendar,
   Clock,
@@ -14,6 +14,7 @@ import {
   Upload
 } from "lucide-react";
 import Swal from 'sweetalert2';
+import { TbCurrencyTaka } from "react-icons/tb";
 
 const StatCard = ({ icon: Icon, value, label, color = "primary" }) => {
   const colorClasses = {
@@ -163,7 +164,7 @@ const ViewDetailsModal = ({ part, onClose, onEdit }) => {
                 Unit Price
               </p>
               <div className="flex items-center gap-3">
-                <DollarSign size={28} className="text-info" />
+                <TbCurrencyTaka size={28} className="text-info" />
                 <span className="text-4xl font-black">
                   ${part.price.toFixed(2)}
                 </span>
@@ -640,7 +641,7 @@ const ManageSpareParts = () => {
         </div>
 
         <div>
-          <label className="block text-sm font-semibold text-base-content mb-2">Price ($) <span className="text-error">*</span></label>
+          <label className="text-sm font-semibold text-base-content mb-2 flex items-center">Price (<TbCurrencyTaka size={20}/>) <span className="text-error">*</span></label>
           <input
             {...register("price", { required: "Price is required", valueAsNumber: true, min: { value: 0.01, message: "Price must be positive" } })}
             type="number" step="0.01"
@@ -882,7 +883,7 @@ const ManageSpareParts = () => {
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
                           <div className="flex items-center gap-1">
-                            <DollarSign size={14} className="text-success" />
+                            <TbCurrencyTaka size={24} className="text-success" />
                             <span className="text-sm sm:text-lg font-bold text-base-content">{part.price}</span>
                           </div>
                         </td>
