@@ -37,11 +37,10 @@ export async function GET(req) {
     const admin = searchParams.get("admin");
     const home = searchParams.get("home");
     const email = searchParams.get("email");
-    const category = searchParams.get("category"); // ✅ NEW: category query added
+    const category = searchParams.get("category");
 
     const collection = await dbConnect(collections.mechanicShops);
 
-// ✅ If email query is provided, return only one shop for that email
 if (email) {
   const shop = await collection.findOne({
     $or: [
