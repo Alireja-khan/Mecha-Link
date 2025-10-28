@@ -1,5 +1,5 @@
 "use client";
-import { Search, Filter, Image as ImageIcon, MessageSquare, Hash, X, ChevronDown, ChevronUp } from 'lucide-react';
+import { Search, Filter, Image as ImageIcon, MessageSquare, Hash, X, ChevronDown, ChevronUp, Menu } from 'lucide-react'; // Added Menu icon
 import { CATEGORIES, CATEGORY_COLORS } from "@/lib/forumConstants";
 import PostSkeleton from './PostSkeleton';
 import MarkdownEditor from '@/app/Components/MarkdownEditor';
@@ -27,11 +27,22 @@ export const ForumContent = ({
   pagination,
   handleCreatePost,
   loadMorePosts,
-  fetchPosts
+  fetchPosts,
+  // NEW PROPS
+  mobileMenuOpen,
+  setMobileMenuOpen
 }) => {
   return (
     <div className="flex-1 min-w-0 flex flex-col">
       <div className="flex flex-col sm:flex-row gap-3 mb-5">
+        <div className="lg:hidden">
+          <button
+            onClick={() => setMobileMenuOpen(true)} // Toggles the sidebar open
+            className="w-full sm:w-auto px-3 py-3 bg-base-200 border border-neutral/30 rounded-xl focus:outline-none focus:border-primary/50 text-base-content flex items-center justify-center gap-2 font-medium hover:bg-base-300 transition-colors"
+          >
+            <Menu size={20} />
+          </button>
+        </div>
         <div className="relative flex-1 min-w-[250px]">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-base-content/40" size={20} />
           <input
@@ -67,7 +78,7 @@ export const ForumContent = ({
           />
         )}
 
-        <PostsHeader 
+        <PostsHeader
           selectedCategory={selectedCategory}
           posts={posts}
           stats={stats}
@@ -98,6 +109,8 @@ export const ForumContent = ({
   );
 };
 
+// ... (Rest of the component functions remain unchanged)
+
 const CreatePostButton = ({ currentUser, setShowPostForm }) => (
   <div className="bg-base-200 rounded-2xl p-4 border border-neutral/50 shadow-sm mb-6">
     <div className="flex items-center gap-4">
@@ -114,7 +127,7 @@ const CreatePostButton = ({ currentUser, setShowPostForm }) => (
           </div>
         )}
       </div>
-      
+
       <button
         onClick={() => setShowPostForm(true)}
         className="flex-1 text-left p-4 bg-base-100 rounded-xl border border-neutral/30 hover:bg-base-300 transition-all duration-200 text-base-content/60 hover:text-base-content"
@@ -184,7 +197,7 @@ const CreatePostForm = ({
           onImagesChange={setUploadedImages}
         />
       </div>
-      
+
       <div className="mb-4">
         <select
           value={selectedCategory}
@@ -199,7 +212,7 @@ const CreatePostForm = ({
           ))}
         </select>
       </div>
-      
+
       <div className="flex justify-end gap-3 pt-4 border-t border-neutral/30">
         <button
           type="button"
@@ -229,7 +242,7 @@ const PostsHeader = ({ selectedCategory, posts, stats, activeSort, setActiveSort
   <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-6 gap-4">
     <div>
       <h2 className="text-xl font-bold text-base-content">
-        {selectedCategory !== "all" 
+        {selectedCategory !== "all"
           ? `${CATEGORIES.find(c => c.value === selectedCategory)?.label || selectedCategory} Posts`
           : "Community Discussions"
         }
@@ -238,7 +251,7 @@ const PostsHeader = ({ selectedCategory, posts, stats, activeSort, setActiveSort
         </span>
       </h2>
     </div>
-    
+
     <div className="flex items-center gap-3">
       <select
         value={activeSort}
@@ -252,14 +265,13 @@ const PostsHeader = ({ selectedCategory, posts, stats, activeSort, setActiveSort
         <option value="most-commented">Most Discussed</option>
         <option value="trending">Trending</option>
       </select>
-      
+
       <button
         onClick={() => setShowFilters(!showFilters)}
-        className={`px-4 py-2 border rounded-xl transition-colors duration-200 flex items-center gap-2 ${
-          showFilters 
-            ? 'bg-primary text-primary-content border-primary' 
-            : 'bg-base-200 border-neutral/30 text-base-content hover:bg-base-100'
-        }`}
+        className={`px-4 py-2 border rounded-xl transition-colors duration-200 flex items-center gap-2 ${showFilters
+          ? 'bg-primary text-primary-content border-primary'
+          : 'bg-base-200 border-neutral/30 text-base-content hover:bg-base-100'
+          }`}
       >
         <Filter size={16} />
         Filters
@@ -275,11 +287,10 @@ const CategoryFilters = ({ selectedCategory, setSelectedCategory }) => (
     <div className="flex flex-wrap gap-2">
       <button
         onClick={() => setSelectedCategory("all")}
-        className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
-          selectedCategory === "all"
-            ? 'bg-primary text-primary-content border-2 border-primary shadow-lg'
-            : 'bg-base-100 text-base-content/70 border border-neutral/30 hover:bg-base-300'
-        }`}
+        className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${selectedCategory === "all"
+          ? 'bg-primary text-primary-content border-2 border-primary shadow-lg'
+          : 'bg-base-100 text-base-content/70 border border-neutral/30 hover:bg-base-300'
+          }`}
       >
         All Categories
       </button>
@@ -287,11 +298,10 @@ const CategoryFilters = ({ selectedCategory, setSelectedCategory }) => (
         <button
           key={category.value}
           onClick={() => setSelectedCategory(category.value)}
-          className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
-            selectedCategory === category.value
-              ? CATEGORY_COLORS[category.value] + ' border-2 border-primary shadow-lg'
-              : 'bg-base-100 text-base-content/70 border border-neutral/30 hover:bg-base-300'
-          }`}
+          className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${selectedCategory === category.value
+            ? CATEGORY_COLORS[category.value] + ' border-2 border-primary shadow-lg'
+            : 'bg-base-100 text-base-content/70 border border-neutral/30 hover:bg-base-300'
+            }`}
         >
           {category.label}
         </button>
@@ -320,7 +330,7 @@ const PostsList = ({
         <MessageSquare size={48} className="mx-auto text-base-content/20 mb-4" />
         <h3 className="text-lg font-semibold text-base-content mb-2">No posts found</h3>
         <p className="text-base-content/60 mb-6">
-          {searchQuery || selectedCategory !== "all" 
+          {searchQuery || selectedCategory !== "all"
             ? "Try adjusting your search or filters"
             : "Be the first to start a discussion!"
           }
@@ -335,14 +345,14 @@ const PostsList = ({
     ) : (
       <>
         {posts.map((post) => (
-          <PostCard 
+          <PostCard
             key={post._id}
             post={post}
             onUpdate={() => fetchPosts(1, false)}
             currentUser={currentUser}
           />
         ))}
-        
+
         {pagination.hasMore && (
           <div className="text-center mt-8">
             <button

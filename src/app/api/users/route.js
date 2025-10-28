@@ -110,7 +110,7 @@ export async function DELETE(req) {
 export async function PUT(req) {
   try {
     const {email} = await req.json();
-    console.log(email);
+    
     if (!email) {
       return NextResponse.json(
         {success: false, message: "Email is required"},
