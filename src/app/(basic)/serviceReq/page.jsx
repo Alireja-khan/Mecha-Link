@@ -1,44 +1,79 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, {useEffect, useState} from "react";
 import ServiceReqCard from "./components/ServiceReqCard";
-import { Search, Filter, AlertTriangle, TrendingUp, Users, Clock, Grid, List } from "lucide-react";
+import {
+  Search,
+  Filter,
+  AlertTriangle,
+  TrendingUp,
+  Users,
+  Clock,
+  Grid,
+  List,
+} from "lucide-react";
 import Pagination from "@/app/Components/pagination";
 
 const ServiceReq = () => {
   const [loading, setLoading] = useState(true);
-  const [totalData, setTotalData] = useState({ result: [], totalDocs: 0, totalPage: 1 });
+  const [totalData, setTotalData] = useState({
+    result: [],
+    totalDocs: 0,
+    totalPage: 1,
+  });
   const [searchTerm, setSearchTerm] = useState("");
   const [itemsPerPage, setItemsPerPage] = useState(12);
   const [currentPage, setCurrentPage] = useState(1);
   const [sortOrder, setSortOrder] = useState("");
   const [viewMode, setViewMode] = useState("grid");
+  // const [isRestored, setIsRestored] = useState(false);
+  const [activeSort, setActiveSort] = useState("");
   const [stats, setStats] = useState({
     total: 0,
     pending: 0,
     inProgress: 0,
     completed: 0,
   });
+  
+  //get from local Storage
+  useEffect(() => {
+    const savedPage = localStorage.getItem("serviceReq_currentPage");
+    const savedItems = localStorage.getItem("serviceReq_itemsPerPage");
+
+    if (savedPage) setCurrentPage(Number(savedPage));
+    if (savedItems) setItemsPerPage(Number(savedItems));
+    // setIsRestored(true);
+  }, []);
+
+  // Save to localStorage
+  useEffect(() => {
+    localStorage.setItem("serviceReq_currentPage", currentPage);
+    localStorage.setItem("serviceReq_itemsPerPage", itemsPerPage);
+  }, [currentPage, itemsPerPage]);
 
   // Fetch service requests whenever relevant params change
   useEffect(() => {
     setLoading(true);
-
-    fetch(`/api/service-request?search=${searchTerm}&sort=${sortOrder}&limit=${itemsPerPage}&page=${currentPage}`)
+    // if (!isRestored) return;
+    fetch(
+      `/api/service-request?search=${searchTerm}&sort=${sortOrder}&limit=${itemsPerPage}&page=${currentPage}`
+    )
       .then((res) => res.json())
       .then((data) => {
-        setTotalData(data || { result: [], totalDocs: 0, totalPage: 1 });
+        setTotalData(data || {result: [], totalDocs: 0, totalPage: 1});
 
         if (data.result) {
           const requests = data.result;
           setStats({
             total: data.totalDocs || 0,
-            pending: requests.filter(req => req.status === 'pending').length,
-            inProgress: requests.filter(req => req.status === 'in-progress').length,
-            completed: requests.filter(req => req.status === 'completed').length,
+            pending: requests.filter((req) => req.status === "pending").length,
+            inProgress: requests.filter((req) => req.status === "in-progress")
+              .length,
+            completed: requests.filter((req) => req.status === "completed")
+              .length,
           });
         } else {
-          setStats({ total: 0, pending: 0, inProgress: 0, completed: 0 });
+          setStats({total: 0, pending: 0, inProgress: 0, completed: 0});
         }
 
         setLoading(false);
@@ -49,7 +84,7 @@ const ServiceReq = () => {
       });
   }, [searchTerm, itemsPerPage, currentPage, sortOrder]);
 
-  const { result: requests = [], totalDocs = 0, totalPage = 1 } = totalData;
+  const {result: requests = [], totalDocs = 0, totalPage = 1} = totalData;
 
   // Handlers
   const handleSearch = (e) => {
@@ -59,6 +94,7 @@ const ServiceReq = () => {
 
   const handleSort = (e) => {
     setSortOrder(e.target.value);
+    setActiveSort( "");
     setCurrentPage(1); // reset page on sort
   };
 
@@ -79,7 +115,10 @@ const ServiceReq = () => {
   const StatsSkeleton = () => (
     <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8 animate-pulse">
       {[...Array(4)].map((_, index) => (
-        <div key={index} className="bg-base-100/90 backdrop-blur-sm rounded-xl p-4 border border-base-300">
+        <div
+          key={index}
+          className="bg-base-100/90 backdrop-blur-sm rounded-xl p-4 border border-base-300"
+        >
           <div className="skeleton bg-base-200 w-8 h-8 mx-auto mb-2 rounded-full"></div>
           <div className="skeleton bg-base-200 h-7 w-12 mx-auto mb-1 rounded"></div>
           <div className="skeleton bg-base-200 h-4 w-16 mx-auto rounded"></div>
@@ -88,8 +127,12 @@ const ServiceReq = () => {
     </div>
   );
 
-  const ServiceReqCardSkeleton = ({ compact = false }) => (
-    <div className={`bg-base-200 rounded-2xl shadow-lg border border-neutral p-6 animate-pulse ${compact ? '' : 'mb-4'}`}>
+  const ServiceReqCardSkeleton = ({compact = false}) => (
+    <div
+      className={`bg-base-200 rounded-2xl shadow-lg border border-neutral p-6 animate-pulse ${
+        compact ? "" : "mb-4"
+      }`}
+    >
       <div className="flex items-start justify-between mb-4">
         <div className="flex-1">
           <div className="skeleton bg-base-300 h-6 w-3/4 rounded mb-3"></div>
@@ -104,7 +147,9 @@ const ServiceReq = () => {
       <div className="space-y-3 mb-4">
         <div className="skeleton bg-base-300 h-4 w-full rounded"></div>
         <div className="skeleton bg-base-300 h-4 w-5/6 rounded"></div>
-        {!compact && <div className="skeleton bg-base-300 h-4 w-4/6 rounded"></div>}
+        {!compact && (
+          <div className="skeleton bg-base-300 h-4 w-4/6 rounded"></div>
+        )}
       </div>
 
       <div className="flex items-center justify-between mb-4">
@@ -134,7 +179,10 @@ const ServiceReq = () => {
       <div className="flex justify-center items-center gap-2">
         <div className="skeleton bg-base-300 h-10 w-20 rounded-lg"></div>
         {[...Array(5)].map((_, i) => (
-          <div key={i} className="skeleton bg-base-300 h-10 w-10 rounded-lg"></div>
+          <div
+            key={i}
+            className="skeleton bg-base-300 h-10 w-10 rounded-lg"
+          ></div>
         ))}
         <div className="skeleton bg-base-300 h-10 w-20 rounded-lg"></div>
       </div>
@@ -153,9 +201,12 @@ const ServiceReq = () => {
             </span>
           </h1>
           <p className="text-xl text-orange-100 mb-8 leading-relaxed">
-            Browse urgent repair requests, accept jobs that match your expertise, and grow your service business
+            Browse urgent repair requests, accept jobs that match your
+            expertise, and grow your service business
           </p>
-          {loading ? <StatsSkeleton /> : (
+          {loading ? (
+            <StatsSkeleton />
+          ) : (
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
               <div className="bg-base-100/90 rounded-xl p-4 border border-neutral text-base-content">
                 <Users className="w-6 h-6 text-primary mx-auto mb-2" />
@@ -179,6 +230,41 @@ const ServiceReq = () => {
               </div>
             </div>
           )}
+
+           <div className="flex flex-wrap justify-center gap-4">
+            <button
+              onClick={() => {
+                setSortOrder("emergency");
+                setActiveSort("emergency");
+                setCurrentPage(1);
+              }}
+              className={`px-6 py-3 rounded-full font-semibold transition-all duration-300 flex items-center gap-2 ${
+                activeSort === "emergency"
+                  ? "bg-primary text-white"
+                  : "bg-orange-700 text-white hover:bg-orange-800"
+              }`}
+            >
+              <AlertTriangle className="w-5 h-5" />
+              Show Emergencies
+            </button>
+
+       
+            <button
+              onClick={() => {
+                setSortOrder("high");
+                setActiveSort("high");
+                setCurrentPage(1);
+              }}
+              className={`px-6 py-3 rounded-full font-semibold transition-all duration-300 flex items-center gap-2 ${
+                activeSort === "high"
+                  ? "bg-primary text-white"
+                  : "bg-orange-700 text-white hover:bg-orange-800"
+              }`}
+            >
+              <Filter className="w-5 h-5" />
+              High Priority
+            </button>
+          </div> 
         </div>
       </section>
 
@@ -202,17 +288,21 @@ const ServiceReq = () => {
                 <div className="flex items-center gap-2 bg-base-100 rounded-lg p-1">
                   <button
                     onClick={() => setViewMode("grid")}
-                    className={`p-2 rounded-md transition-all duration-300 ${viewMode === "grid"
-                      ? "bg-base-200 text-primary shadow-sm"
-                      : "text-base-content/50 hover:text-primary"}`}
+                    className={`p-2 rounded-md transition-all duration-300 ${
+                      viewMode === "grid"
+                        ? "bg-base-200 text-primary shadow-sm"
+                        : "text-base-content/50 hover:text-primary"
+                    }`}
                   >
                     <Grid className="w-4 h-4" />
                   </button>
                   <button
                     onClick={() => setViewMode("list")}
-                    className={`p-2 rounded-md transition-all duration-300 ${viewMode === "list"
-                      ? "bg-base-200 text-primary shadow-sm"
-                      : "text-base-content/50 hover:text-primary"}`}
+                    className={`p-2 rounded-md transition-all duration-300 ${
+                      viewMode === "list"
+                        ? "bg-base-200 text-primary shadow-sm"
+                        : "text-base-content/50 hover:text-primary"
+                    }`}
                   >
                     <List className="w-4 h-4" />
                   </button>
@@ -237,9 +327,18 @@ const ServiceReq = () => {
 
           {/* Service Cards */}
           {loading ? (
-            <div className={viewMode === "grid" ? "grid grid-cols-1 xl:grid-cols-2 gap-6" : "space-y-6"}>
+            <div
+              className={
+                viewMode === "grid"
+                  ? "grid grid-cols-1 xl:grid-cols-2 gap-6"
+                  : "space-y-6"
+              }
+            >
               {[...Array(itemsPerPage)].map((_, index) => (
-                <ServiceReqCardSkeleton key={index} compact={viewMode === "grid"} />
+                <ServiceReqCardSkeleton
+                  key={index}
+                  compact={viewMode === "grid"}
+                />
               ))}
             </div>
           ) : requests.length === 0 ? (
@@ -247,15 +346,28 @@ const ServiceReq = () => {
               <div className="w-24 h-24 bg-primary/20 rounded-full flex items-center justify-center mx-auto mb-4">
                 <AlertTriangle className="w-12 h-12 text-primary" />
               </div>
-              <p className="text-2xl text-primary font-bold mb-2">No Requests Found</p>
+              <p className="text-2xl text-primary font-bold mb-2">
+                No Requests Found
+              </p>
               <p className="text-base-content/50 max-w-md mx-auto">
-                You're all caught up! There are currently no pending service requests matching your criteria.
+                You're all caught up! There are currently no pending service
+                requests matching your criteria.
               </p>
             </div>
           ) : (
-            <div className={viewMode === "grid" ? "grid grid-cols-1 xl:grid-cols-2 gap-6" : "space-y-6"}>
-              {requests.map(req => (
-                <ServiceReqCard key={req._id} request={req} compact={viewMode === "grid"} />
+            <div
+              className={
+                viewMode === "grid"
+                  ? "grid grid-cols-1 xl:grid-cols-2 gap-6"
+                  : "space-y-6"
+              }
+            >
+              {requests.map((req) => (
+                <ServiceReqCard
+                  key={req._id}
+                  request={req}
+                  compact={viewMode === "grid"}
+                />
               ))}
             </div>
           )}
@@ -264,15 +376,13 @@ const ServiceReq = () => {
           {loading ? (
             <PaginationSkeleton />
           ) : (
-            requests.length > 0 && totalPage > 1 && (
-              <Pagination
-                currentPage={currentPage}
-                totalPages={totalPage}
-                onPageChange={handlePageChange}
-                itemsPerPage={itemsPerPage}
-                onItemsPerPageChange={handleItemsPerPage}
-              />
-            )
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPage}
+              onPageChange={handlePageChange}
+              itemsPerPage={itemsPerPage}
+              onItemsPerPageChange={handleItemsPerPage}
+            />
           )}
         </div>
       </section>
