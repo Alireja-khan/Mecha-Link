@@ -6,12 +6,13 @@ import Link from "next/link";
 import { toast } from "react-hot-toast";
 import Image from "next/image";
 import Loader from "../loading";
-import { io } from "socket.io-client"; // NEW: Import io
+import { io } from "socket.io-client";
+import { TbCurrencyTaka } from "react-icons/tb";
+import { useRouter } from "next/navigation";
 
-const SOCKET_URL = 'http://localhost:3001'; // Define socket URL
-let socket; // Define outside to maintain a single instance
+const SOCKET_URL = 'https://socket-server-0r34.onrender.com/';
+let socket;
 
-// Updated QuantitySelector to be interactive
 const QuantitySelector = ({ quantity, onUpdate, max = 10 }) => (
   <div className="flex items-stretch border border-neutral rounded-xl overflow-hidden shadow-sm">
     <button
@@ -39,8 +40,10 @@ const QuantitySelector = ({ quantity, onUpdate, max = 10 }) => (
 export default function CartPage() {
   const { user } = useUser();
   const userEmail = user?.email;
+  const router = useRouter();
 
   const [cartItems, setCartItems] = useState(null);
+  const [selectedItems, setSelectedItems] = useState([]);
 
   const [isCartLoading, setIsCartLoading] = useState(false);
 
@@ -48,13 +51,14 @@ export default function CartPage() {
   const [activeCoupon, setActiveCoupon] = useState(null);
   const [isApplyingCoupon, setIsApplyingCoupon] = useState(false);
   const isLoading = isCartLoading || cartItems === null;
-  
-  // NEW: Initialize socket connection
+
   useEffect(() => {
     if (!socket) {
       socket = io(SOCKET_URL, { transports: ['websocket', 'polling'] });
     }
   }, []);
+
+  // Removed useEffect for default selection: selectedItems remains [] initially.
 
   const handleApplyCoupon = async () => {
     const code = couponCode.toUpperCase().trim();
@@ -95,7 +99,6 @@ export default function CartPage() {
         return;
       }
 
-      // Apply the coupon
       setActiveCoupon(coupon);
       toast.success(`Coupon **${code}** applied! You received ${coupon.discount}% off the subtotal.`);
 
@@ -113,7 +116,6 @@ export default function CartPage() {
     toast.success("Coupon removed.");
   };
 
-  // --- UPDATED: handleRemoveItem with socket emission ---
   const handleRemoveItem = useCallback(
     async (itemId) => {
       if (!userEmail) return;
@@ -121,6 +123,7 @@ export default function CartPage() {
       const originalItems = cartItems;
       const newItems = originalItems.filter((item) => item._id !== itemId);
       setCartItems(newItems);
+      setSelectedItems(prev => prev.filter(id => id !== itemId));
       toast.loading("Removing item...", { id: "removeItemToast" });
 
       try {
@@ -132,7 +135,6 @@ export default function CartPage() {
           throw new Error("Failed to remove item from server.");
         }
 
-        // **EMIT SOCKET EVENT AFTER SUCCESSFUL REMOVAL**
         if (socket && socket.connected) {
           socket.emit('cartUpdate', { userEmail: userEmail, action: 'remove' });
         }
@@ -149,11 +151,10 @@ export default function CartPage() {
     [cartItems, userEmail]
   );
 
-  // --- UPDATED: handleUpdateQuantity with socket emission ---
   const handleUpdateQuantity = useCallback(
     async (itemId, newQuantity) => {
       if (!userEmail) return;
-      
+
       const item = cartItems.find((i) => i._id === itemId);
       if (!item || newQuantity < 1) return;
 
@@ -179,11 +180,10 @@ export default function CartPage() {
           throw new Error("Failed to update quantity on server.");
         }
 
-        // **EMIT SOCKET EVENT AFTER SUCCESSFUL QUANTITY UPDATE**
         if (socket && socket.connected) {
           socket.emit('cartUpdate', { userEmail: userEmail, action: 'update' });
         }
-        
+
       } catch (error) {
         console.error("Error updating quantity:", error);
         setCartItems(originalItems);
@@ -193,9 +193,25 @@ export default function CartPage() {
     [cartItems, userEmail]
   );
 
-  useEffect(() => {
-    // We keep the initial fetch logic separate from socket updates
+  const handleToggleSelectItem = useCallback((itemId) => {
+    setSelectedItems(prev =>
+      prev.includes(itemId)
+        ? prev.filter(id => id !== itemId)
+        : [...prev, itemId]
+    );
+  }, []);
 
+  const handleToggleAllItems = useCallback(() => {
+    const allIds = cartItems.map(item => item._id);
+    if (selectedItems.length === allIds.length) {
+      setSelectedItems([]);
+    } else {
+      setSelectedItems(allIds);
+    }
+  }, [cartItems, selectedItems.length]);
+
+
+  useEffect(() => {
     if (!userEmail) {
       setCartItems([]);
       return;
@@ -226,10 +242,13 @@ export default function CartPage() {
     fetchCartData();
   }, [userEmail]);
 
-  // --- Calculations (Unchanged) ---
+  const selectedCartItems = useMemo(() => {
+    return cartItems?.filter(item => selectedItems.includes(item._id)) || [];
+  }, [cartItems, selectedItems]);
+
   const subtotal = useMemo(() => {
-    return cartItems?.reduce((t, i) => t + i.price * i.quantity, 0) || 0;
-  }, [cartItems]);
+    return selectedCartItems.reduce((t, i) => t + i.price * i.quantity, 0) || 0;
+  }, [selectedCartItems]);
 
   const discountAmount = useMemo(() => {
     if (!activeCoupon) return 0;
@@ -237,12 +256,29 @@ export default function CartPage() {
   }, [subtotal, activeCoupon]);
 
   const discountedSubtotal = subtotal - discountAmount;
-  
-  const shipping = discountedSubtotal > 100 ? 0 : 15.0;
+
+  const shipping = discountedSubtotal > 100 ? 0 : 0; // Use a reasonable Taka value
   const tax = discountedSubtotal * 0.05;
   const cartTotal = discountedSubtotal + shipping + tax;
 
-  // --- Render ---
+  const handleProceedToCheckout = () => {
+    if (selectedItems.length === 0) {
+      toast.error("Please select at least one item to proceed to checkout.");
+      return;
+    }
+
+    const checkoutData = selectedCartItems.map(item => ({
+      partId: item.partId,
+      qty: item.quantity,
+    }));
+
+    const jsonString = JSON.stringify(checkoutData);
+    const base64Encoded = btoa(jsonString);
+
+    router.push(`/checkout?items=${base64Encoded}`);
+
+    toast.success(`${selectedItems.length} item(s) selected for checkout.`);
+  };
 
   if (isLoading || !user) {
     return <Loader />;
@@ -281,112 +317,124 @@ export default function CartPage() {
         </h1>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-10">
-          
-          {/* Cart Items List */}
+
           <div className="lg:col-span-2 space-y-4 md:space-y-6">
+            <div className="flex items-center justify-between p-4 bg-base-200 rounded-xl shadow-lg border border-base-300">
+              <label className="flex items-center space-x-3 text-lg font-bold text-base-content cursor-pointer">
+                <input
+                  type="checkbox"
+                  className="checkbox checkbox-primary w-5 h-5"
+                  checked={selectedItems.length === cartItems.length && cartItems.length > 0}
+                  onChange={handleToggleAllItems}
+                />
+                <span>Select All Items ({selectedItems.length} selected)</span>
+              </label>
+            </div>
+
             {cartItems.map((item) => (
               <div
                 key={item._id}
-                className="flex flex-col md:flex-row items-start md:items-center bg-base-200 p-4 md:p-5 rounded-xl shadow-lg border border-base-300 transition-all hover:shadow-xl"
+                className={`flex flex-col md:flex-row items-start md:items-center p-4 md:p-5 rounded-xl shadow-lg border transition-all ${selectedItems.includes(item._id) ? 'bg-primary/10 border-primary shadow-2xl' : 'bg-base-200 border-base-300 hover:shadow-xl'}`}
               >
-                
-                {/* Image and Info Container */}
+
                 <div className="flex items-start w-full md:w-auto">
-                    <div className="flex-shrink-0 w-20 h-20 md:w-24 md:h-24 relative overflow-hidden rounded-lg mr-4 bg-base-100">
-                        <Image
-                            src={item.image || "/placeholder-image.svg"}
-                            alt={item.partsName}
-                            layout="fill"
-                            objectFit="contain"
-                            className="p-1"
-                            unoptimized
-                        />
-                    </div>
+                  <div className="flex-shrink-0 mr-4 mt-2">
+                    <input
+                      type="checkbox"
+                      className="checkbox checkbox-primary w-5 h-5"
+                      checked={selectedItems.includes(item._id)}
+                      onChange={() => handleToggleSelectItem(item._id)}
+                    />
+                  </div>
 
-                    <div className="flex-grow">
-                        <h3 className="text-lg md:text-xl font-bold text-base-content mb-1 leading-snug font-urbanist">
-                            {item.partsName}
-                        </h3>
-                        <div className="text-xs md:text-sm text-base-content/60 space-x-2 md:space-x-4">
-                            <span className="inline-flex items-center gap-1">
-                                <FaBox className="w-3 h-3 text-secondary" /> {item.brand}
-                            </span>
-                            <span className="inline-flex items-center gap-1">
-                                <FaTag className="w-3 h-3 text-secondary" />{" "}
-                                {item.category}
-                            </span>
-                        </div>
-                        {/* Mobile Price Display */}
-                        <p className="md:hidden text-xl font-extrabold text-primary mt-2">
-                             ${(item.price * item.quantity).toFixed(2)}
-                        </p>
+                  <div className="flex-shrink-0 w-20 h-20 md:w-24 md:h-24 relative overflow-hidden rounded-lg mr-4 bg-base-100">
+                    <Image
+                      src={item.image || "/placeholder-image.svg"}
+                      alt={item.partsName}
+                      layout="fill"
+                      objectFit="contain"
+                      className="p-1"
+                      unoptimized
+                    />
+                  </div>
+
+                  <div className="flex-grow">
+                    <h3 className="text-lg md:text-xl font-bold text-base-content mb-1 leading-snug font-urbanist">
+                      {item.partsName}
+                    </h3>
+                    <div className="text-xs md:text-sm text-base-content/60 space-x-2 md:space-x-4">
+                      <span className="inline-flex items-center gap-1">
+                        <FaBox className="w-3 h-3 text-secondary" /> {item.brand}
+                      </span>
+                      <span className="inline-flex items-center gap-1">
+                        <FaTag className="w-3 h-3 text-secondary" />{" "}
+                        {item.category}
+                      </span>
                     </div>
-                    
-                    {/* Remove Button for Mobile */}
-                    <button
-                        onClick={() => handleRemoveItem(item._id)}
-                        className="md:hidden text-base-content/40 hover:text-error transition-colors p-2 -mr-2 -mt-2 rounded-full"
-                        aria-label={`Remove ${item.partsName}`}
-                    >
-                        <FaTimes className="w-5 h-5" />
-                    </button>
+                    <p className="md:hidden text-xl font-extrabold text-primary mt-2 flex items-center">
+                      <TbCurrencyTaka />{(item.price * item.quantity).toLocaleString()}
+                    </p>
+                  </div>
+
+                  <button
+                    onClick={() => handleRemoveItem(item._id)}
+                    className="md:hidden text-base-content/40 hover:text-error transition-colors p-2 -mr-2 -mt-2 rounded-full"
+                    aria-label={`Remove ${item.partsName}`}
+                  >
+                    <FaTimes className="w-5 h-5" />
+                  </button>
                 </div>
-                
-                
-                {/* Controls and Total Container (stacks on mobile) */}
+
+
                 <div className="flex justify-between items-center w-full md:w-auto mt-4 pt-4 border-t border-base-300 md:border-t-0 md:mt-0 md:pt-0 md:ml-auto md:gap-4">
-                    <div className="text-left md:text-center flex-shrink-0">
-                        <p className="text-sm text-base-content/60 mb-1">Qty</p>
-                        <QuantitySelector
-                            quantity={item.quantity}
-                            max={item.maxQuantity || 10}
-                            onUpdate={(newQuantity) =>
-                                handleUpdateQuantity(item._id, newQuantity)
-                            }
-                        />
-                    </div>
+                  <div className="text-left md:text-center flex-shrink-0">
+                    <p className="text-sm text-base-content/60 mb-1">Qty</p>
+                    <QuantitySelector
+                      quantity={item.quantity}
+                      max={item.maxQuantity || 10}
+                      onUpdate={(newQuantity) =>
+                        handleUpdateQuantity(item._id, newQuantity)
+                      }
+                    />
+                  </div>
 
-                    {/* Desktop/Tablet Price Display */}
-                    <div className="w-24 text-right hidden md:block">
-                        <p className="text-sm text-base-content/60 mb-1">
-                            Total
-                        </p>
-                        <p className="text-2xl font-extrabold text-primary">
-                            ${(item.price * item.quantity).toFixed(2)}
-                        </p>
-                    </div>
+                  <div className="w-24 text-right hidden md:block">
+                    <p className="text-sm text-base-content/60 mb-1">
+                      Total
+                    </p>
+                    <p className="text-2xl flex items-center justify-center font-extrabold text-primary">
+                      <TbCurrencyTaka size={26} />{(item.price * item.quantity).toLocaleString()}
+                    </p>
+                  </div>
 
-                    {/* Remove Button for Desktop/Tablet */}
-                    <button
-                        onClick={() => handleRemoveItem(item._id)}
-                        className="hidden md:block text-base-content/40 hover:text-error transition-colors p-2 rounded-full flex-shrink-0"
-                        aria-label={`Remove ${item.partsName}`}
-                    >
-                        <FaTimes className="w-5 h-5" />
-                    </button>
+                  <button
+                    onClick={() => handleRemoveItem(item._id)}
+                    className="hidden md:block text-base-content/40 hover:text-error transition-colors p-2 rounded-full flex-shrink-0"
+                    aria-label={`Remove ${item.partsName}`}
+                  >
+                    <FaTimes className="w-5 h-5" />
+                  </button>
                 </div>
               </div>
             ))}
           </div>
 
-          {/* Order Summary */}
           <div className="lg:col-span-1">
             <div className="lg:sticky lg:top-20 bg-base-200 p-6 rounded-xl shadow-2xl border border-base-300">
               <h2 className="text-2xl font-bold text-base-content mb-5 border-b border-base-300 pb-3 font-urbanist">
                 Order Summary
               </h2>
 
-              {/* --- COUPON FIELD INTEGRATION --- */}
               <div className="mb-6 p-4 bg-base-100 rounded-xl border border-base-300">
                 <h3 className="text-lg font-bold text-base-content mb-3 flex items-center gap-2">
                   <FaTicketAlt className="text-primary" /> Apply Coupon
                 </h3>
-                
+
                 {activeCoupon ? (
                   <div className="flex flex-col md:flex-row md:items-center justify-between bg-success/10 p-3 rounded-xl border border-success/30">
                     <p className="text-success font-bold text-sm flex items-center gap-2 mb-2 md:mb-0">
-                       <FaCheckCircle className="w-4 h-4" />
-                       **{activeCoupon.code}** applied!
+                      <FaCheckCircle className="w-4 h-4" />
+                      **{activeCoupon.code}** applied!
                     </p>
                     <button
                       onClick={handleRemoveCoupon}
@@ -416,65 +464,61 @@ export default function CartPage() {
                   </div>
                 )}
               </div>
-              {/* --- END COUPON FIELD INTEGRATION --- */}
 
 
               <div className="space-y-3 mb-6 text-base-content/60">
                 <div className="flex justify-between pb-3 border-b border-base-300 ">
-                  <span>Subtotal ({cartItems.length} items)</span>
-                  <span className="font-semibold text-base-content">
-                    ${subtotal.toFixed(2)}
+                  <span>Subtotal ({selectedItems.length} selected items)</span>
+                  <span className="flex items-center justify-center font-semibold text-base-content">
+                    <TbCurrencyTaka size={20} />{subtotal.toLocaleString()}
                   </span>
                 </div>
-                
-                {/* Discount Line Item */}
+
                 {activeCoupon && (
                   <div className="flex justify-between text-success font-semibold pt-3">
                     <span className="flex items-center gap-1">
-                        <FaTicketAlt className="w-4 h-4" /> Discount ({activeCoupon.discount}%)
+                      <FaTicketAlt className="w-4 h-4" /> Discount ({activeCoupon.discount}%)
                     </span>
-                    <span>
-                      -${discountAmount.toFixed(2)}
+                    <span className="flex items-center justify-center">
+                      -<TbCurrencyTaka size={20} />{discountAmount.toLocaleString()}
                     </span>
                   </div>
                 )}
-                
+
                 <div className="flex justify-between">
                   <span>New Subtotal</span>
-                  <span className="font-semibold text-base-content">
-                    ${discountedSubtotal.toFixed(2)}
+                  <span className="font-semibold flex items-center justify-center text-base-content">
+                    <TbCurrencyTaka size={20} /> {discountedSubtotal.toLocaleString()}
                   </span>
                 </div>
-                
+
                 <div className="flex justify-between">
                   <span>Shipping & Handling</span>
                   <span
-                    className={`font-semibold ${
-                      shipping === 0 ? "text-success" : "text-base-content"
-                    }`}
+                    className={`font-semibold ${shipping === 0 ? "text-success" : "text-base-content"
+                      }`}
                   >
-                    {shipping === 0 ? "FREE" : `$${shipping.toFixed(2)}`}
+                    {shipping === 0 ? "FREE" : <span className="flex items-center justify-center"><TbCurrencyTaka size={20} />{shipping.toLocaleString()}</span>}
                   </span>
                 </div>
-                
+
                 <div className="flex justify-between border-b border-base-300 pb-3">
                   <span>Estimated Tax (5%)</span>
-                  <span className="font-semibold text-base-content">
-                    ${tax.toFixed(2)}
+                  <span className="font-semibold flex items-center justify-center text-base-content">
+                    <TbCurrencyTaka size={20} /> {tax.toLocaleString()}
                   </span>
                 </div>
               </div>
 
               <div className="flex justify-between items-center text-2xl md:text-3xl font-extrabold mb-6">
                 <span>Order Total:</span>
-                <span className="text-primary">${cartTotal.toFixed(2)}</span>
+                <span className="flex items-center justify-center text-primary"><TbCurrencyTaka size={42} />{cartTotal.toLocaleString()}</span>
               </div>
 
               <button
-                onClick={() =>
-                  toast.success("Proceeding to secure checkout...")
-                }
-                className="w-full py-4 bg-primary text-primary-content font-extrabold text-lg md:text-xl rounded-full hover:bg-primary/90 transition duration-300 shadow-xl flex items-center justify-center gap-3 uppercase tracking-wider"
+                onClick={handleProceedToCheckout}
+                disabled={selectedItems.length === 0}
+                className="w-full py-4 bg-primary text-primary-content font-extrabold text-lg md:text-xl rounded-full hover:bg-primary/90 transition duration-300 shadow-xl flex items-center justify-center gap-3 uppercase tracking-wider disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 Proceed to Checkout
                 <FaArrowRight className="w-5 h-5" />

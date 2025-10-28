@@ -82,11 +82,6 @@ export default function SpareMarketplace() {
       setTotalPages(res.data.totalPages || 1);
       setTotalCount(res.data.totalCount || 0);
 
-      // ------------------------------------------------------------------
-      // UPDATED LOGIC: Calculate Inventory Stats based on the badge rules
-      // Note: This logic only calculates stats for the currently visible parts on the page.
-      // For accurate totals, you would need a separate API endpoint to return global inventory counts.
-      // ------------------------------------------------------------------
       const newStats = fetchedParts.reduce((acc, part) => {
         const quantity = part.quantity || 0;
         if (quantity > 10) {
