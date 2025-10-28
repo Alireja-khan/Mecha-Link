@@ -322,38 +322,81 @@ export async function PATCH(req) {
   }
 }
 
-// 🔴 DELETE POST (ADMIN ONLY)
+// 🔴 DELETE POST (ADMIN OR POST OWNER)
 export async function DELETE(req) {
   try {
     const { searchParams } = new URL(req.url);
     const postId = searchParams.get("id");
     const userId = searchParams.get("userId");
 
-    if (!userId) {
-      return NextResponse.json({ success: false, message: "User ID required" }, { status: 400 });
+    if (!postId || !userId) {
+      return NextResponse.json({ 
+        success: false, 
+        message: "Post ID and User ID are required" 
+      }, { status: 400 });
     }
 
-    // Check if user is admin
+    // Get user info
     const usersCollection = await dbConnect(collections.users);
     const user = await usersCollection.findOne(
       { _id: new ObjectId(userId) },
-      { projection: { role: 1 } }
+      { projection: { role: 1, _id: 1 } }
     );
 
-    if (!user || user.role !== 'admin') {
-      return NextResponse.json({ success: false, message: "Unauthorized" }, { status: 401 });
+    if (!user) {
+      return NextResponse.json({ 
+        success: false, 
+        message: "User not found" 
+      }, { status: 404 });
     }
 
+    // Get post info
     const forumCollection = await dbConnect(collections.forumPosts);
-    const result = await forumCollection.deleteOne({ _id: new ObjectId(postId) });
+    const post = await forumCollection.findOne({ 
+      _id: new ObjectId(postId) 
+    }, { projection: { authorId: 1 } });
+
+    if (!post) {
+      return NextResponse.json({ 
+        success: false, 
+        message: "Post not found" 
+      }, { status: 404 });
+    }
+
+    // Check if user is authorized to delete
+    // User can delete if they are the author OR an admin
+    const isAuthor = post.authorId.toString() === userId;
+    const isAdmin = user.role === 'admin';
+
+    if (!isAuthor && !isAdmin) {
+      return NextResponse.json({ 
+        success: false, 
+        message: "Unauthorized: You can only delete your own posts" 
+      }, { status: 401 });
+    }
+
+    // Delete the post
+    const result = await forumCollection.deleteOne({ 
+      _id: new ObjectId(postId) 
+    });
 
     if (!result.deletedCount) {
-      return NextResponse.json({ success: false, message: "Post not found" }, { status: 404 });
+      return NextResponse.json({ 
+        success: false, 
+        message: "Post not found" 
+      }, { status: 404 });
     }
 
-    return NextResponse.json({ success: true, message: "Post deleted" });
+    return NextResponse.json({ 
+      success: true, 
+      message: "Post deleted successfully",
+      deletedBy: isAdmin ? 'admin' : 'author'
+    });
   } catch (error) {
     console.error("DELETE /api/forum error:", error);
-    return NextResponse.json({ success: false, message: "Server error" }, { status: 500 });
+    return NextResponse.json({ 
+      success: false, 
+      message: "Server error" 
+    }, { status: 500 });
   }
 }

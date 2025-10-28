@@ -18,7 +18,7 @@ const Footer = () => {
                 MechaLink
               </h1>
             </div>
-            <p className="text-gray-400 text-xs font-poppins leading-relaxed">
+            <p className="text-white text-sm font-poppins leading-relaxed">
               Connecting drivers with trusted mechanics and auto services.
             </p>
           </div>
@@ -65,7 +65,7 @@ const Footer = () => {
           {/* Newsletter */}
           <div>
             <h3 className="text-lg font-semibold text-white mb-4">Subscribe</h3>
-            <p className="text-sm text-gray-400 mb-3">
+            <p className="text-sm text-gray-300 mb-3">
               Get updates on offers, tips, and news.
             </p>
             <form className="hidden lg:flex items-center bg-gray-800 rounded-lg overflow-hidden">

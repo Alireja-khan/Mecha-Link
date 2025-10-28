@@ -69,10 +69,10 @@ export const ForumSidebar = ({
         <TopContributors topContributors={topContributors} />
 
         {/* Recent Active Users */}
-        <RecentActiveUsers recentUsers={recentUsers} />
+        {/* <RecentActiveUsers recentUsers={recentUsers} /> */}
 
         {/* Quick Actions */}
-        <QuickActions />
+        {/* <QuickActions /> */}
       </div>
     </div>
   );
@@ -88,10 +88,7 @@ const QuickSortOptions = ({ activeSort, onSortChange }) => (
     <div className="space-y-2">
       {[
         { value: "latest", label: "Latest", icon: Clock },
-        { value: "popular", label: "Popular", icon: Flame },
         { value: "most-liked", label: "Most Liked", icon: ThumbsUp },
-        { value: "most-commented", label: "Most Discussed", icon: MessageSquare },
-        { value: "trending", label: "Trending", icon: Zap }
       ].map((sort) => (
         <button
           key={sort.value}
@@ -211,53 +208,53 @@ const TopContributors = ({ topContributors }) => (
   </div>
 );
 
-const RecentActiveUsers = ({ recentUsers }) => (
-  <div className="bg-base-200 rounded-2xl p-6 border border-neutral/50 shadow-lg">
-    <h3 className="font-bold text-lg text-base-content mb-4 flex items-center gap-2">
-      <Users size={20} />
-      Active Now
-    </h3>
-    <div className="grid grid-cols-4 gap-3">
-      {recentUsers.map((user) => (
-        <div key={user.id} className="text-center group cursor-pointer" title={user.name}>
-          <div className="relative inline-block">
-            {user.image ? (
-              <img
-                src={user.image}
-                alt={user.name}
-                className="w-10 h-10 rounded-full object-cover border-2 border-transparent group-hover:border-primary transition-colors duration-200 shadow-lg"
-              />
-            ) : (
-              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary to-orange-600 flex items-center justify-center text-white font-bold text-sm group-hover:scale-110 transition-transform duration-200 shadow-lg">
-                {user.name?.charAt(0) || "U"}
-              </div>
-            )}
-            <div className="absolute -bottom-1 -right-1 w-3 h-3 bg-success rounded-full border-2 border-base-100 shadow-lg"></div>
-          </div>
-        </div>
-      ))}
-    </div>
-  </div>
-);
+// const RecentActiveUsers = ({ recentUsers }) => (
+//   <div className="bg-base-200 rounded-2xl p-6 border border-neutral/50 shadow-lg">
+//     <h3 className="font-bold text-lg text-base-content mb-4 flex items-center gap-2">
+//       <Users size={20} />
+//       Active Now
+//     </h3>
+//     <div className="grid grid-cols-4 gap-3">
+//       {recentUsers.map((user) => (
+//         <div key={user.id} className="text-center group cursor-pointer" title={user.name}>
+//           <div className="relative inline-block">
+//             {user.image ? (
+//               <img
+//                 src={user.image}
+//                 alt={user.name}
+//                 className="w-10 h-10 rounded-full object-cover border-2 border-transparent group-hover:border-primary transition-colors duration-200 shadow-lg"
+//               />
+//             ) : (
+//               <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary to-orange-600 flex items-center justify-center text-white font-bold text-sm group-hover:scale-110 transition-transform duration-200 shadow-lg">
+//                 {user.name?.charAt(0) || "U"}
+//               </div>
+//             )}
+//             <div className="absolute -bottom-1 -right-1 w-3 h-3 bg-success rounded-full border-2 border-base-100 shadow-lg"></div>
+//           </div>
+//         </div>
+//       ))}
+//     </div>
+//   </div>
+// );
 
-const QuickActions = () => (
-  <div className="bg-base-200 rounded-2xl p-6 border border-neutral/50">
-    <h3 className="font-bold text-lg text-base-content mb-4">Quick Actions</h3>
-    <div className="space-y-2">
-      <button className="w-full flex items-center gap-3 p-3 bg-base-200 rounded-xl hover:bg-base-300 transition-colors duration-200 text-left group">
-        <Bookmark size={18} />
-        <span className="text-sm font-medium group-hover:text-base-content">Saved Posts</span>
-      </button>
-      <button className="w-full flex items-center gap-3 p-3 bg-base-200 rounded-xl hover:bg-base-300 transition-colors duration-200 text-left group">
-        <ThumbsUp size={18} />
-        <span className="text-sm font-medium group-hover:text-base-content">My Reactions</span>
-      </button>
-      <button className="w-full flex items-center gap-3 p-3 bg-base-200 rounded-xl hover:bg-base-300 transition-colors duration-200 text-left group">
-        <Eye size={18} />
-        <span className="text-sm font-medium group-hover:text-base-content">Viewed Posts</span>
-      </button>
-    </div>
-  </div>
-);
+// const QuickActions = () => (
+//   <div className="bg-base-200 rounded-2xl p-6 border border-neutral/50">
+//     <h3 className="font-bold text-lg text-base-content mb-4">Quick Actions</h3>
+//     <div className="space-y-2">
+//       <button className="w-full flex items-center gap-3 p-3 bg-base-200 rounded-xl hover:bg-base-300 transition-colors duration-200 text-left group">
+//         <Bookmark size={18} />
+//         <span className="text-sm font-medium group-hover:text-base-content">Saved Posts</span>
+//       </button>
+//       <button className="w-full flex items-center gap-3 p-3 bg-base-200 rounded-xl hover:bg-base-300 transition-colors duration-200 text-left group">
+//         <ThumbsUp size={18} />
+//         <span className="text-sm font-medium group-hover:text-base-content">My Reactions</span>
+//       </button>
+//       <button className="w-full flex items-center gap-3 p-3 bg-base-200 rounded-xl hover:bg-base-300 transition-colors duration-200 text-left group">
+//         <Eye size={18} />
+//         <span className="text-sm font-medium group-hover:text-base-content">Viewed Posts</span>
+//       </button>
+//     </div>
+//   </div>
+// );
 
 export default ForumSidebar;
