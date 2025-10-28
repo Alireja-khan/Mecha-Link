@@ -224,8 +224,8 @@ const AllAds = () => {
               ).toLocaleDateString()}</p>
             </div>
             <div>
-              <span class="text-gray-500">ID:</span>
-              <p class="text-gray-300 font-mono text-xs">${ad._id}</p>
+              <span class="text-gray-500">Start Date & End Date:</span>
+              <p class="text-gray-300 font-mono text-xs">${new Date(ad.startDate).toLocaleDateString("en-CA")} to ${new Date(ad.endDate).toLocaleDateString("en-CA")}</p>
             </div>
           </div>
         </div>
@@ -439,6 +439,7 @@ const AllAds = () => {
                       </span>
                     </div>
                   </td>
+                  
 
                   {/* Status */}
                   <td>
@@ -460,6 +461,7 @@ const AllAds = () => {
                         <option value="pending">Pending</option>
                         <option value="approved">Approved</option>
                         <option value="rejected">Rejected</option>
+                        <option value="expired">Expired</option>
                       </select>
                       {updatingId === ad._id && (
                         <Loader2 className="w-3 h-3 animate-spin text-base-content/40" />
