@@ -4,6 +4,8 @@ import React, { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import ServiceCard from "@/app/Components/ServiceCard";
 import { MapPin, Loader2, Sparkles, Search, Filter } from "lucide-react";
+import Pagination from "@/app/Components/pagination";
+
 
 export default function Category(){
     const searchParams = useSearchParams();
@@ -14,6 +16,10 @@ export default function Category(){
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [sortOrder, setSortOrder] = useState("");
+  
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(12);
 
   // Initial load - get all category data
   useEffect(() => {
@@ -26,6 +32,7 @@ export default function Category(){
         setAllServices(services);
         setFilteredServices(services); // Initially show all services
         setLoading(false);
+        setCurrentPage(1); // Reset to first page when category changes
       })
       .catch(() => setLoading(false));
   }, [category]);
@@ -56,12 +63,17 @@ export default function Category(){
       result.sort((a, b) => (b.avgRating || 0) - (a.avgRating || 0));
     } else if (sortOrder === "lth") {
       result.sort((a, b) => (a.avgRating || 0) - (b.avgRating || 0));
-    } else if (sortOrder === "certified") {
-      result = result.filter(service => service.shop?.isCertified === true);
-    }
+    } 
 
     setFilteredServices(result);
+    setCurrentPage(1); // Reset to first page when filters change
   }, [allServices, searchTerm, sortOrder]);
+
+  // Calculate paginated services
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentServices = filteredServices.slice(indexOfFirstItem, indexOfLastItem);
+  const totalPages = Math.ceil(filteredServices.length / itemsPerPage);
 
   // Search handler
   const handleSearch = (e) => {
@@ -71,6 +83,19 @@ export default function Category(){
   // Sort handler
   const handleSort = (e) => {
     setSortOrder(e.target.value);
+  };
+
+  // Page change handler
+  const handlePageChange = (page) => {
+    setCurrentPage(page);
+    // Optional: Scroll to top when page changes
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  // Items per page change handler
+  const handleItemsPerPageChange = (items) => {
+    setItemsPerPage(items);
+    setCurrentPage(1); // Reset to first page
   };
 
   return (
@@ -93,7 +118,7 @@ export default function Category(){
 
                 <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-6 leading-tight">
                   Find Your Perfect
-                  <span className="block text-orange-100">Service Partner</span>
+                  <span className="block text-orange-100">{category} <span className="text-white">shops</span></span>
                 </h1>
 
                 <p className="text-xl text-orange-100 mb-8 leading-relaxed max-w-2xl">
@@ -107,7 +132,7 @@ export default function Category(){
                   <div className="w-80 h-80 bg-white/10 backdrop-blur-sm rounded-3xl border-2 border-white/20 flex items-center justify-center">
                     <div className="text-center p-8">
                       <MapPin className="w-16 h-16 text-white mx-auto mb-4" />
-                      <h3 className="text-white text-xl font-semibold mb-2">{category} Experts</h3>
+                      <h3 className="text-white text-xl font-semibold mb-2">{category}</h3>
                       <p className="text-orange-100 text-sm">
                         Find trusted {category.toLowerCase()} providers in your area with verified reviews and ratings
                       </p>
@@ -150,23 +175,19 @@ export default function Category(){
                 onChange={handleSort}
                 className="px-4 py-3 bg-base-200 rounded-xl border-2 border-base-300 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-300 w-full md:w-auto"
               >
-                <option value="">All {category} Shops</option>
+                <option value="">{category} Shops</option>
                 <option value="htl">Rating: High to Low</option>
                 <option value="lth">Rating: Low to High</option>
-                <option value="certified">Certified Only</option>
               </select>
             </div>
           </div>
         </div>
 
-        {/* Header with dynamic results count */}
-        <div className="text-center mb-10">
-          <h1 className="text-4xl font-bold text-base-content">
-            {category}
-          </h1>
-          <p className="text-base-content/70 mt-2">
+        {/* Results Count */}
+        <div className="text-center mb-6">
+          <p className="text-base-content/70">
             {!loading && filteredServices.length > 0 
-              ? `Found ${filteredServices.length} ${filteredServices.length === 1 ? 'shop' : 'shops'} in ${category}`
+              ? `Showing ${indexOfFirstItem + 1}-${Math.min(indexOfLastItem, filteredServices.length)} of ${filteredServices.length} ${filteredServices.length === 1 ? 'shop' : 'shops'}`
               : `Browse trusted ${category.toLowerCase()} providers`
             }
             {(searchTerm || sortOrder) && " with current filters"}
@@ -201,11 +222,22 @@ export default function Category(){
 
         {/* Service Cards Grid */}
         {!loading && filteredServices.length > 0 && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {filteredServices.map((service) => (
-              <ServiceCard key={service._id} service={service} />
-            ))}
-          </div>
+          <>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-8">
+              {currentServices.map((service) => (
+                <ServiceCard key={service._id} service={service} />
+              ))}
+            </div>
+
+            {/* Pagination */}
+            <Pagination
+              totalPages={totalPages}
+              currentPage={currentPage}
+              onPageChange={handlePageChange}
+              itemsPerPage={itemsPerPage}
+              onItemsPerPageChange={handleItemsPerPageChange}
+            />
+          </>
         )}
       </div>
     </section>

@@ -13,6 +13,16 @@ import RatingForm from "../RatingForm";
 import useUser from "@/hooks/useUser";
 import Swal from "sweetalert2";
 import { FaWhatsapp } from "react-icons/fa6";
+import {
+  FacebookShareButton,
+  TwitterShareButton,
+  LinkedinShareButton,
+  WhatsappShareButton,
+  FacebookIcon,
+  TwitterIcon,
+  LinkedinIcon,
+  WhatsappIcon
+} from "react-share";
 
 // === LEAFLET CONFIG ===
 delete L.Icon.Default.prototype._getIconUrl;
@@ -186,7 +196,29 @@ export default function ServiceDetailsPage() {
   const [isMapReady, setIsMapReady] = useState(false);
   const [submitSuccess, setSubmitSuccess] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [showShareModal, setShowShareModal] = useState(false);
   const { user } = useUser();
+
+  // Share functionality
+  const shareUrl = typeof window !== 'undefined' ? window.location.href : '';
+  const shareTitle = `Check out ${shopdata.shop?.shopName || 'this amazing service shop'} on Mechanic Finder!`;
+
+  const copyToClipboard = async () => {
+    try {
+      await navigator.clipboard.writeText(shareUrl);
+      Swal.fire({
+        icon: "success",
+        title: "Copied!",
+        text: "Link copied to clipboard",
+        timer: 2000,
+        showConfirmButton: false,
+        position: "top-right",
+        toast: true,
+      });
+    } catch (err) {
+      console.error('Failed to copy: ', err);
+    }
+  };
 
   // --- Geocoding Function (Used as fallback) ---
   const geocodeAddress = async (address) => {
@@ -465,6 +497,64 @@ export default function ServiceDetailsPage() {
         </div>
       )}
 
+      {/* Share Modal */}
+      {showShareModal && (
+        <div className="fixed inset-0 bg-black/20 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-base-100 rounded-2xl shadow-2xl max-w-3xl p-6 border border-base-300 transform transition-all duration-300 scale-100 hover:scale-105">
+            <h3 className="text-2xl font-bold text-base-content mb-4">Share This Shop</h3>
+            <p className="text-base-content/70 mb-6">Share this service shop with your friends and community</p>
+            
+            <div className="grid grid-cols-4 gap-4 mb-6">
+              <FacebookShareButton url={shareUrl} quote={shareTitle}>
+                <div className="flex flex-col items-center gap-2 p-3 bg-base-200 rounded-lg hover:bg-blue-500 hover:scale-110 hover:-translate-y-1 hover:shadow-xl transition-all duration-300 transform">
+                  <FacebookIcon size={40} round />
+                  <span className="text-xs font-medium text-base-content">Facebook</span>
+                </div>
+              </FacebookShareButton>
+
+              <TwitterShareButton url={shareUrl} title={shareTitle}>
+                <div className="flex flex-col items-center gap-2 p-3 bg-base-200 rounded-lg hover:bg-blue-400 hover:scale-110 hover:-translate-y-1 hover:shadow-xl transition-all duration-300 transform">
+                  <TwitterIcon size={40} round />
+                  <span className="text-xs font-medium text-base-content">Twitter</span>
+                </div>
+              </TwitterShareButton>
+
+              <LinkedinShareButton url={shareUrl} title={shareTitle}>
+                <div className="flex flex-col items-center gap-2 p-3 bg-base-200 rounded-lg hover:bg-blue-700 hover:scale-110 hover:-translate-y-1 hover:shadow-xl transition-all duration-300 transform">
+                  <LinkedinIcon size={40} round />
+                  <span className="text-xs font-medium text-base-content">LinkedIn</span>
+                </div>
+              </LinkedinShareButton>
+
+              <WhatsappShareButton url={shareUrl} title={shareTitle}>
+                <div className="flex flex-col items-center gap-2 p-3 bg-base-200 rounded-lg hover:bg-green-500 hover:scale-110 hover:-translate-y-1 hover:shadow-xl transition-all duration-300 transform">
+                  <WhatsappIcon size={40} round />
+                  <span className="text-xs font-medium text-base-content">WhatsApp</span>
+                </div>
+              </WhatsappShareButton>
+            </div>
+
+            <div className="flex gap-3">
+              <button
+                onClick={copyToClipboard}
+                className="flex-1 py-3 px-4 border border-base-300 text-base-content font-semibold rounded-lg hover:bg-base-200 hover:border-primary hover:text-primary hover:shadow-lg transform hover:-translate-y-1 transition-all duration-300 flex items-center justify-center gap-2"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                </svg>
+                Copy Link
+              </button>
+              <button
+                onClick={() => setShowShareModal(false)}
+                className="flex-1 py-3 px-4 bg-base-300 text-base-content font-semibold rounded-lg hover:bg-base-400 hover:shadow-lg transform hover:-translate-y-1 transition-all duration-300"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Hero Section */}
       <div className="relative bg-gradient-to-r from-primary via-orange-600 to-red-600 overflow-hidden text-white py-10 sm:py-12">
         {/* Background Pattern */}
@@ -520,7 +610,10 @@ export default function ServiceDetailsPage() {
                   <MessageSquare className="w-5 h-5" />
                   <span>Message</span>
                 </button>
-                <button className="flex items-center gap-2 bg-white/20 backdrop-blur-sm text-white px-6 py-3 rounded-xl font-bold text-sm sm:text-base hover:bg-white/30 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 min-w-[120px] justify-center">
+                <button 
+                  onClick={() => setShowShareModal(true)}
+                  className="flex items-center gap-2 bg-white/20 backdrop-blur-sm text-white px-6 py-3 rounded-xl font-bold text-sm sm:text-base hover:bg-white/30 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 min-w-[120px] justify-center"
+                >
                   <Share2 className="w-5 h-5" />
                   <span>Share</span>
                 </button>

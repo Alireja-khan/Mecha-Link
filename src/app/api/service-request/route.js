@@ -25,29 +25,27 @@ export async function GET(req) {
     const sort = searchParams.get("sort");
     const home = searchParams.get("home");
     const collection = await dbConnect(collections.serviceRequests);
-
     if (home) {
       const result = await collection.find().limit(6).toArray();
       return NextResponse.json(result);
     }
 
-    let matchStage = {};
-    if (search) {
-      matchStage = {
-        $or: [
-          { problemCategory: { $regex: search, $options: "i" } },
-          { deviceType: { $regex: search, $options: "i" } },
-          { "location.address": { $regex: search, $options: "i" } },
-        ],
-      };
-    }
-    if (sort === "high") {
-      matchStage["serviceDetails.urgency"] = "high";
-    } else if (sort === "emergency") {
-      matchStage["serviceDetails.urgency"] = "emergency";
-    } else if (sort === "low") {
-      matchStage["serviceDetails.urgency"] = "low";
-    }
+  let matchStage = {};
+if (search) {
+  matchStage = {
+    $or: [
+      { problemCategory: { $regex: search, $options: "i" } },
+      { "serviceDetails.problemTitle": { $regex: search, $options: "i" } },
+      { deviceType: { $regex: search, $options: "i" } },
+      { "location.address": { $regex: search, $options: "i" } },
+    ],
+  };
+}
+
+if (sort && ["high", "low", "emergency"].includes(sort)) {
+  matchStage["serviceDetails.urgency"] = sort;
+}
+
 
     const result = await collection
       .find(matchStage)

@@ -85,25 +85,33 @@ export async function POST(req) {
 // ✅ Get all ads
 export async function GET(req) {
   try {
-    const {searchParams} = new URL(req.url);
-    const email = searchParams.get("email");  
+    const { searchParams } = new URL(req.url);
+    const email = searchParams.get("email");
 
     const adsCollection = await dbConnect(collections.ads);
     const shopsCollection = await dbConnect(collections.mechanicShops);
 
+    // ✅ Step 1: Auto reject expired ads
+    const now = new Date();
+    await adsCollection.updateMany(
+      { endDate: { $lt: now }, status: { $ne: "expired" } },
+      { $set: { status: "expired" } }
+    );
+
+    // ✅ Step 2: Continue normal fetch
     let query = {};
     if (email) {
       query.shopEmail = email;
     }
 
-    const ads = await adsCollection.find(query).sort({createdAt: -1}).toArray();
+    const ads = await adsCollection.find(query).sort({ createdAt: -1 }).toArray();
 
     const adsWithShopId = await Promise.all(
       ads.map(async (ad) => {
         const shop = await shopsCollection.findOne({
           "shop.contact.email": ad.shopEmail,
         });
-        
+
         return {
           ...ad,
           shopId: shop?._id || null,
@@ -115,6 +123,6 @@ export async function GET(req) {
     return NextResponse.json(adsWithShopId);
   } catch (error) {
     console.error("Error fetching ads:", error);
-    return NextResponse.json({error: "Failed to fetch ads"}, {status: 500});
+    return NextResponse.json({ error: "Failed to fetch ads" }, { status: 500 });
   }
 }

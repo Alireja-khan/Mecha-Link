@@ -16,14 +16,15 @@ import {
   MessageSquare,
 } from "lucide-react";
 import Link from "next/link";
-
+import { useRouter } from "next/navigation"; // Import useRouter for client-side navigation
 import React, { useState, useEffect, useRef } from "react";
-
+import Swal from 'sweetalert2'; // <-- ADD THIS IMPORT
 
 const ServiceReqCard = ({ request }) => {
   const [userData, setUserData] = useState(null);
   const [loadingUser, setLoadingUser] = useState(false);
-  const { user: loggedInUser } = useUser()
+  const { user: loggedInUser } = useUser();
+  const router = useRouter(); // Initialize router
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -35,6 +36,7 @@ const ServiceReqCard = ({ request }) => {
         );
         if (response.ok) {
           const user = await response.json();
+          // Assuming the user API returns an array or a single object
           setUserData(Array.isArray(user) ? user[0] : user);
         }
       } catch (error) {
@@ -148,6 +150,90 @@ const ServiceReqCard = ({ request }) => {
     const dropdownRef = useRef(null);
     const [loadingChat, setLoadingChat] = useState(false);
 
+    // --- START OF CHAT FUNCTION ---
+    const handleMessageContact = async () => {
+      if (!request || !loggedInUser || !userData) {
+        Swal.fire({
+          icon: 'warning',
+          title: 'Data Missing',
+          text: 'Service request or user information not available yet.',
+          confirmButtonColor: '#f97316'
+        });
+        return;
+      }
+
+      setLoadingChat(true);
+      setDropdownOpen(false); // Close dropdown immediately
+
+      try {
+        const loggedInUserRole = loggedInUser.role?.toLowerCase();
+
+        // 1️⃣ Fetch all chats of the logged-in user
+        const res = await fetch(`/api/chats?userId=${loggedInUser._id}`);
+        if (!res.ok) throw new Error('Failed to fetch chats');
+        const userChats = await res.json();
+
+        const customerId = request.userId;
+        const mechanicId = loggedInUser._id;
+
+        // 2️⃣ Check if a chat already exists with these participants
+        const existingChat = userChats.find(chat =>
+          chat.participants?.some(p => p.userId === customerId) &&
+          chat.participants?.some(p => p.userId === mechanicId)
+        );
+
+        if (existingChat) {
+          // Redirect to existing chat
+          router.push(`/dashboard/${loggedInUserRole}/messages`);
+          return;
+        }
+
+        // 3️⃣ Build new chat structure
+        const chatPayload = {
+          participants: [
+            {
+              userId: loggedInUser?._id,
+              name: loggedInUser?.name || "User",
+              email: loggedInUser?.email,
+              profileImage: loggedInUser?.profileImage || ""
+            },
+            {
+              userId: request?.userId,
+              name: userData?.name || request.userName || "Customer",
+              email: userData?.email || request.userEmail,
+              profileImage: userData?.profileImage || ""
+            }
+          ],
+          messages: [],
+          createdAt: new Date().toISOString(),
+          serviceRequestId: request._id
+        };
+
+        // 4️⃣ Create chat
+        const apiResponse = await fetch('/api/chats', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(chatPayload)
+        });
+
+        if (!apiResponse.ok) throw new Error('Failed to create chat');
+
+        // 5️⃣ Redirect to messages
+        router.push(`/dashboard/${loggedInUser.role.toLowerCase()}/messages`);
+
+      } catch (error) {
+        Swal.fire({
+          icon: 'error',
+          title: 'Chat Error',
+          text: error.message || 'An unexpected error occurred while starting the chat.',
+          confirmButtonColor: '#f97316'
+        });
+      } finally {
+        setLoadingChat(false);
+      }
+    };
+    // --- END OF CHAT FUNCTION ---
+
     const Avatar = ({ src, alt, fallbackLetter }) => {
       const [imageError, setImageError] = useState(false);
       useEffect(() => setImageError(false), [src]);
@@ -177,7 +263,7 @@ const ServiceReqCard = ({ request }) => {
       return () => document.removeEventListener("mousedown", handleClickOutside);
     }, []);
 
-    if (loadingUser)
+    if (loadingUser) // Display a loading state for chat creation too
       return (
         <div className="flex items-center gap-3 p-3 bg-base-100 rounded-xl border border-base-300 animate-pulse">
           <div className="skeleton w-10 h-10 bg-base-200 rounded-full" />
@@ -193,6 +279,9 @@ const ServiceReqCard = ({ request }) => {
     const profileImage = userData?.profileImage;
     const fallbackLetter = name[0]?.toUpperCase();
 
+    // Check if the logged-in user is the customer themselves
+    const isCustomerViewingOwnRequest = loggedInUser?._id === request.userId;
+
     return (
       <div className="relative" ref={dropdownRef}>
         <div className="flex items-center gap-3 p-3 bg-base-100 rounded-xl border border-base-300 shadow-sm overflow-hidden">
@@ -203,21 +292,30 @@ const ServiceReqCard = ({ request }) => {
               <Mail className="w-3 h-3" /> {email}
             </p>
           </div>
-          <button
-            onClick={() => setDropdownOpen(!dropdownOpen)}
-            className="p-1 rounded-full hover:bg-base-200 transition"
-          >
-            <MoreVertical className="w-4 h-4 text-base-content/60" />
-          </button>
+          {!isCustomerViewingOwnRequest && ( // Only show dropdown if not viewing own request
+            <button
+              onClick={() => setDropdownOpen(!dropdownOpen)}
+              className="p-1 rounded-full hover:bg-base-200 transition"
+            >
+              <MoreVertical className="w-4 h-4 text-base-content/60" />
+            </button>
+          )}
         </div>
 
         {dropdownOpen && (
           <div className="absolute right-0 top-full mt-2 w-44 bg-base-100 border border-neutral rounded-lg shadow-lg overflow-hidden z-20">
             <button
-              onClick={() => alert("Message sent!")}
+              onClick={handleMessageContact} // <-- CALL THE NEW FUNCTION
               className="flex items-center gap-2 px-4 py-2 text-sm hover:bg-base-content/5 w-full text-base-content"
             >
-              <MessageSquare className="w-4 h-4 text-primary" /> Send Message
+              {loadingChat ? (
+                'Loading chat...'
+              ) : (
+                <div className="flex items-center gap-2">
+                  <MessageSquare className="w-4 h-4 text-primary" />
+                  <span>Send Message</span>
+                </div>
+              )}
             </button>
             <Link
               href={`/profile/${userData?._id || "#"}`}
