@@ -1,5 +1,3 @@
-
-
 import dbConnect, { collections } from "@/lib/dbConnect";
 import { NextResponse } from "next/server";
 import { ObjectId } from "mongodb";
@@ -30,7 +28,8 @@ async function handleSparePartsRequest(req) {
   const category = searchParams.get("category");
   const subCategory = searchParams.get("subCategory");
   const brand = searchParams.get("brand");
-  const search = searchParams.get("search");
+  // FIX: Changed 'search' to 'searchTerm' to match the frontend
+  const searchTerm = searchParams.get("searchTerm"); 
   const sortBy = searchParams.get("sortBy") || "newest";
 
   const collection = await dbConnect(collections.spareParts);
@@ -50,12 +49,15 @@ async function handleSparePartsRequest(req) {
     matchStage.brands = brand;
   }
 
-  if (search) {
+  // UPDATED SEARCH LOGIC
+  if (searchTerm) {
+    // Perform case-insensitive regex search on multiple fields
+    const regex = { $regex: searchTerm, $options: "i" };
     matchStage.$or = [
-      { partsName: { $regex: search, $options: "i" } },
-      { description: { $regex: search, $options: "i" } },
-      { brands: { $regex: search, $options: "i" } },
-      { category: { $regex: search, $options: "i" } }
+      { partsName: regex },      // Search by part name/title
+      { description: regex },     // Search by description
+      { brands: regex },          // Search by brand name
+      { category: regex }         // Search by category name
     ];
   }
 
