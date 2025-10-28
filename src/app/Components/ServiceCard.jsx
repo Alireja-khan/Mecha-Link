@@ -157,7 +157,7 @@ export default function ServiceCard({ service }) {
           </button>
         </div>
 
-        <div className="space-y-1">
+        <div className="space-y-2">
           <div className="text-base mt-3 flex gap-2 items-center">
             <MapPinPlus
               strokeWidth={1.25}
@@ -186,7 +186,7 @@ export default function ServiceCard({ service }) {
         </div>
       </div>
 
-      <div className="flex justify-between gap-2 border-t border-primary p-3 w-full mt-auto">
+      <div className="flex justify-between gap-2 border-t border-gray-200 p-3 w-full mt-auto">
         <button
           onClick={handleMessageUser}
           disabled={loadingChat}
