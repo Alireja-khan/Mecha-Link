@@ -48,11 +48,14 @@ export default function SpecificServices() {
 
 
   return (
-    <section className="mb-16 py-10">
+    <section className="mb-26 py-10">
       <div className="lg:container px-6 mx-auto text-center">
-        <h2 className="text-5xl font-bold mb-10">
+        <h2 className="text-5xl font-bold mb-5">
           Explore by <span className="text-primary">Category</span>
         </h2>
+        <p className="text-lg max-w-2xl mx-auto mb-12">
+          Find the right mechanic shop for your needs — explore by category and connect with trusted experts easily.
+        </p>
 
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-6">
           {categories.map((cat) => (

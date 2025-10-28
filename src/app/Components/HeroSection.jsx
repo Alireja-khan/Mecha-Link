@@ -68,7 +68,7 @@ export default function HeroModern() {
               Trusted Automotive Platform
             </div>
             
-            <h1 className="text-4xl sm:text-5xl md:text-6xl xl:text-7xl font-bold leading-tight">
+            <h1 className="text-4xl sm:text-5xl md:text-6xl xl:text-7xl font-bold ">
               Connect with{" "}
               <span className="text-transparent bg-gradient-to-r from-primary to-secondary bg-clip-text">
                 Trusted Mechanics
@@ -161,7 +161,7 @@ export default function HeroModern() {
 
   // Enhanced Role-based buttons
   const getRoleBasedButtons = () => {
-    const baseButtonClass = "px-8 py-4 rounded-2xl font-semibold transition-all duration-300 transform hover:-translate-y-1 shadow-lg hover:shadow-xl border-2";
+    const baseButtonClass = "px-8 py-4 rounded-md font-semibold transition-all duration-300 transform hover:-translate-y-1 shadow-lg hover:shadow-xl border-2";
     
     if (!loggedInUser) {
       return (

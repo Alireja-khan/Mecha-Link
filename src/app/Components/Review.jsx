@@ -277,7 +277,7 @@ const ReviewSection = ({ shopId = null }) => {
 
   // --- Main Render ---
   return (
-    <section className="relative">
+    <section className="relative mb-15">
       {/* Title + Description */}
       <div className="lg:container mx-auto px-6 text-center mb-10">
         <h2 className="text-3xl md:text-5xl font-bold mb-4 font-urbanist">
