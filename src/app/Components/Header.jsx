@@ -8,7 +8,6 @@ import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { FaGear } from "react-icons/fa6";
 import ToggleTheme from "../shared/ToggleTheme";
-import label from "daisyui/components/label";
 import CartIcon from "../shared/cartIcon";
 
 const MobileDrawerBackdrop = ({ isOpen, onClick }) => {
@@ -28,12 +27,15 @@ export default function Header() {
   const { user: loggedInUser, status } = useUser();
   const [drawerOpen, setDrawerOpen] = useState(false);
 
+
+  // Effect to handle sticky header scroll state
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 0);
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  // Effect to handle clicking outside the user dropdown
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
@@ -44,6 +46,7 @@ export default function Header() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  // Effect to prevent body scrolling when the drawer is open
   useEffect(() => {
     if (drawerOpen) document.body.style.overflow = "hidden";
     else document.body.style.overflow = "unset";
@@ -73,12 +76,12 @@ export default function Header() {
   return (
     <>
       <header
-        className={`sticky top-0 w-full z-[9999] transition-all duration-300 ${scrolled
+        className={`sticky top-0 w-full z-50 transition-all duration-300 ${scrolled
           ? "bg-base-100 backdrop-blur-sm shadow-md py-3"
           : "bg-transparent backdrop-blur-sm py-4"
           }`}
       >
-        <div className="lg:container mx-auto px-6 flex justify-between items-center text-base-content">
+        <div className="xl:container mx-auto px-6 flex justify-between items-center text-base-content">
           <Link href="/" className="z-[9999]">
             <button className="flex gap-2 items-center cursor-pointer">
               <FaGear
@@ -91,7 +94,8 @@ export default function Header() {
             </button>
           </Link>
 
-          <nav className="hidden lg:flex items-center space-x-6">
+          {/* Desktop Navigation */}
+          <nav className="hidden lg:flex items-center space-x-8">
             {navigation.map((item) => (
               <Link
                 key={item.href}
@@ -107,7 +111,8 @@ export default function Header() {
           </nav>
 
           <div className="flex gap-4 items-center">
-            <CartIcon></CartIcon>
+            <CartIcon />
+            {/* Desktop/Tablet Theme Toggle */}
             <div className="hidden md:block">
               <ToggleTheme />
             </div>
@@ -116,7 +121,11 @@ export default function Header() {
               {status === "loading" && (
                 <span className="loading loading-spinner loading-xs"></span>
               )}
+              {status === "authenticated" && !loggedInUser && (
+                <span className="loading loading-spinner loading-xs"></span>
+              )}
 
+              {/* Logged-in User Dropdown (Desktop Only) */}
               {loggedInUser && (
                 <div className="relative hidden lg:block" ref={dropdownRef}>
                   <button
@@ -158,31 +167,39 @@ export default function Header() {
                         className="block px-4 py-2 text-sm hover:bg-base-200 transition-colors"
                         onClick={() => setUserMenuOpen(false)}
                       >
-                        Profile
+                        <div className="flex items-center gap-2">
+                            <Settings className="w-4 h-4 opacity-70" />
+                            <span>Profile</span>
+                        </div>
                       </Link>
                       <Link
                         href={dashboardLink}
                         className="block px-4 py-2 text-sm hover:bg-base-200 transition-colors"
                         onClick={() => setUserMenuOpen(false)}
                       >
-                        Dashboard
+                        <div className="flex items-center gap-2">
+                            <UserIcon className="w-4 h-4 opacity-70" />
+                            <span>Dashboard</span>
+                        </div>
                       </Link>
                       <div className="border-t border-base-300 my-1"></div>
                       <button
                         type="button"
-                        className="w-full text-left px-4 py-2 text-sm text-error font-medium hover:bg-base-200 transition-colors"
+                        className="w-full text-left px-4 py-2 text-sm text-error font-medium hover:bg-base-200 transition-colors flex items-center gap-2"
                         onClick={() => {
                           signOut();
                           setUserMenuOpen(false);
                         }}
                       >
-                        Sign out
+                        <LogOut className="w-4 h-4" />
+                        <span>Sign out</span>
                       </button>
                     </div>
                   )}
                 </div>
               )}
 
+              {/* Auth Links (Desktop/Tablet) */}
               {status === "unauthenticated" && (
                 <>
                   <Link
@@ -201,10 +218,12 @@ export default function Header() {
               )}
             </div>
 
+            {/* Mobile Theme Toggle */}
             <div className="md:hidden">
               <ToggleTheme />
             </div>
 
+            {/* Mobile Drawer Toggle Button */}
             <button
               className="lg:hidden text-primary p-2 transition-colors hover:bg-base-200 rounded-lg"
               onClick={handleDrawerToggle}
@@ -220,13 +239,16 @@ export default function Header() {
         </div>
       </header>
 
+      {/* Mobile Drawer Backdrop */}
       <MobileDrawerBackdrop isOpen={drawerOpen} onClick={() => setDrawerOpen(false)} />
 
+      {/* Mobile Drawer Content */}
       <div
         className={`fixed lg:hidden top-0 left-0 h-screen w-64 z-[9999] transform transition-transform duration-300 bg-base-100 shadow-2xl flex flex-col justify-between ${drawerOpen ? "translate-x-0" : "-translate-x-full"
           }`}
       >
         <div className="p-4 overflow-y-auto">
+          {/* Logo in Drawer */}
           <div className="border-b mb-4 border-base-300 flex justify-between items-center">
             <Link href="/" className="z-[9999]">
               <button
@@ -244,6 +266,7 @@ export default function Header() {
             </Link>
           </div>
 
+          {/* Drawer Navigation Links */}
           <ul className="space-y-1">
             {navigation.map((item) => (
               <li key={item.href}>
@@ -261,6 +284,7 @@ export default function Header() {
             ))}
           </ul>
 
+          {/* Auth Links (Mobile) */}
           {status === "unauthenticated" && (
             <div className="mt-6 space-y-3 border-t pt-4 border-base-300">
               <Link
@@ -281,6 +305,7 @@ export default function Header() {
           )}
         </div>
 
+        {/* Logged-in User Info & Controls (Mobile Drawer Footer) */}
         {loggedInUser && (
           <div className="border-t border-base-300 p-4 bg-base-200/50">
             <div>

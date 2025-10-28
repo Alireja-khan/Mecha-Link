@@ -37,46 +37,42 @@ export async function GET(req) {
     const admin = searchParams.get("admin");
     const home = searchParams.get("home");
     const email = searchParams.get("email");
-    const category = searchParams.get("category"); // ✅ NEW: category query added
+    const category = searchParams.get("category");
 
     const collection = await dbConnect(collections.mechanicShops);
 
-// ✅ If email query is provided, return only one shop for that email
-if (email) {
-  const shop = await collection.findOne({
-    $or: [
-      { ownerEmail: email },
-      { userEmail: email },
-      { "shop.ownerEmail": email },
-    ],
-  });
+    if (email) {
+      const shop = await collection.findOne({
+        $or: [
+          { ownerEmail: email },
+          { userEmail: email },
+          { "shop.ownerEmail": email },
+        ],
+      });
 
-  if (!shop) {
-    return NextResponse.json(
-      { message: "No shop found for this email" },
-      { status: 404 }
-    );
-  }
+      if (!shop) {
+        return NextResponse.json(
+          { message: "No shop found for this email" },
+          { status: 404 }
+        );
+      }
 
-  return NextResponse.json(shop);
-}
-
-    // ✅ 2️⃣ Handle home page request (approved + limited to 6)
-    if (home) {
-      const result = await collection
-        .find({ status: "approved" })
-        .limit(6)
-        .toArray();
-      return NextResponse.json(result);
+      return NextResponse.json(shop);
     }
 
-    // ✅ 3️⃣ Build query pipeline for general fetching
+    // if (home) {
+    //   const result = await collection
+    //     .find({ status: "approved" })
+    //     .limit(6)
+    //     .toArray();
+    //   return NextResponse.json(result);
+    // }
+
     let matchStage = {};
 
     if (!admin) matchStage.status = "approved";
     if (status && status !== "all") matchStage.status = status;
 
-    // ✅ ADDED: category filtering (exact match)
     if (category) {
       matchStage["shop.categories"] = category;
     }
@@ -92,7 +88,6 @@ if (email) {
       ];
     }
 
-    // ✅ 4️⃣ Handle category filter
     if (category) {
       matchStage["shop.categories"] = category;
     }
@@ -106,11 +101,11 @@ if (email) {
       {
         $lookup: {
           from: "reviews",
-          let: { shopId: { $toString: "$_id" } }, 
+          let: { shopId: { $toString: "$_id" } },
           pipeline: [
             {
               $match: {
-                $expr: { $eq: ["$shopId", "$$shopId"] }, 
+                $expr: { $eq: ["$shopId", "$$shopId"] },
               },
             },
           ],
@@ -149,6 +144,15 @@ if (email) {
       pipeline.push({ $limit: limit });
     }
 
+    if (home) {
+      // const result = await collection
+      //   .find({ status: "approved" })
+      //   .limit(6)
+      //   .toArray();
+      // return NextResponse.json(result);
+      const result = await collection.aggregate(pipeline).limit(6).toArray();
+      return NextResponse.json(result);
+    }
     const result = await collection.aggregate(pipeline).toArray();
     const totalDocs = await collection.countDocuments(matchStage);
     const totalPage = limit > 0 ? Math.ceil(totalDocs / limit) : 1;

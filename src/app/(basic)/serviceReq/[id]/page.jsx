@@ -397,6 +397,13 @@ const ServiceRequestDetails = () => {
             return;
         }
 
+        // --- START OF FIX ---
+        // Ensure you have the complete customer data
+        const customerProfileImage = displayUser?.profileImage || "";
+        const customerName = displayUser?.name || request.userName || "Customer";
+        const customerEmail = displayUser?.email || request.userEmail;
+        // --- END OF FIX ---
+
         try {
             const loggedInUserRole = loggedInUser.role?.toLowerCase();
 
@@ -431,9 +438,11 @@ const ServiceRequestDetails = () => {
                     },
                     {
                         userId: request?.userId,
-                        name: request?.user?.name || request.userName || "Customer",
-                        email: request?.user?.email || request.userEmail,
-                        profileImage: request?.user?.profileImage || ""
+                        // --- UPDATED PART ---
+                        name: customerName,
+                        email: customerEmail,
+                        profileImage: customerProfileImage
+                        // --- END UPDATED PART ---
                     }
                 ],
                 messages: [],
@@ -883,7 +892,7 @@ const ServiceRequestDetails = () => {
             {/* Image Modal */}
             {selectedImage && (
                 <div
-                    className="fixed inset-0 bg-black/80 backdrop-blur-md flex items-center justify-center z-[9999] p-4 transition-opacity duration-300"
+                    className="fixed inset-0 bg-black/80 backdrop-blur-md flex items-center justify-center z-50 p-4 transition-opacity duration-300"
                     onClick={() => setSelectedImage(null)}
                 >
                     <div

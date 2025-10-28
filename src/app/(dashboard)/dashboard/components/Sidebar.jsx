@@ -16,6 +16,7 @@ import {
   ClipboardCheck,
   Radio,
   UserIcon,
+  Cog,
 } from "lucide-react";
 import { FaGear } from "react-icons/fa6";
 import useUser from "@/hooks/useUser";
@@ -68,7 +69,7 @@ const Sidebar = ({ isMobileOpen, setIsMobileOpen }) => {
       menuItem("Coupons", <Ticket size={20} />, "/dashboard/admin/coupons"),
       menuItem("Announcements", <Megaphone size={20} />, "/dashboard/admin/announcements"),
       menuItem("Add Blogs", <NotebookPen size={20} />, "/dashboard/admin/blogs"),
-      menuItem("Add Parts", <Wrench size={20} />, "/dashboard/admin/AddSpareParts"),
+      menuItem("Manage Parts", <Cog size={20} />, "/dashboard/admin/ManageSpareParts"),
       menuItem("All Ads", <ScrollText size={20} />, "/dashboard/admin/allAds"),
       menuItem("Revenue Report", <BarChart3 size={20} />, "/dashboard/admin/revenue"),
     ],

@@ -117,7 +117,7 @@ export default function FeaturesSection() {
           <div className="absolute inset-0 bg-black/60"></div>
           <div className="relative lg:container mx-auto px-6">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-              
+
               <div className="relative order-1">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   {[...Array(4)].map((_, index) => (
@@ -141,13 +141,13 @@ export default function FeaturesSection() {
   }
 
   return (
-    <section className="relative mt-12 sm:mt-16">
+    <section className="relative mb-5 mt-12 sm:mt-16">
       <div className="lg:container mx-auto px-6 text-center mb-8 sm:mb-10">
         <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold font-urbanist">
           Our <span className="text-primary">Features</span>
         </h2>
         <p className="text-base sm:text-lg mt-2 max-w-2xl mx-auto font-poppins">
-          Find trusted mechanics and book car services online—fast, easy, and reliable.
+          Find trusted mechanics, book instant services, get real-time updates, and enjoy transparent pricing—all in one platform.
         </p>
       </div>
 
@@ -162,7 +162,7 @@ export default function FeaturesSection() {
 
         <div className="relative lg:container mx-auto px-6">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-            
+
             <div className="relative order-1">
               <Swiper
                 spaceBetween={16}
@@ -202,10 +202,10 @@ export default function FeaturesSection() {
 
               <div className="mt-8 flex justify-center gap-4">
                 <button className="swiper-prev w-10 h-10 rounded-full bg-base-200 text-primary shadow hover:bg-primary hover:text-white transition text-2xl flex items-center justify-center">
-                  <ChevronLeft/>
+                  <ChevronLeft />
                 </button>
                 <button className="swiper-next w-10 h-10 rounded-full bg-base-200 text-primary shadow hover:bg-primary hover:text-white transition text-2xl flex items-center justify-center">
-                  <ChevronRight/>
+                  <ChevronRight />
                 </button>
               </div>
             </div>
@@ -213,7 +213,7 @@ export default function FeaturesSection() {
             <div className="order-2">
               <div className="grid grid-cols-2 gap-4 sm:gap-8 my-8 sm:my-12 lg:my-0 lg:ml-8 xl:ml-20 text-center lg:text-left">
                 {stats.map((stat, idx) => (
-                  <div key={idx} className="flex flex-col items-center lg:items-start">
+                  <div key={idx} className="flex flex-col items-center lg:items-center">
                     <h3 className="text-4xl md:text-5xl lg:text-5xl xl:text-6xl font-extrabold text-primary">
                       <CountUp end={stat.value} duration={10} suffix={stat.suffix} />
                     </h3>
@@ -224,7 +224,7 @@ export default function FeaturesSection() {
                 ))}
               </div>
             </div>
-            
+
           </div>
         </div>
       </div>
