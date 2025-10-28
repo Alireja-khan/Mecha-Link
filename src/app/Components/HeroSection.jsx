@@ -1,28 +1,29 @@
 "use client";
 import Image from "next/image";
 import Link from "next/link";
-import { useState, useEffect } from "react";
+import {useState, useEffect} from "react";
 import axios from "axios";
-import { Swiper, SwiperSlide } from "swiper/react";
-import { Autoplay, Pagination, Navigation, EffectFade } from "swiper/modules";
+import {Swiper, SwiperSlide} from "swiper/react";
+import {Autoplay, Pagination, Navigation, EffectFade} from "swiper/modules";
 import "swiper/css";
 import "swiper/css/pagination";
 import "swiper/css/navigation";
 import "swiper/css/effect-fade";
 import useUser from "@/hooks/useUser";
-import { Store, Star, MapPin, Clock, ShieldCheck } from "lucide-react";
+import {Store, Star, MapPin, Clock, ShieldCheck} from "lucide-react";
 import Button from "../shared/Button";
 
 export default function HeroModern() {
   const [loading, setLoading] = useState(true);
   const [ads, setAds] = useState([]);
-  const { user: loggedInUser } = useUser();
+  const {user: loggedInUser} = useUser();
 
   useEffect(() => {
     const fetchAds = async () => {
       try {
-        const { data } = await axios.get("/api/ads");
-        const approvedAds = data?.filter((ad) => ad.status === "approved") || [];
+        const {data} = await axios.get("/api/ads");
+        const approvedAds =
+          data?.filter((ad) => ad.status === "approved") || [];
         setAds(approvedAds);
       } catch (error) {
         console.error("Error fetching ads:", error);
@@ -58,7 +59,7 @@ export default function HeroModern() {
       {/* Background decorative elements */}
       <div className="absolute top-10 left-10 w-72 h-72 bg-primary/10 rounded-full blur-3xl"></div>
       <div className="absolute bottom-10 right-10 w-96 h-96 bg-secondary/10 rounded-full blur-3xl"></div>
-      
+
       <div className="lg:container mx-auto px-6 flex flex-col-reverse lg:flex-row items-center gap-12 sm:gap-20 max-w-7xl relative z-10">
         {/* Text Section */}
         <div className="flex-1 text-center lg:text-left w-full space-y-8">
@@ -68,7 +69,7 @@ export default function HeroModern() {
               Trusted Automotive Platform
             </div>
             
-            <h1 className="text-4xl sm:text-5xl md:text-6xl xl:text-7xl font-bold leading-tight">
+            <h1 className="text-4xl sm:text-5xl md:text-6xl xl:text-7xl font-bold ">
               Connect with{" "}
               <span className="text-transparent bg-gradient-to-r from-primary to-secondary bg-clip-text">
                 Trusted Mechanics
@@ -77,8 +78,8 @@ export default function HeroModern() {
             </h1>
 
             <p className="text-lg sm:text-xl text-base-content/80 max-w-2xl mx-auto lg:mx-0 leading-relaxed">
-              Instant access to certified mechanics, transparent pricing, and reliable service 
-              when you need it most.
+              Instant access to certified mechanics, transparent pricing, and
+              reliable service when you need it most.
             </p>
           </div>
 
@@ -105,8 +106,12 @@ export default function HeroModern() {
                 ))}
               </div>
               <div className="ml-2">
-                <p className="font-semibold text-base-content">20k+ Happy Customers</p>
-                <p className="text-sm text-base-content/60">Served with excellence</p>
+                <p className="font-semibold text-base-content">
+                  20k+ Happy Customers
+                </p>
+                <p className="text-sm text-base-content/60">
+                  Served with excellence
+                </p>
               </div>
             </div>
 
@@ -130,7 +135,7 @@ export default function HeroModern() {
                 className="object-cover w-full h-full min-h-80 sm:min-h-96"
                 priority
               />
-              
+
               {/* Enhanced Live Booking Card */}
               <div className="absolute bottom-6 left-6 bg-base-100/95 backdrop-blur-md rounded-2xl shadow-xl p-4 flex items-center gap-4 border border-base-300">
                 <div className="w-12 h-12 bg-gradient-to-br from-primary to-secondary rounded-xl flex items-center justify-center shadow-lg">
@@ -161,18 +166,22 @@ export default function HeroModern() {
 
   // Enhanced Role-based buttons
   const getRoleBasedButtons = () => {
-    const baseButtonClass = "px-8 py-4 rounded-2xl font-semibold transition-all duration-300 transform hover:-translate-y-1 shadow-lg hover:shadow-xl border-2";
+    const baseButtonClass = "px-8 py-4 rounded-md font-semibold transition-all duration-300 transform hover:-translate-y-1 shadow-lg hover:shadow-xl border-2";
     
     if (!loggedInUser) {
       return (
         <div className="mt-10 flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
           <Link href="/services">
-            <button className={`${baseButtonClass} bg-gradient-to-r from-primary to-secondary text-white border-transparent hover:shadow-2xl`}>
+            <button
+              className={`${baseButtonClass} bg-gradient-to-r from-primary to-secondary text-white border-transparent hover:shadow-2xl`}
+            >
               Find Mechanic Shops
             </button>
           </Link>
           <Link href="/login">
-            <button className={`${baseButtonClass} border-primary text-primary hover:bg-primary/10 backdrop-blur-sm`}>
+            <button
+              className={`${baseButtonClass} border-primary text-primary hover:bg-primary/10 backdrop-blur-sm`}
+            >
               Join Our Community
             </button>
           </Link>
@@ -184,10 +193,16 @@ export default function HeroModern() {
       case "admin":
         return (
           <div className="mt-10 flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
-            <Link href="/dashboard/admin/manageShops" className={`${baseButtonClass} bg-gradient-to-r from-primary to-secondary text-white border-transparent`}>
+            <Link
+              href="/dashboard/admin/manageShops"
+              className={`${baseButtonClass} bg-gradient-to-r from-primary to-secondary text-white border-transparent`}
+            >
               Manage Shops
             </Link>
-            <Link href="/dashboard/admin/manageUsers" className={`${baseButtonClass} border-primary text-primary hover:bg-primary/10`}>
+            <Link
+              href="/dashboard/admin/manageUsers"
+              className={`${baseButtonClass} border-primary text-primary hover:bg-primary/10`}
+            >
               Manage Users
             </Link>
           </div>
@@ -196,10 +211,16 @@ export default function HeroModern() {
       case "mechanic":
         return (
           <div className="mt-10 flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
-            <Link href="/serviceReq" className={`${baseButtonClass} bg-gradient-to-r from-primary to-secondary text-white border-transparent`}>
+            <Link
+              href="/serviceReq"
+              className={`${baseButtonClass} bg-gradient-to-r from-primary to-secondary text-white border-transparent`}
+            >
               Explore Service Requests
             </Link>
-            <Link href="/dashboard/mechanic/AddMechanicShop" className={`${baseButtonClass} border-primary text-primary hover:bg-primary/10`}>
+            <Link
+              href="/dashboard/mechanic/AddMechanicShop"
+              className={`${baseButtonClass} border-primary text-primary hover:bg-primary/10`}
+            >
               Register Your Shop
             </Link>
           </div>
@@ -209,12 +230,16 @@ export default function HeroModern() {
         return (
           <div className="mt-10 flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
             <Link href="/services">
-              <button className={`${baseButtonClass} bg-gradient-to-r from-primary to-secondary text-white border-transparent hover:shadow-2xl`}>
+              <button
+                className={`${baseButtonClass} bg-gradient-to-r from-primary to-secondary text-white border-transparent hover:shadow-2xl`}
+              >
                 Find a Mechanic
               </button>
             </Link>
             <Link href="/dashboard/user/addServiceRequest">
-              <button className={`${baseButtonClass} border-primary text-primary hover:bg-primary/10 backdrop-blur-sm`}>
+              <button
+                className={`${baseButtonClass} border-primary text-primary hover:bg-primary/10 backdrop-blur-sm`}
+              >
                 Post Your Problem
               </button>
             </Link>
@@ -232,30 +257,27 @@ export default function HeroModern() {
       {/* Background elements */}
       <div className="absolute top-0 left-0 w-64 h-64 bg-primary/10 rounded-full blur-3xl"></div>
       <div className="absolute bottom-0 right-0 w-80 h-80 bg-secondary/10 rounded-full blur-3xl"></div>
-      
-      <div className="container mx-auto px-6 max-w-7xl relative z-10">
-      
-        
 
+      <div className="container mx-auto px-6 max-w-7xl relative z-10">
         <Swiper
           modules={[Autoplay, Pagination, Navigation, EffectFade]}
           effect="fade"
-          fadeEffect={{ crossFade: true }}
-          autoplay={{ 
-            delay: 5000, 
+          fadeEffect={{crossFade: true}}
+          autoplay={{
+            delay: 5000,
             disableOnInteraction: false,
-            pauseOnMouseEnter: true 
+            pauseOnMouseEnter: true,
           }}
-          pagination={{ 
+          pagination={{
             clickable: true,
             dynamicBullets: true,
             renderBullet: (index, className) => {
               return `<span class="${className} !w-3 !h-3 !bg-primary/80 hover:!bg-primary !transition-all !duration-300"></span>`;
-            }
+            },
           }}
           navigation={{
-            nextEl: '.swiper-button-next',
-            prevEl: '.swiper-button-prev',
+            nextEl: ".swiper-button-next",
+            prevEl: ".swiper-button-prev",
           }}
           loop={true}
           speed={1000}
@@ -273,11 +295,11 @@ export default function HeroModern() {
                   priority
                   sizes="(max-width: 768px) 100vw, (max-width: 1200px) 80vw, 70vw"
                 />
-                
+
                 {/* Multi-layer Gradient Overlay */}
                 <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/50 to-transparent"></div>
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
-                
+
                 {/* Content Container */}
                 <div className="relative z-10 max-w-7xl mx-auto px-6 w-full">
                   <div className="max-w-2xl">
@@ -300,21 +322,18 @@ export default function HeroModern() {
                     </p>
 
                     {/* CTA Button */}
-                    <div className="flex flex-col sm:flex-row gap-4 items-start">
+                    <div className="flex flex-col sm:flex-row gap-4 items-center ">
                       <Link
-                        href={ad.shopId ? `/services/${ad.shopId}` : "/services"}
+                        href={
+                          ad.shopId ? `/services/${ad.shopId}` : "/services"
+                        }
                         className="inline-block"
                       >
-                        <Button 
-                          variant="primary" 
-                          className="px-8 py-4 text-lg font-semibold rounded-2xl shadow-2xl hover:shadow-3xl transform hover:-translate-y-1 transition-all duration-300 bg-gradient-to-r from-primary to-secondary border-0 text-white flex items-center"
-                        >
-                          <Store className="w-5 h-5 mr-2" />
-                          Visit Shop 
+                        <Button variant="primary" className="...">
+                          Visit Shop
                         </Button>
                       </Link>
-                      
-                      {/* Additional Info - Clean Version */}
+
                       <div className="flex items-center justify-center gap-4 text-white/80">
                         <div className="flex items-center gap-2 bg-white/10 backdrop-blur-sm px-3 py-2 rounded-lg">
                           <Clock className="w-4 h-4" />
@@ -338,8 +357,12 @@ export default function HeroModern() {
                     <Star className="w-4 h-4 fill-current" />
                     <Star className="w-4 h-4 fill-current" />
                   </div>
-                  <div className="text-sm font-bold text-base-content">Premium Partner</div>
-                  <div className="text-xs text-base-content/60">Trusted Service</div>
+                  <div className="text-sm font-bold text-base-content">
+                    Premium Partner
+                  </div>
+                  <div className="text-xs text-base-content/60">
+                    Trusted Service
+                  </div>
                 </div>
               </div>
             </SwiperSlide>
@@ -349,14 +372,16 @@ export default function HeroModern() {
         {/* Custom Navigation Buttons */}
         <div className="flex justify-center gap-4 mt-8">
           <button className="swiper-button-prev bg-base-100/80 backdrop-blur-sm rounded-2xl p-4 shadow-lg border border-base-300 hover:bg-base-100 transition-all duration-300 hover:scale-110 group">
-            <div className="w-6 h-6 text-base-content group-hover:text-primary transition-colors">←</div>
+            <div className="w-6 h-6 text-base-content group-hover:text-primary transition-colors">
+              ←
+            </div>
           </button>
           <button className="swiper-button-next bg-base-100/80 backdrop-blur-sm rounded-2xl p-4 shadow-lg border border-base-300 hover:bg-base-100 transition-all duration-300 hover:scale-110 group">
-            <div className="w-6 h-6 text-base-content group-hover:text-primary transition-colors">→</div>
+            <div className="w-6 h-6 text-base-content group-hover:text-primary transition-colors">
+              →
+            </div>
           </button>
         </div>
-
-        
       </div>
     </section>
   );

@@ -1,22 +1,42 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, {useEffect, useState} from "react";
 import ServiceCard from "@/app/Components/ServiceCard";
 import Pagination from "@/app/Components/pagination";
-import { Search, Filter, MapPin, Sparkles } from "lucide-react";
+import {Search, Filter, MapPin, Sparkles} from "lucide-react";
 
 const Services = () => {
-  const [totalData, setTotalData] = useState({ result: [], totalDocs: 0, totalPage: 1 });
+  const [totalData, setTotalData] = useState({
+    result: [],
+    totalDocs: 0,
+    totalPage: 1,
+  });
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [sortOrder, setSortOrder] = useState("");
   const [itemsPerPage, setItemsPerPage] = useState(12);
   const [currentPage, setCurrentPage] = useState(1);
+  const [isRestored, setIsRestored] = useState(false);
+  // get from local storage
+  useEffect(() => {
+    const savedPage = localStorage.getItem("mechanicShops_currentPage");
+    const savedItems = localStorage.getItem("mechanicShops_itemsPerPage");
+
+    if (savedPage) setCurrentPage(Number(savedPage));
+    if (savedItems) setItemsPerPage(Number(savedItems));
+    setIsRestored(true);
+  }, []);
+
+  //  Save to local storage
+  useEffect(() => {
+    localStorage.setItem("mechanicShops_currentPage", currentPage);
+    localStorage.setItem("mechanicShops_itemsPerPage", itemsPerPage);
+  }, [currentPage, itemsPerPage]);
 
   // Fetch data from API whenever search, sort, page, or itemsPerPage changes
   useEffect(() => {
     setLoading(true);
-
+    if (!isRestored) return;
     const apiUrl = `/api/shops?search=${searchTerm}&sort=${sortOrder}&limit=${itemsPerPage}&page=${currentPage}`;
 
     fetch(apiUrl)
@@ -30,12 +50,12 @@ const Services = () => {
       })
       .catch((err) => {
         console.error("Error fetching shops:", err);
-        setTotalData({ result: [], totalDocs: 0, totalPage: 1 });
+        setTotalData({result: [], totalDocs: 0, totalPage: 1});
         setLoading(false);
       });
-  }, [searchTerm, sortOrder, itemsPerPage, currentPage]);
+  }, [searchTerm, sortOrder, itemsPerPage, currentPage, isRestored]);
 
-  const { result: services = [], totalDocs = 0, totalPage = 1 } = totalData;
+  const {result: services = [], totalDocs = 0, totalPage = 1} = totalData;
 
   const handleSearch = (e) => {
     setSearchTerm(e.target.value);
@@ -90,14 +110,18 @@ const Services = () => {
             <div className="flex-1 text-center lg:text-left">
               <div className="inline-flex items-center gap-2 bg-white/20 backdrop-blur-sm rounded-full px-4 py-2 mb-6">
                 <Sparkles className="w-5 h-5 text-yellow-300" />
-                <span className="text-white text-sm font-semibold">Trusted Service Providers</span>
+                <span className="text-white text-sm font-semibold">
+                  Trusted Service Providers
+                </span>
               </div>
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-6 leading-tight">
                 Find Your Perfect
                 <span className="block text-orange-100">Service Partner</span>
               </h1>
               <p className="text-xl text-orange-100 mb-8 leading-relaxed max-w-2xl">
-                Connect with certified mechanics and service shops. Browse ratings, services, and locations to find the perfect match for your needs.
+                Connect with certified mechanics and service shops. Browse
+                ratings, services, and locations to find the perfect match for
+                your needs.
               </p>
             </div>
 
@@ -106,9 +130,12 @@ const Services = () => {
                 <div className="w-80 h-80 bg-white/10 backdrop-blur-sm rounded-3xl border-2 border-white/20 flex items-center justify-center">
                   <div className="text-center p-8">
                     <MapPin className="w-16 h-16 text-white mx-auto mb-4" />
-                    <h3 className="text-white text-xl font-semibold mb-2">Local Experts</h3>
+                    <h3 className="text-white text-xl font-semibold mb-2">
+                      Local Experts
+                    </h3>
                     <p className="text-orange-100 text-sm">
-                      Find trusted service providers in your area with verified reviews and ratings
+                      Find trusted service providers in your area with verified
+                      reviews and ratings
                     </p>
                   </div>
                 </div>
@@ -146,7 +173,6 @@ const Services = () => {
                 <option value="">All Shops</option>
                 <option value="htl">Rating: High to Low</option>
                 <option value="lth">Rating: Low to High</option>
-                <option value="certified">Certified Only</option>
               </select>
             </div>
           </div>
@@ -166,9 +192,12 @@ const Services = () => {
               <div className="w-24 h-24 bg-accent rounded-full flex items-center justify-center mx-auto mb-4">
                 <MapPin className="w-12 h-12 text-primary" />
               </div>
-              <p className="text-2xl text-primary font-bold mb-2">No Shops Found</p>
+              <p className="text-2xl text-primary font-bold mb-2">
+                No Shops Found
+              </p>
               <p className="text-base-content/70 max-w-md mx-auto">
-                We couldn't find any service shops matching your criteria. Try adjusting your search filters.
+                We couldn't find any service shops matching your criteria. Try
+                adjusting your search filters.
               </p>
             </div>
           )}

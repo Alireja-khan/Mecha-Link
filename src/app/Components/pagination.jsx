@@ -55,7 +55,7 @@ const Pagination = ({ totalPages, currentPage, onPageChange, itemsPerPage, onIte
           onChange={(e) => onItemsPerPageChange(Number(e.target.value))}
           className="px-4 py-2 bg-base-100 rounded-lg border-2 border-base-300 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-300"
         >
-          {[12, 24, 36, 48].map((num) => (
+          {[12, 24, 36, 50].map((num) => (
             <option key={num} value={num}>
               {num}
             </option>

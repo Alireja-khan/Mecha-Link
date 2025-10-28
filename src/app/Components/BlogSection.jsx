@@ -159,9 +159,7 @@ const BlogSection = () => {
                     <span className="text-xs font-semibold uppercase px-3 py-1 rounded-full bg-primary text-white">
                       {post.category}
                     </span>
-                    <div className="flex items-center text-text/70 text-sm">
-                      <Clock className="w-4 h-4 mr-1" /> {post.readTime}
-                    </div>
+                   
                   </div>
                   {/* Title and Excerpt are clickable */}
                   <div
