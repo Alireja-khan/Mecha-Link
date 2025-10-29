@@ -1,31 +1,25 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import {
-  Users,
   Store,
   Wrench,
-  UserCheck,
   DollarSign,
   Star,
-  Shield,
-  Crown,
-  Calendar,
   Eye,
   FileText,
   Settings,
   BarChart3,
   Clock,
   CheckCircle,
-  XCircle,
   AlertTriangle,
   MapPin,
   Phone,
-  Mail,
+  Loader2,
+  Radio,
+  BrainCircuit,
 } from "lucide-react";
 import {
-  LineChart,
-  Line,
   XAxis,
   YAxis,
   CartesianGrid,
@@ -39,313 +33,243 @@ import {
   Bar,
 } from "recharts";
 import useUser from "@/hooks/useUser";
+import Loader from "@/app/(basic)/loading";
+import Link from "next/link";
+
+const generateMonthlyRevenue = (requests) => {
+  const months = [
+    "Jan",
+    "Feb",
+    "Mar",
+    "Apr",
+    "May",
+    "Jun",
+    "Jul",
+    "Aug",
+    "Sep",
+    "Oct",
+    "Nov",
+    "Dec",
+  ];
+
+  if (!requests || requests.length === 0) {
+    return months.map((month) => ({ month, revenue: 0 }));
+  }
+
+  const revenueByMonth = {};
+
+  requests
+    .filter((req) => req.status === "completed")
+    .forEach((req) => {
+      const date =
+        req.updatedAt || req.createdAt || req.requestedDate || new Date();
+      const month = new Date(date).getMonth();
+      const monthName = months[month];
+      const cost =
+        req.serviceDetails?.estimatedCost ||
+        req.estimatedCost ||
+        req.estimatedBudget?.split("-")[0]?.trim() ||
+        req.cost ||
+        0;
+      revenueByMonth[monthName] =
+        (revenueByMonth[monthName] || 0) + (parseFloat(cost) || 0);
+    });
+
+  return months.map((month) => ({
+    month,
+    revenue: revenueByMonth[month] || 0,
+  }));
+};
 
 const MechanicDashboardOverview = () => {
   const { user: loggedInUser, loading: userLoading } = useUser();
-  const [loading, setLoading] = useState(true);
+
+  const [shopLoading, setShopLoading] = useState(true);
+  const [requestsLoading, setRequestsLoading] = useState(true);
+  const [reviewsLoading, setReviewsLoading] = useState(true);
+
   const [shopData, setShopData] = useState(null);
-  const [acceptedRequests, setAcceptedRequests] = useState([]);
-  const [recentReviews, setRecentReviews] = useState([]);
-  const [performanceStats, setPerformanceStats] = useState({});
-  const [revenueData, setRevenueData] = useState([]);
+  const [allRequests, setAllRequests] = useState([]);
+  const [allReviews, setAllReviews] = useState([]);
+
 
   useEffect(() => {
-    const fetchDashboardData = async () => {
-      if (!loggedInUser?._id) return;
+    const fetchShopData = async () => {
+      if (!loggedInUser?.email) return;
 
-      setLoading(true);
+      setShopLoading(true);
       try {
+        const shopRes = await fetch(`/api/shops?email=${loggedInUser.email}`);
+        let data = null;
 
-        // ✅ FIXED: Fetch shop data using user email
-        let shopData = null;
-        try {
-          const shopRes = await fetch(`/api/shops?email=${loggedInUser.email}`);
-
-          if (shopRes.ok) {
-            shopData = await shopRes.json();
-
-            // ✅ Handle array response (your API returns array)
-            if (Array.isArray(shopData) && shopData.length > 0) {
-              shopData = shopData[0]; // Take the first shop
-            } else if (Array.isArray(shopData) && shopData.length === 0) {
-              shopData = null;
-            } else {
-            }
-          } else {
-            const errorText = await shopRes.text();
-            shopData = null;
+        if (shopRes.ok) {
+          data = await shopRes.json();
+          if (Array.isArray(data) && data.length > 0) {
+            data = data[0];
+          } else if (Array.isArray(data) && data.length === 0) {
+            data = null;
           }
-        } catch (shopError) {
-          console.error("Error fetching shop data:", shopError);
-          shopData = null;
+        } else {
+          console.error("Shop fetch failed:", await shopRes.text());
         }
 
-        // ✅ Set shop data (could be null if no shop found)
-        setShopData(shopData);
-
-
-        // Get the actual shop ID from shop data
-        const shopId = shopData?._id;
-
-        // Fetch service requests for this shop
-        let requestsData = [];
-        try {
-          const requestsRes = await fetch(
-            `/api/service-request/shop/${loggedInUser._id}`
-          );
-
-          if (requestsRes.ok) {
-            requestsData = await requestsRes.json();
-          } else {
-            const errorText = await requestsRes.text();
-          }
-        } catch (error) {
-          console.error("Error fetching service requests:", error);
-        }
-
-        setAcceptedRequests(Array.isArray(requestsData) ? requestsData : []);
-
-        // Fetch all reviews
-        let allReviews = [];
-        try {
-          const reviewsRes = await fetch("/api/reviews");
-
-          if (reviewsRes.ok) {
-            allReviews = await reviewsRes.json();
-          } else {
-          }
-        } catch (error) {
-          console.error("Error fetching reviews:", error);
-        }
-
-        // Filter reviews by shop ID - FIXED: Use the actual shop ID from shop data
-        const shopReviews = allReviews.filter((review) => {
-          // Check if review belongs to this shop using shopId field
-          const matchesShop = shopId && review.shopId === shopId.toString();
-          // Also check if review belongs to user's shop via other possible fields
-          const matchesUserShop = review.shopId === loggedInUser._id;
-          const matchesService = review.serviceId === shopId;
-
-
-
-          return matchesShop || matchesUserShop || matchesService;
-        });
-
-        setRecentReviews(
-          Array.isArray(shopReviews) ? shopReviews.slice(-5).reverse() : []
-        );
-
-        // Calculate performance stats
-        const requestsArray = Array.isArray(requestsData) ? requestsData : [];
-        const completedRequests = requestsArray.filter(
-          (req) => req.status === "completed"
-        ).length;
-        const inProgressRequests = requestsArray.filter(
-          (req) => req.status === "in-progress"
-        ).length;
-        const pendingRequests = requestsArray.filter(
-          (req) =>
-            req.status === "pending" || req.status === "accepted" || !req.status
-        ).length;
-
-        // Calculate total earnings from completed requests
-        const totalEarnings = requestsArray
-          .filter((req) => req.status === "completed")
-          .reduce((sum, req) => {
-            const cost =
-              req.serviceDetails?.estimatedCost ||
-              req.estimatedCost ||
-              req.estimatedBudget?.split("-")[0]?.trim() ||
-              req.cost ||
-              0;
-            const costValue = parseFloat(cost) || 0;
-            return sum + costValue;
-          }, 0);
-
-        // Calculate completion rate
-        const totalRequests = requestsArray.length;
-        const completionRate =
-          totalRequests > 0 ? (completedRequests / totalRequests) * 100 : 0;
-
-        // Calculate average rating from reviews - FIXED: Use the filtered shop reviews
-        const shopReviewsArray = Array.isArray(shopReviews) ? shopReviews : [];
-        const totalRatings = shopReviewsArray.reduce((sum, review) => {
-          const rating = parseFloat(review.rating) || 0;
-          return sum + rating;
-        }, 0);
-        const averageRating =
-          shopReviewsArray.length > 0
-            ? totalRatings / shopReviewsArray.length
-            : 0;
-
-        const stats = {
-          completed: completedRequests,
-          inProgress: inProgressRequests,
-          pending: pendingRequests,
-          totalEarnings,
-          completionRate: completionRate.toFixed(1),
-          averageRating: averageRating.toFixed(1),
-          totalRequests,
-          totalReviews: shopReviewsArray.length,
-        };
-
-        setPerformanceStats(stats);
-
-        // Generate revenue data for chart
-        const monthlyRevenue = generateMonthlyRevenue(requestsArray);
-        setRevenueData(monthlyRevenue);
+        setShopData(data);
       } catch (error) {
-        console.error("Failed to fetch dashboard data:", error);
-        // Set default data on error
-        setPerformanceStats({
-          completed: 0,
-          inProgress: 0,
-          pending: 0,
-          totalEarnings: 0,
-          completionRate: 0,
-          averageRating: 0,
-          totalRequests: 0,
-          totalReviews: 0,
-        });
-        setRevenueData(generateMonthlyRevenue([]));
+        console.error("Error fetching shop data:", error);
         setShopData(null);
       } finally {
-        setLoading(false);
+        setShopLoading(false);
       }
     };
 
-    if (loggedInUser) {
-      fetchDashboardData();
-    }
+    fetchShopData();
   }, [loggedInUser]);
 
-  // Generate monthly revenue data from service requests
-  const generateMonthlyRevenue = (requests) => {
-    const months = [
-      "Jan",
-      "Feb",
-      "Mar",
-      "Apr",
-      "May",
-      "Jun",
-      "Jul",
-      "Aug",
-      "Sep",
-      "Oct",
-      "Nov",
-      "Dec",
-    ];
 
-    // If no requests, return empty data for all months
-    if (!requests || requests.length === 0) {
-      return months.map((month) => ({ month, revenue: 0 }));
-    }
+  useEffect(() => {
+    const fetchRequestsData = async () => {
+      if (!loggedInUser?._id) return;
 
-    const revenueByMonth = {};
+      setRequestsLoading(true);
+      try {
+        const requestsRes = await fetch(
+          `/api/service-request/shop/${loggedInUser._id}`
+        );
+        let data = [];
 
-    requests
+        if (requestsRes.ok) {
+          data = await requestsRes.json();
+        } else {
+          console.error("Requests fetch failed:", await requestsRes.text());
+        }
+
+        setAllRequests(Array.isArray(data) ? data : []);
+      } catch (error) {
+        console.error("Error fetching service requests:", error);
+        setAllRequests([]);
+      } finally {
+        setRequestsLoading(false);
+      }
+    };
+
+    fetchRequestsData();
+  }, [loggedInUser]);
+
+  useEffect(() => {
+    const fetchReviews = async () => {
+      setReviewsLoading(true);
+      try {
+        const reviewsRes = await fetch("/api/reviews");
+        let data = [];
+
+        if (reviewsRes.ok) {
+          data = await reviewsRes.json();
+        } else {
+          console.error("Reviews fetch failed:", await reviewsRes.text());
+        }
+
+        setAllReviews(Array.isArray(data) ? data : []);
+      } catch (error) {
+        console.error("Error fetching reviews:", error);
+        setAllReviews([]);
+      } finally {
+        setReviewsLoading(false);
+      }
+    };
+
+    fetchReviews();
+  }, []);
+
+
+  const shopReviews = useMemo(() => {
+    const shopId = shopData?._id;
+    if (!shopId || allReviews.length === 0) return [];
+
+    return allReviews.filter((review) => {
+      const matchesShop = review.shopId === shopId.toString();
+      const matchesUserShop = review.shopId === loggedInUser._id;
+      const matchesService = review.serviceId === shopId;
+
+      return matchesShop || matchesUserShop || matchesService;
+    });
+  }, [allReviews, shopData, loggedInUser?._id]);
+
+  const performanceStats = useMemo(() => {
+    const requestsArray = allRequests;
+    const shopReviewsArray = shopReviews;
+
+    const completedRequests = requestsArray.filter(
+      (req) => req.status === "completed"
+    ).length;
+    const inProgressRequests = requestsArray.filter(
+      (req) => req.status === "in-progress"
+    ).length;
+    const pendingRequests = requestsArray.filter(
+      (req) =>
+        req.status === "pending" || req.status === "accepted" || !req.status
+    ).length;
+
+    const totalEarnings = requestsArray
       .filter((req) => req.status === "completed")
-      .forEach((req) => {
-        const date =
-          req.updatedAt || req.createdAt || req.requestedDate || new Date();
-        const month = new Date(date).getMonth();
-        const monthName = months[month];
+      .reduce((sum, req) => {
         const cost =
           req.serviceDetails?.estimatedCost ||
           req.estimatedCost ||
           req.estimatedBudget?.split("-")[0]?.trim() ||
           req.cost ||
           0;
-        revenueByMonth[monthName] =
-          (revenueByMonth[monthName] || 0) + (parseFloat(cost) || 0);
-      });
+        const costValue = parseFloat(cost) || 0;
+        return sum + costValue;
+      }, 0);
 
-    return months.map((month) => ({
-      month,
-      revenue: revenueByMonth[month] || 0,
-    }));
-  };
+    const totalRequests = requestsArray.length;
+    const completionRate =
+      totalRequests > 0 ? (completedRequests / totalRequests) * 100 : 0;
 
-  // Platform metrics for mechanic dashboard
-  const mechanicMetrics = [
-    {
-      id: 1,
-      title: "Completed Jobs",
-      value: loading ? "…" : performanceStats.completed || 0,
-      change: "+12%",
-      trend: "up",
-      icon: CheckCircle,
-      color: "green",
-    },
-    {
-      id: 2,
-      title: "In Progress",
-      value: loading ? "…" : performanceStats.inProgress || 0,
-      change: "+3",
-      trend: "up",
-      icon: Clock,
-      color: "blue",
-    },
-    {
-      id: 3,
-      title: "Pending Requests",
-      value: loading ? "…" : performanceStats.pending || 0,
-      change: "-2",
-      trend: "down",
-      icon: AlertTriangle,
-      color: "yellow",
-    },
-    {
-      id: 4,
-      title: "Total Revenue",
-      value: loading
-        ? "…"
-        : `$${performanceStats.totalEarnings?.toLocaleString() || 0}`,
-      change: "+18%",
-      trend: "up",
-      icon: DollarSign,
-      color: "emerald",
-    },
-    {
-      id: 5,
-      title: "Completion Rate",
-      value: loading ? "…" : `${performanceStats.completionRate || 0}%`,
-      change: "+5%",
-      trend: "up",
-      icon: Star,
-      color: "purple",
-    },
-    {
-      id: 6,
-      title: "Shop Rating",
-      value: loading
-        ? "…"
-        : performanceStats.averageRating > 0
-        ? performanceStats.averageRating
-        : "0.0",
-      change: "+0.3",
-      trend: "up",
-      icon: Star,
-      color: "orange",
-    },
-  ];
+    const totalRatings = shopReviewsArray.reduce((sum, review) => {
+      const rating = parseFloat(review.rating) || 0;
+      return sum + rating;
+    }, 0);
+    const averageRating =
+      shopReviewsArray.length > 0 ? totalRatings / shopReviewsArray.length : 0;
 
-  // Service type breakdown for assigned requests
-  const serviceTypeBreakdown = acceptedRequests.reduce((acc, req) => {
+    return {
+      completed: completedRequests,
+      inProgress: inProgressRequests,
+      pending: pendingRequests,
+      totalEarnings,
+      completionRate: completionRate.toFixed(1),
+      averageRating: averageRating.toFixed(1),
+      totalRequests,
+      totalReviews: shopReviewsArray.length,
+    };
+  }, [allRequests, shopReviews]);
+
+  const revenueData = useMemo(() => {
+    return generateMonthlyRevenue(allRequests);
+  }, [allRequests]);
+
+  // 🔥 CHANGE APPLIED HERE: Using allRequests for service breakdown and activity
+  const allServiceRequests = useMemo(() => allRequests, [allRequests]);
+
+  const recentReviews = useMemo(() => shopReviews.slice(-5).reverse(), [shopReviews]);
+
+  // Dependent on allServiceRequests (which is now allRequests)
+  const serviceTypeBreakdown = useMemo(() => allServiceRequests.reduce((acc, req) => {
     const type = req.deviceType || req.problemCategory || "Other";
     acc[type] = (acc[type] || 0) + 1;
     return acc;
-  }, {});
+  }, {}), [allServiceRequests]);
 
-  const serviceTypeData = Object.entries(serviceTypeBreakdown).map(
+  const serviceTypeData = useMemo(() => Object.entries(serviceTypeBreakdown).map(
     ([name, value]) => ({
       name,
       value,
     })
-  );
+  ), [serviceTypeBreakdown]);
 
-  // Recent activity data
-  const recentActivity = acceptedRequests
+  // Dependent on allServiceRequests (which is now allRequests)
+  const recentActivity = useMemo(() => allServiceRequests
     .slice(-5)
     .reverse()
     .map((request) => ({
@@ -360,45 +284,97 @@ const MechanicDashboardOverview = () => {
       status: request.status || "pending",
       date: new Date(
         request.updatedAt ||
-          request.createdAt ||
-          request.requestedDate ||
-          Date.now()
+        request.createdAt ||
+        request.requestedDate ||
+        Date.now()
       ).toLocaleDateString(),
       urgency: request.serviceDetails?.urgency || "medium",
-    }));
+    })), [allServiceRequests]);
 
-  // Status colors
+  const fullLoading = shopLoading || requestsLoading || reviewsLoading;
+
+
+  const mechanicMetrics = [
+    {
+      id: 1,
+      title: "Completed Jobs",
+      value: fullLoading ? (<Loader2 className="animate-spin" />) : performanceStats.completed || 0,
+      icon: CheckCircle,
+      color: "green",
+    },
+    {
+      id: 2,
+      title: "In Progress",
+      value: fullLoading ? (<Loader2 className="animate-spin" />) : performanceStats.inProgress || 0,
+      icon: Clock,
+      color: "blue",
+    },
+    {
+      id: 3,
+      title: "Pending Requests",
+      value: fullLoading ? (<Loader2 className="animate-spin" />) : performanceStats.pending || 0,
+      icon: AlertTriangle,
+      color: "yellow",
+    },
+    {
+      id: 4,
+      title: "Total Revenue",
+      value: fullLoading
+        ? (<Loader2 className="animate-spin" />)
+        : `$${performanceStats.totalEarnings?.toLocaleString() || 0}`,
+      icon: DollarSign,
+      color: "emerald",
+    },
+    {
+      id: 5,
+      title: "Completion Rate",
+      value: fullLoading ? (<Loader2 className="animate-spin" />) : `${performanceStats.completionRate || 0}%`,
+      icon: Star,
+      color: "purple",
+    },
+    {
+      id: 6,
+      title: "Shop Rating",
+      value: fullLoading
+        ? (<Loader2 className="animate-spin" />)
+        : performanceStats.averageRating > 0
+          ? performanceStats.averageRating
+          : "0.0",
+      icon: Star,
+      color: "orange",
+    },
+  ];
+
   const statusColors = {
-    completed: "bg-green-100 text-green-600",
-    "in-progress": "bg-blue-100 text-blue-600",
-    pending: "bg-yellow-100 text-yellow-600",
-    accepted: "bg-purple-100 text-purple-600",
-    cancelled: "bg-red-100 text-red-600",
+    completed: "bg-success/20 text-success",
+    "in-progress": "bg-info/20 text-info",
+    pending: "bg-warning/20 text-warning",
+    accepted: "bg-primary/20 text-primary",
+    cancelled: "bg-error/20 text-error",
   };
 
-  // Urgency colors
   const urgencyColors = {
-    emergency: "bg-red-500",
-    high: "bg-orange-500",
-    medium: "bg-yellow-500",
-    low: "bg-green-500",
+    emergency: "bg-error",
+    high: "bg-primary",
+    medium: "bg-warning",
+    low: "bg-success",
   };
 
   const colorMap = {
     orange: {
-      bg: "bg-orange-500/15",
-      hoverBg: "group-hover:bg-orange-500/25",
-      text: "text-orange-500",
+      bg: "bg-primary/15",
+      hoverBg: "group-hover:bg-primary/25",
+      text: "text-primary",
     },
     blue: {
-      bg: "bg-blue-500/15",
-      hoverBg: "group-hover:bg-blue-500/25",
-      text: "text-blue-500",
+      bg: "bg-info/15",
+      hoverBg: "group-hover:bg-info/25",
+      text: "text-info",
     },
     green: {
-      bg: "bg-green-500/15",
-      hoverBg: "group-hover:bg-green-500/25",
-      text: "text-green-500",
+      bg: "bg-success/15",
+      hoverBg: "group-hover:bg-success/25",
+      text: "text-success",
     },
     purple: {
       bg: "bg-purple-500/15",
@@ -411,13 +387,12 @@ const MechanicDashboardOverview = () => {
       text: "text-emerald-500",
     },
     yellow: {
-      bg: "bg-yellow-500/15",
-      hoverBg: "group-hover:bg-yellow-500/25",
-      text: "text-yellow-500",
+      bg: "bg-warning/15",
+      hoverBg: "group-hover:bg-warning/25",
+      text: "text-warning",
     },
   };
 
-  // Chart colors
   const COLORS = [
     "#EA580C",
     "#22C55E",
@@ -427,7 +402,6 @@ const MechanicDashboardOverview = () => {
     "#9333EA",
   ];
 
-  // Custom label for pie chart
   const renderCustomizedLabel = ({
     cx,
     cy,
@@ -456,13 +430,11 @@ const MechanicDashboardOverview = () => {
     );
   };
 
-  // Stat Card Component
   const StatCard = ({
     icon: Icon,
     value,
     label,
     change,
-    trend,
     color = "orange",
   }) => {
     const { bg, hoverBg, text } = colorMap[color] || colorMap.orange;
@@ -475,15 +447,6 @@ const MechanicDashboardOverview = () => {
           >
             <Icon className={`${text}`} size={24} />
           </div>
-          <span
-            className={`px-2 py-1 rounded-full text-xs font-bold ${
-              trend === "up"
-                ? "bg-green-100 text-green-600"
-                : "bg-red-100 text-red-600"
-            }`}
-          >
-            {trend === "up" ? "↑" : "↓"} {change}
-          </span>
         </div>
         <p className={`text-3xl font-bold ${text} mb-1`}>{value}</p>
         <p className="text-base-content/60 text-sm font-medium">{label}</p>
@@ -491,20 +454,9 @@ const MechanicDashboardOverview = () => {
     );
   };
 
-  // Loading and Auth Check
-  if (userLoading) {
+  if (userLoading || !loggedInUser) {
     return (
-      <div className="flex items-center justify-center h-full w-full bg-base-200">
-        <span className="loading loading-bars loading-xl text-orange-500"></span>
-      </div>
-    );
-  }
-
-  if (!loggedInUser) {
-    return (
-      <div className="flex items-center justify-center h-full w-full bg-base-200">
-        <span className="loading loading-bars loading-xl text-orange-500"></span>
-      </div>
+      <Loader />
     );
   }
 
@@ -527,9 +479,11 @@ const MechanicDashboardOverview = () => {
                   {loggedInUser.name}
                 </span>
               </p>
-              <p className="text-orange-200 text-sm mt-1">
-                {shopData?.shop?.shopName || "Your Shop"}
-              </p>
+              <Link href={`/services/${shopData?._id}`}>
+                <button className="text-orange-200 text-sm mt-1 py-1 px-2 rounded-lg bg-secondary/50 cursor-pointer hover:scale-105 transition duration-300">
+                  {shopData?.shop?.shopName || "Your Shop"}
+                </button>
+              </Link>
             </div>
           </div>
           <div className="flex flex-wrap gap-4">
@@ -564,7 +518,6 @@ const MechanicDashboardOverview = () => {
             value={metric.value}
             label={metric.title}
             change={metric.change}
-            trend={metric.trend}
             color={metric.color}
           />
         ))}
@@ -577,28 +530,34 @@ const MechanicDashboardOverview = () => {
           <h2 className="text-xl md:text-2xl font-bold text-base-content mb-8">
             Monthly Revenue
           </h2>
-          <ResponsiveContainer width="100%" height={300}>
-            <BarChart
-              data={revenueData}
-              margin={{ top: 5, right: 20, left: 10, bottom: 5 }}
-            >
-              <CartesianGrid
-                strokeDasharray="3 3"
-                stroke="var(--color-neutral)"
-              />
-              <XAxis dataKey="month" stroke="var(--color-base-content)" />
-              <YAxis stroke="var(--color-base-content)" />
-              <Tooltip
-                contentStyle={{
-                  backgroundColor: "var(--color-base-100)",
-                  border: "1px solid var(--color-neutral)",
-                  borderRadius: "8px",
-                }}
-                formatter={(value) => [`$${value}`, "Revenue"]}
-              />
-              <Bar dataKey="revenue" fill="#EA580C" radius={[4, 4, 0, 0]} />
-            </BarChart>
-          </ResponsiveContainer>
+          {fullLoading ? (
+            <div className="h-[300px] flex items-center justify-center">
+              <span className="loading loading-bars loading-lg text-primary"></span>
+            </div>
+          ) : (
+            <ResponsiveContainer width="100%" height={300}>
+              <BarChart
+                data={revenueData}
+                margin={{ top: 5, right: 20, left: 10, bottom: 5 }}
+              >
+                <CartesianGrid
+                  strokeDasharray="3 3"
+                  stroke="var(--color-neutral)"
+                />
+                <XAxis dataKey="month" stroke="var(--color-base-content)" />
+                <YAxis stroke="var(--color-base-content)" />
+                <Tooltip
+                  contentStyle={{
+                    backgroundColor: "var(--color-base-100)",
+                    border: "1px solid var(--color-neutral)",
+                    borderRadius: "8px",
+                  }}
+                  formatter={(value) => [`$${value}`, "Revenue"]}
+                />
+                <Bar dataKey="revenue" fill="#EA580C" radius={[4, 4, 0, 0]} />
+              </BarChart>
+            </ResponsiveContainer>
+          )}
         </div>
 
         {/* Service Type Breakdown */}
@@ -606,47 +565,53 @@ const MechanicDashboardOverview = () => {
           <h2 className="text-xl md:text-2xl font-bold text-base-content mb-8">
             Service Types
           </h2>
-          <ResponsiveContainer width="100%" height={300}>
-            <PieChart>
-              <Pie
-                data={
-                  serviceTypeData.length > 0
-                    ? serviceTypeData
-                    : [{ name: "No Data", value: 1 }]
-                }
-                dataKey="value"
-                nameKey="name"
-                cx="50%"
-                cy="50%"
-                outerRadius={100}
-                label={renderCustomizedLabel}
-                labelLine={false}
-              >
-                {serviceTypeData.map((entry, index) => (
-                  <Cell
-                    key={`cell-${index}`}
-                    fill={COLORS[index % COLORS.length]}
-                  />
-                ))}
-                {serviceTypeData.length === 0 && (
-                  <Cell key="cell-0" fill="#94a3b8" />
-                )}
-              </Pie>
-              <Tooltip
-                contentStyle={{
-                  backgroundColor: "var(--color-base-100)",
-                  border: "1px solid var(--color-neutral)",
-                  borderRadius: "8px",
-                }}
-              />
-              <Legend
-                layout="horizontal"
-                verticalAlign="bottom"
-                align="center"
-                wrapperStyle={{ paddingTop: "10px" }}
-              />
-            </PieChart>
-          </ResponsiveContainer>
+          {fullLoading ? (
+            <div className="h-[300px] flex items-center justify-center">
+              <span className="loading loading-bars loading-lg text-primary"></span>
+            </div>
+          ) : (
+            <ResponsiveContainer width="100%" height={300}>
+              <PieChart>
+                <Pie
+                  data={
+                    serviceTypeData.length > 0
+                      ? serviceTypeData
+                      : [{ name: "No Data", value: 1 }]
+                  }
+                  dataKey="value"
+                  nameKey="name"
+                  cx="50%"
+                  cy="50%"
+                  outerRadius={100}
+                  label={serviceTypeData.length > 0 ? renderCustomizedLabel : false}
+                  labelLine={false}
+                >
+                  {serviceTypeData.map((entry, index) => (
+                    <Cell
+                      key={`cell-${index}`}
+                      fill={COLORS[index % COLORS.length]}
+                    />
+                  ))}
+                  {serviceTypeData.length === 0 && (
+                    <Cell key="cell-0" fill="#94a3b8" />
+                  )}
+                </Pie>
+                <Tooltip
+                  contentStyle={{
+                    backgroundColor: "var(--color-base-100)",
+                    border: "1px solid var(--color-neutral)",
+                    borderRadius: "8px",
+                  }}
+                />
+                <Legend
+                  layout="horizontal"
+                  verticalAlign="bottom"
+                  align="center"
+                  wrapperStyle={{ paddingTop: "10px" }}
+                />
+              </PieChart>
+            </ResponsiveContainer>
+          )}
         </div>
       </div>
 
@@ -661,7 +626,7 @@ const MechanicDashboardOverview = () => {
             <Eye className="text-primary" size={24} />
           </div>
           <div className="space-y-4">
-            {loading ? (
+            {fullLoading ? (
               <div className="text-center py-8">
                 <span className="loading loading-bars loading-md text-primary"></span>
               </div>
@@ -673,9 +638,8 @@ const MechanicDashboardOverview = () => {
                 >
                   <div className="flex items-center gap-4 flex-1">
                     <div
-                      className={`w-3 h-3 rounded-full ${
-                        urgencyColors[activity.urgency] || "bg-gray-500"
-                      }`}
+                      className={`w-3 h-3 rounded-full ${urgencyColors[activity.urgency] || "bg-gray-500"
+                        }`}
                     ></div>
                     <div className="flex-1 min-w-0">
                       <p className="font-semibold text-base-content truncate">
@@ -688,10 +652,9 @@ const MechanicDashboardOverview = () => {
                   </div>
                   <div className="flex items-center gap-4">
                     <span
-                      className={`px-3 py-1 rounded-full text-xs font-bold ${
-                        statusColors[activity.status] ||
+                      className={`px-3 py-1 rounded-full text-xs font-bold ${statusColors[activity.status] ||
                         "bg-gray-100 text-gray-600"
-                      }`}
+                        }`}
                     >
                       {activity.status.replace("-", " ")}
                     </span>
@@ -718,7 +681,7 @@ const MechanicDashboardOverview = () => {
             <Star className="text-primary" size={24} />
           </div>
           <div className="space-y-4">
-            {loading ? (
+            {fullLoading ? (
               <div className="text-center py-8">
                 <span className="loading loading-bars loading-md text-primary"></span>
               </div>
@@ -758,7 +721,7 @@ const MechanicDashboardOverview = () => {
               ))
             ) : (
               <div className="text-center py-8 text-base-content/70">
-                No recent reviews
+                No recent reviews for your shop
               </div>
             )}
           </div>
@@ -771,71 +734,30 @@ const MechanicDashboardOverview = () => {
           Quick Actions
         </h2>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <button className="flex items-center justify-center gap-2 p-4 bg-primary text-primary-content rounded-xl text-xs md:text-sm font-semibold transition-all duration-300 hover:bg-orange-700 hover:shadow-lg transform hover:scale-[1.03]">
-            <Wrench size={20} />
-            <span>Manage Jobs</span>
-          </button>
-          <button className="flex items-center justify-center gap-2 p-4 bg-base-200 text-base-content rounded-xl text-xs md:text-sm font-semibold border border-base-300 transition-all duration-300 hover:bg-base-300 hover:shadow-lg transform hover:scale-[1.03]">
-            <Settings size={20} className="text-primary" />
-            <span>Shop Settings</span>
-          </button>
-          <button className="flex items-center justify-center gap-2 p-4 bg-base-200 text-base-content rounded-xl text-xs md:text-sm font-semibold border border-base-300 transition-all duration-300 hover:bg-base-300 hover:shadow-lg transform hover:scale-[1.03]">
-            <BarChart3 size={20} className="text-primary" />
-            <span>Performance</span>
-          </button>
-          <button className="flex items-center justify-center gap-2 p-4 bg-primary text-primary-content rounded-xl text-xs md:text-sm font-semibold transition-all duration-300 hover:bg-orange-700 hover:shadow-lg transform hover:scale-[1.03]">
-            <FileText size={20} />
-            <span>Reports</span>
-          </button>
-        </div>
-      </div>
-
-      {/* Shop Information */}
-      <div className="bg-base-100 rounded-3xl p-6 md:p-8 border border-neutral shadow-xl transition-all duration-300 hover:shadow-2xl">
-        <h2 className="text-xl sm:text-2xl font-bold text-base-content mb-6">
-          Shop Information
-        </h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          <div className="space-y-2">
-            <h3 className="font-semibold text-base-content/70 text-sm">
-              Shop Name
-            </h3>
-            <p className="text-base-content font-medium">
-              {shopData?.shop?.shopName || "N/A"}
-            </p>
-          </div>
-          <div className="space-y-2">
-            <h3 className="font-semibold text-base-content/70 text-sm">
-              Contact Email
-            </h3>
-            <p className="text-base-content font-medium">
-              {shopData?.shop?.contact?.businessEmail || "N/A"}
-            </p>
-          </div>
-          <div className="space-y-2">
-            <h3 className="font-semibold text-base-content/70 text-sm">
-              Phone
-            </h3>
-            <p className="text-base-content font-medium">
-              {shopData?.shop?.contact?.phone || "N/A"}
-            </p>
-          </div>
-          <div className="space-y-2">
-            <h3 className="font-semibold text-base-content/70 text-sm">
-              Status
-            </h3>
-            <span
-              className={`px-3 py-1 rounded-full text-xs font-bold ${
-                shopData?.status === "approved"
-                  ? "bg-green-100 text-green-600"
-                  : shopData?.status === "rejected"
-                  ? "bg-red-100 text-red-600"
-                  : "bg-yellow-100 text-yellow-600"
-              }`}
-            >
-              {shopData?.status || "pending"}
-            </span>
-          </div>
+          <Link href={'mechanic/requests'}>
+            <button className="flex items-center w-full justify-center gap-2 p-4 bg-primary text-primary-content rounded-xl text-xs md:text-sm font-semibold transition-all duration-300 hover:bg-orange-700 hover:shadow-lg transform hover:scale-[1.03]">
+              <Wrench size={20} />
+              <span>Manage requests</span>
+            </button>
+          </Link>
+          <Link href={'mechanic/settings'}>
+            <button className="flex w-full items-center justify-center gap-2 p-4 bg-base-200 text-base-content rounded-xl text-xs md:text-sm font-semibold border border-base-300 transition-all duration-300 hover:bg-base-300 hover:shadow-lg transform hover:scale-[1.03]">
+              <Settings size={20} className="text-primary" />
+              <span>Shop Settings</span>
+            </button>
+          </Link>
+          <Link href={'mechanic/advertise'}>
+            <button className="flex w-full items-center justify-center gap-2 p-4 bg-base-200 text-base-content rounded-xl text-xs md:text-sm font-semibold border border-base-300 transition-all duration-300 hover:bg-base-300 hover:shadow-lg transform hover:scale-[1.03]">
+              <Radio size={20} className="text-primary" />
+              <span>Advertise</span>
+            </button>
+          </Link>
+          <Link href={'mechanic/AskAI'}>
+            <button className="flex w-full items-center justify-center gap-2 p-4 bg-primary text-primary-content rounded-xl text-xs md:text-sm font-semibold transition-all duration-300 hover:bg-orange-700 hover:shadow-lg transform hover:scale-[1.03]">
+              <BrainCircuit size={20} />
+              <span>Ask AI</span>
+            </button>
+          </Link>
         </div>
       </div>
     </div>
