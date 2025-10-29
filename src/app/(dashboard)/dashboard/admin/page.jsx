@@ -1,26 +1,41 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { Users, Store, Wrench, UserCheck, DollarSign, Star, Shield, Crown, Calendar, Eye, FileText, Settings, BarChart3 } from "lucide-react";
+import { Users, Store, Wrench, UserCheck, Star, Shield, Crown, Calendar, Eye, FileText, Settings, BarChart3, DollarSign } from "lucide-react";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, PieChart, Pie, Cell, ResponsiveContainer, Legend } from "recharts";
 import useUser from "@/hooks/useUser";
+import Link from "next/link";
 
 const AdminDashboardOverview = () => {
-    // Custom useUser hook is assumed to be defined elsewhere
     const { user: loggedInUser, loading: userLoading } = useUser();
     const [loading, setLoading] = useState(true);
-    // Initialize data structures to match expected object structure
+    const [dashboardData, setDashboardData] = useState({
+        users: 0,
+        mechanicShops: 0,
+        serviceRequests: 0,
+        averageRating: 0,
+        totalMechanic: 0
+    });
     const [totalData, setTotalData] = useState({ result: [] });
     const [totalShop, setTotalShop] = useState({ result: [] });
     const [recentSignups, setRecentSignups] = useState([]);
-    const [userData, setUserData] = useState([]);
     const [totalReviews, setTotalReviews] = useState([]);
+    const [paymentData, setPaymentData] = useState({ payments: [], totalAmount: 0 });
 
     useEffect(() => {
         // --- Data Fetching Functions ---
+        const fetchDashboardStats = async () => {
+            try {
+                const res = await fetch("/api/countCollection");
+                const data = await res.json();
+                setDashboardData(data || {});
+            } catch (err) {
+                console.error("Failed to fetch dashboard stats:", err);
+            }
+        };
+
         const fetchUsers = async () => {
             try {
-                // Fetch recent signups (limit 5)
                 const res = await fetch("/api/users/dashboardUser?overview=true");
                 const data = await res.json();
                 setRecentSignups(data || []);
@@ -29,14 +44,13 @@ const AdminDashboardOverview = () => {
             }
         };
 
-        const fetchAllUsers = async () => {
+        const fetchPayments = async () => {
             try {
-                // Fetch all users for total count
-                const res = await fetch("/api/users/dashboardUser");
+                const res = await fetch("/api/payment");
                 const data = await res.json();
-                setUserData(data || []);
+                setPaymentData(data);
             } catch (err) {
-                console.error("Failed to fetch all users:", err);
+                console.error("Failed to fetch payments:", err);
             }
         };
 
@@ -45,8 +59,9 @@ const AdminDashboardOverview = () => {
             try {
                 // Fetch all necessary data in parallel
                 await Promise.all([
+                    fetchDashboardStats(),
                     fetchUsers(),
-                    fetchAllUsers(),
+                    fetchPayments(),
                     fetch("/api/service-request").then(res => res.json()).then(data => setTotalData(data)),
                     fetch("/api/shops").then(res => res.json()).then(data => setTotalShop(data)),
                     fetch("/api/reviews").then(res => res.json()).then(data => setTotalReviews(data))
@@ -82,6 +97,45 @@ const AdminDashboardOverview = () => {
     const { result: requests = [] } = totalData;
     const { result: shops = [] } = totalShop;
     const reviews = totalReviews;
+    const { payments = [], totalAmount = 0 } = paymentData;
+
+    // Process payment data for dynamic chart
+    const processPaymentTrends = () => {
+        if (!payments.length) return [];
+
+        // Group payments by month and calculate total amount per month
+        const monthlyData = payments.reduce((acc, payment) => {
+            if (!payment.paymentDate) return acc;
+            
+            const date = new Date(payment.paymentDate);
+            const monthYear = date.toLocaleDateString('en-US', { 
+                month: 'short', 
+                year: 'numeric' 
+            });
+            
+            const amount = parseFloat(payment.amount) || 0;
+            
+            if (!acc[monthYear]) {
+                acc[monthYear] = { month: monthYear, amount: 0, payments: 0 };
+            }
+            
+            acc[monthYear].amount += amount;
+            acc[monthYear].payments += 1;
+            
+            return acc;
+        }, {});
+
+        // Convert to array and sort by date
+        return Object.values(monthlyData)
+            .sort((a, b) => {
+                const dateA = new Date(a.month);
+                const dateB = new Date(b.month);
+                return dateA - dateB;
+            })
+            .slice(-6); // Show last 6 months
+    };
+
+    const paymentTrends = processPaymentTrends();
 
     // Recent Service Requests (last 5)
     const recentServiceReq = requests.slice(-5).reverse().map((service) => ({
@@ -97,32 +151,11 @@ const AdminDashboardOverview = () => {
         date: new Date(s.shop?.createdAt || Date.now()).toLocaleDateString(),
     }));
 
-    // Calculate total mechanics
-    const calculateTotalMechanics = (shopsArray) => {
-        if (!shopsArray || !Array.isArray(shopsArray)) return 0;
-        return shopsArray.reduce((total, shop) => {
-            const count = shop.shop?.mechanicCount || 0;
-            return total + count;
-        }, 0);
-    };
-    const totalMechanics = calculateTotalMechanics(shops);
-
-    // Calculate total Ratings and Average Ratings
-    const calculateTotalRatings = (reviewsArray) => {
-        if (!reviewsArray || !Array.isArray(reviewsArray)) return 0;
-        return reviewsArray.reduce((total, review) => {
-            const count = review.rating || 0;
-            return total + count;
-        }, 0);
-    };
-    const totalRatings = calculateTotalRatings(totalReviews);
-    const averageRatings = (reviews.length > 0 ? totalRatings / reviews.length : 0).toFixed(1);
-
     const platformMetrics = [
         {
             id: 1,
             title: "Total Users",
-            value: loading ? "…" : userData.length,
+            value: loading ? "…" : dashboardData.users || 0,
             change: "+12%",
             trend: "up",
             icon: Users,
@@ -131,7 +164,7 @@ const AdminDashboardOverview = () => {
         {
             id: 2,
             title: "Mechanic Shops",
-            value: loading ? "…" : shops.length,
+            value: loading ? "…" : dashboardData.mechanicShops || 0,
             change: "+8%",
             trend: "up",
             icon: Store,
@@ -140,7 +173,7 @@ const AdminDashboardOverview = () => {
         {
             id: 3,
             title: "Service Requests",
-            value: loading ? "…" : requests.length,
+            value: loading ? "…" : dashboardData.serviceRequests || 0,
             change: "+15%",
             trend: "up",
             icon: Wrench,
@@ -149,7 +182,7 @@ const AdminDashboardOverview = () => {
         {
             id: 4,
             title: "Active Mechanics",
-            value: loading ? "…" : totalMechanics,
+            value: loading ? "…" : dashboardData.totalMechanic || 0,
             change: "+5%",
             trend: "up",
             icon: UserCheck,
@@ -157,8 +190,8 @@ const AdminDashboardOverview = () => {
         },
         {
             id: 5,
-            title: "Revenue",
-            value: "$24,580",
+            title: "Total Revenue",
+            value: loading ? "…" : `$${totalAmount.toLocaleString()}`,
             change: "+18%",
             trend: "up",
             icon: DollarSign,
@@ -167,22 +200,12 @@ const AdminDashboardOverview = () => {
         {
             id: 6,
             title: "Avg. Rating",
-            value: loading ? "…" : averageRatings,
+            value: loading ? "…" : dashboardData.averageRating || 0,
             change: "+0.2",
             trend: "up",
             icon: Star,
             color: "yellow",
         },
-    ];
-
-    // Service Trends Data (Static for chart example)
-    const serviceTrends = [
-        { month: "Jan", requests: 200 },
-        { month: "Feb", requests: 240 },
-        { month: "Mar", requests: 300 },
-        { month: "Apr", requests: 270 },
-        { month: "May", requests: 350 },
-        { month: "Jun", requests: 400 },
     ];
 
     // Service Type Breakdown Data
@@ -247,6 +270,24 @@ const AdminDashboardOverview = () => {
         );
     };
 
+    // Custom tooltip for payment trends
+    const CustomTooltip = ({ active, payload, label }) => {
+        if (active && payload && payload.length) {
+            return (
+                <div className="bg-base-100 p-4 border border-neutral rounded-lg shadow-lg">
+                    <p className="font-bold text-base-content">{label}</p>
+                    <p className="text-green-600">
+                        Amount: <span className="font-bold">${payload[0].value.toLocaleString()}</span>
+                    </p>
+                    <p className="text-blue-600">
+                        Payments: <span className="font-bold">{payload[0].payload.payments}</span>
+                    </p>
+                </div>
+            );
+        }
+        return null;
+    };
+
     // --- Main Component Render ---
     return (
         <div className="min-h-screen p-4 md:p-8 bg-base-200 space-y-8">
@@ -292,21 +333,22 @@ const AdminDashboardOverview = () => {
 
             {/* Charts - Uniform Card Style */}
             <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
-                {/* Line Chart */}
+                {/* Dynamic Payment Trends Chart */}
                 <div className="xl:col-span-2 bg-base-100 rounded-3xl p-6 md:p-8 border border-neutral shadow-xl transition-all duration-300 hover:shadow-2xl">
-                    <h2 className="text-xl md:text-2xl font-bold text-base-content mb-8">Service Requests Trend</h2>
+                    <h2 className="text-xl md:text-2xl font-bold text-base-content mb-8">Revenue Trends</h2>
                     <ResponsiveContainer width="100%" height={300}>
-                        <LineChart data={serviceTrends} margin={{ top: 5, right: 20, left: 10, bottom: 5 }}>
+                        <LineChart data={paymentTrends} margin={{ top: 5, right: 20, left: 10, bottom: 5 }}>
                             <CartesianGrid strokeDasharray="3 3" stroke="var(--color-neutral)" />
                             <XAxis dataKey="month" stroke="var(--color-base-content)" />
                             <YAxis stroke="var(--color-base-content)" />
-                            <Tooltip contentStyle={{ backgroundColor: 'var(--color-base-100)', border: '1px solid var(--color-neutral)', borderRadius: '8px' }} />
+                            <Tooltip content={<CustomTooltip />} />
                             <Line
                                 type="monotone"
-                                dataKey="requests"
-                                stroke="#EA580C"
+                                dataKey="amount"
+                                stroke="#22C55E"
                                 strokeWidth={3}
-                                dot={{ fill: '#EA580C', r: 4 }}
+                                dot={{ fill: '#22C55E', r: 4 }}
+                                name="Revenue"
                             />
                         </LineChart>
                     </ResponsiveContainer>
@@ -435,21 +477,29 @@ const AdminDashboardOverview = () => {
             <div className="bg-base-100 rounded-3xl p-6 md:p-8 border border-neutral shadow-xl transition-all duration-300 hover:shadow-2xl">
                 <h2 className="text-xl sm:text-2xl font-bold text-base-content mb-6">Quick Actions</h2>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                    <button className="flex items-center justify-center gap-2 p-4 bg-primary text-primary-content rounded-xl text-xs md:text-sm font-semibold transition-all duration-300 hover:bg-orange-700 hover:shadow-lg transform hover:scale-[1.03]">
-                        <UserCheck size={20} />
+                    <button >
+                        <Link className="flex items-center justify-center gap-2 p-4 bg-base-200 text-base-content rounded-xl text-xs md:text-sm font-semibold border border-base-300 transition-all duration-300 hover:bg-base-300 hover:shadow-lg transform hover:scale-[1.03]" href={"/dashboard/admin/manageUsers"}>
+                        <UserCheck size={20} className="text-primary"/>
                         <span>User Management</span>
+                        </Link>
                     </button>
-                    <button className="flex items-center justify-center gap-2 p-4 bg-base-200 text-base-content rounded-xl text-xs md:text-sm font-semibold border border-base-300 transition-all duration-300 hover:bg-base-300 hover:shadow-lg transform hover:scale-[1.03]">
+                    <button>
+                        <Link className="flex items-center justify-center gap-2 p-4 bg-base-200 text-base-content rounded-xl text-xs md:text-sm font-semibold border border-base-300 transition-all duration-300 hover:bg-base-300 hover:shadow-lg transform hover:scale-[1.03]" href={"/dashboard/admin/settings"}>
                         <Settings size={20} className="text-primary" />
                         <span>System Settings</span>
+                        </Link>
                     </button>
-                    <button className="flex items-center justify-center gap-2 p-4 bg-base-200 text-base-content rounded-xl text-xs md:text-sm font-semibold border border-base-300 transition-all duration-300 hover:bg-base-300 hover:shadow-lg transform hover:scale-[1.03]">
+                    <button >
+                        <Link href={"/dashboard/admin/revenue"} className="flex items-center justify-center gap-2 p-4 bg-base-200 text-base-content rounded-xl text-xs md:text-sm font-semibold border border-base-300 transition-all duration-300 hover:bg-base-300 hover:shadow-lg transform hover:scale-[1.03]">
                         <BarChart3 size={20} className="text-primary" />
-                        <span>Analytics</span>
+                        <span>Revenue Reports</span>
+                        </Link>
                     </button>
-                    <button className="flex items-center justify-center gap-2 p-4 bg-primary text-primary-content rounded-xl text-xs md:text-sm font-semibold transition-all duration-300 hover:bg-orange-700 hover:shadow-lg transform hover:scale-[1.03]">
-                        <FileText size={20} />
-                        <span>Reports</span>
+                    <button>
+                        <Link className="flex items-center justify-center gap-2 p-4 bg-base-200 text-base-content rounded-xl text-xs md:text-sm font-semibold border border-base-300 transition-all duration-300 hover:bg-base-300 hover:shadow-lg transform hover:scale-[1.03]" href={"/dashboard/admin/allAds"}>
+                        <FileText size={20} className="text-primary"/>
+                        <span>Ads</span>
+                        </Link>
                     </button>
                 </div>
             </div>
