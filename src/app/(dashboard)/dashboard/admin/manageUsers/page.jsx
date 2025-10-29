@@ -81,7 +81,7 @@ const ManageUsers = () => {
   const [formData, setFormData] = useState({
     name: "",
     email: "",
-    role: "customer",
+    role: "user",
     status: "active",
     phone: "",
     location: "",
@@ -321,7 +321,7 @@ const ManageUsers = () => {
     setFormData({
       name: user.name || "",
       email: user.email || "",
-      role: user.role || "customer",
+      role: user.role || "user",
       status: user.status || "active",
       phone: user.phone || "",
       location: user.location || "",
@@ -334,7 +334,7 @@ const ManageUsers = () => {
     setModalOpen(false);
     setDetailModalOpen(false);
     setSelectedUser(null);
-    setFormData({ name: "", email: "", role: "customer", status: "active", phone: "", location: "", id: "" });
+    setFormData({ name: "", email: "", role: "user", status: "active", phone: "", location: "", id: "" });
   };
 
   // --- Data Filtering ---
@@ -377,8 +377,8 @@ const ManageUsers = () => {
       case 'mechanic':
         // Custom color: Info (blue) for mechanic
         return <span className={`${base} bg-info/10 text-info border-info/30`}>{role}</span>;
-      default: // customer
-        // Primary (main orange) for customer
+      default: // user
+        // Primary (main orange) for user
         return <span className={`${base} bg-primary/10 text-primary border-base-content/30`}>{role}</span>;
     }
   };
@@ -522,7 +522,7 @@ const ManageUsers = () => {
             className="px-3 sm:px-4 py-2.5 sm:py-3 border border-base-content/30 rounded-xl bg-base-200/50 focus:bg-base-100 focus:border-base-content text-sm focus:outline-none w-full md:w-auto text-base-content"
           >
             <option value="all">All Roles</option>
-            <option value="customer">Customer</option>
+            <option value="user">user</option>
             <option value="mechanic">Mechanic</option>
             <option value="admin">Admin</option>
           </select>
@@ -606,7 +606,7 @@ const ManageUsers = () => {
                       </div>
                     </td>
                     <td className="px-6 py-4">
-                      {getRoleBadge(user.role || "customer")}
+                      {getRoleBadge(user.role || "user")}
                     </td>
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-2">
@@ -742,7 +742,7 @@ const ManageUsers = () => {
                     onChange={(e) => setFormData({ ...formData, role: e.target.value })}
                     className="w-full p-3 border border-base-content/20 rounded-xl bg-base-200/50 focus:bg-base-100 focus:border-base-content focus:outline-none transition-all duration-300 text-sm text-base-content"
                   >
-                    <option value="customer">Customer</option>
+                    <option value="user">user</option>
                     <option value="mechanic">Mechanic</option>
                     <option value="admin">Admin</option>
                   </select>
