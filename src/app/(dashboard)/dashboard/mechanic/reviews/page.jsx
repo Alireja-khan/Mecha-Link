@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import { 
     Star, 
     Search, 
@@ -13,21 +13,19 @@ import {
     User,
     MessageSquare,
     Shield,
-    Crown,
     TrendingUp,
     TrendingDown,
-    ChevronDown,
-    ChevronUp,
     MessageCircle,
     Mail,
     Check,
-    X
+    X,
+    Loader2
 } from "lucide-react";
 import Swal from "sweetalert2";
 import useUser from "@/hooks/useUser";
 import { useRouter } from "next/navigation";
+import Loader from "@/app/(basic)/loading"; 
 
-// --- Utility Components (same as MechanicRequestsPage) ---
 const StatCard = ({ icon: Icon, value, label, color = "primary" }) => {
     const colorClasses = {
         primary: {
@@ -67,16 +65,63 @@ const StatCard = ({ icon: Icon, value, label, color = "primary" }) => {
     );
 };
 
+// NEW COMPONENT: Isolated state for the response textarea
+const ResponseInputArea = ({ reviewId, initialText, isEditMode, onSend, onCancel }) => {
+    const [localResponseText, setLocalResponseText] = useState(initialText || "");
+
+    useEffect(() => {
+        // Reset local state when the component is mounted for a different review ID
+        setLocalResponseText(initialText || "");
+    }, [initialText, reviewId]);
+
+    const handleSend = () => {
+        onSend(reviewId, localResponseText);
+    };
+
+    return (
+        <div className="mt-4 p-3 bg-base-200 rounded-lg border border-neutral/30">
+            <textarea
+                value={localResponseText}
+                onChange={(e) => setLocalResponseText(e.target.value)}
+                placeholder={isEditMode ? "Edit your response here..." : "Type your professional response here..."}
+                rows="5"
+                className="w-full px-3 py-2 border border-neutral/50 rounded-lg bg-base-100 focus:bg-base-100 focus:border-primary/50 text-sm focus:outline-none text-base-content"
+            />
+            <div className="flex gap-2 mt-3 justify-end">
+                <button
+                    onClick={handleSend}
+                    className="px-4 py-2 bg-primary text-primary-content rounded-xl hover:bg-primary/90 transition-colors text-sm font-medium flex items-center gap-1"
+                >
+                    <Check size={16} />
+                    {isEditMode ? 'Update Response' : 'Send Response'}
+                </button>
+                <button
+                    onClick={onCancel}
+                    className="px-4 py-2 border border-neutral/50 text-base-content rounded-xl hover:bg-base-300 transition-colors text-sm font-medium flex items-center gap-1"
+                >
+                    <X size={16} />
+                    Cancel
+                </button>
+            </div>
+        </div>
+    );
+};
+
 const MechanicShopReviews = () => {
-    const [reviews, setReviews] = useState([]);
-    const [loading, setLoading] = useState(true);
+    const [reviews, setReviews] = useState([]); 
+    const [allReviews, setAllReviews] = useState([]); 
+    
+    const [shopLoading, setShopLoading] = useState(true);
+    const [reviewsLoading, setReviewsLoading] = useState(true);
+    
+    const [shopData, setShopData] = useState(null);
+
     const [filteredReviews, setFilteredReviews] = useState([]);
     const [searchTerm, setSearchTerm] = useState("");
     const [statusFilter, setStatusFilter] = useState("all");
     const [ratingFilter, setRatingFilter] = useState("all");
     const [dateFilter, setDateFilter] = useState("all");
     const [sortBy, setSortBy] = useState("newest");
-    const [selectedReviews, setSelectedReviews] = useState([]);
     const [stats, setStats] = useState({
         total: 0,
         averageRating: 0,
@@ -85,84 +130,21 @@ const MechanicShopReviews = () => {
         responded: 0
     });
     const [editingReview, setEditingReview] = useState(null);
-    const [responseText, setResponseText] = useState("");
-    const [shopId, setShopId] = useState(null);
     const [detailModalOpen, setDetailModalOpen] = useState(false);
     const [selectedReview, setSelectedReview] = useState(null);
+
     const { user: loggedInUser, loading: userLoading } = useUser();
     const router = useRouter();
 
-    // Function to truncate text without line breaks
-    const truncateText = (text, maxLength = 60) => {
-        if (!text) return 'No feedback provided';
-        if (text.length <= maxLength) return text;
-        return text.substring(0, maxLength) + '...';
-    };
-
-    // Open detail modal
-    const openDetailModal = (review) => {
-        setSelectedReview(review);
-        setDetailModalOpen(true);
-    };
-
-    // Format date for display
-    const formatDate = (dateString) => {
-        if (!dateString) return 'N/A';
-        return new Date(dateString).toLocaleDateString('en-US', {
-            year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit'
-        });
-    };
-
-    // Fetch shop ID and reviews
-    const fetchShopAndReviews = useCallback(async () => {
-        try {
-            setLoading(true);
-            
-            // First, get the shop data for the logged-in user
-            const shopRes = await fetch('/api/shops?email=' + encodeURIComponent(loggedInUser?.email));
-            if (shopRes.ok) {
-                const shopData = await shopRes.json();
-                if (Array.isArray(shopData) && shopData.length > 0) {
-                    const shop = shopData[0];
-                    setShopId(shop._id);
-                    
-                    // Fetch reviews for this shop
-                    const reviewsRes = await fetch(`/api/reviews?shopId=${shop._id}`);
-                    if (reviewsRes.ok) {
-                        const reviewsData = await reviewsRes.json();
-                        setReviews(reviewsData);
-                        setFilteredReviews(reviewsData);
-                        calculateStats(reviewsData);
-                    }
-                }
-            }
-        } catch (error) {
-            console.error("Error fetching reviews:", error);
-            Swal.fire({
-                icon: "error",
-                title: "Error",
-                text: "Failed to load reviews",
-                confirmButtonColor: 'var(--color-error)',
-                background: 'var(--color-base-100)',
-                color: 'var(--color-base-content)'
-            });
-        } finally {
-            setLoading(false);
-        }
-    }, [loggedInUser]);
-
-    useEffect(() => {
-        fetchShopAndReviews();
-    }, [fetchShopAndReviews]);
-
-    // Calculate statistics
     const calculateStats = (reviewsData) => {
         const total = reviewsData.length;
+        const totalRatings = reviewsData.reduce((sum, review) => sum + (parseFloat(review.rating) || 0), 0);
+        
         const averageRating = total > 0 
-            ? (reviewsData.reduce((sum, review) => sum + (review.rating || 0), 0) / total).toFixed(1)
+            ? (totalRatings / total).toFixed(1)
             : 0;
-        const fiveStar = reviewsData.filter(review => review.rating === 5).length;
-        const oneStar = reviewsData.filter(review => review.rating === 1).length;
+        const fiveStar = reviewsData.filter(review => parseFloat(review.rating) === 5).length;
+        const oneStar = reviewsData.filter(review => parseFloat(review.rating) === 1).length;
         const responded = reviewsData.filter(review => review.response).length;
 
         setStats({
@@ -173,31 +155,178 @@ const MechanicShopReviews = () => {
             responded
         });
     };
+    
+    const truncateText = (text, maxLength = 60) => {
+        if (!text) return 'No feedback provided';
+        if (text.length <= maxLength) return text;
+        return text.substring(0, maxLength) + '...';
+    };
 
-    // Apply filters and search
+    const openDetailModal = (review, startEditing = false) => {
+        setSelectedReview(review);
+        
+        if (startEditing || !review.response) {
+            setEditingReview(review._id);
+        } else {
+            setEditingReview(null);
+        }
+
+        setDetailModalOpen(true);
+    };
+
+    const formatDate = (dateString) => {
+        if (!dateString) return 'N/A';
+        return new Date(dateString).toLocaleDateString('en-US', {
+            year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit'
+        });
+    };
+
+    const formatDateShort = (dateString) => {
+        if (!dateString) return 'N/A';
+        return new Date(dateString).toLocaleDateString('en-US', {
+            year: 'numeric', month: 'short', day: 'numeric'
+        });
+    };
+
+    const getStatusBadge = (status) => {
+        const base = "px-2 sm:px-3 py-1 text-xs font-semibold rounded-full border whitespace-nowrap";
+        switch (status) {
+            case "completed":
+                return <span className={`${base} bg-success/10 text-success border-success/30`}>Responded</span>;
+            case "pending":
+                return <span className={`${base} bg-warning/10 text-warning border-warning/30`}>Pending Response</span>;
+            case "in-progress": 
+                return <span className={`${base} bg-primary/10 text-primary border-primary/30`}>In Progress</span>;
+            case "rejected": 
+                return <span className={`${base} bg-error/10 text-error border-error/30`}>Rejected</span>;
+            default:
+                return <span className={`${base} bg-base-300 text-base-content/80 border-neutral/20`}>{status || 'N/A'}</span>;
+        }
+    };
+
+    const renderStars = (rating, size = 16) => {
+        const numericRating = parseFloat(rating) || 0;
+        return (
+            <div className="flex items-center gap-1">
+                {[...Array(5)].map((_, i) => (
+                    <Star
+                        key={i}
+                        size={size}
+                        className={`${
+                            i < numericRating
+                                ? "fill-warning text-warning"
+                                : "text-base-content/30"
+                        }`}
+                    />
+                ))}
+                <span className="ml-1 text-sm font-medium text-base-content">
+                    {numericRating.toFixed(1)}
+                </span>
+            </div>
+        );
+    };
+    
+    useEffect(() => {
+        const fetchShopData = async () => {
+            if (!loggedInUser?.email) return;
+
+            setShopLoading(true);
+            try {
+                const shopRes = await fetch(`/api/shops?email=${loggedInUser.email}`);
+                let data = null;
+                if (shopRes.ok) {
+                    data = await shopRes.json();
+                    if (Array.isArray(data) && data.length > 0) data = data[0];
+                }
+                setShopData(data);
+            } catch (err) {
+                console.error("Error fetching shop:", err);
+                Swal.fire({
+                    icon: "error",
+                    title: "Shop Error",
+                    text: "Failed to load shop data.",
+                    confirmButtonColor: 'var(--color-error)',
+                    background: 'var(--color-base-100)',
+                    color: 'var(--color-base-content)'
+                });
+                setShopData(null);
+            } finally {
+                setShopLoading(false);
+            }
+        };
+        
+        if (!userLoading && loggedInUser) {
+            fetchShopData();
+        }
+    }, [loggedInUser, userLoading]);
+
+    useEffect(() => {
+        const fetchReviews = async () => {
+            setReviewsLoading(true);
+            try {
+                const reviewsRes = await fetch("/api/reviews"); 
+                let data = [];
+                if (reviewsRes.ok) data = await reviewsRes.json();
+                setAllReviews(Array.isArray(data) ? data : []);
+            } catch (err) {
+                console.error("Error fetching reviews:", err);
+                Swal.fire({
+                    icon: "error",
+                    title: "Reviews Error",
+                    text: "Failed to load all reviews.",
+                    confirmButtonColor: 'var(--color-error)',
+                    background: 'var(--color-base-100)',
+                    color: 'var(--color-base-content)'
+                });
+                setAllReviews([]);
+            } finally {
+                setReviewsLoading(false);
+            }
+        };
+        fetchReviews();
+    }, []);
+    
+    const shopReviews = useMemo(() => {
+        const shopId = shopData?._id;
+        if (!shopId || allReviews.length === 0) {
+            calculateStats([]);
+            return [];
+        }
+        
+        const filtered = allReviews.filter(
+            (review) => review.shopId?.toString() === shopId.toString()
+        );
+        
+        setReviews(filtered);
+        calculateStats(filtered);
+
+        return filtered;
+    }, [allReviews, shopData]);
+
     useEffect(() => {
         let filtered = [...reviews];
 
-        // Search filter
         if (searchTerm) {
+            const lowerCaseSearch = searchTerm.toLowerCase();
             filtered = filtered.filter(review =>
-                review.userName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                review.feedback?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                review.userEmail?.toLowerCase().includes(searchTerm.toLowerCase())
+                review.userName?.toLowerCase().includes(lowerCaseSearch) ||
+                review.feedback?.toLowerCase().includes(lowerCaseSearch) ||
+                review.userEmail?.toLowerCase().includes(lowerCaseSearch)
             );
         }
 
-        // Status filter
         if (statusFilter !== "all") {
-            filtered = filtered.filter(review => review.status === statusFilter);
+            filtered = filtered.filter(review => 
+                (statusFilter === "completed" && review.response) ||
+                (statusFilter === "pending" && !review.response) ||
+                (statusFilter !== "completed" && statusFilter !== "pending" && review.status === statusFilter)
+            );
         }
 
-        // Rating filter
         if (ratingFilter !== "all") {
-            filtered = filtered.filter(review => review.rating === parseInt(ratingFilter));
+            filtered = filtered.filter(review => parseFloat(review.rating) === parseInt(ratingFilter));
         }
 
-        // Date filter
         if (dateFilter !== "all") {
             const now = new Date();
             const filterDate = new Date();
@@ -226,17 +355,21 @@ const MechanicShopReviews = () => {
             }
         }
 
-        // Sort
         filtered.sort((a, b) => {
+            const dateA = new Date(a.createdAt);
+            const dateB = new Date(b.createdAt);
+            const ratingA = parseFloat(a.rating) || 0;
+            const ratingB = parseFloat(b.rating) || 0;
+            
             switch (sortBy) {
                 case "newest":
-                    return new Date(b.createdAt) - new Date(a.createdAt);
+                    return dateB - dateA;
                 case "oldest":
-                    return new Date(a.createdAt) - new Date(b.createdAt);
+                    return dateA - dateB;
                 case "highest":
-                    return (b.rating || 0) - (a.rating || 0);
+                    return ratingB - ratingA;
                 case "lowest":
-                    return (a.rating || 0) - (b.rating || 0);
+                    return ratingA - ratingB;
                 default:
                     return 0;
             }
@@ -245,7 +378,6 @@ const MechanicShopReviews = () => {
         setFilteredReviews(filtered);
     }, [reviews, searchTerm, statusFilter, ratingFilter, dateFilter, sortBy]);
 
-    // Handle review actions
     const handleDeleteReview = async (reviewId) => {
         const result = await Swal.fire({
             title: "Are you sure?",
@@ -266,7 +398,9 @@ const MechanicShopReviews = () => {
                 });
 
                 if (response.ok) {
-                    setReviews(reviews.filter(review => review._id !== reviewId));
+                    setAllReviews(prev => prev.filter(review => review._id !== reviewId));
+                    setDetailModalOpen(false); 
+
                     Swal.fire({
                         title: "Deleted!",
                         text: "Review has been deleted.",
@@ -291,8 +425,9 @@ const MechanicShopReviews = () => {
         }
     };
 
-    const handleRespond = async (reviewId) => {
-        if (!responseText.trim()) {
+    // Updated signature to receive responseText from ResponseInputArea
+    const handleRespond = async (reviewId, responseTextToSend) => {
+        if (!responseTextToSend.trim()) {
             Swal.fire({
                 icon: "error",
                 title: "Error!",
@@ -311,19 +446,28 @@ const MechanicShopReviews = () => {
                     "Content-Type": "application/json"
                 },
                 body: JSON.stringify({
-                    response: responseText,
+                    response: responseTextToSend,
                     respondedAt: new Date().toISOString()
                 })
             });
 
             if (response.ok) {
-                setReviews(reviews.map(review =>
-                    review._id === reviewId
-                        ? { ...review, response: responseText, respondedAt: new Date().toISOString() }
-                        : review
+                const updatedReviewResponse = { 
+                    ...allReviews.find(r => r._id === reviewId), 
+                    response: responseTextToSend, 
+                    respondedAt: new Date().toISOString() 
+                };
+
+                setAllReviews(prev => prev.map(review =>
+                    review._id === reviewId ? updatedReviewResponse : review
                 ));
-                setResponseText("");
+                
+                if (selectedReview?._id === reviewId) {
+                    setSelectedReview(updatedReviewResponse);
+                }
+
                 setEditingReview(null);
+                
                 Swal.fire({
                     title: "Success!",
                     text: "Response sent successfully.",
@@ -347,117 +491,6 @@ const MechanicShopReviews = () => {
         }
     };
 
-    const handleStatusUpdate = async (reviewId, newStatus) => {
-        try {
-            const response = await fetch(`/api/reviews/${reviewId}`, {
-                method: "PATCH",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({ status: newStatus })
-            });
-
-            if (response.ok) {
-                setReviews(reviews.map(review =>
-                    review._id === reviewId
-                        ? { ...review, status: newStatus }
-                        : review
-                ));
-                Swal.fire({
-                    title: "Updated!",
-                    text: "Status updated successfully.",
-                    icon: "success",
-                    confirmButtonColor: 'var(--color-success)',
-                    background: 'var(--color-base-100)',
-                    color: 'var(--color-base-content)'
-                });
-            } else {
-                throw new Error("Failed to update status");
-            }
-        } catch (error) {
-            Swal.fire({
-                icon: "error",
-                title: "Error!",
-                text: "Failed to update status.",
-                confirmButtonColor: 'var(--color-error)',
-                background: 'var(--color-base-100)',
-                color: 'var(--color-base-content)'
-            });
-        }
-    };
-
-    // Export reviews
-    const exportReviews = () => {
-        const csvContent = [
-            ["Customer", "Email", "Rating", "Feedback", "Status", "Response", "Date"],
-            ...filteredReviews.map(review => [
-                review.userName,
-                review.userEmail,
-                review.rating,
-                `"${review.feedback?.replace(/"/g, '""')}"`,
-                review.status,
-                `"${review.response?.replace(/"/g, '""') || ''}"`,
-                new Date(review.createdAt).toLocaleDateString()
-            ])
-        ].map(row => row.join(",")).join("\n");
-
-        const blob = new Blob([csvContent], { type: "text/csv" });
-        const url = URL.createObjectURL(blob);
-        const link = document.createElement("a");
-        link.href = url;
-        link.download = `reviews-${new Date().toISOString().split('T')[0]}.csv`;
-        link.click();
-        URL.revokeObjectURL(url);
-    };
-
-    // Render star rating
-    const renderStars = (rating) => {
-        return (
-            <div className="flex items-center gap-1">
-                {[...Array(5)].map((_, i) => (
-                    <Star
-                        key={i}
-                        size={16}
-                        className={`${
-                            i < rating
-                                ? "fill-warning text-warning"
-                                : "text-base-content/30"
-                        }`}
-                    />
-                ))}
-                <span className="ml-1 text-sm font-medium text-base-content">
-                    {rating}.0
-                </span>
-            </div>
-        );
-    };
-
-    // Status badge component (consistent with MechanicRequestsPage)
-    const getStatusBadge = (status) => {
-        const base = "px-2 sm:px-3 py-1 text-xs font-semibold rounded-full border whitespace-nowrap";
-        switch (status) {
-            case "completed":
-                return <span className={`${base} bg-success/10 text-success border-success/30`}>Completed</span>;
-            case "in-progress":
-                return <span className={`${base} bg-primary/10 text-primary border-primary/30`}>In Progress</span>;
-            case "pending":
-                return <span className={`${base} bg-warning/10 text-warning border-warning/30`}>Pending</span>;
-            case "rejected":
-                return <span className={`${base} bg-error/10 text-error border-error/30`}>Rejected</span>;
-            default:
-                return <span className={`${base} bg-base-300 text-base-content/80 border-neutral/20`}>Unknown</span>;
-        }
-    };
-
-    // Format date utility (consistent with MechanicRequestsPage)
-    const formatDateShort = (dateString) => {
-        if (!dateString) return 'N/A';
-        return new Date(dateString).toLocaleDateString('en-US', {
-            year: 'numeric', month: 'short', day: 'numeric'
-        });
-    };
-
-    // Mobile Card Component (consistent design pattern)
     const ReviewMobileCard = ({ review }) => (
         <div className="bg-base-100 p-4 rounded-xl border border-neutral/50 shadow-lg hover:shadow-xl transition-all duration-200">
             <div className="flex items-start gap-3 mb-3 border-b border-neutral/50 pb-3">
@@ -475,7 +508,7 @@ const MechanicShopReviews = () => {
                     </p>
                 </div>
                 <div className="flex-shrink-0">
-                    {getStatusBadge(review.status)}
+                    {review.response ? getStatusBadge("completed") : getStatusBadge("pending")}
                 </div>
             </div>
 
@@ -492,7 +525,7 @@ const MechanicShopReviews = () => {
                                 Your Response
                             </span>
                         </div>
-                        <p className="text-primary text-sm">
+                        <p className="text-primary text-sm line-clamp-2">
                             {review.response}
                         </p>
                     </div>
@@ -517,10 +550,7 @@ const MechanicShopReviews = () => {
                     </button>
                     {!review.response && (
                         <button
-                            onClick={() => {
-                                setEditingReview(review._id);
-                                setResponseText("");
-                            }}
+                            onClick={() => setEditingReview(review._id)}
                             className="p-2 bg-primary/10 text-primary rounded-lg border border-primary/20 hover:bg-primary/20 transition-colors"
                             title="Respond"
                         >
@@ -537,59 +567,162 @@ const MechanicShopReviews = () => {
                 </div>
             </div>
 
-            {/* Response Input for Mobile */}
             {editingReview === review._id && (
-                <div className="mt-4 p-3 bg-base-200 rounded-lg border border-neutral/30">
-                    <textarea
-                        value={responseText}
-                        onChange={(e) => setResponseText(e.target.value)}
-                        placeholder="Type your response here..."
-                        rows="3"
-                        className="w-full px-3 py-2 border border-neutral/50 rounded-lg bg-base-100 focus:bg-base-100 focus:border-primary/50 text-sm focus:outline-none text-base-content"
-                    />
-                    <div className="flex gap-2 mt-2">
-                        <button
-                            onClick={() => handleRespond(review._id)}
-                            className="px-3 py-1.5 bg-primary text-primary-content rounded-lg hover:bg-primary/90 transition-colors text-sm font-medium flex items-center gap-1"
-                        >
-                            <Check size={14} />
-                            Send
-                        </button>
-                        <button
-                            onClick={() => {
-                                setEditingReview(null);
-                                setResponseText("");
-                            }}
-                            className="px-3 py-1.5 border border-neutral/50 text-base-content rounded-lg hover:bg-base-300 transition-colors text-sm font-medium flex items-center gap-1"
-                        >
-                            <X size={14} />
-                            Cancel
-                        </button>
-                    </div>
-                </div>
+                <ResponseInputArea
+                    key={review._id} 
+                    reviewId={review._id}
+                    initialText={review.response}
+                    isEditMode={!!review.response}
+                    onSend={handleRespond}
+                    onCancel={() => setEditingReview(null)}
+                />
             )}
         </div>
     );
 
-    if (loading) {
+    const ReviewDetailModal = () => {
+        if (!selectedReview) return null;
+
+        const review = selectedReview;
+        const isEditing = editingReview === review._id;
+        const isResponded = !!review.response;
+
         return (
-            <div className="flex items-center justify-center h-screen w-full bg-base-100">
-                <span className="loading loading-bars loading-lg text-primary"></span>
+            <div 
+                className={`fixed inset-0 z-50 flex items-center justify-center p-4 bg-base-content/50 backdrop-blur-sm transition-opacity duration-300 ${
+                    detailModalOpen ? "opacity-100" : "opacity-0 pointer-events-none"
+                }`}
+                onClick={() => setDetailModalOpen(false)}
+            >
+                <div 
+                    className="bg-base-100 rounded-2xl w-full max-w-lg lg:max-w-3xl p-6 sm:p-8 shadow-3xl transform transition-transform duration-300 scale-100 overflow-y-auto max-h-[90vh]"
+                    onClick={(e) => e.stopPropagation()}
+                >
+                    <div className="flex justify-between items-start border-b border-neutral/50 pb-4 mb-4">
+                        <h2 className="text-2xl font-bold text-base-content flex items-center gap-3">
+                            <MessageSquare size={24} className="text-primary" />
+                            Review Details
+                        </h2>
+                        <button
+                            onClick={() => setDetailModalOpen(false)}
+                            className="p-2 rounded-full text-base-content/60 hover:bg-base-200 transition-colors"
+                        >
+                            <X size={24} />
+                        </button>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6 pb-4 border-b border-neutral/50">
+                        <div>
+                            <p className="text-sm font-medium text-base-content/70 flex items-center gap-2 mb-1">
+                                <User size={16} /> Customer Name
+                            </p>
+                            <p className="text-base font-semibold text-base-content">{review.userName || 'Anonymous'}</p>
+                        </div>
+                        <div>
+                            <p className="text-sm font-medium text-base-content/70 flex items-center gap-2 mb-1">
+                                <Mail size={16} /> Email
+                            </p>
+                            <p className="text-base font-semibold text-base-content truncate">{review.userEmail || 'No email provided'}</p>
+                        </div>
+                        <div>
+                            <p className="text-sm font-medium text-base-content/70 flex items-center gap-2 mb-1">
+                                <Star size={16} /> Rating
+                            </p>
+                            {renderStars(review.rating, 20)}
+                        </div>
+                        <div>
+                            <p className="text-sm font-medium text-base-content/70 flex items-center gap-2 mb-1">
+                                <Calendar size={16} /> Date
+                            </p>
+                            <p className="text-base font-semibold text-base-content">{formatDate(review.createdAt)}</p>
+                        </div>
+                    </div>
+
+                    <div className="mb-6">
+                        <p className="text-lg font-bold text-base-content mb-2 flex items-center gap-2">
+                            <MessageCircle size={20} className="text-primary" /> Customer Feedback
+                        </p>
+                        <div className="bg-base-200 p-4 rounded-lg text-base-content leading-relaxed border border-neutral/50">
+                            {review.feedback || 'No detailed feedback provided.'}
+                        </div>
+                    </div>
+
+                    <div className="mb-6">
+                        <p className="text-lg font-bold text-base-content mb-2 flex items-center gap-2">
+                            <Shield size={20} className="text-primary" /> Your Shop Response
+                        </p>
+                        
+                        {isEditing ? (
+                            <ResponseInputArea
+                                key={review._id} 
+                                reviewId={review._id}
+                                initialText={review.response}
+                                isEditMode={isResponded}
+                                onSend={handleRespond}
+                                onCancel={() => setEditingReview(null)}
+                            />
+                        ) : isResponded ? (
+                            <div className="bg-primary/10 p-4 rounded-lg text-primary leading-relaxed border border-primary/20">
+                                <p className="text-sm font-medium mb-1 flex items-center gap-2">
+                                    <Check size={14} /> Responded on {formatDateShort(review.respondedAt)}
+                                </p>
+                                <p>{review.response}</p>
+                                <button
+                                    onClick={() => setEditingReview(review._id)}
+                                    className="mt-3 px-3 py-1.5 bg-primary text-primary-content rounded-lg hover:bg-primary/90 transition-colors text-xs font-medium flex items-center gap-1"
+                                >
+                                    <Edit size={14} />
+                                    Edit Response
+                                </button>
+                            </div>
+                        ) : (
+                            <div className="flex justify-start">
+                                <button
+                                    onClick={() => setEditingReview(review._id)}
+                                    className="px-4 py-2 bg-primary text-primary-content rounded-xl hover:bg-primary/90 transition-colors text-sm font-medium flex items-center gap-1"
+                                >
+                                    <MessageCircle size={16} />
+                                    Write Response
+                                </button>
+                            </div>
+                        )}
+                    </div>
+
+                    <div className="flex justify-end pt-4 border-t border-neutral/50">
+                        <button
+                            onClick={() => handleDeleteReview(review._id)}
+                            className="flex items-center gap-2 px-4 py-2 bg-error text-error-content rounded-xl hover:bg-error/90 transition-colors font-medium"
+                        >
+                            <Trash2 size={18} />
+                            Delete Review
+                        </button>
+                    </div>
+                </div>
+            </div>
+        );
+    };
+
+    if (userLoading || shopLoading || reviewsLoading) {
+        return <Loader />;
+    }
+    
+    if (!loggedInUser) {
+        return (
+            <div className="flex items-center justify-center h-screen w-full bg-base-100 text-error">
+                <p>Access Denied. Please log in as a mechanic.</p>
             </div>
         );
     }
-
+    
     return (
         <div className="min-h-screen w-full p-3 sm:p-4 lg:p-6 mx-auto bg-base-200">
-            {/* Header */}
             <div className="mb-4 sm:mb-6 lg:mb-8">
                 <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-base-content mb-1 sm:mb-2">Customer Reviews</h1>
                 <p className="text-base-content/70 text-sm sm:text-base lg:text-lg">
-                    Manage and respond to customer feedback
+                    Manage and respond to customer feedback for your shop.
                 </p>
             </div>
 
-            {/* Statistics Cards */}
             <div className="grid grid-cols-2 lg:grid-cols-5 gap-3 sm:gap-4 lg:gap-6 mb-4 sm:mb-6 lg:mb-8">
                 <StatCard icon={MessageSquare} value={stats.total} label="Total Reviews" color="primary" />
                 <StatCard icon={Star} value={stats.averageRating} label="Average Rating" color="warning" />
@@ -598,9 +731,7 @@ const MechanicShopReviews = () => {
                 <StatCard icon={Shield} value={stats.responded} label="Responded" color="primary" />
             </div>
 
-            {/* Main Content */}
             <div className="bg-base-100 rounded-2xl sm:rounded-3xl p-4 sm:p-6 lg:p-8 border border-neutral shadow-2xl">
-                {/* Search and Filter */}
                 <div className="flex flex-col md:flex-row gap-3 w-full mb-6">
                     <div className="relative flex-1">
                         <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-base-content/40" size={18} />
@@ -619,9 +750,9 @@ const MechanicShopReviews = () => {
                             className="px-3 sm:px-4 py-2.5 sm:py-3 border border-neutral rounded-xl bg-base-200/50 focus:bg-base-100 focus:border-primary/50 text-sm focus:outline-none text-base-content"
                         >
                             <option value="all">All Status</option>
-                            <option value="completed">Completed</option>
+                            <option value="pending">Pending Response</option>
+                            <option value="completed">Responded</option>
                             <option value="in-progress">In Progress</option>
-                            <option value="pending">Pending</option>
                             <option value="rejected">Rejected</option>
                         </select>
 
@@ -648,18 +779,20 @@ const MechanicShopReviews = () => {
                             <option value="week">This Week</option>
                             <option value="month">This Month</option>
                         </select>
-
-                        <button
-                            onClick={exportReviews}
-                            className="flex items-center gap-2 px-4 py-2.5 sm:py-3 border border-neutral rounded-xl bg-base-200/50 hover:bg-base-300 text-base-content transition-colors text-sm font-medium"
+                        
+                        <select
+                            value={sortBy}
+                            onChange={(e) => setSortBy(e.target.value)}
+                            className="px-3 sm:px-4 py-2.5 sm:py-3 border border-neutral rounded-xl bg-base-200/50 focus:bg-base-100 focus:border-primary/50 text-sm focus:outline-none text-base-content"
                         >
-                            <Download size={16} />
-                            Export
-                        </button>
+                            <option value="newest">Newest</option>
+                            <option value="oldest">Oldest</option>
+                            <option value="highest">Highest Rating</option>
+                            <option value="lowest">Lowest Rating</option>
+                        </select>
                     </div>
                 </div>
 
-                {/* Mobile View */}
                 <div className="block xl:hidden space-y-4">
                     {filteredReviews.length > 0 ? (
                         filteredReviews.map(review => (
@@ -673,7 +806,6 @@ const MechanicShopReviews = () => {
                     )}
                 </div>
 
-                {/* Desktop Table View */}
                 <div className="hidden xl:block rounded-2xl border border-neutral overflow-x-auto">
                     {filteredReviews.length > 0 ? (
                         <table className="min-w-full divide-y divide-neutral">
@@ -692,95 +824,58 @@ const MechanicShopReviews = () => {
                                     <tr key={review._id} className="hover:bg-base-200/50 transition-colors duration-200">
                                         <td className="px-6 py-4">
                                             <div className="flex items-center gap-3">
-                                                <div className="w-10 h-10 bg-primary rounded-xl flex items-center justify-center text-primary-content font-bold text-sm">
+                                                <div className="w-10 h-10 bg-primary rounded-xl flex items-center justify-center text-primary-content font-bold text-sm flex-shrink-0">
                                                     {review.userName?.charAt(0) || "U"}
                                                 </div>
                                                 <div>
                                                     <p className="font-semibold text-base-content">{review.userName || 'Anonymous'}</p>
                                                     <p className="text-sm text-base-content/70">{review.userEmail || 'No email'}</p>
-                                                    <div className="mt-1">
-                                                        {renderStars(review.rating)}
-                                                    </div>
                                                 </div>
                                             </div>
+                                            <div className="mt-2">{renderStars(review.rating)}</div>
                                         </td>
-                                        <td className="px-6 py-4">
-                                            <div className="max-w-50">
-                                                <p className="text-base-content text-sm whitespace-nowrap overflow-hidden text-ellipsis">
-                                                    {truncateText(review.feedback, 80)}
-                                                </p>
-                                                <button 
-                                                    onClick={() => openDetailModal(review)} 
-                                                    className="text-primary flex items-center gap-1 text-sm hover:text-secondary transition-colors mt-1"
-                                                >
-                                                    <Eye size={14} />View Full Review
-                                                </button>
-                                            </div>
+                                        <td className="px-6 py-4 text-sm text-base-content max-w-xs whitespace-normal">
+                                            <p className="line-clamp-2">{truncateText(review.feedback, 100)}</p>
                                         </td>
-                                        <td className="px-6 py-4">
+                                        <td className="px-6 py-4 text-sm text-base-content max-w-xs whitespace-normal">
                                             {review.response ? (
-                                                <div className="bg-primary/10 border border-primary/20 rounded-lg p-3">
-                                                    <p className="text-primary text-sm line-clamp-3">
-                                                        {review.response}
-                                                    </p>
-                                                    <p className="text-primary/70 text-xs mt-1">
-                                                        {formatDateShort(review.respondedAt)}
-                                                    </p>
+                                                <div className="bg-primary/10 p-2 rounded-lg line-clamp-2 text-primary">
+                                                    {truncateText(review.response, 100)}
                                                 </div>
                                             ) : (
-                                                <span className="text-base-content/50 text-sm">No response yet</span>
+                                                <span className="text-base-content/50 italic">No response yet</span>
                                             )}
                                         </td>
-                                        <td className="px-6 py-4">
-                                            <div className="flex items-center gap-2">
-                                                <Calendar size={14} className="text-primary" />
-                                                <span className="text-sm text-base-content">
-                                                    {formatDateShort(review.createdAt)}
-                                                </span>
-                                            </div>
+                                        <td className="px-6 py-4 text-sm text-base-content/80">
+                                            {formatDateShort(review.createdAt)}
                                         </td>
                                         <td className="px-6 py-4">
-                                            {getStatusBadge(review.status)}
+                                            {review.response ? getStatusBadge("completed") : getStatusBadge("pending")}
                                         </td>
-                                        <td className="px-6 py-4">
-                                            <div className="flex justify-center gap-2">
+                                        <td className="px-6 py-4 text-center whitespace-nowrap">
+                                            <div className="flex gap-2 justify-center">
                                                 <button
                                                     onClick={() => openDetailModal(review)}
-                                                    className="px-3 py-2 bg-primary/10 text-primary rounded-xl border border-primary/20 hover:bg-primary/20 hover:scale-105 transition-all duration-200 flex items-center gap-1 text-sm"
+                                                    className="p-2 bg-primary/10 text-primary rounded-lg hover:bg-primary/20 transition-colors"
                                                     title="View Details"
                                                 >
-                                                    <Eye size={14} />
-                                                    View
+                                                    <Eye size={18} />
                                                 </button>
                                                 {!review.response && (
                                                     <button
-                                                        onClick={() => {
-                                                            setEditingReview(review._id);
-                                                            setResponseText("");
-                                                        }}
-                                                        className="p-2 bg-primary/10 text-primary rounded-xl border border-primary/20 hover:bg-primary/20 hover:scale-105 transition-all duration-200"
-                                                        title="Respond to Review"
+                                                        onClick={() => openDetailModal(review, true)}
+                                                        className="p-2 bg-warning/10 text-warning rounded-lg hover:bg-warning/20 transition-colors"
+                                                        title="Respond"
                                                     >
-                                                        <MessageCircle size={16} />
+                                                        <MessageCircle size={18} />
                                                     </button>
                                                 )}
-                                                <select
-                                                    value={review.status}
-                                                    onChange={(e) => handleStatusUpdate(review._id, e.target.value)}
-                                                    className="px-2 py-1 border border-neutral/50 rounded-lg bg-base-200 text-sm focus:outline-none text-base-content focus:border-primary/50"
-                                                    title="Update Status"
-                                                >
-                                                    <option value="pending">Pending</option>
-                                                    <option value="in-progress">In Progress</option>
-                                                    <option value="completed">Completed</option>
-                                                    <option value="rejected">Rejected</option>
-                                                </select>
                                                 <button
                                                     onClick={() => handleDeleteReview(review._id)}
-                                                    className="p-2 bg-error/10 text-error rounded-xl border border-error/20 hover:bg-error/20 hover:scale-105 transition-all duration-200"
+                                                    className="p-2 bg-error/10 text-error rounded-lg hover:bg-error/20 transition-colors"
                                                     title="Delete Review"
                                                 >
-                                                    <Trash2 size={16} />
+                                                    <Trash2 size={18} />
                                                 </button>
                                             </div>
                                         </td>
@@ -790,127 +885,14 @@ const MechanicShopReviews = () => {
                         </table>
                     ) : (
                         <div className="text-center py-12">
-                            <div className="flex flex-col items-center gap-3">
-                                <MessageSquare className="text-base-content/30" size={48} />
-                                <p className="text-base-content/60 text-lg">No reviews found</p>
-                            </div>
+                            <MessageSquare size={64} className="mx-auto text-base-content/30" />
+                            <p className="text-base-content/60 mt-4 text-lg">No reviews found matching your criteria.</p>
                         </div>
                     )}
                 </div>
-
-                {/* Detail Modal */}
-                {detailModalOpen && selectedReview && (
-                    <div className="fixed inset-0 flex items-center justify-center backdrop-blur-md bg-base-content/20 z-50 p-4">
-                        <div className="bg-base-100 rounded-3xl p-8 w-full max-w-4xl border border-base-300 shadow-2xl max-h-[90vh] overflow-y-auto">
-                            <div className="flex justify-between items-center mb-6">
-                                <h2 className="text-2xl font-bold text-base-content">Review Details</h2>
-                                <button onClick={() => setDetailModalOpen(false)} className="p-2 bg-base-200 text-base-content rounded-xl border border-base-300 hover:bg-base-300 transition-colors"><X size={20} /></button>
-                            </div>
-                            <div className="space-y-6">
-                                {/* User Info Header Card */}
-                                <div className="flex items-center gap-4 p-4 bg-primary/10 rounded-xl border border-primary/20">
-                                    <div className="w-16 h-16 bg-primary rounded-xl flex items-center justify-center text-primary-content font-bold text-xl">
-                                        {selectedReview.userName?.charAt(0) || "U"}
-                                    </div>
-                                    <div>
-                                        <h3 className="text-xl font-bold text-base-content">{selectedReview.userName || 'Anonymous Customer'}</h3>
-                                        <div className="flex items-center gap-4 mt-1">
-                                            {getStatusBadge(selectedReview.status)}
-                                            <span className="text-sm text-base-content/70">Created: {formatDate(selectedReview.createdAt)}</span>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                                    {/* User Info Card */}
-                                    <div className="p-4 bg-info/10 rounded-xl border border-info/20 text-base-content">
-                                        <p className="font-semibold text-info mb-1">User Info</p>
-                                        <div className='text-base-content/90'>
-                                            <p><Mail size={14} className='inline mr-1 text-info' />{selectedReview.userEmail || 'No email provided'}</p>
-                                            <p><User size={14} className='inline mr-1 text-info' />{selectedReview.userName || 'Anonymous Customer'}</p>
-                                        </div>
-                                    </div>
-                                    {/* Rating & Feedback Card */}
-                                    <div className="p-4 bg-accent/10 rounded-xl border border-accent/20 text-base-content">
-                                        <p className="font-semibold text-accent mb-1 text-warning">Rating & Feedback</p>
-                                        {renderStars(selectedReview.rating)}
-                                        <p className='bg-base-200 text-base-content rounded-lg border-2 border-base-300 p-2 mt-2 whitespace-pre-wrap'>{selectedReview.feedback || 'No feedback provided'}</p>
-                                    </div>
-                                    {/* Response Card */}
-                                    <div className="p-4 bg-success/10 rounded-xl border border-success/20 text-base-content">
-                                        <p className="font-semibold text-success mb-1">Your Response</p>
-                                        {selectedReview.response ? (
-                                            <div>
-                                                <p className='bg-base-200 text-base-content rounded-lg border-2 border-base-300 p-2 mt-2 whitespace-pre-wrap'>{selectedReview.response}</p>
-                                                <p className="text-success/70 text-xs mt-1">Responded: {formatDate(selectedReview.respondedAt)}</p>
-                                            </div>
-                                        ) : (
-                                            <p className="text-base-content/70">No response yet</p>
-                                        )}
-                                    </div>
-                                    {/* Metadata Card */}
-                                    <div className="p-4 bg-base-200 rounded-xl border border-base-300 text-base-content">
-                                        <p className="font-semibold text-base-content/90 mb-1">Metadata</p>
-                                        <p className='text-base-content/70'>Status: {selectedReview.status}</p>
-                                        <p className='text-base-content/70'>Created: {formatDate(selectedReview.createdAt)}</p>
-                                        <p className='text-base-content/70'>Rating: {selectedReview.rating}/5</p>
-                                    </div>
-                                </div>
-                                {/* Modal Action Buttons */}
-                                <div className="flex justify-end gap-3 pt-4">
-                                    <button onClick={() => setDetailModalOpen(false)} className="px-6 py-2 bg-base-100 border border-base-300 text-base-content rounded-xl hover:bg-base-200 transition-colors">Close</button>
-                                    {!selectedReview.response && (
-                                        <button 
-                                            onClick={() => {
-                                                setDetailModalOpen(false);
-                                                setEditingReview(selectedReview._id);
-                                                setResponseText("");
-                                            }}
-                                            className="px-6 py-3 bg-primary text-primary-content rounded-xl hover:bg-primary/80 transition-colors"
-                                        >
-                                            Respond to Review
-                                        </button>
-                                    )}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                )}
-
-                {/* Response Modal for Desktop */}
-                {editingReview && (
-                    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-                        <div className="bg-base-100 rounded-2xl p-6 max-w-md w-full border border-neutral shadow-2xl">
-                            <h3 className="text-lg font-semibold text-base-content mb-4">Respond to Review</h3>
-                            <textarea
-                                value={responseText}
-                                onChange={(e) => setResponseText(e.target.value)}
-                                placeholder="Type your response here..."
-                                rows="4"
-                                className="w-full px-3 py-2 border border-neutral rounded-lg bg-base-200 focus:bg-base-100 focus:border-primary/50 text-sm focus:outline-none text-base-content mb-4"
-                            />
-                            <div className="flex gap-2 justify-end">
-                                <button
-                                    onClick={() => handleRespond(editingReview)}
-                                    className="px-4 py-2 bg-primary text-primary-content rounded-lg hover:bg-primary/90 transition-colors text-sm font-medium flex items-center gap-1"
-                                >
-                                    <Check size={16} />
-                                    Send Response
-                                </button>
-                                <button
-                                    onClick={() => {
-                                        setEditingReview(null);
-                                        setResponseText("");
-                                    }}
-                                    className="px-4 py-2 border border-neutral text-base-content rounded-lg hover:bg-base-300 transition-colors text-sm font-medium flex items-center gap-1"
-                                >
-                                    <X size={16} />
-                                    Cancel
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                )}
             </div>
+            
+            <ReviewDetailModal />
         </div>
     );
 };

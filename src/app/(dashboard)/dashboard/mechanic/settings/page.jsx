@@ -5,7 +5,6 @@ import useUser from "@/hooks/useUser";
 import { User, Shield, Globe, Save, Store } from "lucide-react";
 import ProfileSettings from "./ProfileSettings";
 import SecuritySettings from "./SecuritySettings";
-import PreferencesSettings from "./PreferencesSettings";
 
 export default function MechanicSettings() {
   const { user: loggedInUser, loading: userLoading } = useUser();
@@ -30,16 +29,6 @@ export default function MechanicSettings() {
     confirmPassword: "",
     twoFactor: false,
     loginAlerts: false,
-  });
-
-  const [preferences, setPreferences] = useState({
-    language: "en",
-    timezone: "UTC",
-    dateFormat: "MM/DD/YYYY",
-    theme: "light",
-    emailNotifications: true,
-    pushNotifications: false,
-    smsNotifications: false,
   });
 
   // Fetch shop data
@@ -125,10 +114,6 @@ export default function MechanicSettings() {
       };
       endpoint = `/api/shops/${shopData._id}`;
       successMessage = "Shop profile updated successfully!";
-    } else if (activeTab === "preferences") {
-      body = { preferences };
-      endpoint = "/api/users/preferences";
-      successMessage = "Preferences updated successfully!";
     } else {
       alert("Please use the 'Change Password' button on the Security tab");
       return;
@@ -157,18 +142,10 @@ export default function MechanicSettings() {
   const tabs = [
     { id: "profile", label: "Shop Profile", icon: Store },
     { id: "security", label: "Security", icon: Shield },
-    { id: "preferences", label: "Preferences", icon: Globe },
   ];
 
   return (
     <div className="p-4 sm:p-8 space-y-8 bg-base-200 mx-auto text-base-content min-h-screen">
-
-      {/* <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center">
-        <div className="text-sm text-base-content/70 mt-2 sm:mt-0">
-          Last updated: {shopData?.updatedAt ? new Date(shopData.updatedAt).toLocaleDateString() : "Never"}
-        </div>
-      </div> */}
-
       <div className="bg-base-100 rounded-2xl shadow-xl border border-neutral/40">
 
         <div className="flex border-b border-base-300 overflow-x-auto whitespace-nowrap">
@@ -197,12 +174,6 @@ export default function MechanicSettings() {
           )}
           {activeTab === "security" && (
             <SecuritySettings security={security} setSecurity={setSecurity} />
-          )}
-          {activeTab === "preferences" && (
-            <PreferencesSettings
-              preferences={preferences}
-              setPreferences={setPreferences}
-            />
           )}
         </div>
       </div>

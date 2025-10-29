@@ -510,7 +510,7 @@ export default function SpareMarketplace() {
                   <StyledSelect
                     value={sortOrder}
                     onChange={handleSort}
-                    className="w-[180px]"
+                    className="min-w-[180px]"
                   >
                     <option value="newest">Newest Arrivals</option>
                     <option value="price-low">Price: Low to High</option>

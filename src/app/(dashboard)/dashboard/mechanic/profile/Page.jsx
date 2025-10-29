@@ -338,8 +338,8 @@ const MechanicProfile = ({ shopId }) => {
           {trend && (
             <span
               className={`px-2 py-1 rounded-full text-xs font-bold ${trend > 0
-                  ? "bg-success/20 text-success"
-                  : "bg-error/20 text-error"
+                ? "bg-success/20 text-success"
+                : "bg-error/20 text-error"
                 }`}
             >
               {trend > 0 ? "↑" : "↓"} {Math.abs(trend)}%
@@ -400,7 +400,7 @@ const MechanicProfile = ({ shopId }) => {
   );
 
   const handlePayment = async (purpose, price, adID = null) => {
-  
+
     const res = await fetch("/api/ssl/init", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -410,7 +410,7 @@ const MechanicProfile = ({ shopId }) => {
         email: processedShopData.email,
         phone: processedShopData.phone,
         category: processedShopData.categories[0],
-        amount:price,
+        amount: price,
         shopID: shopData._id || null,
         adID,
         purpose,
@@ -474,10 +474,10 @@ const MechanicProfile = ({ shopId }) => {
                   </div>
                   <div
                     className={`inline-flex items-center gap-2 px-4 py-2 rounded-full border font-semibold text-sm ${processedShopData.status === "approved"
-                        ? "bg-success/10 text-success border-success/20"
-                        : processedShopData.status === "pending"
-                          ? "bg-warning/10 text-warning border-warning/20"
-                          : "bg-error/10 text-error border-error/20"
+                      ? "bg-success/10 text-success border-success/20"
+                      : processedShopData.status === "pending"
+                        ? "bg-warning/10 text-warning border-warning/20"
+                        : "bg-error/10 text-error border-error/20"
                       }`}
                   >
                     {processedShopData.status.charAt(0).toUpperCase() +
@@ -533,12 +533,10 @@ const MechanicProfile = ({ shopId }) => {
           </div>
 
           <div className="space-y-6">
-            {/* Payment Section */}
             <div className="space-y-4">
               <div className="bg-base-100 rounded-3xl p-6 border border-neutral/40 shadow-lg relative overflow-hidden">
-                {/* Status Dot Indicator */}
                 <div
-                  className={`absolute top-4 left-4 w-10 h-3 rounded-full ${!paymentInfo ? "bg-error animate-pulse" : "bg-success"
+                  className={`absolute top-4 left-4 w-3 h-3 rounded-full ${!paymentInfo ? "bg-error animate-pulse" : "bg-success"
                     }`}
                 ></div>
 
@@ -629,10 +627,10 @@ const MechanicProfile = ({ shopId }) => {
                     </span>
                     <span
                       className={`badge badge-lg font-semibold ${paymentInfo?.paymentStatus === "paid"
-                          ? "badge-success"
-                          : paymentInfo?.paymentStatus === "failed"
-                            ? "badge-error"
-                            : "badge-warning"
+                        ? "badge-success"
+                        : paymentInfo?.paymentStatus === "failed"
+                          ? "badge-error"
+                          : "badge-warning"
                         }`}
                     >
                       {paymentInfo?.paymentStatus === "paid"
@@ -670,85 +668,6 @@ const MechanicProfile = ({ shopId }) => {
           </div>
         </div>
 
-
-        <div className="bg-base-100 rounded-3xl p-4 mb-8 border border-neutral/40 shadow-lg">
-          <h2 className="text-2xl font-semibold mb-4">Your Ads</h2>
-
-          {adsData.length === 0 ? (
-            <p className="text-gray-500">No ads available.</p>
-          ) : (
-            adsData.map((ad) => (
-              <div
-                key={ad._id}
-                className="flex flex-col md:flex-row items-center md:items-start gap-4 mb-6 p-4 border border-gray-50 rounded-2xl shadow-sm hover:shadow-md transition"
-              >
-                {/* Banner Image */}
-                <img
-                  src={ad.bannerImage}
-                  alt={ad.title}
-                  className="w-full md:w-48 h-32 md:h-40 object-cover rounded-xl"
-                />
-
-                {/* Ad Details */}
-                <div className="flex-1">
-                  <h3 className="text-xl font-bold">{ad.title}</h3>
-                  <p className="text-gray-600 mt-1">{ad.description}</p>
-                  <p className="text-sm text-gray-500 mt-1">
-                    Duration: {ad.duration} {ad.duration > 1 ? "days" : "day"} |
-                    Price: {ad.price} Tk
-                  </p>
-                  <p className="text-gray-600 mt-1">
-                    Status: <span>{ad.status}</span>
-                  </p>
-                  <p className="text-sm mt-1">
-                    Payment Status:{" "}
-                    <span
-                      className={
-                        ad.isPaid
-                          ? "text-green-600 font-semibold"
-                          : "text-orange-500 font-semibold"
-                      }
-                    >
-                      {ad.isPaid ? "Paid" : "UnPaid"}
-                    </span>
-                  </p>
-                </div>
-
-                {/* Action Buttons */}
-                <div className="flex flex-col md:flex-row gap-2">
-                  {!ad.isPaid && (
-                    <Button
-                      onClick={async () => {
-                        const result = await Swal.fire({
-                          title: `Pay ${ad.price} Tk for "${ad.title}"?`,
-                          icon: "question",
-                          showCancelButton: true,
-                          confirmButtonText: "Yes, Pay Now",
-                          cancelButtonText: "Cancel",
-                        });
-
-                        if (result.isConfirmed) {
-                          handlePayment("Ads", ad.price, ad._id);
-                        }
-                      }}
-                    >
-                      Pay Now
-                    </Button>
-                  )}
-
-                  {/* Delete Button */}
-                  <Button
-                    className="bg-red-500 hover:bg-red-600 text-white btn-sm"
-                    onClick={() => handleDelete(ad._id, ad.title)}
-                  >
-                    <Trash2 />
-                  </Button>
-                </div>
-              </div>
-            ))
-          )}
-        </div>
-
         {/* Navigation Tabs */}
         <div className="bg-base-100 rounded-3xl p-2 mb-8 border border-neutral/40 shadow-lg">
           <div className="flex overflow-x-auto">
@@ -757,8 +676,8 @@ const MechanicProfile = ({ shopId }) => {
                 key={tab}
                 onClick={() => setActiveTab(tab)}
                 className={`flex items-center gap-2 px-6 py-3 rounded-xl font-semibold whitespace-nowrap transition-all duration-300 ${activeTab === tab
-                    ? "bg-primary text-primary-content shadow-lg"
-                    : "text-base-content/70 hover:text-base-content hover:bg-base-200"
+                  ? "bg-primary text-primary-content shadow-lg"
+                  : "text-base-content/70 hover:text-base-content hover:bg-base-200"
                   }`}
               >
                 {tab === "overview" && <BarChart3 size={18} />}
@@ -824,38 +743,6 @@ const MechanicProfile = ({ shopId }) => {
                       trend={15}
                       color="warning"
                     />
-                  </div>
-                </div>
-
-                {/* Service Categories Overview */}
-                <div className="bg-base-100 rounded-3xl p-6 md:p-8 border border-neutral/40 shadow-xl">
-                  <h2 className="text-2xl font-bold text-base-content mb-6">
-                    Service Categories
-                  </h2>
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {processedShopData.categories.map((category, index) => (
-                      <div
-                        key={index}
-                        className="bg-base-200 rounded-xl p-4 border border-base-300 transition-all duration-300 hover:scale-[1.02] group"
-                      >
-                        <div className="flex items-center gap-3 mb-2">
-                          <div className="p-2 rounded-lg bg-primary/10 group-hover:bg-primary/20 transition-colors duration-300">
-                            <Wrench className="text-primary" size={18} />
-                          </div>
-                          <h3 className="font-semibold text-base-content">
-                            {category}
-                          </h3>
-                        </div>
-                        <p className="text-base-content/70 text-sm">
-                          {
-                            Object.values(
-                              processedShopData.services[category] || {}
-                            ).flat().length
-                          }{" "}
-                          services available
-                        </p>
-                      </div>
-                    ))}
                   </div>
                 </div>
               </>
@@ -1061,56 +948,6 @@ const MechanicProfile = ({ shopId }) => {
                         </button>
                       </div>
                     </div>
-
-                    {/* Social Links */}
-                    {Object.keys(processedShopData.socialLinks).length > 0 && (
-                      <div className="bg-base-200 rounded-xl p-6 border border-base-300">
-                        <h3 className="font-semibold text-base-content mb-4">
-                          Follow Us
-                        </h3>
-                        <div className="flex gap-3">
-                          {processedShopData.socialLinks.facebook && (
-                            <button
-                              onClick={() =>
-                                window.open(
-                                  processedShopData.socialLinks.facebook,
-                                  "_blank"
-                                )
-                              }
-                              className="p-3 bg-base-100 rounded-lg hover:bg-base-300 transition-colors duration-300"
-                            >
-                              <Facebook className="text-primary" size={20} />
-                            </button>
-                          )}
-                          {processedShopData.socialLinks.instagram && (
-                            <button
-                              onClick={() =>
-                                window.open(
-                                  processedShopData.socialLinks.instagram,
-                                  "_blank"
-                                )
-                              }
-                              className="p-3 bg-base-100 rounded-lg hover:bg-base-300 transition-colors duration-300"
-                            >
-                              <Instagram className="text-primary" size={20} />
-                            </button>
-                          )}
-                          {processedShopData.socialLinks.twitter && (
-                            <button
-                              onClick={() =>
-                                window.open(
-                                  processedShopData.socialLinks.twitter,
-                                  "_blank"
-                                )
-                              }
-                              className="p-3 bg-base-100 rounded-lg hover:bg-base-300 transition-colors duration-300"
-                            >
-                              <Twitter className="text-primary" size={20} />
-                            </button>
-                          )}
-                        </div>
-                      </div>
-                    )}
                   </div>
                 </div>
               </div>
@@ -1141,8 +978,8 @@ const MechanicProfile = ({ shopId }) => {
                     <span className="text-base-content font-medium">{day}</span>
                     <span
                       className={`font-semibold ${day === processedShopData.workingHours.weekend
-                          ? "text-error"
-                          : "text-success"
+                        ? "text-error"
+                        : "text-success"
                         }`}
                     >
                       {day === processedShopData.workingHours.weekend
@@ -1153,62 +990,85 @@ const MechanicProfile = ({ shopId }) => {
                 ))}
               </div>
             </div>
-
-            {/* Management Actions */}
-            {loggedInUser &&
-              (loggedInUser.email === processedShopData.email ||
-                loggedInUser.role === "admin") && (
-                <div className="bg-base-100 rounded-3xl p-6 border border-neutral/40 shadow-xl">
-                  <h2 className="text-xl font-bold text-base-content mb-4">
-                    Shop Management
-                  </h2>
-                  <div className="space-y-3">
-                    <ActionButton
-                      icon={Edit3}
-                      label="Edit Shop Profile"
-                      variant="primary"
-                    />
-                    <ActionButton
-                      icon={Settings}
-                      label="Shop Settings"
-                      variant="secondary"
-                    />
-                    <ActionButton
-                      icon={BarChart3}
-                      label="View Analytics"
-                      variant="secondary"
-                    />
-                    <ActionButton
-                      icon={Share2}
-                      label="Share Profile"
-                      variant="secondary"
-                    />
-                  </div>
-                </div>
-              )}
-
-            {/* Service Specialties */}
-            <div className="bg-base-100 rounded-3xl p-6 border border-neutral/40 shadow-xl">
-              <h2 className="text-xl font-bold text-base-content mb-4">
-                Specialties
-              </h2>
-              <div className="flex flex-wrap gap-2">
-                {processedShopData.categories.map((category, index) => (
-                  <span
-                    key={index}
-                    className="px-3 py-1 bg-primary/10 text-primary text-sm rounded-xl border border-primary/20 font-medium transition-colors duration-300 hover:bg-primary/20"
-                  >
-                    {category}
-                  </span>
-                ))}
-                {processedShopData.categories.length === 0 && (
-                  <p className="text-base-content/70 text-sm">
-                    No specialties listed
-                  </p>
-                )}
-              </div>
-            </div>
           </div>
+        </div>
+
+        <div className="bg-base-100 rounded-3xl p-4 mb-8 border border-neutral/40 shadow-lg">
+          <h2 className="text-2xl font-semibold mb-4">Your Ads</h2>
+
+          {adsData.length === 0 ? (
+            <p className="text-gray-500">No ads available.</p>
+          ) : (
+            adsData.map((ad) => (
+              <div
+                key={ad._id}
+                className="flex flex-col md:flex-row items-center md:items-start gap-4 mb-6 p-4 border border-gray-50 rounded-2xl shadow-sm hover:shadow-md transition"
+              >
+                {/* Banner Image */}
+                <img
+                  src={ad.bannerImage}
+                  alt={ad.title}
+                  className="w-full md:w-48 h-32 md:h-40 object-cover rounded-xl"
+                />
+
+                {/* Ad Details */}
+                <div className="flex-1">
+                  <h3 className="text-xl font-bold">{ad.title}</h3>
+                  <p className="text-gray-600 mt-1">{ad.description}</p>
+                  <p className="text-sm text-gray-500 mt-1">
+                    Duration: {ad.duration} {ad.duration > 1 ? "days" : "day"} |
+                    Price: {ad.price} Tk
+                  </p>
+                  <p className="text-gray-600 mt-1">
+                    Status: <span>{ad.status}</span>
+                  </p>
+                  <p className="text-sm mt-1">
+                    Payment Status:{" "}
+                    <span
+                      className={
+                        ad.isPaid
+                          ? "text-green-600 font-semibold"
+                          : "text-orange-500 font-semibold"
+                      }
+                    >
+                      {ad.isPaid ? "Paid" : "UnPaid"}
+                    </span>
+                  </p>
+                </div>
+
+                {/* Action Buttons */}
+                <div className="flex flex-col md:flex-row gap-2">
+                  {!ad.isPaid && (
+                    <Button
+                      onClick={async () => {
+                        const result = await Swal.fire({
+                          title: `Pay ${ad.price} Tk for "${ad.title}"?`,
+                          icon: "question",
+                          showCancelButton: true,
+                          confirmButtonText: "Yes, Pay Now",
+                          cancelButtonText: "Cancel",
+                        });
+
+                        if (result.isConfirmed) {
+                          handlePayment("Ads", ad.price, ad._id);
+                        }
+                      }}
+                    >
+                      Pay Now
+                    </Button>
+                  )}
+
+                  {/* Delete Button */}
+                  <Button
+                    className="bg-red-500 hover:bg-red-600 text-white btn-sm"
+                    onClick={() => handleDelete(ad._id, ad.title)}
+                  >
+                    <Trash2 />
+                  </Button>
+                </div>
+              </div>
+            ))
+          )}
         </div>
       </div>
     </div>

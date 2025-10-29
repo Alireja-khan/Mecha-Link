@@ -50,6 +50,7 @@ const StatCard = ({ icon: Icon, value, label, color = "primary" }) => {
     );
 };
 
+// --- Main Component ---
 const MechanicRequestsPage = () => {
     const [acceptedRequests, setAcceptedRequests] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -137,26 +138,33 @@ const MechanicRequestsPage = () => {
         }
     };
 
-    const handleContactCustomer = (phoneNumber) => {
-        if (phoneNumber) {
-            window.open(`tel:${phoneNumber}`, '_blank');
-        }
-    };
-
+    // --- UPDATED LOGIC FOR CHAT PAYLOAD ---
     const handleMessageContact = async (request) => {
         if (!request || !loggedInUser) return;
 
         const chatPayload = {
             serviceRequestId: request._id,
-            customerId: request.userId,
-            customerName: request.user?.name || request.user?.userName || "Customer",
-            customerEmail: request.user?.email || request.userEmail,
-            customerProfileImage: request.user?.profileImage || null,
-            mechanicId: loggedInUser._id,
-            mechanicName: loggedInUser.name || "Shop Owner",
-            mechanicEmail: loggedInUser.email,
             messages: [],
-            mechanicProfileImage: loggedInUser.profileImage || null,
+            
+            // Correct structure: An array of two participants
+            participants: [
+                // Customer
+                {
+                    _id: request.userId,
+                    name: request.user?.name || request.user?.userName || "Customer",
+                    email: request.user?.email || request.userEmail,
+                    role: 'customer',
+                    profileImage: request.user?.profileImage || null,
+                },
+                // Mechanic/Shop Owner
+                {
+                    _id: loggedInUser._id,
+                    name: loggedInUser.name || "Shop Owner",
+                    email: loggedInUser.email,
+                    role: loggedInUser.role.toLowerCase(),
+                    profileImage: loggedInUser.profileImage || null,
+                }
+            ],
         };
 
         try {
@@ -166,15 +174,20 @@ const MechanicRequestsPage = () => {
                 body: JSON.stringify(chatPayload)
             });
 
-            if (!apiResponse.ok) throw new Error('Failed to create chat');
+            if (!apiResponse.ok) {
+                 const errorData = await apiResponse.json();
+                 throw new Error(errorData.error || 'Failed to create chat');
+            }
 
+            // Chat created or existing one found, now navigate to messages
             router.push(`/dashboard/${loggedInUser.role.toLowerCase()}/messages`);
 
         } catch (error) {
+            console.error("Chat creation error:", error);
             Swal.fire({
                 icon: 'error',
                 title: 'Chat Error',
-                text: 'Failed to start chat with customer',
+                text: `Failed to start chat with customer: ${error.message || 'Server error'}`,
                 confirmButtonColor: 'var(--color-error)',
                 background: 'var(--color-base-100)',
                 color: 'var(--color-base-content)'
@@ -516,15 +529,6 @@ const MechanicRequestsPage = () => {
                                                 >
                                                     <MessageCircle size={16} />
                                                 </button>
-                                                {request.contactInfo?.phoneNumber && (
-                                                    <button
-                                                        onClick={() => handleContactCustomer(request.contactInfo.phoneNumber)}
-                                                        className="p-2 bg-info/10 text-info rounded-xl border border-info/20 hover:bg-info/20 hover:scale-105 transition-all duration-200"
-                                                        title="Call Customer"
-                                                    >
-                                                        <Phone size={16} />
-                                                    </button>
-                                                )}
                                                 {request.location && (
                                                     <button
                                                         onClick={() => handleOpenMaps(request.location)}
