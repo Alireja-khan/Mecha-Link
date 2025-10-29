@@ -17,6 +17,7 @@ import NotificationWidget from "@/app/shared/NotificationWidget";
 import ToggleTheme from "../../../shared/ToggleTheme";
 import { useRouter } from "next/navigation";
 import CartIcon from "@/app/shared/cartIcon";
+import Link from "next/link";
 
 const transitionClasses = "transition duration-200 ease-in-out";
 
@@ -49,7 +50,7 @@ const UserDropdown = ({ loggedInUser, roleConfig }) => {
   return (
     <div
       ref={dropdownRef}
-      className="relative flex items-center gap-2 sm:gap-3 cursor-pointer px-1.5 py-1.5 xl:px-2 xl:py-2 rounded-full hover-lift transition-all duration-200 flex-shrink"
+      className="relative flex items-center gap-2 sm:gap-3 px-1.5 xl:px-2 rounded-full hover-lift transition-all duration-200 flex-shrink"
       onClick={() => setDropdownOpen((prev) => !prev)}
     >
       {loggedInUser && (
@@ -103,7 +104,7 @@ const PaymentReminder = ({ paymentStatus, onPayClick }) => {
 
   if (paymentStatus) {
     return (
-      <div className="relative" ref={tooltipRef}>
+      <div className="relative lg:block hidden" ref={tooltipRef}>
         <div
           className="flex items-center gap-2 px-4 py-2 bg-success/20 text-success rounded-xl border border-success/30 cursor-help"
           onMouseEnter={() => setShowTooltip(true)}
@@ -239,6 +240,7 @@ const Topbar = ({ pageTitle = "Dashboard", setIsMobileOpen }) => {
         return {
           badgeColor: "bg-red-100 text-red-600 border-red-400",
           actionText: "Manage Users",
+          route: "admin/manageUsers",
           actionIcon: <Users size={18} />,
           btnBg: "bg-red-600 hover:bg-red-700 shadow-red-300/50",
         };
@@ -246,13 +248,15 @@ const Topbar = ({ pageTitle = "Dashboard", setIsMobileOpen }) => {
         return {
           badgeColor: "bg-blue-100 text-blue-600 border-blue-400",
           actionText: "Service Requests",
+          route: "mechanic/requests",
           actionIcon: <Wrench size={18} />,
           btnBg: "bg-blue-600 hover:bg-blue-700 shadow-blue-300/50",
         };
       default:
         return {
           badgeColor: "bg-orange-100 text-orange-600 border-orange-400",
-          actionText: "New Booking",
+          actionText: "Service Request",
+          route: "user/addServiceRequest",
           actionIcon: <ClipboardList size={18} />,
           btnBg: "bg-orange-600 hover:bg-orange-700 shadow-orange-300/50",
         };
@@ -276,9 +280,11 @@ const Topbar = ({ pageTitle = "Dashboard", setIsMobileOpen }) => {
         >
           <Menu size={26} />
         </button>
-        <h1 className="text-2xl md:text-3xl font-extrabold text-base-content truncate">
-          {pageTitle}
-        </h1>
+        <div className="md:py-2.5  py-1.5">
+          <h1 className="text-2xl md:text-3xl font-extrabold text-base-content truncate">
+            {pageTitle}
+          </h1>
+        </div>
       </div>
 
       <div className="flex items-center gap-3">
@@ -290,20 +296,22 @@ const Topbar = ({ pageTitle = "Dashboard", setIsMobileOpen }) => {
           />
         )}
 
-        <CartIcon/>
+        <CartIcon />
         <ToggleTheme />
 
         {/* Notification Widget */}
         {loggedInUser && <NotificationWidget loggedInUser={loggedInUser} />}
 
         {roleConfig && (
-          <button
-            className={`hidden md:flex px-4 py-2 sm:py-2.5 rounded-lg sm:rounded-xl text-white text-sm sm:text-base font-semibold transition items-center gap-2 shadow-md ${roleConfig.btnBg}`}
-            title={roleConfig.actionText}
-          >
-            {roleConfig.actionIcon}
-            <span className="hidden md:block">{roleConfig.actionText}</span>
-          </button>
+          <Link href={roleConfig.route}>
+            <button
+              className={`hidden md:flex px-4 py-2 sm:py-2.5 rounded-lg sm:rounded-xl text-white text-sm sm:text-base font-semibold transition items-center gap-2 shadow-md ${roleConfig.btnBg}`}
+              title={roleConfig.actionText}
+            >
+              {roleConfig.actionIcon}
+              <span className="hidden md:block">{roleConfig.actionText}</span>
+            </button>
+          </Link>
         )}
 
         {loggedInUser && (

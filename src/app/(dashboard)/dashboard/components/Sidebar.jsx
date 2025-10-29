@@ -9,7 +9,7 @@ import {
   Store, LayoutDashboard, X, PanelLeft, PanelRight,
   LucideBrainCircuit,
   Building2,
-    Ticket,
+  Ticket,
   NotebookPen,
   ScrollText,
   BarChart3,
@@ -20,6 +20,7 @@ import {
 } from "lucide-react";
 import { FaGear } from "react-icons/fa6";
 import useUser from "@/hooks/useUser";
+import { signOut } from "next-auth/react";
 
 const menuItem = (name, icon, href) => ({ name, icon, href });
 
@@ -87,6 +88,10 @@ const Sidebar = ({ isMobileOpen, setIsMobileOpen }) => {
   };
 
   const fullMenu = [...commonMenu, ...(roleMenu[role] || [])];
+
+  const handleSignOut = () => {
+    signOut({ callbackUrl: "/" });
+  };
 
   return (
     <>
@@ -182,6 +187,7 @@ const Sidebar = ({ isMobileOpen, setIsMobileOpen }) => {
             className={`flex items-center transition-all duration-200 p-3 rounded-xl text-error hover:bg-error/10 hover:shadow-sm font-medium
               ${isExpanded ? "justify-start gap-4" : "justify-center"}`}
             title="Logout"
+            onClick={() => { handleSignOut() }}
           >
             <LogOut size={20} />
             <span className={`${isExpanded ? "opacity-100" : "opacity-0 max-w-0"}`}>

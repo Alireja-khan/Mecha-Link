@@ -120,7 +120,7 @@ const decodeCheckoutData = (base64) => {
 };
 
 export default function CheckoutPage() {
-    const { user, status } = useUser();
+    const { user } = useUser();
     const searchParams = useSearchParams();
     const itemsEncoded = searchParams.get('items');
     
@@ -140,10 +140,8 @@ export default function CheckoutPage() {
     const [placingOrder, setPlacingOrder] = useState(false);
 
     useEffect(() => {
-        if (status === 'loading') return;
 
-        if (status === 'unauthenticated' || !user) {
-            toast.error("Please log in to proceed to checkout.");
+        if (!user) {
             setLoading(false);
             return;
         }
@@ -165,7 +163,6 @@ export default function CheckoutPage() {
                 };
             } catch (error) {
                 console.error(`Failed to fetch part ${partId}:`, error);
-                // Fail silently for this item, let others load
                 return null;
             }
         };
@@ -203,7 +200,7 @@ export default function CheckoutPage() {
 
         loadCheckoutData();
 
-    }, [user, status, itemsEncoded, singlePartId, singleQuantity]);
+    }, [user, itemsEncoded, singlePartId, singleQuantity]);
 
     const { subtotal, shippingFee, total } = useMemo(() => {
         const itemSubtotal = checkoutItems.reduce((acc, item) => acc + item.price * item.quantity, 0);
@@ -264,7 +261,7 @@ export default function CheckoutPage() {
     };
 
 
-    if (loading || status === 'loading' || !user) {
+    if (loading || !user) {
         return <Loader />;
     }
 

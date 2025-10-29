@@ -1,16 +1,14 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
-import { User, MapPin, Clock, AlertTriangle, Car, Bike, Truck, Home, Tv, Zap } from "lucide-react";
+import { User, MapPin, Clock, AlertTriangle, Car, Bike, Truck, Home, Tv, Zap, Building, Landmark, Pin, Camera } from "lucide-react";
 import Button from "@/app/shared/Button";
 import toast from "react-hot-toast";
-import AddressSelector from "../../components/AddressSelector";
 import Swal from "sweetalert2";
 import { useSession } from "next-auth/react";
 import useUser from "@/hooks/useUser";
 
 const VEHICLE_BRANDS = {
-
   car: [
     "Toyota", "Honda", "Nissan", "Mitsubishi", "Suzuki", "Hyundai", "Kia",
     "BMW", "Mercedes-Benz", "Audi", "Volkswagen", "Ford", "Chevrolet",
@@ -28,29 +26,49 @@ const VEHICLE_BRANDS = {
   ]
 };
 
-const VEHICLE_MODELS = {
-  "Toyota": [
-    "Corolla", "Camry", "Premio", "Allion", "Noah", "Voxy", "Aqua",
-    "Prius", "Vitz", "Raize", "Rush", "Hilux", "Land Cruiser", "Fortuner", "Other"
+// --- UPDATED BANGLADESH LOCATION DATA (8 DIVISIONS, 64 DISTRICTS) ---
+const BANGLADESH_LOCATIONS = {
+  divisions: [
+    "Dhaka", "Chattogram", "Rajshahi", "Khulna", "Barishal",
+    "Sylhet", "Rangpur", "Mymensingh"
   ],
-  "Honda": [
-    "Civic", "Accord", "City", "Fit", "Vezel", "CR-V", "HR-V", "BR-V",
-    "Stepwagon", "Freed", "N-Box", "Other"
-  ],
-  "Nissan": [
-    "Sunny", "Tiida", "Note", "March", "X-Trail", "Qashqai", "Patrol",
-    "Navara", "Juke", "Other"
-  ],
-  "Yamaha": [
-    "YZF-R15", "MT-15", "FZ", "FZS", "R15", "MT-07", "MT-09", "YZF-R3",
-    "Fazer", "FZ-S", "Other"
-  ],
-  "Suzuki": [
-    "Gixxer", "Hayabusa", "V-Strom", "Burgman", "Access", "Intruder",
-    "GSX-R", "Other"
-  ],
-  "Other": ["Other"]
+  districts: {
+    Dhaka: [
+      "Dhaka", "Gazipur", "Kishoreganj", "Manikganj", "Munshiganj",
+      "Narayanganj", "Narsingdi", "Tangail", "Faridpur", "Gopalganj",
+      "Madaripur", "Rajbari", "Shariatpur"
+    ],
+    Chattogram: [
+      "Chattogram", "Bandarban", "Brahmanbaria", "Chandpur", "Cumilla",
+      "Cox's Bazar", "Feni", "Khagrachhari", "Lakshmipur", "Noakhali",
+      "Rangamati"
+    ],
+    Rajshahi: [
+      "Rajshahi", "Bogra", "Joypurhat", "Naogaon", "Natore",
+      "Chapai Nawabganj", "Pabna", "Sirajganj"
+    ],
+    Khulna: [
+      "Khulna", "Bagerhat", "Chuadanga", "Jashore", "Jhenaidah",
+      "Kushtia", "Magura", "Meherpur", "Narail", "Satkhira"
+    ],
+    Barishal: [
+      "Barishal", "Barguna", "Bhola", "Jhalokati", "Patuakhali",
+      "Pirojpur"
+    ],
+    Sylhet: [
+      "Sylhet", "Habiganj", "Moulvibazar", "Sunamganj"
+    ],
+    Rangpur: [
+      "Rangpur", "Dinajpur", "Gaibandha", "Kurigram", "Lalmonirhat",
+      "Nilphamari", "Panchagarh", "Thakurgaon"
+    ],
+    Mymensingh: [
+      "Mymensingh", "Jamalpur", "Netrokona", "Sherpur"
+    ],
+  }
 };
+// --- END OF UPDATED LOCATION DATA ---
+
 
 const DEVICE_TYPES = {
   car: { label: "Car", icon: Car, categories: ["Engine", "Transmission", "Brakes", "Electrical", "AC", "Tires", "General Maintenance"] },
@@ -63,12 +81,12 @@ const DEVICE_TYPES = {
 };
 
 const URGENCY_LEVELS = [
-  // Updated colors to match your theme standards (success, warning, error)
-  { value: "low", label: "Low (Within 1 week)", color: "text-success" },
-  { value: "medium", label: "Medium (Within 3 days)", color: "text-warning" },
-  { value: "high", label: "High (Within 24 hours)", color: "text-error" },
-  { value: "emergency", label: "Emergency (Immediate)", color: "text-error" }
+  { value: "low", label: "Low (Within 1 week)", color: "text-success", icon: Clock },
+  { value: "medium", label: "Medium (Within 3 days)", color: "text-warning", icon: AlertTriangle },
+  { value: "high", label: "High (Within 24 hours)", color: "text-error", icon: AlertTriangle },
+  { value: "emergency", label: "Emergency (Immediate)", color: "text-error", icon: AlertTriangle }
 ];
+
 
 const ServiceRequest = () => {
   const {
@@ -84,7 +102,12 @@ const ServiceRequest = () => {
       problemCategory: "",
       urgency: "medium",
       brand: "",
-      model: ""
+      model: "",
+      images: [],
+      fullAddress: "",
+      area: "",
+      city: "",
+      division: ""
     }
   });
 
@@ -95,47 +118,53 @@ const ServiceRequest = () => {
   });
   const [uploadProgress, setUploadProgress] = useState(0);
   const [availableBrands, setAvailableBrands] = useState([]);
-  const [availableModels, setAvailableModels] = useState([]);
 
   const watchDeviceType = watch("deviceType");
   const watchImages = watch("images");
+  const watchDivision = watch("division");
   const watchUrgency = watch("urgency");
-  const watchBrand = watch("brand");
+
   const { data: session } = useSession();
   const loggedInUser = useUser(session?.user?.email)
-
-  // ------------------------------------------
-  // LOG USER ID, NAME, AND EMAIL ON PAGE LOAD (unchanged)
-  // ------------------------------------------
-  useEffect(() => {
-  }, [session, loggedInUser]);
-  // ------------------------------------------
 
   useEffect(() => {
     if (watchDeviceType) {
       setValue("problemCategory", "");
       setValue("brand", "");
-      setValue("model", "");
-      setValue("year", "");
-      setValue("vin", "");
-
       if (["car", "bike", "truck"].includes(watchDeviceType)) {
+        setValue("model", "");
         setAvailableBrands(VEHICLE_BRANDS[watchDeviceType] || []);
       } else {
         setAvailableBrands([]);
       }
-      setAvailableModels([]);
+      setValue("year", "");
+      setValue("vin", "");
     }
   }, [watchDeviceType, setValue]);
 
   useEffect(() => {
-    if (watchBrand && watchDeviceType && ["car", "bike", "truck"].includes(watchDeviceType)) {
-      setAvailableModels(VEHICLE_MODELS[watchBrand] || ["Other"]);
-      setValue("model", "");
+    setValue("city", "");
+  }, [watchDivision, setValue]);
+
+
+  const handleImageChange = (event) => {
+    const newFiles = Array.from(event.target.files);
+    const existingFiles = watchImages || [];
+    const MAX_FILES = 5;
+    const totalNewCount = existingFiles.length + newFiles.length;
+
+    if (totalNewCount > MAX_FILES) {
+      const filesToAdd = MAX_FILES - existingFiles.length;
+      const mergedFiles = [...existingFiles, ...newFiles.slice(0, filesToAdd)];
+      setValue("images", mergedFiles);
+      toast.error(`Maximum 5 images allowed. Only added ${filesToAdd} from your last selection.`);
     } else {
-      setAvailableModels([]);
+      const mergedFiles = [...existingFiles, ...newFiles];
+      setValue("images", mergedFiles);
     }
-  }, [watchBrand, watchDeviceType, setValue]);
+    event.target.value = null;
+  };
+
 
   const uploadImageToImgbb = async (file) => {
     const formData = new FormData();
@@ -143,6 +172,7 @@ const ServiceRequest = () => {
 
     try {
       const response = await fetch(
+        // Ensure you have this environment variable set
         `https://api.imgbb.com/1/upload?key=${process.env.NEXT_PUBLIC_ImgBB_API_KEY}`,
         {
           method: "POST",
@@ -164,11 +194,11 @@ const ServiceRequest = () => {
 
 
   const onSubmit = async (data) => {
-    if (!location.address || !location.latitude || !location.longitude) {
-      toast.error("Please select a valid location");
+    if (!data.fullAddress || !data.area || !data.city || !data.division) {
+      toast.error("Please fill in all address details for service coverage.");
       Swal.fire({
-        title: 'Location Required',
-        text: 'Please select a valid location',
+        title: 'Address Required',
+        text: 'Please enter the Full Address, Area, City/District, and Division/Region.',
         icon: 'warning',
         confirmButtonText: 'OK'
       });
@@ -178,14 +208,19 @@ const ServiceRequest = () => {
     try {
       setUploadProgress(0);
       let uploadedImages = [];
+      const filesToUpload = data.images || [];
 
-      if (data.images && data.images.length > 0) {
-        const uploadToast = toast.loading(`Uploading images (0/${data.images.length})`);
-        for (let i = 0; i < data.images.length; i++) {
-          const imageUrl = await uploadImageToImgbb(data.images[i]);
+      if (filesToUpload.length > 0) {
+        const uploadToast = toast.loading(`Uploading images (0/${filesToUpload.length})`);
+        for (let i = 0; i < filesToUpload.length; i++) {
+          if (filesToUpload[i].size > 5 * 1024 * 1024) {
+            toast.error(`Image ${i + 1} is too large (>${5}MB). Skipping.`);
+            continue;
+          }
+          const imageUrl = await uploadImageToImgbb(filesToUpload[i]);
           uploadedImages.push(imageUrl);
-          toast.loading(`Uploading images (${i + 1}/${data.images.length})`, { id: uploadToast });
-          setUploadProgress(((i + 1) / data.images.length) * 100);
+          toast.loading(`Uploading images (${i + 1}/${filesToUpload.length})`, { id: uploadToast });
+          setUploadProgress(((i + 1) / filesToUpload.length) * 100);
         }
         toast.dismiss();
       }
@@ -194,6 +229,8 @@ const ServiceRequest = () => {
       const userEmail = session?.user?.email || loggedInUser?.email || "guest@example.com";
       const userName = session?.user?.name || loggedInUser?.name || "Guest User";
       const userImage = session?.user?.profileImage || loggedInUser?.profileImage || "Guest User";
+
+      const isVehicle = ["car", "bike", "truck"].includes(data.deviceType);
 
       const formData = {
         userId: userId,
@@ -207,14 +244,26 @@ const ServiceRequest = () => {
           description: data.description,
           images: uploadedImages,
           urgency: data.urgency,
-          vehicleInfo: {
+          vehicleInfo: isVehicle ? {
             brand: data.brand,
             model: data.model,
             year: data.year,
             vin: data.vin
+          } : {
+            brand: data.brand,
+            model: data.model,
+            year: null,
+            vin: null
           }
         },
-        location,
+        location: {
+          address: data.fullAddress,
+          area: data.area,
+          city: data.city,
+          division: data.division,
+          latitude: location.latitude,
+          longitude: location.longitude,
+        },
         contactInfo: {
           phoneNumber: data.phoneNumber,
           alternatePhone: data.alternatePhone,
@@ -231,7 +280,6 @@ const ServiceRequest = () => {
         estimatedBudget: data.budgetRange,
         completedDate: null,
       };
-
 
       const res = await fetch("/api/service-request", {
         method: "POST",
@@ -266,29 +314,33 @@ const ServiceRequest = () => {
   };
 
 
+  const removeImage = (indexToRemove) => {
+    const newImages = watchImages.filter((_, index) => index !== indexToRemove);
+    setValue("images", newImages);
+  };
+
   const getUrgencyIcon = (urgency) => {
     const level = URGENCY_LEVELS.find(l => l.value === urgency);
-    const colorClass = level ? level.color : "";
 
-    switch (urgency) {
-      case "low": return <Clock className={`h-4 w-4 ${colorClass}`} />;
-      case "medium": return <AlertTriangle className={`h-4 w-4 ${colorClass}`} />;
-      case "high": return <AlertTriangle className={`h-4 w-4 ${colorClass}`} />;
-      case "emergency": return <AlertTriangle className={`h-4 w-4 ${colorClass}`} />;
-      default: return <Clock className="h-4 w-4 text-base-content" />;
-    }
+    if (!level) return null;
+
+    const IconComponent = level.icon;
+    return <IconComponent className={`h-4 w-4 ${level.color}`} />;
   };
+
+  const getUrgencyLabel = (urgency) => {
+    const level = URGENCY_LEVELS.find(l => l.value === urgency);
+    return level ? level.label : "Not selected";
+  }
 
 
   return (
-    // Updated background to base-200, matching common page background
     <div className="min-h-screen bg-base-200 py-8 px-4 text-base-content">
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-8">
           <h1 className="text-4xl font-bold text-primary mb-2">
             Service Request Form
           </h1>
-          {/* Updated text color to neutral-content */}
           <p className="text-lg text-neutral-content">
             Get professional help for your vehicle or appliance repair needs
           </p>
@@ -297,7 +349,7 @@ const ServiceRequest = () => {
         <form onSubmit={handleSubmit(onSubmit)} className="grid xl:grid-cols-3 lg:grid-cols-2 gap-6">
 
           <div className="xl:col-span-1 space-y-6">
-            {/* Card Background, Shadow, and Border */}
+
             <div className="bg-base-100 p-6 rounded-xl shadow-lg border border-neutral h-fit">
               <h2 className="flex items-center gap-2 text-primary mb-4 text-xl font-semibold">
                 <User className="h-5 w-5" /> Device/Vehicle Information
@@ -305,11 +357,9 @@ const ServiceRequest = () => {
 
               <div className="grid gap-4">
                 <div>
-                  {/* Updated label color */}
-                  <label className="block text-sm font-medium mb-2 text-base-content">Device Type *</label>
+                  <label className="block text-sm font-medium mb-2 text-base-content">Device Type</label>
                   <select
                     {...register("deviceType", { required: "Device type is required" })}
-                    // Updated input styles
                     className="w-full p-3 border border-neutral rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent bg-base-100 text-base-content"
                   >
                     <option value="">Select what needs service</option>
@@ -323,42 +373,29 @@ const ServiceRequest = () => {
                 </div>
 
                 {watchDeviceType && ["car", "bike", "truck"].includes(watchDeviceType) && (
-                  // Updated background to accent/base-200
                   <div className="grid gap-4 p-4 bg-accent/20 rounded-lg">
                     <div>
-                      <label className="block text-sm font-medium mb-2 text-base-content">Brand *</label>
-                      <select
-                        {...register("brand", {
+                      <label className="block text-sm font-medium mb-2 text-base-content">Brand</label>
+                      <input
+                        type="text"
+                        {...register("model", {
                           required: "Brand is required for vehicles"
                         })}
-                        // Updated input styles
                         className="w-full p-3 border border-neutral rounded-lg bg-base-100 text-base-content"
-                      >
-                        <option value="">Select brand</option>
-                        {availableBrands.map((brand) => (
-                          <option key={brand} value={brand}>{brand}</option>
-                        ))}
-                      </select>
-                      {errors.brand && (
-                        <p className="text-sm text-error mt-1">{errors.brand.message}</p>
-                      )}
+                        placeholder="Vehicle Brand"
+                      />
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium mb-2 text-base-content">Model *</label>
-                      <select
+                      <label className="block text-sm font-medium mb-2 text-base-content">Model</label>
+                      <input
+                        type="text"
                         {...register("model", {
                           required: "Model is required for vehicles"
                         })}
-                        // Updated input styles
                         className="w-full p-3 border border-neutral rounded-lg bg-base-100 text-base-content"
-                        disabled={!watchBrand}
-                      >
-                        <option value="">{watchBrand ? "Select model" : "Select brand first"}</option>
-                        {availableModels.map((model) => (
-                          <option key={model} value={model}>{model}</option>
-                        ))}
-                      </select>
+                        placeholder="Vehicle Model (e.g., Civic, R15)"
+                      />
                       {errors.model && (
                         <p className="text-sm text-error mt-1">{errors.model.message}</p>
                       )}
@@ -376,7 +413,6 @@ const ServiceRequest = () => {
                               message: `Year cannot be in the future`
                             }
                           })}
-                          // Updated input styles
                           className="w-full p-3 border border-neutral rounded-lg bg-base-100 text-base-content"
                           placeholder="e.g., 2020"
                         />
@@ -386,7 +422,7 @@ const ServiceRequest = () => {
                       </div>
 
                       <div>
-                        <label className="block text-sm font-medium mb-2 text-base-content">VIN (Optional)</label>
+                        <label className="block text-sm font-medium mb-2 text-base-content">VIN</label>
                         <input
                           {...register("vin", {
                             pattern: {
@@ -394,7 +430,6 @@ const ServiceRequest = () => {
                               message: "VIN must be 17 characters (letters and numbers)"
                             }
                           })}
-                          // Updated input styles
                           className="w-full p-3 border border-neutral rounded-lg bg-base-100 text-base-content"
                           placeholder="Vehicle Identification Number"
                           maxLength={17}
@@ -408,39 +443,43 @@ const ServiceRequest = () => {
                 )}
 
                 {watchDeviceType && !["car", "bike", "truck"].includes(watchDeviceType) && watchDeviceType !== "other" && (
-                  <div>
-                    <label className="block text-sm font-medium mb-2 text-base-content">Brand (Optional)</label>
-                    <input
-                      {...register("brand")}
-                      // Updated input styles
-                      className="w-full p-3 border border-neutral rounded-lg bg-base-100 text-base-content"
-                      placeholder={`e.g., Samsung, LG, General, etc.`}
-                    />
-                  </div>
+                  <>
+                    <div>
+                      <label className="block text-sm font-medium mb-2 text-base-content">Brand</label>
+                      <input
+                        {...register("brand")}
+                        className="w-full p-3 border border-neutral rounded-lg bg-base-100 text-base-content"
+                        placeholder={`e.g., Samsung, LG`}
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium mb-2 text-base-content">Model</label>
+                      <input
+                        {...register("model")}
+                        className="w-full p-3 border border-neutral rounded-lg bg-base-100 text-base-content"
+                        placeholder={`e.g., AA5000, 42-inch LED`}
+                      />
+                    </div>
+                  </>
                 )}
 
                 {watchDeviceType && (
                   <div>
-                    <label className="block text-sm font-medium mb-2 text-base-content">Problem Category *</label>
-                    <select
-                      {...register("problemCategory", { required: "Problem category is required" })}
-                      // Updated input styles
+                    <label className="block text-sm font-medium mb-2 text-base-content">Problem Category</label>
+                    <input
+                      type="text"
+                      {...register("model", {
+                        required: "problem is required for vehicles"
+                      })}
                       className="w-full p-3 border border-neutral rounded-lg bg-base-100 text-base-content"
-                    >
-                      <option value="">Select problem category</option>
-                      {DEVICE_TYPES[watchDeviceType]?.categories.map(category => (
-                        <option key={category} value={category}>{category}</option>
-                      ))}
-                    </select>
-                    {errors.problemCategory && (
-                      <p className="text-sm text-error mt-1">{errors.problemCategory.message}</p>
-                    )}
+                      placeholder="Problem category (e.g., Engine)"
+                    />
                   </div>
                 )}
               </div>
             </div>
 
-            {/* Card Background, Shadow, and Border */}
             <div className="bg-base-100 p-6 rounded-xl shadow-lg border border-neutral h-fit">
               <h2 className="flex items-center gap-2 text-primary mb-4 text-xl font-semibold">
                 <AlertTriangle className="h-5 w-5" /> Service Details
@@ -448,10 +487,9 @@ const ServiceRequest = () => {
 
               <div className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium mb-2 text-base-content">Problem Title *</label>
+                  <label className="block text-sm font-medium mb-2 text-base-content">Problem Title</label>
                   <input
                     {...register("problemTitle", { required: "Problem title is required" })}
-                    // Updated input styles
                     className="w-full p-3 border border-neutral rounded-lg bg-base-100 text-base-content"
                     placeholder="Brief description of the problem"
                   />
@@ -461,13 +499,12 @@ const ServiceRequest = () => {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium mb-2 text-base-content">Detailed Description *</label>
+                  <label className="block text-sm font-medium mb-2 text-base-content">Detailed Description</label>
                   <textarea
                     {...register("description", {
                       required: "Description is required",
                       minLength: { value: 20, message: "Description should be at least 20 characters" }
                     })}
-                    // Updated input styles
                     className="w-full p-3 border border-neutral rounded-lg bg-base-100 text-base-content"
                     placeholder="Describe the problem in detail, including any symptoms, when it started, and what you've tried..."
                     rows={4}
@@ -478,87 +515,88 @@ const ServiceRequest = () => {
                 </div>
               </div>
             </div>
-
-            {/* Card Background, Shadow, and Border */}
-            <div className="bg-base-100 p-6 rounded-xl shadow-lg border border-neutral h-fit">
-              <h2 className="flex items-center gap-2 text-primary mb-4 text-xl font-semibold">
-                ⚡ Urgency & Budget
-              </h2>
-
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium mb-2 text-base-content">Urgency Level</label>
-                  <div className="grid grid-cols-2 gap-2">
-                    {URGENCY_LEVELS.map((level) => (
-                      <label key={level.value} className={`flex items-center p-3 border rounded-lg cursor-pointer transition-colors ${watchUrgency === level.value ? 'border-primary bg-primary/10' : 'border-neutral bg-base-100 hover:bg-base-200'
-                        }`}>
-                        <input
-                          type="radio"
-                          value={level.value}
-                          {...register("urgency")}
-                          className="hidden"
-                        />
-                        <span className={`flex items-center gap-1 text-sm font-medium ${level.color}`}>
-                          {getUrgencyIcon(level.value)}
-                          {level.label.split(' ')[0]}
-                        </span>
-                      </label>
-                    ))}
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium mb-2 text-base-content">Expected Budget Range (BDT)</label>
-                  <select
-                    {...register("budgetRange")}
-                    // Updated input styles
-                    className="w-full p-3 border border-neutral rounded-lg bg-base-100 text-base-content"
-                  >
-                    <option value="">Not sure</option>
-                    <option value="0-1000">0 - 1,000 BDT</option>
-                    <option value="1000-5000">1,000 - 5,000 BDT</option>
-                    <option value="5000-10000">5,000 - 10,000 BDT</option>
-                    <option value="10000-20000">10,000 - 20,000 BDT</option>
-                    <option value="20000-50000">20,000 - 50,000 BDT</option>
-                    <option value="50000+">50,000+ BDT</option>
-                  </select>
-                  {/* Updated text color */}
-                  <p className="text-sm text-neutral-content mt-2">
-                    This helps mechanics provide appropriate quotes
-                  </p>
-                </div>
-              </div>
-            </div>
           </div>
 
           <div className="xl:col-span-1 space-y-6">
-            {/* Card Background, Shadow, and Border */}
+
             <div className="bg-base-100 p-6 rounded-xl shadow-lg border border-neutral h-fit">
               <h2 className="flex items-center gap-2 text-primary mb-4 text-xl font-semibold">
                 <MapPin className="h-5 w-5" /> Service Location
               </h2>
 
               <div className="space-y-4">
-                <label className="block text-sm font-medium text-base-content">Select your location *</label>
-                <AddressSelector location={location} setLocation={setLocation} />
+                <div>
+                  <label className="block text-sm font-medium mb-2 text-base-content flex items-center gap-1">
+                    <Pin className="h-4 w-4 text-secondary" /> Full Address / Street
+                  </label>
+                  <input
+                    {...register("fullAddress", { required: "Full Address is required" })}
+                    className="w-full p-3 border border-neutral rounded-lg bg-base-100 text-base-content"
+                    placeholder="House/Plot/Holding No., Road Name/No."
+                  />
+                  {errors.fullAddress && (
+                    <p className="text-sm text-error mt-1">{errors.fullAddress.message}</p>
+                  )}
+                </div>
 
-                {!location.address && (
-                  <p className="text-sm text-warning mt-1">
-                    <AlertTriangle className="h-4 w-4 inline mr-1" /> Please select your location on the map
-                  </p>
-                )}
-                {location.address && (
-                  <p className="text-sm text-success mt-1">
-                    <span className="font-semibold">✅ Location selected:</span> {location.address}
-                  </p>
-                )}
+                <div>
+                  <label className="block text-sm font-medium mb-2 text-base-content flex items-center gap-1">
+                    <Building className="h-4 w-4 text-secondary" /> Area / Moholla
+                  </label>
+                  <input
+                    {...register("area", { required: "Area/Moholla is required" })}
+                    className="w-full p-3 border border-neutral rounded-lg bg-base-100 text-base-content"
+                    placeholder="e.g., Mirpur DOHS, Dhanmondi"
+                  />
+                  {errors.area && (
+                    <p className="text-sm text-error mt-1">{errors.area.message}</p>
+                  )}
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium mb-2 text-base-content flex items-center gap-1">
+                      <Landmark className="h-4 w-4 text-secondary" /> Division / Region
+                    </label>
+                    <select
+                      {...register("division", { required: "Division is required" })}
+                      className="w-full p-3 border border-neutral rounded-lg bg-base-100 text-base-content"
+                    >
+                      <option value="">Select Division</option>
+                      {BANGLADESH_LOCATIONS.divisions.map(div => (
+                        <option key={div} value={div}>{div}</option>
+                      ))}
+                    </select>
+                    {errors.division && (
+                      <p className="text-sm text-error mt-1">{errors.division.message}</p>
+                    )}
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium mb-2 text-base-content flex items-center gap-1">
+                      <MapPin className="h-4 w-4 text-secondary" /> City / District
+                    </label>
+                    <select
+                      {...register("city", { required: "City/District is required" })}
+                      className="w-full p-3 border border-neutral rounded-lg bg-base-100 text-base-content disabled:bg-gray-200 disabled:opacity-70"
+                      disabled={!watchDivision}
+                    >
+                      <option value="">Select District</option>
+                      {watchDivision && BANGLADESH_LOCATIONS.districts[watchDivision]?.map(city => (
+                        <option key={city} value={city}>{city}</option>
+                      ))}
+                    </select>
+                    {errors.city && (
+                      <p className="text-sm text-error mt-1">{errors.city.message}</p>
+                    )}
+                  </div>
+                </div>
               </div>
             </div>
 
-            {/* Card Background, Shadow, and Border */}
             <div className="bg-base-100 p-6 rounded-xl shadow-lg border border-neutral h-fit">
               <h2 className="flex items-center gap-2 text-primary mb-4 text-xl font-semibold">
-                📸 Problem Images
+                <Camera /> Problem Images
               </h2>
 
               <div className="space-y-4">
@@ -570,33 +608,24 @@ const ServiceRequest = () => {
                     type="file"
                     multiple
                     accept="image/*"
-                    {...register("images", {
-                      validate: {
-                        maxFiles: files => !files || files.length <= 5 || "Maximum 5 images allowed",
-                        maxSize: files => {
-                          if (files) {
-                            for (let file of files) {
-                              if (file.size > 5 * 1024 * 1024) {
-                                return "Each image should be less than 5MB";
-                              }
-                            }
-                          }
-                          return true;
-                        }
-                      }
-                    })}
-                    // Updated input styles
-                    className="w-full border border-neutral rounded-lg p-3 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-primary file:text-primary-content hover:file:bg-primary/90 file:cursor-pointer"
+                    onChange={handleImageChange}
+                    disabled={watchImages.length >= 5}
+                    className="w-full border border-neutral rounded-lg p-3 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-primary file:text-primary-content hover:file:bg-primary/90 file:cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                   />
-                  {errors.images && (
-                    <p className="text-sm text-error mt-1">{errors.images.message}</p>
+
+                  {watchImages.length >= 5 && (
+                    <p className="text-sm text-warning mt-1">Maximum limit of 5 images reached.</p>
+                  )}
+
+                  {watchImages.some(file => file.size > 5 * 1024 * 1024) && (
+                    <p className="text-sm text-error mt-1">Each image must be less than 5MB.</p>
                   )}
 
                   {watchImages && watchImages.length > 0 && (
                     <div className="mt-4">
                       <p className="text-sm text-neutral-content mb-2">Image Previews:</p>
                       <div className="grid grid-cols-3 gap-2">
-                        {Array.from(watchImages).map((file, i) => (
+                        {watchImages.map((file, i) => (
                           <div key={i} className="relative">
                             <img
                               src={URL.createObjectURL(file)}
@@ -605,12 +634,7 @@ const ServiceRequest = () => {
                             />
                             <button
                               type="button"
-                              onClick={() => {
-                                const newImages = Array.from(watchImages);
-                                newImages.splice(i, 1);
-                                setValue("images", newImages);
-                              }}
-                              // Updated button colors to error
+                              onClick={() => removeImage(i)}
                               className="absolute -top-2 -right-2 bg-error text-error-content rounded-full w-5 h-5 text-xs flex items-center justify-center transition-colors hover:bg-error/80"
                             >
                               ×
@@ -626,7 +650,7 @@ const ServiceRequest = () => {
           </div>
 
           <div className="xl:col-span-1 space-y-6">
-            {/* Card Background, Shadow, and Border */}
+
             <div className="bg-base-100 p-6 rounded-xl shadow-lg border border-neutral h-fit">
               <h2 className="flex items-center gap-2 text-primary mb-4 text-xl font-semibold">
                 <Clock className="h-5 w-5" /> Scheduling Preferences
@@ -634,12 +658,36 @@ const ServiceRequest = () => {
 
               <div className="space-y-4">
                 <div>
+                  <label className="block text-sm font-medium mb-2 text-base-content">Urgency Level</label>
+                  <select
+                    {...register("urgency")}
+                    className="w-full p-3 border border-neutral rounded-lg bg-base-100 text-base-content"
+                  >
+                    {URGENCY_LEVELS.map(level => (
+                      <option key={level.value} value={level.value}>
+                        {level.label}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* --- URGENCY ICON DISPLAY FIX --- */}
+                {watchUrgency && (
+                  <div className="flex items-center gap-2 p-3 rounded-lg bg-base-300/50">
+                    {getUrgencyIcon(watchUrgency)}
+                    <span className={`text-sm font-semibold ${URGENCY_LEVELS.find(l => l.value === watchUrgency)?.color}`}>
+                      **Current Urgency:** {getUrgencyLabel(watchUrgency)}
+                    </span>
+                  </div>
+                )}
+                {/* --- END URGENCY ICON DISPLAY FIX --- */}
+
+                <div>
                   <label className="block text-sm font-medium mb-2 text-base-content">Preferred Date</label>
                   <input
                     type="date"
                     {...register("scheduledDate")}
                     min={new Date().toISOString().split('T')[0]}
-                    // Updated input styles
                     className="w-full p-3 border border-neutral rounded-lg bg-base-100 text-base-content"
                   />
                 </div>
@@ -648,7 +696,6 @@ const ServiceRequest = () => {
                   <label className="block text-sm font-medium mb-2 text-base-content">Preferred Time Slot</label>
                   <select
                     {...register("timeSlot")}
-                    // Updated input styles
                     className="w-full p-3 border border-neutral rounded-lg bg-base-100 text-base-content"
                   >
                     <option value="">Any time</option>
@@ -662,7 +709,6 @@ const ServiceRequest = () => {
                   <label className="block text-sm font-medium mb-2 text-base-content">Schedule Flexibility</label>
                   <select
                     {...register("flexibility")}
-                    // Updated input styles
                     className="w-full p-3 border border-neutral rounded-lg bg-base-100 text-base-content"
                   >
                     <option value="flexible">Flexible (±2 days)</option>
@@ -673,7 +719,6 @@ const ServiceRequest = () => {
               </div>
             </div>
 
-            {/* Card Background, Shadow, and Border */}
             <div className="bg-base-100 p-6 rounded-xl shadow-lg border border-neutral h-fit">
               <h2 className="flex items-center gap-2 text-primary mb-4 text-xl font-semibold">
                 <User className="h-5 w-5" /> Contact Information
@@ -681,7 +726,7 @@ const ServiceRequest = () => {
 
               <div className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium mb-2 text-base-content">Emergency Contact Number *</label>
+                  <label className="block text-sm font-medium mb-2 text-base-content">Emergency Contact Number</label>
                   <input
                     type="tel"
                     {...register("phoneNumber", {
@@ -691,7 +736,6 @@ const ServiceRequest = () => {
                         message: "Please enter a valid Bangladeshi phone number (+8801XXXXXXXXX)"
                       }
                     })}
-                    // Updated input styles
                     className="w-full p-3 border border-neutral rounded-lg bg-base-100 text-base-content"
                     placeholder="+8801XXXXXXXXX"
                   />
@@ -705,7 +749,6 @@ const ServiceRequest = () => {
                   <input
                     type="tel"
                     {...register("alternatePhone")}
-                    // Updated input styles
                     className="w-full p-3 border border-neutral rounded-lg bg-base-100 text-base-content"
                     placeholder="Optional alternate number"
                   />
@@ -715,7 +758,6 @@ const ServiceRequest = () => {
                   <label className="block text-sm font-medium mb-2 text-base-content">Special Instructions</label>
                   <textarea
                     {...register("specialInstructions")}
-                    // Updated input styles
                     className="w-full p-3 border border-neutral rounded-lg bg-base-100 text-base-content"
                     placeholder="Any special instructions for the mechanic..."
                     rows={3}
@@ -725,15 +767,13 @@ const ServiceRequest = () => {
             </div>
           </div>
 
-          <div className="xl:col-span-3 flex justify-center mt-8">
+          <div className="xl:col-span-3 flex flex-col items-center justify-center mt-8">
             <Button
               type="submit"
               disabled={isSubmitting}
-              // Button component should handle primary/disabled styles internally, but we ensure proper classes for min-width and size are passed.
               className="px-12 py-4 text-lg font-semibold min-w-[250px] rounded-lg"
             >
               {isSubmitting ? (
-                // Updated spinner color to primary-content
                 <span className="flex items-center gap-2">
                   <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-primary-content"></div>
                   Submitting Request...
@@ -746,13 +786,11 @@ const ServiceRequest = () => {
 
           {isSubmitting && uploadProgress > 0 && (
             <div className="xl:col-span-3">
-              {/* Updated background to info/accent */}
               <div className="bg-info/10 p-4 rounded-lg">
                 <div className="flex justify-between mb-2">
                   <span className="text-sm font-medium text-base-content">Uploading Images</span>
                   <span className="text-sm text-base-content">{Math.round(uploadProgress)}%</span>
                 </div>
-                {/* Updated progress bar background and progress color */}
                 <div className="w-full bg-base-300 rounded-full h-2">
                   <div
                     className="bg-info h-2 rounded-full transition-all duration-300"
