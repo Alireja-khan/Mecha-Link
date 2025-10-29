@@ -95,7 +95,7 @@ const AdminProfile = () => {
     );
   }
 
-  console.log(loggedInUser);
+
   // Dynamic admin data from logged-in user
   const adminData = {
     name: loggedInUser.name || loggedInUser.email,
@@ -257,12 +257,12 @@ const AdminProfile = () => {
                   </span>
                 </div>
                 <div className="flex justify-between items-center p-3 bg-base-200 rounded-xl col-span-2 md:col-span-1 lg:col-span-1 **transition-colors duration-200 hover:bg-base-300**">
-                  <span className="text-base-content/70">Tasks Today</span>
-                  <span className="font-semibold text-primary">18/24</span>
+                  <span className="text-base-content/70">New Service Requests Today</span>
+                  <span className="font-semibold text-primary">{statsData.todayServiceRequests}</span>
                 </div>
                 <div className="flex justify-between items-center p-3 bg-base-200 rounded-xl col-span-2 md:col-span-1 lg:col-span-1 **transition-colors duration-200 hover:bg-base-300**">
-                  <span className="text-base-content/70">System Health</span>
-                  <span className="font-semibold text-success">98%</span>
+                  <span className="text-base-content/70">New Mechanic Shop Request Today</span>
+                  <span className="font-semibold text-success">{statsData.todayMechanicShops}</span>
                 </div>
               </div>
             </div>
@@ -356,45 +356,7 @@ const AdminProfile = () => {
               </div>
             </div>
 
-            {/* Management Actions */}
-            <div className="bg-base-100 rounded-3xl p-6 md:p-8 border border-neutral/40 shadow-xl">
-              <h2 className="text-2xl font-bold text-base-content mb-6 md:mb-8">
-                Management Tools
-              </h2>
-              {/* Uses ActionButton component already updated */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <ActionButton
-                  icon={User}
-                  label="User Management"
-                  variant="primary"
-                />
-                <ActionButton
-                  icon={Shield}
-                  label="Security Center"
-                  variant="secondary"
-                />
-                <ActionButton
-                  icon={BarChart3}
-                  label="Analytics Dashboard"
-                  variant="secondary"
-                />
-                <ActionButton
-                  icon={Settings}
-                  label="System Settings"
-                  variant="primary"
-                />
-                <ActionButton
-                  icon={Database}
-                  label="Database Admin"
-                  variant="secondary"
-                />
-                <ActionButton
-                  icon={FileText}
-                  label="Report Center"
-                  variant="primary"
-                />
-              </div>
-            </div>
+            
           </div>
 
           {/* Right Column - Info Panels (1/3 width on large) */}
@@ -437,57 +399,7 @@ const AdminProfile = () => {
               </div>
             </div>
 
-            {/* Security Status */}
-            <div className="bg-base-100 rounded-3xl p-6 md:p-8 border border-neutral/40 shadow-xl">
-              <h2 className="text-2xl font-bold text-base-content mb-6">
-                Security Status
-              </h2>
-              <div className="space-y-4">
-                {[
-                  {
-                    label: "Password Encryption",
-                    value: adminData.security.systemEncryption,
-                    icon: KeyRound,
-                  },
-                  {
-                    label: "Login Alerts",
-                    value: adminData.security.loginAlerts,
-                    icon: Eye,
-                  },
-                ].map((item, index) => (
-                  // Security List Item BG: base-200, Border: base-300
-                  <div
-                    key={index}
-                    className="flex justify-between items-center p-4 bg-base-200 rounded-xl border border-base-300 **transition-colors duration-200 hover:bg-base-300**"
-                  >
-                    <div className="flex items-center gap-3">
-                      <item.icon className="text-primary" size={20} />
-                      <span className="text-base-content font-medium">
-                        {item.label}
-                      </span>
-                    </div>
-                    {/* Status Tag: Uses DaisyUI success/error colors */}
-                    <span
-                      className={`px-3 py-1 rounded-lg text-xs font-bold ${
-                        item.value
-                          ? "bg-success/20 text-success border border-success/30"
-                          : "bg-error/20 text-error border border-error/30"
-                      }`}
-                    >
-                      {item.value ? "ACTIVE" : "INACTIVE"}
-                    </span>
-                  </div>
-                ))}
-                {/* Password Change Info */}
-                <div
-                  className="flex items-center justify-center gap-2 px-4 py-3 bg-primary text-primary-content rounded-xl font-semibold shadow-md hover:shadow-lg hover:bg-primary/90 transition-all duration-200 cursor-pointer"
-                  onClick={() => router.push("/ForgetPass")}
-                >
-                  <KeyRound size={20} />
-                  <span>Reset Password</span>
-                </div>
-              </div>
-            </div>
+            
           </div>
         </div>
       </div>
