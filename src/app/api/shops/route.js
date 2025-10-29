@@ -25,18 +25,21 @@ export async function POST(req) {
 }
 
 
+
 export async function GET(req) {
   try {
     const { searchParams } = new URL(req.url);
-    const sort = searchParams.get("sort");
-    const search = searchParams.get("search");
-    const page = parseInt(searchParams.get("page"));
-    const limit = parseInt(searchParams.get("limit"));
-    const status = searchParams.get("status");
-    const admin = searchParams.get("admin");
-    const home = searchParams.get("home");
-    const email = searchParams.get("email");
+
+    // --- Query params ---
+    const page = parseInt(searchParams.get("page")) || 1;
+    const limit = parseInt(searchParams.get("limit")) || 10;
+    const search = searchParams.get("search") || "";
+    const status = searchParams.get("status") || "all";
     const category = searchParams.get("category");
+    const sort = searchParams.get("sort"); // "htl" or "lth"
+    const admin = searchParams.get("admin") === "true";
+    const home = searchParams.get("home") === "true";
+    const email = searchParams.get("email");
 
     const collection = await dbConnect(collections.mechanicShops);
 
@@ -61,7 +64,7 @@ export async function GET(req) {
 
     let matchStage = {};
 
-    if (!admin) matchStage.status = "approved";
+    if (!admin) matchStage.status = "approved"; // non-admin only sees approved
     if (status && status !== "all") matchStage.status = status;
 
     if (category) {
@@ -74,8 +77,7 @@ export async function GET(req) {
         { "shop.address.city": { $regex: search, $options: "i" } },
         { "ownerName": { $regex: search, $options: "i" } },
         { "shop.address.country": { $regex: search, $options: "i" } },
-        { ownerName: { $regex: search, $options: "i" } },
-        { ownerEmail: { $regex: search, $options: "i" } },
+        { "ownerEmail": { $regex: search, $options: "i" } },
       ];
     }
 
@@ -87,11 +89,16 @@ export async function GET(req) {
     if (sort === "htl") sortStage = { avgRating: -1 };
     if (sort === "lth") sortStage = { avgRating: 1 };
 
+    // --- Pagination calculation ---
+    const skip = (page - 1) * limit;
+
+    // --- Aggregation pipeline ---
     const pipeline = [
       { $match: matchStage },
       {
         $lookup: {
           from: "reviews",
+          let: { shopId: { $toString: "$_id" } },
           let: { shopId: { $toString: "$_id" } },
           pipeline: [
             {
@@ -140,16 +147,25 @@ export async function GET(req) {
       return NextResponse.json(result);
     }
     const result = await collection.aggregate(pipeline).toArray();
-    const totalDocs = await collection.countDocuments(matchStage);
-    const totalPage = limit > 0 ? Math.ceil(totalDocs / limit) : 1;
 
-    return NextResponse.json({ result, totalDocs, totalPage });
-  } catch (error) {
-    console.error(error);
-    return NextResponse.json(
-      { error: "Failed to fetch shop data" },
-      { status: 500 }
-    );
+    // --- Total count for pagination ---
+    const totalDocs = await collection.countDocuments(matchStage);
+    const totalPages = Math.ceil(totalDocs / limit);
+
+    return NextResponse.json({
+      result,
+      pagination: {
+        page,
+        limit,
+        totalDocs,
+        totalPages,
+        hasNextPage: page < totalPages,
+        hasPrevPage: page > 1,
+      },
+    });
+  } catch (err) {
+    console.error("Failed to fetch shops:", err);
+    return NextResponse.json({ message: "Internal Server Error" }, { status: 500 });
   }
 }
 

@@ -207,7 +207,7 @@ async function start() {
     // -----------------------------
     server.listen(PORT, () => {
       const host = process.env.PORT
-        ? `https://mechalink-socket-server-production.up.railway.app/`
+        ? `https://socket-server-production-7caf.up.railway.app/`
         : `http://localhost:${PORT}`;
     });
   } catch (err) {

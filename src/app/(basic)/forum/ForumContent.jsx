@@ -1,5 +1,5 @@
 "use client";
-import { Search, Filter, Image as ImageIcon, MessageSquare, Hash, X, ChevronDown, ChevronUp, Menu } from 'lucide-react'; // Added Menu icon
+import { Search, Filter, Image as ImageIcon, MessageSquare, Hash, X, ChevronDown, ChevronUp, Menu } from 'lucide-react';
 import { CATEGORIES, CATEGORY_COLORS } from "@/lib/forumConstants";
 import PostSkeleton from './PostSkeleton';
 import MarkdownEditor from '@/app/Components/MarkdownEditor';
@@ -17,10 +17,7 @@ export const ForumContent = ({
   setSelectedCategory,
   searchQuery,
   setSearchQuery,
-  showFilters,
-  setShowFilters,
   uploadedImages,
-  setUploadedImages,
   activeSort,
   setActiveSort,
   stats,
@@ -28,7 +25,6 @@ export const ForumContent = ({
   handleCreatePost,
   loadMorePosts,
   fetchPosts,
-  // NEW PROPS
   mobileMenuOpen,
   setMobileMenuOpen
 }) => {
@@ -37,7 +33,7 @@ export const ForumContent = ({
       <div className="flex flex-col sm:flex-row gap-3 mb-5">
         <div className="lg:hidden">
           <button
-            onClick={() => setMobileMenuOpen(true)} // Toggles the sidebar open
+            onClick={() => setMobileMenuOpen(true)}
             className="w-full sm:w-auto px-3 py-3 bg-base-200 border border-neutral/30 rounded-xl focus:outline-none focus:border-primary/50 text-base-content flex items-center justify-center gap-2 font-medium hover:bg-base-300 transition-colors"
           >
             <Menu size={20} />
@@ -46,7 +42,7 @@ export const ForumContent = ({
         <div className="relative flex-1 min-w-[250px]">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-base-content/40" size={20} />
           <input
-            type="text"
+            type="search"
             placeholder="Search posts, users, comments..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
@@ -72,7 +68,7 @@ export const ForumContent = ({
             selectedCategory={selectedCategory}
             setSelectedCategory={setSelectedCategory}
             uploadedImages={uploadedImages}
-            setUploadedImages={setUploadedImages}
+            setUploadedImages={() => {}}
             setShowPostForm={setShowPostForm}
             handleCreatePost={handleCreatePost}
           />
@@ -84,13 +80,7 @@ export const ForumContent = ({
           stats={stats}
           activeSort={activeSort}
           setActiveSort={setActiveSort}
-          showFilters={showFilters}
-          setShowFilters={setShowFilters}
         />
-
-        {showFilters && (
-          <CategoryFilters selectedCategory={selectedCategory} setSelectedCategory={setSelectedCategory} />
-        )}
 
         <PostsList
           posts={posts}
@@ -108,8 +98,6 @@ export const ForumContent = ({
     </div>
   );
 };
-
-// ... (Rest of the component functions remain unchanged)
 
 const CreatePostButton = ({ currentUser, setShowPostForm }) => (
   <div className="bg-base-200 rounded-2xl p-4 border border-neutral/50 shadow-sm mb-6">
@@ -238,7 +226,7 @@ const CreatePostForm = ({
   </div>
 );
 
-const PostsHeader = ({ selectedCategory, posts, stats, activeSort, setActiveSort, showFilters, setShowFilters }) => (
+const PostsHeader = ({ selectedCategory, posts, stats, activeSort, setActiveSort }) => (
   <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-6 gap-4">
     <div>
       <h2 className="text-xl font-bold text-base-content">
@@ -260,52 +248,8 @@ const PostsHeader = ({ selectedCategory, posts, stats, activeSort, setActiveSort
       >
         <option value="latest">Latest</option>
         <option value="oldest">Oldest</option>
-        <option value="popular">Most Popular</option>
         <option value="most-liked">Most Liked</option>
-        <option value="most-commented">Most Discussed</option>
-        <option value="trending">Trending</option>
       </select>
-
-      <button
-        onClick={() => setShowFilters(!showFilters)}
-        className={`px-4 py-2 border rounded-xl transition-colors duration-200 flex items-center gap-2 ${showFilters
-          ? 'bg-primary text-primary-content border-primary'
-          : 'bg-base-200 border-neutral/30 text-base-content hover:bg-base-100'
-          }`}
-      >
-        <Filter size={16} />
-        Filters
-        {showFilters ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
-      </button>
-    </div>
-  </div>
-);
-
-const CategoryFilters = ({ selectedCategory, setSelectedCategory }) => (
-  <div className="bg-base-200 rounded-2xl p-6 border border-neutral/30 shadow-sm mb-6">
-    <h3 className="font-semibold text-base-content mb-4">Filter by Category</h3>
-    <div className="flex flex-wrap gap-2">
-      <button
-        onClick={() => setSelectedCategory("all")}
-        className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${selectedCategory === "all"
-          ? 'bg-primary text-primary-content border-2 border-primary shadow-lg'
-          : 'bg-base-100 text-base-content/70 border border-neutral/30 hover:bg-base-300'
-          }`}
-      >
-        All Categories
-      </button>
-      {CATEGORIES.map((category) => (
-        <button
-          key={category.value}
-          onClick={() => setSelectedCategory(category.value)}
-          className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${selectedCategory === category.value
-            ? CATEGORY_COLORS[category.value] + ' border-2 border-primary shadow-lg'
-            : 'bg-base-100 text-base-content/70 border border-neutral/30 hover:bg-base-300'
-            }`}
-        >
-          {category.label}
-        </button>
-      ))}
     </div>
   </div>
 );

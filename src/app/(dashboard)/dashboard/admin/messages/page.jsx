@@ -136,7 +136,7 @@ const Avatar = ({ src, alt, size = "large" }) => {
 };
 
 const AvatarHeader = ({ src, alt, size = "large" }) => {
-    const wH = size === "small" ? "w-10 h-10" : "w-12 h-12";
+    const wH = "w-12 h-12";
     const iconSize = size === "small" ? "w-6 h-6" : "w-6 h-6";
 
     return src ? (
@@ -183,7 +183,7 @@ const ConversationListItem = ({ conv, userEmail, active, onSelect, onDeleteUser 
     };
 
     const timeDisplay = formatRelativeTime(conv.lastMessageAt);
-    
+
     // Fallback preview logic for the new structure:
     const lastMessagePreview = conv.lastMessagePreview || "Start conversation...";
 
@@ -773,7 +773,7 @@ export default function MessagesPage() {
                     <div className={`flex-1 flex flex-col overflow-hidden bg-base-100 ${isMobileDevice && activeConversation ? 'w-full' : ''}`}>
                         <>
                             {/* Chat Header */}
-                            <div className="flex-shrink-0 flex items-center justify-between p-4 bg-primary text-white shadow-xl sticky top-0 z-10">
+                            <div className="flex-shrink-0 flex items-center justify-between p-3 border-b border-neutral bg-primary text-white shadow-xl sticky top-0 z-10">
                                 <div className="flex items-center gap-3">
                                     {isMobileDevice && (
                                         <button

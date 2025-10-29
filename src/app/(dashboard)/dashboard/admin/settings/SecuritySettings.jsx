@@ -130,7 +130,7 @@ export default function SecuritySettings({ security, setSecurity }) {
       </form>
 
       {/* Security Preferences */}
-      <div className="space-y-4">
+      {/* <div className="space-y-4">
         <h3 className="text-xl font-bold text-base-content pb-2 border-b border-base-300">
           Security Preferences
         </h3>
@@ -167,10 +167,10 @@ export default function SecuritySettings({ security, setSecurity }) {
             </label>
           ))}
         </div>
-      </div>
+      </div> */}
 
       {/* Session Settings */}
-      <div className="space-y-4">
+      {/* <div className="space-y-4">
         <h3 className="text-xl font-bold text-base-content pb-2 border-b border-base-300">
           Session & Password Settings
         </h3>
@@ -209,7 +209,7 @@ export default function SecuritySettings({ security, setSecurity }) {
             </div>
           ))}
         </div>
-      </div>
+      </div> */}
     </div>
   );
 }

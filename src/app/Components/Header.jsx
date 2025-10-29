@@ -88,7 +88,7 @@ export default function Header() {
                 className={`h-8 w-8 transition-transform duration-500 text-primary ${scrolled ? "h-6 w-6" : ""
                   }`}
               />
-              <h1 className="text-2xl font-extrabold tracking-tight">
+              <h1 className="text-3xl font-extrabold tracking-tight">
                 Mecha<span className="text-primary">Link</span>
               </h1>
             </button>
