@@ -3,6 +3,7 @@ import { useState } from "react";
 import { uploadImageToImgbb } from "@/lib/uploadImgbb";
 import { Camera, Loader2, User as UserIcon } from "lucide-react";
 import useUser from "@/hooks/useUser";
+import Swal from 'sweetalert2';
 
 export default function ProfileSettings({ profile, setProfile }) {
   const [imageUploading, setImageUploading] = useState(false);
@@ -13,38 +14,73 @@ export default function ProfileSettings({ profile, setProfile }) {
     setProfile(prev => ({ ...prev, [name]: value }));
   };
 
+  // console.log(profile);
+  // console.log(loggedInUser);
+
 
   const handleImageUpload = async (e) => {
-    const image = e.target.files[0];
-    if (!image) return;
+  const image = e.target.files[0];
+  if (!image) return;
 
-    // Validate file type and size
-    if (!image.type.startsWith('image/')) {
-      alert('Please select a valid image file');
-      return;
-    }
+  // Validate file type and size
+  if (!image.type.startsWith('image/')) {
+    Swal.fire({
+      icon: 'error',
+      title: 'Invalid File',
+      text: 'Please select a valid image file (JPEG, PNG, etc.)',
+      confirmButtonColor: '#d33',
+    });
+    return;
+  }
 
-    if (image.size > 5 * 1024 * 1024) {
-      alert('Image size should be less than 5MB');
-      return;
-    }
+  if (image.size > 5 * 1024 * 1024) {
+    Swal.fire({
+      icon: 'error',
+      title: 'File Too Large',
+      text: 'Image size should be less than 5MB',
+      confirmButtonColor: '#d33',
+    });
+    return;
+  }
 
-    setImageUploading(true);
-    try {
-      // NOTE: Using profile.photoURL for display after upload, 
-      // but loggedInUser.profileImage for initial display if photoURL is not yet set.
-      const uploadedUrl = await uploadImageToImgbb(image);
-      setProfile(prev => ({
-        ...prev,
-        photoURL: uploadedUrl
-      }));
-    } catch (error) {
-      console.error('Image upload failed:', error);
-      alert('Failed to upload image');
-    } finally {
-      setImageUploading(false);
+  // Show loading alert
+  Swal.fire({
+    title: 'Uploading Image...',
+    text: 'Please wait while we upload your image',
+    allowOutsideClick: false,
+    didOpen: () => {
+      Swal.showLoading();
     }
-  };
+  });
+
+  setImageUploading(true);
+  try {
+    const uploadedUrl = await uploadImageToImgbb(image);
+    setProfile(prev => ({
+      ...prev,
+      photoURL: uploadedUrl
+    }));
+    
+    // Close loading and show success
+    Swal.fire({
+      icon: 'success',
+      title: 'Success!',
+      text: 'Profile image uploaded successfully',
+      timer: 2000,
+      showConfirmButton: false,
+    });
+  } catch (error) {
+    console.error('Image upload failed:', error);
+    Swal.fire({
+      icon: 'error',
+      title: 'Upload Failed',
+      text: 'Failed to upload image. Please try again.',
+      confirmButtonColor: '#d33',
+    });
+  } finally {
+    setImageUploading(false);
+  }
+};
 
   const removeProfileImage = () => {
     setProfile(prev => ({
