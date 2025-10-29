@@ -2,10 +2,10 @@
 import { useState, useCallback, useMemo } from "react";
 import MDEditor from "@uiw/react-md-editor";
 import { CATEGORIES, CATEGORY_COLORS } from "@/lib/forumConstants";
-import { Heart, MessageCircle, ThumbsDown, Flag, MoreVertical, Clock, User, Trash2, Plus, X } from "lucide-react";
+import { Heart, MessageCircle, ThumbsDown, MoreVertical, Clock, Trash2, Plus, X } from "lucide-react";
 import Swal from "sweetalert2";
 
-// Mock Modal Component (Replace with a real modal implementation like a DaisyUI modal or a custom one)
+// Mock Modal Component
 const ImageModal = ({ images, isOpen, onClose, onImageClick }) => {
     if (!isOpen) return null;
 
@@ -36,7 +36,7 @@ const ImageModal = ({ images, isOpen, onClose, onImageClick }) => {
     );
 };
 
-// Full Screen Viewer (Simulated)
+// Full Screen Viewer
 const FullScreenViewer = ({ imageUrl, onClose }) => {
     if (!imageUrl) return null;
 
@@ -54,21 +54,18 @@ const FullScreenViewer = ({ imageUrl, onClose }) => {
                     src={imageUrl}
                     alt="Full screen view"
                     className="object-contain max-w-full max-h-full"
-                    onClick={(e) => e.stopPropagation()} // Prevent closing on image click
+                    onClick={(e) => e.stopPropagation()}
                 />
             </div>
         </div>
     );
 };
 
-
 const PostCard = ({ post, onUpdate, currentUser }) => {
     const [showCommentForm, setShowCommentForm] = useState(false);
     const [commentText, setCommentText] = useState("");
     const [showOptions, setShowOptions] = useState(false);
     const [showComments, setShowComments] = useState(false);
-
-    // New State for Image Modal and Fullscreen Viewer
     const [showAllImagesModal, setShowAllImagesModal] = useState(false);
     const [fullScreenImageUrl, setFullScreenImageUrl] = useState(null);
 
@@ -126,11 +123,16 @@ const PostCard = ({ post, onUpdate, currentUser }) => {
         });
     };
 
-    // --- Handlers for Post Actions ---
+    // Check if current user can delete the post
+    const canDeletePost = useMemo(() => {
+        if (!currentUser) return false;
+        // Users can delete their own posts OR admins can delete any post
+        return currentUser._id === post.authorId || currentUser.role === 'admin';
+    }, [currentUser, post.authorId]);
 
+    // Handlers for Post Actions
     const handleLike = async () => {
         if (!currentUser) return;
-        // API call logic remains the same
         try {
             const res = await fetch("/api/forum", {
                 method: "PATCH",
@@ -147,7 +149,6 @@ const PostCard = ({ post, onUpdate, currentUser }) => {
 
     const handleDislike = async () => {
         if (!currentUser) return;
-        // API call logic remains the same
         try {
             const res = await fetch("/api/forum", {
                 method: "PATCH",
@@ -165,7 +166,6 @@ const PostCard = ({ post, onUpdate, currentUser }) => {
     const handleComment = async (e) => {
         e.preventDefault();
         if (!commentText.trim() || !currentUser) return;
-        // API call logic remains the same
         try {
             const res = await fetch("/api/forum", {
                 method: "PATCH",
@@ -193,12 +193,14 @@ const PostCard = ({ post, onUpdate, currentUser }) => {
     };
 
     const handleDelete = async () => {
-        if (!currentUser || currentUser.role !== 'admin') return;
+        if (!canDeletePost) return;
 
         const result = await showConfirmDialog(
             'Are you sure?',
-            "You won't be able to revert this!",
-            'Yes, delete it!'
+            currentUser._id === post.authorId 
+                ? "This will permanently delete your post."
+                : "You are about to delete this post as an admin. This action cannot be undone.",
+            currentUser._id === post.authorId ? 'Yes, delete my post' : 'Yes, delete as admin'
         );
 
         if (result.isConfirmed) {
@@ -212,7 +214,12 @@ const PostCard = ({ post, onUpdate, currentUser }) => {
                 const data = await res.json();
                 if (data.success) {
                     Swal.close();
-                    await showSuccessAlert('Deleted!', 'The post has been deleted.');
+                    await showSuccessAlert(
+                        'Deleted!', 
+                        currentUser._id === post.authorId 
+                            ? 'Your post has been deleted.'
+                            : 'The post has been deleted by admin.'
+                    );
                     onUpdate();
                 } else {
                     Swal.close();
@@ -227,42 +234,37 @@ const PostCard = ({ post, onUpdate, currentUser }) => {
     };
 
     const toggleComments = () => {
-        // If comments are hidden, show them and the form, otherwise just hide them
         if (!showComments) {
             setShowComments(true);
-            setShowCommentForm(true); // Always show the form when opening
+            setShowCommentForm(true);
         } else {
             setShowComments(false);
             setShowCommentForm(false);
         }
     };
 
-    // --- New Image Handlers ---
+    // Image Handlers
     const handleImageClick = useCallback((imageUrl) => {
         setFullScreenImageUrl(imageUrl);
-        setShowAllImagesModal(false); // Close the grid modal if open
+        setShowAllImagesModal(false);
     }, []);
 
     const handleFullScreenClose = useCallback(() => {
         setFullScreenImageUrl(null);
     }, []);
 
-    // --- Computed Values ---
-
+    // Computed Values
     const isLiked = post.likes.includes(currentUser?._id);
     const isDisliked = post.dislikes?.includes(currentUser?._id);
 
-    // Get first letter for avatar fallback
     const getInitial = (name) => {
         return name ? name.charAt(0).toUpperCase() : 'U';
     };
 
-    // Get category color
     const getCategoryColor = (category) => {
         return CATEGORY_COLORS[category] || CATEGORY_COLORS.general;
     };
 
-    // Format relative time
     const formatRelativeTime = (dateString) => {
         const date = new Date(dateString);
         const now = new Date();
@@ -274,21 +276,14 @@ const PostCard = ({ post, onUpdate, currentUser }) => {
         return date.toLocaleDateString();
     };
 
-    // --- Dynamic Image Grid Logic (MODIFIED FOR RESPONSIVENESS) ---
+    // Dynamic Image Grid Logic
     const allImages = post.images || [];
     const imageCount = allImages.length;
-
-    const maxGridSpots = 3;
-
     const showMoreButton = imageCount > 2;
-
     const maxImagesToRender = 2;
-
     const actualImagesToShow = showMoreButton
         ? allImages.slice(0, maxImagesToRender)
-        : allImages.slice(0, maxGridSpots);
-
-    // Calculate the number of remaining images for the 'more' button
+        : allImages.slice(0, 3);
     const remainingImagesCount = imageCount - actualImagesToShow.length;
     const imageToBlurUrl = showMoreButton && actualImagesToShow[actualImagesToShow.length - 1];
 
@@ -351,38 +346,34 @@ const PostCard = ({ post, onUpdate, currentUser }) => {
                         </span>
                     )}
 
-                    {/* Options Menu */}
-                    <div className="relative flex-shrink-0">
-                        <button
-                            onClick={() => setShowOptions(!showOptions)}
-                            className="p-2 bg-base-100 rounded-xl border border-neutral hover:bg-base-300 transition-colors duration-200"
-                            aria-expanded={showOptions}
-                            aria-label="More options"
-                        >
-                            <MoreVertical size={18} />
-                        </button>
+                    {/* Options Menu - Only show if user can delete */}
+                    {canDeletePost && (
+                        <div className="relative flex-shrink-0">
+                            <button
+                                onClick={() => setShowOptions(!showOptions)}
+                                className="p-2 bg-base-100 rounded-xl border border-neutral hover:bg-base-300 transition-colors duration-200"
+                                aria-expanded={showOptions}
+                                aria-label="More options"
+                            >
+                                <MoreVertical size={18} />
+                            </button>
 
-                        {showOptions && (
-                            <div className="absolute right-0 top-12 bg-base-200 rounded-xl border border-neutral shadow-2xl z-10 min-w-32 origin-top-right animate-in fade-in-0 zoom-in-95">
-                                {currentUser?.role === 'admin' && (
+                            {showOptions && (
+                                <div className="absolute right-0 top-12 bg-base-200 rounded-xl border border-neutral shadow-2xl z-10 min-w-32 origin-top-right animate-in fade-in-0 zoom-in-95">
                                     <button
                                         onClick={() => {
                                             handleDelete();
-                                            setShowOptions(false); // Close menu after action
+                                            setShowOptions(false);
                                         }}
-                                        className="flex items-center gap-2 w-full px-4 py-3 text-error hover:bg-error/10 rounded-t-xl transition-colors duration-200"
+                                        className="flex items-center gap-2 w-full px-4 py-3 text-error hover:bg-error/10 rounded-xl transition-colors duration-200"
                                     >
                                         <Trash2 size={16} />
                                         Delete
                                     </button>
-                                )}
-                                <button className={`flex items-center gap-2 w-full px-4 py-3 text-base-content hover:bg-base-100 rounded-xl transition-colors duration-200 ${currentUser?.role === 'admin' ? 'rounded-b-xl' : 'rounded-t-xl'}`}>
-                                    <Flag size={16} />
-                                    Report
-                                </button>
-                            </div>
-                        )}
-                    </div>
+                                </div>
+                            )}
+                        </div>
+                    )}
                 </div>
             </div>
 
@@ -403,7 +394,7 @@ const PostCard = ({ post, onUpdate, currentUser }) => {
                 </div>
             </div>
 
-            {/* Post Images - Dynamic Grid and "More" Button Logic (MODIFIED) */}
+            {/* Post Images - Dynamic Grid and "More" Button Logic */}
             {imageCount > 0 && (
                 <div className="mb-6">
                     <div className={`flex gap-3 items-center justify-center`}>
@@ -610,7 +601,7 @@ const PostCard = ({ post, onUpdate, currentUser }) => {
                 </div>
             )}
 
-            {/* Image Modal Component (Rendered outside the main card flow) */}
+            {/* Image Modal Component */}
             <ImageModal
                 images={allImages}
                 isOpen={showAllImagesModal}
@@ -618,7 +609,7 @@ const PostCard = ({ post, onUpdate, currentUser }) => {
                 onImageClick={handleImageClick}
             />
 
-            {/* Full Screen Viewer (Rendered outside the main card flow) */}
+            {/* Full Screen Viewer */}
             <FullScreenViewer
                 imageUrl={fullScreenImageUrl}
                 onClose={handleFullScreenClose}

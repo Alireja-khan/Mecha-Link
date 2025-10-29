@@ -13,18 +13,9 @@ import RatingForm from "../RatingForm";
 import useUser from "@/hooks/useUser";
 import Swal from "sweetalert2";
 import { FaWhatsapp } from "react-icons/fa6";
-import {
-  FacebookShareButton,
-  TwitterShareButton,
-  LinkedinShareButton,
-  WhatsappShareButton,
-  FacebookIcon,
-  TwitterIcon,
-  LinkedinIcon,
-  WhatsappIcon
-} from "react-share";
+import { FacebookShareButton, TwitterShareButton, LinkedinShareButton, WhatsappShareButton, FacebookIcon, TwitterIcon, LinkedinIcon, WhatsappIcon } from "react-share";
 
-// === LEAFLET CONFIG ===
+// === LEAFLET CONFIG === 
 delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({
   iconRetinaUrl:
@@ -33,7 +24,7 @@ L.Icon.Default.mergeOptions({
   shadowUrl: "https://unpkg.com/leaflet@1.7.1/dist/images/marker-shadow.png",
 });
 
-// === CONSTANTS ===
+// === CONSTANTS === 
 const serviceIcons = {
   "Car Service & Repair": <Car className="w-5 h-5" />,
   "Motorcycle Service & Repair": <Bike className="w-5 h-5" />,
