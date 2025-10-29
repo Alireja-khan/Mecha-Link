@@ -1,18 +1,18 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { 
-  Calendar, 
-  Car, 
-  Wrench, 
-  Star, 
-  Clock, 
-  MapPin, 
-  DollarSign, 
-  Shield, 
-  User, 
-  Settings, 
-  FileText, 
+import {
+  Calendar,
+  Car,
+  Wrench,
+  Star,
+  Clock,
+  MapPin,
+  DollarSign,
+  Shield,
+  User,
+  Settings,
+  FileText,
   MessageSquare,
   Bell,
   Award,
@@ -23,6 +23,7 @@ import {
 } from "lucide-react";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, PieChart, Pie, Cell, ResponsiveContainer, Legend } from "recharts";
 import useUser from "@/hooks/useUser";
+import Link from "next/link";
 
 const UserDashboardOverview = () => {
   const { user: loggedInUser, loading: userLoading } = useUser();
@@ -30,17 +31,19 @@ const UserDashboardOverview = () => {
   const [serviceRequests, setServiceRequests] = useState([]);
   const [reviews, setReviews] = useState([]);
   const [appointments, setAppointments] = useState([]);
+  const [summeryData, setSummeryData] = useState({});
 
   useEffect(() => {
     const fetchUserDashboardData = async () => {
       if (!loggedInUser) return;
-      
+
       setLoading(true);
       try {
         const [serviceRes, reviewsRes, appointmentsRes] = await Promise.all([
-          fetch(`/api/service-request?userId=${loggedInUser._id}`),
+          fetch(`/api/service-request/${loggedInUser._id}/status`),
           fetch(`/api/reviews?userId=${loggedInUser._id}`),
-          fetch(`/api/appointments?userId=${loggedInUser._id}`)
+          fetch(`/api/reviews?userId=${loggedInUser._id}`),
+          // fetch(`/api/appointments?userId=${loggedInUser._id}`)
         ]);
 
         const serviceData = await serviceRes.json();
@@ -61,42 +64,16 @@ const UserDashboardOverview = () => {
     fetchUserDashboardData();
   }, [loggedInUser]);
 
-  // Calculate dynamic metrics from actual data
-  const calculateUserMetrics = () => {
-    if (!serviceRequests || !reviews) return {};
+  useEffect(() => {
+    setLoading(true);
+    fetch(`/api/users/summery?email=${loggedInUser?.email}`)
+      .then(res => res.json())
+      .then(data => {
+        setSummeryData(data)
+        setLoading(false);
+      });
+  }, [loggedInUser]);
 
-    const totalServices = serviceRequests.length;
-    const completedServices = serviceRequests.filter(req => 
-      req.status === 'completed' || req.status === 'resolved'
-    ).length;
-    const pendingServices = serviceRequests.filter(req => 
-      req.status === 'pending' || req.status === 'in_progress'
-    ).length;
-    
-    const totalSpent = serviceRequests
-      .filter(req => req.status === 'completed' || req.status === 'resolved')
-      .reduce((total, req) => total + (req.totalCost || req.estimatedCost || 0), 0);
-
-    const averageRating = reviews.length > 0 
-      ? (reviews.reduce((sum, review) => sum + (review.rating || 0), 0) / reviews.length).toFixed(1)
-      : 0;
-
-    const totalShopsUsed = [...new Set(serviceRequests
-      .filter(req => req.shopId || req.shop?._id)
-      .map(req => req.shopId || req.shop?._id))].length;
-
-    return {
-      totalServices,
-      completedServices,
-      pendingServices,
-      totalSpent,
-      averageRating,
-      totalShopsUsed,
-      memberSince: new Date(loggedInUser?.createdAt).getFullYear()
-    };
-  };
-
-  const userMetricsData = calculateUserMetrics();
 
   // Process service history for charts
   const processServiceHistory = () => {
@@ -126,7 +103,7 @@ const UserDashboardOverview = () => {
       const requestDate = new Date(request.createdAt || request.requestedDate);
       const month = requestDate.toLocaleString('default', { month: 'short' });
       const monthData = last6Months.find(m => m.month === month);
-      
+
       if (monthData) {
         monthData.services += 1;
         if (request.status === 'completed' || request.status === 'resolved') {
@@ -156,21 +133,7 @@ const UserDashboardOverview = () => {
     }));
   };
 
-  // Get recent services (last 5)
-  const getRecentServices = () => {
-    return serviceRequests
-      .slice(-5)
-      .reverse()
-      .map(service => ({
-        id: service._id,
-        service: service.serviceType || service.problemCategory || 'Service Request',
-        shop: service.shopName || service.shop?.shopName || 'AutoCare Shop',
-        date: service.createdAt || service.requestedDate,
-        status: service.status || 'pending',
-        cost: service.totalCost || service.estimatedCost || 0,
-        rating: reviews.find(review => review.serviceRequestId === service._id)?.rating || null
-      }));
-  };
+
 
   // Get upcoming appointments
   const getUpcomingAppointments = () => {
@@ -192,52 +155,42 @@ const UserDashboardOverview = () => {
     {
       id: 1,
       title: "Total Services",
-      value: loading ? "…" : userMetricsData.totalServices,
-      change: "+2 this month",
-      trend: "up",
+      value: loading ? "…" : summeryData?.serviceStats?.total,
       icon: Wrench,
       color: "orange",
     },
     {
       id: 2,
       title: "Completed Services",
-      value: loading ? "…" : userMetricsData.completedServices,
-      change: `${userMetricsData.pendingServices} pending`,
-      trend: userMetricsData.completedServices > 0 ? "up" : "neutral",
+      value: loading ? "…" : summeryData?.serviceStats?.completed,
       icon: UserCheck,
       color: "green",
     },
     {
       id: 3,
-      title: "Total Spent",
-      value: loading ? "…" : `$${userMetricsData.totalSpent.toFixed(0)}`,
-      change: `${userMetricsData.completedServices} services`,
-      trend: userMetricsData.totalSpent > 0 ? "up" : "neutral",
-      icon: DollarSign,
+      title: "Pending Services",
+      value: loading ? "…" : summeryData?.serviceStats?.pending,
+      icon: UserCheck,
       color: "emerald",
     },
     {
       id: 4,
-      title: "Avg. Rating",
-      value: loading ? "…" : userMetricsData.averageRating,
-      change: `${reviews.length} reviews`,
-      trend: userMetricsData.averageRating >= 4 ? "up" : "neutral",
+      title: "Total Reviews",
+      value: loading ? "…" : summeryData?.reviewStats?.totalReviews,
       icon: Star,
       color: "yellow",
     },
     {
       id: 5,
-      title: "Shops Used",
-      value: loading ? "…" : userMetricsData.totalShopsUsed,
-      change: "Loyal customer",
-      trend: "up",
-      icon: Store,
-      color: "blue",
+      title: "Avg. Rating",
+      value: loading ? "…" : summeryData?.reviewStats?.averageRating,
+      icon: Star,
+      color: "yellow",
     },
     {
       id: 6,
       title: "Member Since",
-      value: loading ? "…" : userMetricsData.memberSince,
+      value: loading ? "…" : new Date(summeryData?.createdAt).getFullYear() || 2025,
       change: "Active user",
       trend: "up",
       icon: Calendar,
@@ -259,7 +212,7 @@ const UserDashboardOverview = () => {
   };
 
   // Stat Card Component - Exact same as Admin Dashboard
-  const StatCard = ({ icon: Icon, value, label, change, trend, color = "orange" }) => {
+  const StatCard = ({ icon: Icon, value, label, color = "orange" }) => {
     const { bg, hoverBg, text } = colorMap[color] || colorMap.orange;
 
     return (
@@ -268,12 +221,7 @@ const UserDashboardOverview = () => {
           <div className={`p-3 rounded-xl ${bg} ${hoverBg} transition-colors duration-300`}>
             <Icon className={`${text}`} size={24} />
           </div>
-          <span
-            className={`px-2 py-1 rounded-full text-xs font-bold ${trend === "up" ? "bg-green-100 text-green-600" : "bg-red-100 text-red-600"
-              }`}
-          >
-            {trend === "up" ? "↑" : "↓"} {change}
-          </span>
+
         </div>
         <p className={`text-3xl font-bold ${text} mb-1`}>{value}</p>
         <p className="text-base-content/60 text-sm font-medium">{label}</p>
@@ -329,16 +277,8 @@ const UserDashboardOverview = () => {
         </div>
         <div className="flex items-center gap-4 text-sm flex-wrap">
           <div className="flex items-center gap-2 bg-white/20 px-4 py-2 rounded-xl">
-            <Shield size={16} />
-            <span className="capitalize">{loggedInUser.role} • {loggedInUser.status}</span>
-          </div>
-          <div className="flex items-center gap-2 bg-white/20 px-4 py-2 rounded-xl">
             <Calendar size={16} />
             <span>Joined {new Date(loggedInUser.createdAt).toLocaleDateString()}</span>
-          </div>
-          <div className="flex items-center gap-2 bg-white/20 px-4 py-2 rounded-xl">
-            <Star size={16} />
-            <span>Verified User</span>
           </div>
         </div>
       </div>
@@ -421,38 +361,54 @@ const UserDashboardOverview = () => {
         {/* Recent Service Requests - Same styling */}
         <div className="bg-base-100 col-span-1 xl:col-span-2 rounded-3xl p-6 md:p-8 border border-neutral shadow-xl transition-all duration-300 hover:shadow-2xl">
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-xl md:text-2xl font-bold text-base-content">Recent Service Requests</h2>
+            <h2 className="text-xl md:text-2xl font-bold text-base-content">My Recent Service Requests</h2>
             <Eye className="text-primary" size={24} />
           </div>
-          <div className="space-y-4">
-            {loading ? (
-              <div className="text-center py-8">
-                <span className="loading loading-bars loading-md text-primary"></span>
-              </div>
-            ) : getRecentServices().length > 0 ? (
-              getRecentServices().map((service) => (
-                <div key={service.id} className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-4 bg-base-200 rounded-xl border border-base-300 hover:bg-base-300 transition-colors duration-200">
-                  <div>
-                    <p className="font-semibold text-base-content">{service.service}</p>
-                    <p className="text-sm text-base-content/60">{service.shop}</p>
-                  </div>
-                  <div className="flex items-center gap-4 mt-2 sm:mt-0">
-                    {service.rating && (
-                      <div className="flex items-center gap-1">
-                        <Star size={14} className="text-yellow-500 fill-current" />
-                        <span className="text-sm text-base-content/60">{service.rating}</span>
-                      </div>
-                    )}
-                    <span className="text-xs text-base-content whitespace-nowrap">${service.cost.toFixed(2)}</span>
-                    <span className="text-xs text-base-content/50 whitespace-nowrap">
-                      {new Date(service.date).toLocaleDateString()}
-                    </span>
-                  </div>
-                </div>
-              ))
-            ) : (
-              <div className="text-center py-8 text-base-content/70">No recent service requests</div>
-            )}
+          <div className="overflow-x-auto">
+            <table className="table table-zebra w-full">
+              {/* Table Header */}
+              <thead className="bg-base-200">
+                <tr>
+                  <th className="w-12 text-center">#</th>
+                  <th>Title</th>
+                  <th>Priority</th>
+                  <th>Device Type</th>
+                  <th>Status</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+
+              {/* Table Body */}
+              <tbody>
+                {loading ? (
+                  <tr>
+                    <td colSpan="5" className="text-center py-8">
+                      <span className="loading loading-bars loading-md text-primary"></span>
+                    </td>
+                  </tr>
+                ) : serviceRequests.length > 0 ? (
+                  serviceRequests.map((service, index) => (
+                    <tr key={service._id || index}>
+                      <td>{index + 1}</td>
+                      <td>{service?.serviceDetails?.problemTitle}</td>
+                      <td>{service?.serviceDetails?.urgency}</td>
+                      <td>{service?.deviceType}</td>
+                      <td>{service.status}</td>
+                      <td>
+                        {/* Example actions */}
+                        <Link href={`/serviceReq/${service._id}`} className="btn btn-sm btn-primary rounded-md">View</Link>
+                      </td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan="5" className="text-center py-8 text-gray-500">
+                      No service requests found
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
           </div>
         </div>
 
@@ -487,29 +443,6 @@ const UserDashboardOverview = () => {
               <div className="text-center py-8 text-base-content/70">No upcoming appointments</div>
             )}
           </div>
-        </div>
-      </div>
-
-      {/* Quick Actions - Same styling and button colors as Admin Dashboard */}
-      <div className="bg-base-100 rounded-3xl p-6 md:p-8 border border-neutral shadow-xl transition-all duration-300 hover:shadow-2xl">
-        <h2 className="text-xl sm:text-2xl font-bold text-base-content mb-6">Quick Actions</h2>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <button className="flex items-center justify-center gap-2 p-4 bg-primary text-primary-content rounded-xl text-xs md:text-sm font-semibold transition-all duration-300 hover:bg-orange-700 hover:shadow-lg transform hover:scale-[1.03]">
-            <Wrench size={20} />
-            <span>Book Service</span>
-          </button>
-          <button className="flex items-center justify-center gap-2 p-4 bg-base-200 text-base-content rounded-xl text-xs md:text-sm font-semibold border border-base-300 transition-all duration-300 hover:bg-base-300 hover:shadow-lg transform hover:scale-[1.03]">
-            <FileText size={20} className="text-primary" />
-            <span>Service History</span>
-          </button>
-          <button className="flex items-center justify-center gap-2 p-4 bg-base-200 text-base-content rounded-xl text-xs md:text-sm font-semibold border border-base-300 transition-all duration-300 hover:bg-base-300 hover:shadow-lg transform hover:scale-[1.03]">
-            <MessageSquare size={20} className="text-primary" />
-            <span>Support</span>
-          </button>
-          <button className="flex items-center justify-center gap-2 p-4 bg-primary text-primary-content rounded-xl text-xs md:text-sm font-semibold transition-all duration-300 hover:bg-orange-700 hover:shadow-lg transform hover:scale-[1.03]">
-            <Settings size={20} />
-            <span>Settings</span>
-          </button>
         </div>
       </div>
     </div>

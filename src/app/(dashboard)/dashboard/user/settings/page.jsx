@@ -26,7 +26,7 @@ export default function UserSettings() {
   ];
 
   return (
-    <div className="p-4 sm:p-8 space-y-8 bg-base-200 mx-auto text-base-content">
+    <div className="p-4 sm:p-8 space-y-8 bg-base-200 min-h-full mx-auto text-base-content">
 
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center">
         <h1 className="text-3xl font-extrabold text-base-content">User Settings</h1>
@@ -35,7 +35,7 @@ export default function UserSettings() {
         </div>
       </div>
 
-      <div className="bg-base-100 rounded-2xl shadow-xl border border-neutral/40">
+      <div className="bg-base-100 h-full rounded-2xl shadow-xl border border-neutral/40">
 
         <div className="flex border-b border-base-300 overflow-x-auto whitespace-nowrap">
           {tabs.map((tab) => {

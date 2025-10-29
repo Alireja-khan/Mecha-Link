@@ -10,8 +10,8 @@ export default function DashboardLayout({ children }) {
 
   if (loading || !loggedInUser) {
     return <div className="flex items-center justify-center h-screen w-full">
-                <span className="loading loading-bars loading-xl text-orange-500"></span>
-            </div>;
+      <span className="loading loading-bars loading-xl text-orange-500"></span>
+    </div>;
   }
 
   return (
