@@ -1,15 +1,74 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { uploadImageToImgbb } from "@/lib/uploadImgbb";
-import { Camera, Loader2, User as UserIcon, Car } from "lucide-react";
-import useUser from "@/hooks/useUser";
+import { Camera, Loader2, User as UserIcon, Car, Save } from "lucide-react";
 
-export default function ProfileSettings({ profile, setProfile }) {
+import useUser from "@/hooks/useUser";
+import Swal from "sweetalert2";
+
+export default function ProfileSettings() {
+  const [profile, setProfile] = useState({
+    name: "",
+    email: "",
+    phone: "",
+    location: "",
+    photoURL: "",
+    bio: "",
+    vehicleInfo: "",
+  });
   const [imageUploading, setImageUploading] = useState(false);
   const { user: loggedInUser } = useUser();
 
+  useEffect(() => {
+    if (loggedInUser) {
+      setProfile({
+        name: loggedInUser.name || "",
+        email: loggedInUser.email || "",
+        phone: loggedInUser.phone || "",
+        location: loggedInUser.location || "",
+        photoURL: loggedInUser.profileImage || "",
+        bio: loggedInUser.bio || "",
+        vehicleInfo: loggedInUser.vehicleInfo || "",
+      });
+    }
+  },[loggedInUser]);
   const handleChange = (e) => {
     const { name, value } = e.target;
     setProfile(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleSave = async () => {
+    let body = {};
+    let endpoint = "";
+    let successMessage = "Profile updated successfully!";
+
+    body = {
+        email: profile.email,
+        name: profile.name,
+        phone: profile.phone,
+        location: profile.location,
+        bio: profile.bio,
+        profileImage: profile.photoURL,
+        vehicleInfo: profile.vehicleInfo,
+      };
+      endpoint = "/api/users/dashboardUser";
+
+    try {
+      const res = await fetch(endpoint, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      });
+
+      const data = await res.json();
+      if (res.ok) {
+        Swal.fire("Success", successMessage, "success");
+      } else {
+        Swal.fire("Failed", data.message || `Failed to update Profile`, "error");
+      }
+    } catch (error) {
+      console.error(`❌ Update error for Profile:`, error);
+      Swal.fire("Error", "Something went wrong while updating", "error");
+    }
   };
 
   const handleImageUpload = async (e) => {
@@ -213,6 +272,14 @@ export default function ProfileSettings({ profile, setProfile }) {
           className="w-full border border-base-300 bg-base-100 text-base-content rounded-xl px-4 py-3 focus:ring-2 focus:ring-primary focus:border-primary outline-none transition"
           placeholder="Tell us about yourself and your automotive needs..."
         />
+      </div>
+      <div className="flex justify-end gap-3 pt-4">
+        <button
+          onClick={handleSave}
+          className="px-6 py-3 bg-primary text-primary-content rounded-xl hover:bg-secondary transition duration-200 flex items-center gap-2 font-medium shadow-md shadow-primary/30"
+        >
+          <Save size={18} /> Save Changes
+        </button>
       </div>
     </div>
   );

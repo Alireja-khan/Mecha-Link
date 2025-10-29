@@ -6,7 +6,6 @@ export async function POST(req) {
     const data = await req.json();
     const collection = await dbConnect("mechanicShops");
 
-    // Ensure status is set, default to "pending"
     const shopData = {
       ...data,
       status: data.status || "pending",
@@ -44,7 +43,6 @@ export async function GET(req) {
 
     const collection = await dbConnect(collections.mechanicShops);
 
-    // --- Search by email ---
     if (email) {
       const shop = await collection.findOne({
         $or: [
@@ -54,25 +52,24 @@ export async function GET(req) {
         ],
       });
 
-      if (!shop) return NextResponse.json({ message: "No shop found for this email" }, { status: 404 });
+      if (!shop) {
+        return NextResponse.json(
+          { message: "No shop found for this email" },
+          { status: 404 }
+        );
+      }
+
       return NextResponse.json(shop);
     }
 
-    // --- Home page request (approved + limit 6) ---
-    if (home) {
-      const result = await collection
-        .find({ status: "approved" })
-        .limit(6)
-        .toArray();
-      return NextResponse.json(result);
-    }
-
-    // --- Build query ---
-    const matchStage = {};
+    let matchStage = {};
 
     if (!admin) matchStage.status = "approved"; // non-admin only sees approved
     if (status && status !== "all") matchStage.status = status;
-    if (category) matchStage["shop.categories"] = category;
+
+    if (category) {
+      matchStage["shop.categories"] = category;
+    }
 
     if (search) {
       matchStage.$or = [
@@ -84,8 +81,11 @@ export async function GET(req) {
       ];
     }
 
-    // --- Sorting ---
-    let sortStage = { createdAt: -1 }; // default newest first
+    if (category) {
+      matchStage["shop.categories"] = category;
+    }
+
+    let sortStage = {};
     if (sort === "htl") sortStage = { avgRating: -1 };
     if (sort === "lth") sortStage = { avgRating: 1 };
 
@@ -99,22 +99,53 @@ export async function GET(req) {
         $lookup: {
           from: "reviews",
           let: { shopId: { $toString: "$_id" } },
+          let: { shopId: { $toString: "$_id" } },
           pipeline: [
-            { $match: { $expr: { $eq: ["$shopId", "$$shopId"] } } },
+            {
+              $match: {
+                $expr: { $eq: ["$shopId", "$$shopId"] },
+              },
+            },
           ],
           as: "reviews",
         },
       },
       {
         $addFields: {
-          avgRating: { $avg: "$reviews.rating" },
+          avgRating: {
+            $ifNull: [
+              {
+                $avg: {
+                  $map: {
+                    input: "$reviews",
+                    as: "r",
+                    in: {
+                      $cond: [
+                        { $ifNull: ["$$r.rating", false] },
+                        { $toDouble: "$$r.rating" },
+                        null,
+                      ],
+                    },
+                  },
+                },
+              },
+              0,
+            ],
+          },
         },
       },
-      { $sort: sortStage },
-      { $skip: skip },
-      { $limit: limit },
     ];
 
+    if (Object.keys(sortStage).length) pipeline.push({ $sort: sortStage });
+    if (limit > 0) {
+      pipeline.push({ $skip: (page - 1) * limit });
+      pipeline.push({ $limit: limit });
+    }
+
+    if (home) {
+      const result = await collection.aggregate(pipeline).limit(6).toArray();
+      return NextResponse.json(result);
+    }
     const result = await collection.aggregate(pipeline).toArray();
 
     // --- Total count for pagination ---

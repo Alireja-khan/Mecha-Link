@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 export default function DashboardRedirect() {
   const router = useRouter();
 
-  const {user: loggedInUser, status} = useUser();
+  const {user: loggedInUser} = useUser();
 
   const role = loggedInUser?.role; // "admin" | "mechanic" | "user"
       if (role === "admin") router.push("/dashboard/admin");

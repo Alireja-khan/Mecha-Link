@@ -8,7 +8,6 @@ import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { FaGear } from "react-icons/fa6";
 import ToggleTheme from "../shared/ToggleTheme";
-// import label from "daisyui/components/label"; // This line seems unnecessary and is commented out
 import CartIcon from "../shared/cartIcon";
 
 const MobileDrawerBackdrop = ({ isOpen, onClick }) => {
@@ -27,6 +26,7 @@ export default function Header() {
   const dropdownRef = useRef(null);
   const { user: loggedInUser, status } = useUser();
   const [drawerOpen, setDrawerOpen] = useState(false);
+
 
   // Effect to handle sticky header scroll state
   useEffect(() => {
@@ -119,6 +119,9 @@ export default function Header() {
 
             <div className="flex items-center gap-3">
               {status === "loading" && (
+                <span className="loading loading-spinner loading-xs"></span>
+              )}
+              {status === "authenticated" && !loggedInUser && (
                 <span className="loading loading-spinner loading-xs"></span>
               )}
 

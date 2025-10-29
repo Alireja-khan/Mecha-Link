@@ -60,3 +60,14 @@ export async function PATCH(request, { params }) {
     );
   }
 }
+
+export async function GET (req, {params}){
+  const {id} = await params;
+
+  const query = { userId: id}
+  const collection = await dbConnect(collections.serviceRequests);
+  const result =await collection.find(query).sort({requestedDate: -1}).limit(5).toArray();
+
+  return NextResponse.json(result)
+  
+}
