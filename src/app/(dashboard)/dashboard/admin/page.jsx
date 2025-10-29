@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 import { Users, Store, Wrench, UserCheck, Star, Shield, Crown, Calendar, Eye, FileText, Settings, BarChart3, DollarSign } from "lucide-react";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, PieChart, Pie, Cell, ResponsiveContainer, Legend } from "recharts";
 import useUser from "@/hooks/useUser";
+import Link from "next/link";
 
 const AdminDashboardOverview = () => {
     const { user: loggedInUser, loading: userLoading } = useUser();
@@ -476,21 +477,29 @@ const AdminDashboardOverview = () => {
             <div className="bg-base-100 rounded-3xl p-6 md:p-8 border border-neutral shadow-xl transition-all duration-300 hover:shadow-2xl">
                 <h2 className="text-xl sm:text-2xl font-bold text-base-content mb-6">Quick Actions</h2>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                    <button className="flex items-center justify-center gap-2 p-4 bg-primary text-primary-content rounded-xl text-xs md:text-sm font-semibold transition-all duration-300 hover:bg-orange-700 hover:shadow-lg transform hover:scale-[1.03]">
-                        <UserCheck size={20} />
+                    <button >
+                        <Link className="flex items-center justify-center gap-2 p-4 bg-base-200 text-base-content rounded-xl text-xs md:text-sm font-semibold border border-base-300 transition-all duration-300 hover:bg-base-300 hover:shadow-lg transform hover:scale-[1.03]" href={"/dashboard/admin/manageUsers"}>
+                        <UserCheck size={20} className="text-primary"/>
                         <span>User Management</span>
+                        </Link>
                     </button>
-                    <button className="flex items-center justify-center gap-2 p-4 bg-base-200 text-base-content rounded-xl text-xs md:text-sm font-semibold border border-base-300 transition-all duration-300 hover:bg-base-300 hover:shadow-lg transform hover:scale-[1.03]">
+                    <button>
+                        <Link className="flex items-center justify-center gap-2 p-4 bg-base-200 text-base-content rounded-xl text-xs md:text-sm font-semibold border border-base-300 transition-all duration-300 hover:bg-base-300 hover:shadow-lg transform hover:scale-[1.03]" href={"/dashboard/admin/settings"}>
                         <Settings size={20} className="text-primary" />
                         <span>System Settings</span>
+                        </Link>
                     </button>
-                    <button className="flex items-center justify-center gap-2 p-4 bg-base-200 text-base-content rounded-xl text-xs md:text-sm font-semibold border border-base-300 transition-all duration-300 hover:bg-base-300 hover:shadow-lg transform hover:scale-[1.03]">
+                    <button >
+                        <Link href={"/dashboard/admin/revenue"} className="flex items-center justify-center gap-2 p-4 bg-base-200 text-base-content rounded-xl text-xs md:text-sm font-semibold border border-base-300 transition-all duration-300 hover:bg-base-300 hover:shadow-lg transform hover:scale-[1.03]">
                         <BarChart3 size={20} className="text-primary" />
-                        <span>Analytics</span>
+                        <span>Revenue Reports</span>
+                        </Link>
                     </button>
-                    <button className="flex items-center justify-center gap-2 p-4 bg-primary text-primary-content rounded-xl text-xs md:text-sm font-semibold transition-all duration-300 hover:bg-orange-700 hover:shadow-lg transform hover:scale-[1.03]">
-                        <FileText size={20} />
-                        <span>Reports</span>
+                    <button>
+                        <Link className="flex items-center justify-center gap-2 p-4 bg-base-200 text-base-content rounded-xl text-xs md:text-sm font-semibold border border-base-300 transition-all duration-300 hover:bg-base-300 hover:shadow-lg transform hover:scale-[1.03]" href={"/dashboard/admin/allAds"}>
+                        <FileText size={20} className="text-primary"/>
+                        <span>Ads</span>
+                        </Link>
                     </button>
                 </div>
             </div>

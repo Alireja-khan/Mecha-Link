@@ -37,24 +37,6 @@ export default function AdminSettings() {
   // Refs to store initial form states for each tab
   const initialProfileRef = useRef(null);
   const initialSecurityRef = useRef(null);
-  // const initialPreferencesRef = useRef(null);
-
-  // const [preferences, setPreferences] = useState({
-  //   language: "en",
-  //   timezone: "UTC",
-  //   dateFormat: "MM/DD/YYYY",
-  //   theme: "light",
-  //   emailNotifications: true,
-  //   pushNotifications: false,
-  //   smsNotifications: false,
-  // });
-
-  // const [privacy, setPrivacy] = useState({
-  //   profileVisibility: "private",
-  //   emailVisibility: "private",
-  //   activityStatus: true,
-  //   dataSharing: false,
-  // });
 
   useEffect(() => {
     if (loggedInUser) {
@@ -85,22 +67,7 @@ export default function AdminSettings() {
       // Store initial states
       initialProfileRef.current = profileData;
       initialSecurityRef.current = securityData;
-      // setPreferences({
-      //   language: loggedInUser.preferences?.language || "en",
-      //   timezone: loggedInUser.preferences?.timezone || "UTC",
-      //   dateFormat: loggedInUser.preferences?.dateFormat || "MM/DD/YYYY",
-      //   theme: loggedInUser.preferences?.theme || "light",
-      //   emailNotifications:
-      //     loggedInUser.preferences?.emailNotifications ?? true,
-      //   pushNotifications: loggedInUser.preferences?.pushNotifications ?? false,
-      //   smsNotifications: loggedInUser.preferences?.smsNotifications ?? false,
-      // });
-      // setPrivacy({
-      //   profileVisibility: loggedInUser.privacy?.profileVisibility || "private",
-      //   emailVisibility: loggedInUser.privacy?.emailVisibility || "private",
-      //   activityStatus: loggedInUser.privacy?.activityStatus ?? true,
-      //   dataSharing: loggedInUser.privacy?.dataSharing ?? false,
-      // });
+      
     }
   }, [loggedInUser]);
 
@@ -220,7 +187,8 @@ export default function AdminSettings() {
         Swal.fire({
           title: 'Changes Discarded!',
           text: 'Your changes have been discarded.',
-          timer: 500,
+          icon:"success",
+          timer: 1500,
           showConfirmButton: false
         });
       }
@@ -234,7 +202,7 @@ export default function AdminSettings() {
   ];
 
   return (
-    <div className="p-4 sm:p-8 space-y-8 bg-base-200 mx-auto text-base-content">
+    <div className=" p-4 sm:p-8 space-y-8 mx-auto text-base-content">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center">
         <h1 className="text-3xl font-extrabold text-base-content">
           Admin Settings
@@ -273,16 +241,11 @@ export default function AdminSettings() {
           {activeTab === "security" && (
             <SecuritySettings security={security} setSecurity={setSecurity} />
           )}
-          {/* {activeTab === "preferences" && (
-            <PreferencesSettings
-              preferences={preferences}
-              setPreferences={setPreferences}
-            />
-          )} */}
         </div>
       </div>
 
-      <div className="flex justify-end gap-3 pt-4">
+      {activeTab === "profile" && (
+        <div className="flex justify-end gap-3 pt-4">
         <button
         onClick={handleCancel}
          className="px-6 py-3 border border-base-300 text-base-content rounded-xl hover:bg-base-300 transition duration-200 font-medium">
@@ -295,6 +258,7 @@ export default function AdminSettings() {
           <Save size={18} /> Save Changes
         </button>
       </div>
+      )}
     </div>
   );
 }

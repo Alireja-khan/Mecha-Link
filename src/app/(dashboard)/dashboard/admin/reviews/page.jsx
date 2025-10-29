@@ -197,67 +197,6 @@ const Page = () => {
     return matchesSearch && matchesRating;
   });
 
-  // const updateReviewStatus = async (reviewId, newStatus) => {
-  //     const action = newStatus === 'approved' ? 'approve' : newStatus === 'rejected' ? 'reject' : 'set to pending';
-
-  //     const result = await showConfirmDialog(
-  //         `${action.charAt(0).toUpperCase() + action.slice(1)} Review`,
-  //         `Are you sure you want to ${action} this review?`,
-  //         `Yes, ${action.charAt(0).toUpperCase() + action.slice(1)}`
-  //     );
-
-  //     if (!result.isConfirmed) return;
-
-  //     try {
-  //         showLoadingAlert('Updating...', 'Please wait while we update the review status');
-
-  //         const res = await fetch(`/api/reviews/${reviewId}`, {
-  //             method: 'PATCH',
-  //             headers: {
-  //                 'Content-Type': 'application/json',
-  //             },
-  //             body: JSON.stringify({ status: newStatus }),
-  //         });
-
-  //         if (res.ok) {
-  //             setTotalReviews(prevReviews =>
-  //                 prevReviews.map(review =>
-  //                     review._id === reviewId ? { ...review, status: newStatus } : review
-  //                 )
-  //             );
-  //             Swal.close();
-  //             showSuccessAlert('Success!', `Review has been ${action}d successfully`);
-  //             if (selectedReview?._id === reviewId) {
-  //                 setSelectedReview(prev => ({ ...prev, status: newStatus }));
-  //             }
-  //         } else {
-  //             throw new Error('Failed to update review status');
-  //         }
-  //     } catch (error) {
-  //         console.error('Failed to update review status:', error);
-  //         Swal.close();
-  //         showErrorAlert('Error', `Failed to ${action} review`);
-  //     }
-  // };
-
-  // const getStatusBadge = (status) => {
-  //     const base = "px-2 sm:px-3 py-1 text-xs font-semibold rounded-full border whitespace-nowrap";
-  //     switch (status) {
-  //         case "c":
-  //             // DaisyUI success colors
-  //             return <span className={`${base} bg-success/20 text-success border-success/40`}>Approved</span>;
-  //         case "pending":
-  //             // DaisyUI warning colors
-  //             return <span className={`${base} bg-warning/20 text-warning border-warning/40`}>Pending</span>;
-  //         case "rejected":
-  //             // DaisyUI error colors
-  //             return <span className={`${base} bg-error/20 text-error border-error/40`}>Rejected</span>;
-  //         default:
-  //             // DaisyUI neutral colors
-  //             return <span className={`${base} bg-base-300/50 text-base-content border-neutral/40`}>Unknown</span>;
-  //     }
-  // };
-
   const renderStars = (rating) => (
     <div className="flex items-center gap-1">
       {[1, 2, 3, 4, 5].map((star) => (
@@ -406,33 +345,6 @@ const Page = () => {
             </span>
           </div>
           <div className="flex gap-2">
-            {/* {review.status === "pending" && (
-                                <>
-                                    <button
-                                        onClick={() => updateReviewStatus(review._id, "approved")}
-                                        className="p-2 bg-success/10 text-success rounded-lg border border-success/30 hover:bg-success/20 transition-colors"
-                                        title="Approve"
-                                    >
-                                        <Check size={14} />
-                                    </button>
-                                    <button
-                                        onClick={() => updateReviewStatus(review._id, "rejected")}
-                                        className="p-2 bg-error/10 text-error rounded-lg border border-error/30 hover:bg-error/20 transition-colors"
-                                        title="Reject"
-                                    >
-                                        <X size={14} />
-                                    </button>
-                                </>
-                            )}
-                            {(review.status === "approved" || review.status === "rejected") && (
-                                <button
-                                    onClick={() => updateReviewStatus(review._id, "pending")}
-                                    className="p-2 bg-warning/10 text-warning rounded-lg border border-warning/30 hover:bg-warning/20 transition-colors"
-                                    title="Set Pending"
-                                >
-                                    <Clock size={14} />
-                                </button>
-                            )} */}
             <button
               onClick={() => openDetailModal(review)}
               className="p-2 bg-primary/10 text-primary rounded-lg border border-primary/30 hover:bg-primary/20 transition-colors"
@@ -440,6 +352,13 @@ const Page = () => {
             >
               <Eye size={14} />
             </button>
+            <button
+                          onClick={()=>deleteReview(review._id)}
+                          className="p-1.5 bg-error/10 text-error rounded-lg border border-error/30 hover:bg-error/20 transition-colors"
+                          title="Delete"
+                        >
+                          <Trash size={16} />
+                        </button>
           </div>
         </div>
       </div>
@@ -605,6 +524,7 @@ const Page = () => {
                             <Eye size={14} />
                             View
                           </button>
+                          
                         </div>
                       </td>
                       <td className="px-6 py-4 space-y-2">
@@ -630,13 +550,6 @@ const Page = () => {
                       {/* <td className="px-6 py-4">{getStatusBadge(review.status)}</td> */}
                       <td className="px-6 py-4 flex justify-center gap-2">
                         <button
-                          onClick={()=>deleteReview(review._id)}
-                          className="p-1.5 bg-error/10 text-error rounded-lg border border-error/30 hover:bg-error/20 transition-colors"
-                          title="Delete"
-                        >
-                          <Trash size={16} />
-                        </button>
-                        <button
                           onClick={() => {
                             setSelectedReview(review);
                             setDetailModalOpen(true);
@@ -645,6 +558,13 @@ const Page = () => {
                           title="View Details"
                         >
                           <Eye size={16} />
+                        </button>
+                        <button
+                          onClick={()=>deleteReview(review._id)}
+                          className="p-1.5 bg-error/10 text-error rounded-lg border border-error/30 hover:bg-error/20 transition-colors"
+                          title="Delete"
+                        >
+                          <Trash size={16} />
                         </button>
                       </td>
                     </tr>
