@@ -1,15 +1,32 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Eye, EyeOff } from "lucide-react";
 import Swal from "sweetalert2";
+import useUser from "@/hooks/useUser";
 
-export default function SecuritySettings({ security, setSecurity }) {
+export default function SecuritySettings() {
+  const { user: loggedInUser } = useUser();
   const [showPassword, setShowPassword] = useState({
     password: false,
     newPassword: false,
     confirmPassword: false,
   });
+  const [security, setSecurity] = useState({
+    password: "",
+    newPassword: "",
+    confirmPassword: ""
+  });
+
+  useEffect(() => {
+    if (loggedInUser) {
+      setSecurity({
+        password: "",
+        newPassword: "",
+        confirmPassword: ""
+      });
+    }
+  }, [loggedInUser]);
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -119,44 +136,6 @@ export default function SecuritySettings({ security, setSecurity }) {
           </button>
         </div>
       </form>
-
-      {/* Security Preferences */}
-      <div className="space-y-4">
-        <h3 className="text-xl font-bold text-base-content pb-2 border-b border-base-300">
-          Security Preferences
-        </h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {[
-            {
-              name: "twoFactor",
-              label: "Two-Factor Authentication",
-              desc: "Require a second code for login for an extra layer of security.",
-            },
-            {
-              name: "loginAlerts",
-              label: "Login Alerts",
-              desc: "Get notified via email when your account is logged into from a new device.",
-            },
-          ].map((item) => (
-            <label
-              key={item.name}
-              className="flex items-center justify-between p-4 border border-base-300 bg-base-100 rounded-xl hover:bg-base-200 cursor-pointer transition"
-            >
-              <div>
-                <div className="font-semibold text-base-content">{item.label}</div>
-                <div className="text-sm text-base-content/70">{item.desc}</div>
-              </div>
-              <input
-                type="checkbox"
-                name={item.name}
-                checked={security[item.name]}
-                onChange={handleChange}
-                className="w-5 h-5 accent-primary focus:ring-primary/50 ml-4"
-              />
-            </label>
-          ))}
-        </div>
-      </div>
     </div>
   );
 }

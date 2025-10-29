@@ -6,7 +6,6 @@ export async function POST(req) {
     const data = await req.json();
     const collection = await dbConnect("mechanicShops");
 
-    // Ensure status is set, default to "pending"
     const shopData = {
       ...data,
       status: data.status || "pending",
@@ -59,14 +58,6 @@ export async function GET(req) {
 
       return NextResponse.json(shop);
     }
-
-    // if (home) {
-    //   const result = await collection
-    //     .find({ status: "approved" })
-    //     .limit(6)
-    //     .toArray();
-    //   return NextResponse.json(result);
-    // }
 
     let matchStage = {};
 
@@ -145,11 +136,6 @@ export async function GET(req) {
     }
 
     if (home) {
-      // const result = await collection
-      //   .find({ status: "approved" })
-      //   .limit(6)
-      //   .toArray();
-      // return NextResponse.json(result);
       const result = await collection.aggregate(pipeline).limit(6).toArray();
       return NextResponse.json(result);
     }
