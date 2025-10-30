@@ -7,7 +7,6 @@ import FeaturesSection from "./components/FeaturesSection";
 import TechnologySection from "./components/TechnologySection";
 import FounderSection from "./components/FounderSection";
 import TeamSection from "./components/TeamSection";
-import CTASection from "./components/CTASection";
 import LoadingSkeleton from "./components/LoadingSkeleton"; // Import from separate file
 
 const AboutPage = () => {
@@ -34,7 +33,6 @@ const AboutPage = () => {
       <TechnologySection />
       <FounderSection />
       <TeamSection />
-      <CTASection />
     </div>
   );
 };
