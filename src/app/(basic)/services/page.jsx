@@ -2,8 +2,8 @@
 
 import React, {useEffect, useState} from "react";
 import ServiceCard from "@/app/Components/ServiceCard";
-import Pagination from "@/app/Components/pagination";
-import {Search, Filter, MapPin, Sparkles} from "lucide-react";
+// REMOVED: import Pagination from "@/app/Components/pagination";
+import {Search, Filter, MapPin, Sparkles, ChevronLeft, ChevronRight, ArrowLeft, ArrowRight} from "lucide-react";
 
 const Services = () => {
   const [totalData, setTotalData] = useState({
@@ -17,7 +17,9 @@ const Services = () => {
   const [itemsPerPage, setItemsPerPage] = useState(12);
   const [currentPage, setCurrentPage] = useState(1);
   const [isRestored, setIsRestored] = useState(false);
-  // get from local storage
+  const [isSmall, setIsSmall] = useState(false);
+
+  // get from local storage and setup responsiveness listener
   useEffect(() => {
     const savedPage = localStorage.getItem("mechanicShops_currentPage");
     const savedItems = localStorage.getItem("mechanicShops_itemsPerPage");
@@ -25,9 +27,14 @@ const Services = () => {
     if (savedPage) setCurrentPage(Number(savedPage));
     if (savedItems) setItemsPerPage(Number(savedItems));
     setIsRestored(true);
+
+    const checkSize = () => setIsSmall(window.innerWidth < 768);
+    checkSize();
+    window.addEventListener("resize", checkSize);
+    return () => window.removeEventListener("resize", checkSize);
   }, []);
 
-  //  Save to local storage
+  // Save to local storage
   useEffect(() => {
     localStorage.setItem("mechanicShops_currentPage", currentPage);
     localStorage.setItem("mechanicShops_itemsPerPage", itemsPerPage);
@@ -45,7 +52,8 @@ const Services = () => {
         return res.json();
       })
       .then((data) => {
-        setTotalData(data);
+        // Ensure totalPage is correctly extracted if the API returns a 'pagination' object
+        setTotalData(data.pagination ? {...data, totalPage: data.pagination.totalPages} : data);
         setLoading(false);
       })
       .catch((err) => {
@@ -76,6 +84,101 @@ const Services = () => {
     setCurrentPage(page);
   };
 
+  // Start of INLINED Pagination Logic
+
+  const getVisiblePages = (totalPages, currentPage) => {
+    if (totalPages <= 7) return Array.from({length: totalPages}, (_, i) => i + 1);
+
+    const pages = new Set();
+    const range = isSmall ? 0 : 1;
+
+    pages.add(1);
+    pages.add(totalPages);
+
+    for (let i = -range; i <= range; i++) {
+      const pageNum = currentPage + i;
+      if (pageNum > 1 && pageNum < totalPages) pages.add(pageNum);
+    }
+
+    const sortedPages = Array.from(pages).sort((a, b) => a - b);
+    const result = [];
+    let lastPage = 0;
+
+    for (const page of sortedPages) {
+      if (page > lastPage + 1) result.push("...");
+      result.push(page);
+      lastPage = page;
+    }
+
+    return result;
+  };
+
+  const PaginationComponent = () => {
+    const visiblePages = getVisiblePages(totalPage, currentPage);
+
+    return (
+      <div className="flex flex-col md:flex-row justify-between mt-10 items-center gap-4 border-t pt-6 border-base-300">
+        <div className="flex items-center gap-3">
+          <label htmlFor="itemsPerPage" className="text-base-content/70 font-medium">
+            Show per page:
+          </label>
+          <select
+            id="itemsPerPage"
+            value={itemsPerPage}
+            onChange={(e) => handleItemsPerPage(Number(e.target.value))}
+            className="px-4 py-2 bg-base-100 rounded-lg border-2 border-base-300 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-300"
+          >
+            {[12, 24, 36, 50].map((num) => (
+              <option key={num} value={num}>
+                {num}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <div className="flex flex-wrap justify-center items-center gap-2">
+          <button
+            className="w-10 h-10 flex items-center justify-center border border-primary text-primary rounded-lg hover:bg-primary hover:text-white transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+            disabled={currentPage === 1}
+            onClick={() => handlePageChange(currentPage - 1)}
+          >
+            <ArrowLeft className="w-4 h-4" />
+          </button>
+
+          {visiblePages.map((page, idx) =>
+            page === "..." ? (
+              <span key={idx} className="px-3 py-2 text-base-content/70">
+                ...
+              </span>
+            ) : (
+              <button
+                key={idx}
+                className={`w-10 h-10 flex items-center justify-center border rounded-lg transition-all duration-300 ${
+                  page === currentPage
+                    ? "bg-primary text-white border-primary"
+                    : "border-neutral text-base-content hover:bg-primary/10 hover:border-primary"
+                }`}
+                onClick={() => handlePageChange(page)}
+              >
+                {page}
+              </button>
+            )
+          )}
+
+          <button
+            className="w-10 h-10 flex items-center justify-center border border-primary text-primary rounded-lg hover:bg-primary hover:text-white transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+            disabled={currentPage === totalPage}
+            onClick={() => handlePageChange(currentPage + 1)}
+          >
+            <ArrowRight className="w-4 h-4" />
+          </button>
+        </div>
+      </div>
+    );
+  };
+
+  // End of INLINED Pagination Logic
+
   const ServiceCardSkeleton = () => (
     <div className="bg-base-100 rounded-2xl shadow-xl border border-base-300 p-6 animate-pulse">
       <div className="skeleton bg-base-300 h-48 w-full rounded-2xl mb-4"></div>
@@ -94,6 +197,25 @@ const Services = () => {
         <div className="skeleton bg-base-300 h-3 w-4/6 rounded"></div>
       </div>
       <div className="skeleton bg-base-300 h-10 w-full rounded-xl"></div>
+    </div>
+  );
+  
+  const PaginationSkeleton = () => (
+    <div className="flex flex-col md:flex-row justify-between mt-10 items-center gap-4 pt-6 border-t border-base-300 animate-pulse">
+      <div className="flex items-center gap-3">
+        <div className="skeleton bg-base-300 h-4 w-32 rounded"></div>
+        <div className="skeleton bg-base-300 h-10 w-20 rounded-lg"></div>
+      </div>
+      <div className="flex justify-center items-center gap-2">
+        <div className="skeleton bg-base-300 h-10 w-20 rounded-lg"></div>
+        {[...Array(5)].map((_, i) => (
+          <div
+            key={i}
+            className="skeleton bg-base-300 h-10 w-10 rounded-lg"
+          ></div>
+        ))}
+        <div className="skeleton bg-base-300 h-10 w-20 rounded-lg"></div>
+      </div>
     </div>
   );
 
@@ -211,13 +333,7 @@ const Services = () => {
                 ))}
               </div>
 
-              <Pagination
-                currentPage={currentPage}
-                totalPages={totalPage}
-                onPageChange={handlePageChange}
-                itemsPerPage={itemsPerPage}
-                onItemsPerPageChange={handleItemsPerPage}
-              />
+              {loading ? <PaginationSkeleton /> : <PaginationComponent />}
             </>
           )}
         </div>
