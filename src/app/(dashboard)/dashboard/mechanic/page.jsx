@@ -87,11 +87,13 @@ const MechanicDashboardOverview = () => {
   const [shopLoading, setShopLoading] = useState(true);
   const [requestsLoading, setRequestsLoading] = useState(true);
   const [reviewsLoading, setReviewsLoading] = useState(true);
+  const [allServiceRequestsLoading, setAllServiceRequestsLoading] = useState(true);
 
   const [shopData, setShopData] = useState(null);
   const [allRequests, setAllRequests] = useState([]);
   const [allReviews, setAllReviews] = useState([]);
-
+  const [allServiceRequestsData, setAllServiceRequestsData] = useState([]);
+  const [pendingCount, setPendingCount] = useState([]); // State for the pending requests array
 
   useEffect(() => {
     const fetchShopData = async () => {
@@ -124,7 +126,6 @@ const MechanicDashboardOverview = () => {
 
     fetchShopData();
   }, [loggedInUser]);
-
 
   useEffect(() => {
     const fetchRequestsData = async () => {
@@ -180,6 +181,46 @@ const MechanicDashboardOverview = () => {
     fetchReviews();
   }, []);
 
+  // Corrected useEffect for fetching all service requests
+  useEffect(() => {
+    const fetchAllRequestsData = async () => {
+      setAllServiceRequestsLoading(true);
+      try {
+        const requestsRes = await fetch(`/api/service-request?status=pending`);
+        console.log(requestsRes);
+        let fetchedObject = {};
+        let requestArray = [];
+
+        if (requestsRes.ok) {
+          fetchedObject = await requestsRes.json();
+
+          // --- FIX APPLIED HERE ---
+          requestArray = Array.isArray(fetchedObject.result)
+            ? fetchedObject.result
+            : [];
+
+          const pendingRequests = requestArray.filter(
+            (req) => req.status === "pending"
+          );
+
+          setPendingCount(pendingRequests);
+
+        } else {
+          console.error("All Requests fetch failed:", await requestsRes.text());
+        }
+
+        setAllServiceRequestsData(requestArray);
+      } catch (error) {
+        console.error("Error fetching all service requests:", error);
+        setAllServiceRequestsData([]);
+        setPendingCount([]);
+      } finally {
+        setAllServiceRequestsLoading(false);
+      }
+    };
+
+    fetchAllRequestsData();
+  }, []);
 
   const shopReviews = useMemo(() => {
     const shopId = shopData?._id;
@@ -203,10 +244,6 @@ const MechanicDashboardOverview = () => {
     ).length;
     const inProgressRequests = requestsArray.filter(
       (req) => req.status === "in-progress"
-    ).length;
-    const pendingRequests = requestsArray.filter(
-      (req) =>
-        req.status === "pending" || req.status === "accepted" || !req.status
     ).length;
 
     const totalEarnings = requestsArray
@@ -236,25 +273,22 @@ const MechanicDashboardOverview = () => {
     return {
       completed: completedRequests,
       inProgress: inProgressRequests,
-      pending: pendingRequests,
       totalEarnings,
       completionRate: completionRate.toFixed(1),
       averageRating: averageRating.toFixed(1),
       totalRequests,
       totalReviews: shopReviewsArray.length,
     };
-  }, [allRequests, shopReviews]);
+  }, [allRequests, shopReviews, allServiceRequestsData]);
 
   const revenueData = useMemo(() => {
     return generateMonthlyRevenue(allRequests);
   }, [allRequests]);
 
-  // 🔥 CHANGE APPLIED HERE: Using allRequests for service breakdown and activity
   const allServiceRequests = useMemo(() => allRequests, [allRequests]);
 
   const recentReviews = useMemo(() => shopReviews.slice(-5).reverse(), [shopReviews]);
 
-  // Dependent on allServiceRequests (which is now allRequests)
   const serviceTypeBreakdown = useMemo(() => allServiceRequests.reduce((acc, req) => {
     const type = req.deviceType || req.problemCategory || "Other";
     acc[type] = (acc[type] || 0) + 1;
@@ -268,7 +302,6 @@ const MechanicDashboardOverview = () => {
     })
   ), [serviceTypeBreakdown]);
 
-  // Dependent on allServiceRequests (which is now allRequests)
   const recentActivity = useMemo(() => allServiceRequests
     .slice(-5)
     .reverse()
@@ -291,8 +324,7 @@ const MechanicDashboardOverview = () => {
       urgency: request.serviceDetails?.urgency || "medium",
     })), [allServiceRequests]);
 
-  const fullLoading = shopLoading || requestsLoading || reviewsLoading;
-
+  const fullLoading = shopLoading || requestsLoading || reviewsLoading || allServiceRequestsLoading;
 
   const mechanicMetrics = [
     {
@@ -303,16 +335,16 @@ const MechanicDashboardOverview = () => {
       color: "green",
     },
     {
-      id: 2,
+      id: 3,
       title: "In Progress",
       value: fullLoading ? (<Loader2 className="animate-spin" />) : performanceStats.inProgress || 0,
       icon: Clock,
       color: "blue",
     },
     {
-      id: 3,
+      id: 2,
       title: "Pending Requests",
-      value: fullLoading ? (<Loader2 className="animate-spin" />) : performanceStats.pending || 0,
+      value: fullLoading ? (<Loader2 className="animate-spin" />) : pendingCount.length || 0,
       icon: AlertTriangle,
       color: "yellow",
     },
@@ -462,7 +494,6 @@ const MechanicDashboardOverview = () => {
 
   return (
     <div className="min-h-screen p-4 md:p-8 bg-base-200 space-y-8">
-      {/* Header */}
       <div className="bg-gradient-to-br from-primary to-orange-600 rounded-3xl p-6 md:p-10 text-white shadow-2xl">
         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
           <div className="flex items-center gap-4">
@@ -509,7 +540,6 @@ const MechanicDashboardOverview = () => {
         </div>
       </div>
 
-      {/* Stats Grid */}
       <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4 sm:gap-6">
         {mechanicMetrics.map((metric) => (
           <StatCard
@@ -523,9 +553,7 @@ const MechanicDashboardOverview = () => {
         ))}
       </div>
 
-      {/* Charts Section */}
       <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
-        {/* Revenue Chart */}
         <div className="xl:col-span-2 bg-base-100 rounded-3xl p-6 md:p-8 border border-neutral shadow-xl transition-all duration-300 hover:shadow-2xl">
           <h2 className="text-xl md:text-2xl font-bold text-base-content mb-8">
             Monthly Revenue
@@ -560,7 +588,6 @@ const MechanicDashboardOverview = () => {
           )}
         </div>
 
-        {/* Service Type Breakdown */}
         <div className="bg-base-100 rounded-3xl p-6 md:p-8 border border-neutral shadow-xl transition-all duration-300 hover:shadow-2xl">
           <h2 className="text-xl md:text-2xl font-bold text-base-content mb-8">
             Service Types
@@ -615,9 +642,7 @@ const MechanicDashboardOverview = () => {
         </div>
       </div>
 
-      {/* Recent Activity & Reviews */}
       <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
-        {/* Recent Service Requests */}
         <div className="xl:col-span-2 bg-base-100 rounded-3xl p-6 md:p-8 border border-neutral shadow-xl transition-all duration-300 hover:shadow-2xl">
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-xl md:text-2xl font-bold text-base-content">
@@ -672,7 +697,6 @@ const MechanicDashboardOverview = () => {
           </div>
         </div>
 
-        {/* Recent Reviews */}
         <div className="bg-base-100 rounded-3xl p-6 md:p-8 border border-neutral shadow-xl transition-all duration-300 hover:shadow-2xl">
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-xl md:text-2xl font-bold text-base-content">
@@ -728,7 +752,6 @@ const MechanicDashboardOverview = () => {
         </div>
       </div>
 
-      {/* Quick Actions */}
       <div className="bg-base-100 rounded-3xl p-6 md:p-8 border border-neutral shadow-xl transition-all duration-300 hover:shadow-2xl">
         <h2 className="text-xl sm:text-2xl font-bold text-base-content mb-6">
           Quick Actions
