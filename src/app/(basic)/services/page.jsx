@@ -1,292 +1,345 @@
 "use client";
 
-import React, { useState } from "react";
-import ServiceBanner from "./ServiceBanner";
+import React, {useEffect, useState} from "react";
 import ServiceCard from "@/app/Components/ServiceCard";
-// import ServiceCard from "../../Components/ServiceCard";
+// REMOVED: import Pagination from "@/app/Components/pagination";
+import {Search, Filter, MapPin, Sparkles, ChevronLeft, ChevronRight, ArrowLeft, ArrowRight} from "lucide-react";
 
-export default function Services() {
-  const services = [
-    {
-      id: 1,
-      name: "AutoFix Garage",
-      category: "Automobile",
-      location: "Dhaka, Bangladesh",
-      workingHour: "9:00 AM - 8:00 PM",
-      weekend: "Friday",
-      rating: 4,
-      image: "https://i.ibb.co/twWwK13q/pexels-olly-3817756.jpg",
-    },
-    {
-      id: 2,
-      name: "Home Essentials",
-      category: "Household",
-      location: "Chittagong, Bangladesh",
-      workingHour: "10:00 AM - 9:00 PM",
-      weekend: "Sunday",
-      rating: 3,
-      image: "https://i.ibb.co/j96BjHkM/pexels-olly-3846508.jpg",
-    },
-    {
-      id: 3,
-      name: "Speedy Motors",
-      category: "Automobile",
-      location: "Khulna, Bangladesh",
-      workingHour: "8:00 AM - 7:00 PM",
-      weekend: "Friday",
-      rating: 5,
-      image: "https://i.ibb.co/d0xkrYqh/pexels-gustavo-fring-6870320.jpg",
-    },
-    {
-      id: 4,
-      name: "Daily Needs Store",
-      category: "Household",
-      location: "Rajshahi, Bangladesh",
-      workingHour: "9:30 AM - 8:30 PM",
-      weekend: "Saturday",
-      rating: 2,
-      image: "https://i.ibb.co.com/ds3m107k/pexels-centre-for-ageing-better-55954677-7849743.jpg",
-    },
-    {
-      id: 5,
-      name: "Elite Auto Care",
-      category: "Automobile",
-      location: "Sylhet, Bangladesh",
-      workingHour: "9:00 AM - 6:00 PM",
-      weekend: "Friday",
-      rating: 4,
-      image: "https://i.ibb.co.com/1G6K3BDg/pexels-gustavo-fring-4173282.jpg",
-    },
-    {
-      id: 6,
-      name: "City Home Mart",
-      category: "Household",
-      location: "Barisal, Bangladesh",
-      workingHour: "10:00 AM - 9:00 PM",
-      weekend: "Sunday",
-      rating: 3,
-      image: "https://i.ibb.co.com/279cNcqV/pexels-cottonbro-4489732.jpg",
-    },
-    {
-      id: 7,
-      name: "Prime Car Service",
-      category: "Automobile",
-      location: "Rangpur, Bangladesh",
-      workingHour: "9:00 AM - 8:00 PM",
-      weekend: "Friday",
-      rating: 5,
-      image: "https://i.ibb.co.com/0pFykFJ7/pexels-sergey-sergeev-2153675005-32845697.jpg",
-    },
-    {
-      id: 8,
-      name: "Family Needs",
-      category: "Household",
-      location: "Mymensingh, Bangladesh",
-      workingHour: "10:00 AM - 8:00 PM",
-      weekend: "Saturday",
-      rating: 2,
-      image: "https://i.ibb.co.com/CsMCdKgP/pexels-cottonbro-4489748.jpg",
-    },
-    {
-      id: 9,
-      name: "Super Auto Hub",
-      category: "Automobile",
-      location: "Dhaka, Bangladesh",
-      workingHour: "8:00 AM - 7:00 PM",
-      weekend: "Friday",
-      rating: 4,
-      image: "https://i.ibb.co.com/N6kYLt4S/pexels-olly-3822843.jpg",
-    },
-    {
-      id: 10,
-      name: "Happy Home Store",
-      category: "Household",
-      location: "Chittagong, Bangladesh",
-      workingHour: "9:00 AM - 8:30 PM",
-      weekend: "Sunday",
-      rating: 3,
-      image: "https://i.ibb.co.com/JFqMFR8y/pexels-olly-3807120.jpg",
-    },
-    {
-      id: 11,
-      name: "Metro Car Clinic",
-      category: "Automobile",
-      location: "Sylhet, Bangladesh",
-      workingHour: "9:00 AM - 7:00 PM",
-      weekend: "Friday",
-      rating: 5,
-      image: "https://i.ibb.co.com/4Rvr6PFS/pexels-pixabay-279949.jpg",
-    },
-    {
-      id: 12,
-      name: "Smart Living",
-      category: "Household",
-      location: "Rajshahi, Bangladesh",
-      workingHour: "10:00 AM - 9:00 PM",
-      weekend: "Saturday",
-      rating: 2,
-      image: "https://i.ibb.co.com/zTn519zm/kato-blackmore-qc-F-19-Bv-Vi-E-unsplash.jpg",
-    },
-  ];
-
-  // ===== State =====
+const Services = () => {
+  const [totalData, setTotalData] = useState({
+    result: [],
+    totalDocs: 0,
+    totalPage: 1,
+  });
+  const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
-  const [sortOrder, setSortOrder] = useState("htl"); // htl = High to Low
+  const [sortOrder, setSortOrder] = useState("");
   const [itemsPerPage, setItemsPerPage] = useState(12);
   const [currentPage, setCurrentPage] = useState(1);
+  const [isRestored, setIsRestored] = useState(false);
+  const [isSmall, setIsSmall] = useState(false);
 
-  // ===== Filter & Sort =====
-  const filteredServices = services
-    .filter((service) =>
-      service.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      service.location.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      service.category.toLowerCase().includes(searchTerm.toLowerCase())
-    )
-    .sort((a, b) =>
-      sortOrder === "htl" ? b.rating - a.rating : a.rating - b.rating
-    );
+  // get from local storage and setup responsiveness listener
+  useEffect(() => {
+    const savedPage = localStorage.getItem("mechanicShops_currentPage");
+    const savedItems = localStorage.getItem("mechanicShops_itemsPerPage");
 
-  // ===== Pagination =====
-  const totalPages = Math.ceil(filteredServices.length / itemsPerPage);
-  const displayedServices = filteredServices.slice(
-    (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage
-  );
+    if (savedPage) setCurrentPage(Number(savedPage));
+    if (savedItems) setItemsPerPage(Number(savedItems));
+    setIsRestored(true);
 
-  // ===== Handlers =====
+    const checkSize = () => setIsSmall(window.innerWidth < 768);
+    checkSize();
+    window.addEventListener("resize", checkSize);
+    return () => window.removeEventListener("resize", checkSize);
+  }, []);
+
+  // Save to local storage
+  useEffect(() => {
+    localStorage.setItem("mechanicShops_currentPage", currentPage);
+    localStorage.setItem("mechanicShops_itemsPerPage", itemsPerPage);
+  }, [currentPage, itemsPerPage]);
+
+  // Fetch data from API whenever search, sort, page, or itemsPerPage changes
+  useEffect(() => {
+    setLoading(true);
+    if (!isRestored) return;
+    const apiUrl = `/api/shops?search=${searchTerm}&sort=${sortOrder}&limit=${itemsPerPage}&page=${currentPage}`;
+
+    fetch(apiUrl)
+      .then((res) => {
+        if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+        return res.json();
+      })
+      .then((data) => {
+        // Ensure totalPage is correctly extracted if the API returns a 'pagination' object
+        setTotalData(data.pagination ? {...data, totalPage: data.pagination.totalPages} : data);
+        setLoading(false);
+      })
+      .catch((err) => {
+        console.error("Error fetching shops:", err);
+        setTotalData({result: [], totalDocs: 0, totalPage: 1});
+        setLoading(false);
+      });
+  }, [searchTerm, sortOrder, itemsPerPage, currentPage, isRestored]);
+
+  const {result: services = [], totalDocs = 0, totalPage = 1} = totalData;
+
   const handleSearch = (e) => {
     setSearchTerm(e.target.value);
-    setCurrentPage(1); // Reset to first page on search
+    setCurrentPage(1);
   };
 
   const handleSort = (e) => {
     setSortOrder(e.target.value);
+    setCurrentPage(1);
   };
 
-  const handleItemsPerPage = (e) => {
-    setItemsPerPage(parseInt(e.target.value));
-    setCurrentPage(1);
+  const handleItemsPerPage = (num) => {
+    setItemsPerPage(num);
+    setCurrentPage(1); // Reset page to 1 whenever items per page changes
   };
 
   const handlePageChange = (page) => {
     setCurrentPage(page);
   };
 
-  return (
-    <>
-      <ServiceBanner />
-      <section className="py-20">
-        <div className="container">
-          {/* Title */}
-          <div className="text-center mb-12">
-            <h2 className="text-4xl md:text-5xl font-extrabold text-center">
-              Explore <span className="text-orange-500">MechaLink Services</span>
-            </h2>
-            <p className="text-md max-w-2xl mx-auto md:text-xl mt-3">
-              Discover professional services for all your needs and manage bookings effortlessly with MechaLink.
-            </p>
-          </div>
+  // Start of INLINED Pagination Logic
 
-          {/* Search & Sort */}
-          <div className="flex flex-col md:flex-row justify-between items-center gap-4 mb-6">
-            {/* Search */}
-            <div className="flex-1">
-              <div className="flex items-center gap-3 bg-orange-500 rounded-lg px-4 py-1 shadow-sm">
-                <label htmlFor="search" className="text-white font-medium">
-                  Search
-                </label>
-                <input
-                  type="search"
-                  id="search"
-                  placeholder="Shop, mechanic, or location"
-                  value={searchTerm}
-                  onChange={handleSearch}
-                  className="flex-1 bg-white text-gray-900 placeholder-gray-800 px-3 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
-                />
+  const getVisiblePages = (totalPages, currentPage) => {
+    if (totalPages <= 7) return Array.from({length: totalPages}, (_, i) => i + 1);
+
+    const pages = new Set();
+    const range = isSmall ? 0 : 1;
+
+    pages.add(1);
+    pages.add(totalPages);
+
+    for (let i = -range; i <= range; i++) {
+      const pageNum = currentPage + i;
+      if (pageNum > 1 && pageNum < totalPages) pages.add(pageNum);
+    }
+
+    const sortedPages = Array.from(pages).sort((a, b) => a - b);
+    const result = [];
+    let lastPage = 0;
+
+    for (const page of sortedPages) {
+      if (page > lastPage + 1) result.push("...");
+      result.push(page);
+      lastPage = page;
+    }
+
+    return result;
+  };
+
+  const PaginationComponent = () => {
+    const visiblePages = getVisiblePages(totalPage, currentPage);
+
+    return (
+      <div className="flex flex-col md:flex-row justify-between mt-10 items-center gap-4 border-t pt-6 border-base-300">
+        <div className="flex items-center gap-3">
+          <label htmlFor="itemsPerPage" className="text-base-content/70 font-medium">
+            Show per page:
+          </label>
+          <select
+            id="itemsPerPage"
+            value={itemsPerPage}
+            onChange={(e) => handleItemsPerPage(Number(e.target.value))}
+            className="px-4 py-2 bg-base-100 rounded-lg border-2 border-base-300 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-300"
+          >
+            {[12, 24, 36, 50].map((num) => (
+              <option key={num} value={num}>
+                {num}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <div className="flex flex-wrap justify-center items-center gap-2">
+          <button
+            className="w-10 h-10 flex items-center justify-center border border-primary text-primary rounded-lg hover:bg-primary hover:text-white transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+            disabled={currentPage === 1}
+            onClick={() => handlePageChange(currentPage - 1)}
+          >
+            <ArrowLeft className="w-4 h-4" />
+          </button>
+
+          {visiblePages.map((page, idx) =>
+            page === "..." ? (
+              <span key={idx} className="px-3 py-2 text-base-content/70">
+                ...
+              </span>
+            ) : (
+              <button
+                key={idx}
+                className={`w-10 h-10 flex items-center justify-center border rounded-lg transition-all duration-300 ${
+                  page === currentPage
+                    ? "bg-primary text-white border-primary"
+                    : "border-neutral text-base-content hover:bg-primary/10 hover:border-primary"
+                }`}
+                onClick={() => handlePageChange(page)}
+              >
+                {page}
+              </button>
+            )
+          )}
+
+          <button
+            className="w-10 h-10 flex items-center justify-center border border-primary text-primary rounded-lg hover:bg-primary hover:text-white transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+            disabled={currentPage === totalPage}
+            onClick={() => handlePageChange(currentPage + 1)}
+          >
+            <ArrowRight className="w-4 h-4" />
+          </button>
+        </div>
+      </div>
+    );
+  };
+
+  // End of INLINED Pagination Logic
+
+  const ServiceCardSkeleton = () => (
+    <div className="bg-base-100 rounded-2xl shadow-xl border border-base-300 p-6 animate-pulse">
+      <div className="skeleton bg-base-300 h-48 w-full rounded-2xl mb-4"></div>
+      <div className="skeleton bg-base-300 h-6 w-3/4 rounded mb-3"></div>
+      <div className="flex items-center gap-2 mb-3">
+        <div className="skeleton bg-base-300 h-5 w-5 rounded-full"></div>
+        <div className="skeleton bg-base-300 h-4 w-16 rounded"></div>
+      </div>
+      <div className="flex items-center gap-2 mb-4">
+        <div className="skeleton bg-base-300 h-4 w-4 rounded"></div>
+        <div className="skeleton bg-base-300 h-4 w-32 rounded"></div>
+      </div>
+      <div className="space-y-2 mb-4">
+        <div className="skeleton bg-base-300 h-3 w-full rounded"></div>
+        <div className="skeleton bg-base-300 h-3 w-5/6 rounded"></div>
+        <div className="skeleton bg-base-300 h-3 w-4/6 rounded"></div>
+      </div>
+      <div className="skeleton bg-base-300 h-10 w-full rounded-xl"></div>
+    </div>
+  );
+  
+  const PaginationSkeleton = () => (
+    <div className="flex flex-col md:flex-row justify-between mt-10 items-center gap-4 pt-6 border-t border-base-300 animate-pulse">
+      <div className="flex items-center gap-3">
+        <div className="skeleton bg-base-300 h-4 w-32 rounded"></div>
+        <div className="skeleton bg-base-300 h-10 w-20 rounded-lg"></div>
+      </div>
+      <div className="flex justify-center items-center gap-2">
+        <div className="skeleton bg-base-300 h-10 w-20 rounded-lg"></div>
+        {[...Array(5)].map((_, i) => (
+          <div
+            key={i}
+            className="skeleton bg-base-300 h-10 w-10 rounded-lg"
+          ></div>
+        ))}
+        <div className="skeleton bg-base-300 h-10 w-20 rounded-lg"></div>
+      </div>
+    </div>
+  );
+
+  return (
+    <div className="min-h-screen bg-base-200">
+      {/* Hero Section */}
+      <section className="relative bg-gradient-to-r from-primary via-orange-600 to-red-600 py-16 overflow-hidden">
+        <div className="absolute inset-0 bg-black/10"></div>
+        <div className="absolute top-0 left-0 w-72 h-72 bg-white/10 rounded-full -translate-x-1/2 -translate-y-1/2"></div>
+        <div className="absolute bottom-0 right-0 w-96 h-96 bg-white/5 rounded-full translate-x-1/3 translate-y-1/3"></div>
+
+        <div className="lg:container mx-auto px-6 relative z-10">
+          <div className="max-w-6xl mx-auto flex flex-col lg:flex-row items-center justify-between gap-12">
+            <div className="flex-1 text-center lg:text-left">
+              <div className="inline-flex items-center gap-2 bg-white/20 backdrop-blur-sm rounded-full px-4 py-2 mb-6">
+                <Sparkles className="w-5 h-5 text-yellow-300" />
+                <span className="text-white text-sm font-semibold">
+                  Trusted Service Providers
+                </span>
               </div>
+              <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-6 leading-tight">
+                Find Your Perfect
+                <span className="block text-orange-100">Service Partner</span>
+              </h1>
+              <p className="text-xl text-orange-100 mb-8 leading-relaxed max-w-2xl">
+                Connect with certified mechanics and service shops. Browse
+                ratings, services, and locations to find the perfect match for
+                your needs.
+              </p>
             </div>
 
-            {/* Sort */}
-            <div className="flex items-center gap-3">
-              <label htmlFor="sort" className="font-medium">
-                Sort by
-              </label>
+            <div className="flex-1 flex justify-center">
+              <div className="relative">
+                <div className="w-80 h-80 bg-white/10 backdrop-blur-sm rounded-3xl border-2 border-white/20 flex items-center justify-center">
+                  <div className="text-center p-8">
+                    <MapPin className="w-16 h-16 text-white mx-auto mb-4" />
+                    <h3 className="text-white text-xl font-semibold mb-2">
+                      Local Experts
+                    </h3>
+                    <p className="text-orange-100 text-sm">
+                      Find trusted service providers in your area with verified
+                      reviews and ratings
+                    </p>
+                  </div>
+                </div>
+                <div className="absolute -top-4 -right-4 w-20 h-20 bg-yellow-400/20 rounded-full backdrop-blur-sm border border-yellow-300/30"></div>
+                <div className="absolute -bottom-4 -left-4 w-16 h-16 bg-green-400/20 rounded-full backdrop-blur-sm border border-green-300/30"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Services Section */}
+      <section>
+        <div className="lg:container mx-auto px-4 md:px-6 lg:px-8 -mt-8 pb-10 relative z-20">
+          {/* Search & Sort */}
+          <div className="bg-base-100 rounded-2xl shadow-xl p-6 mb-8 border border-base-300 flex flex-col md:flex-row justify-between items-center gap-4">
+            <div className="flex-1 w-full relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-base-content/40 w-5 h-5" />
+              <input
+                type="search"
+                placeholder="Search shops, mechanics, or locations..."
+                value={searchTerm}
+                onChange={handleSearch}
+                className="w-full bg-base-200 placeholder-base-content/70 pl-10 pr-4 py-3 rounded-xl border-2 border-base-300 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-300"
+              />
+            </div>
+
+            <div className="flex items-center gap-3 w-full md:w-auto">
+              <Filter className="text-base-content/70 w-5 h-5" />
               <select
-                name="sort"
-                id="sort"
                 value={sortOrder}
                 onChange={handleSort}
-                className="px-3 py-2 bg-white rounded-md border-2 border-orange-500 focus:outline-none focus:ring-2 focus:ring-orange-500"
+                className="px-4 py-3 bg-base-200 rounded-xl border-2 border-base-300 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-300 w-full md:w-auto"
               >
+                <option value="">All Shops</option>
                 <option value="htl">Rating: High to Low</option>
                 <option value="lth">Rating: Low to High</option>
               </select>
             </div>
           </div>
 
-          {/* Services Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-10">
-            {displayedServices.map((service) => (
-              <ServiceCard key={service.id} service={service} />
-            ))}
-          </div>
-
-          {/* Pagination & Items per page */}
-          <div className="flex justify-between mt-8 items-center">
-            {/* Items per page */}
-            <div>
-              <div className="flex items-center gap-3">
-                <label htmlFor="itemsPerPage">Show on page</label>
-                <select
-                  name="itemsPerPage"
-                  id="itemsPerPage"
-                  value={itemsPerPage}
-                  onChange={handleItemsPerPage}
-                  className="px-3 py-2 border-2 rounded-lg border-orange-500 focus:outline-none"
-                >
-                  <option value="12">12</option>
-                  <option value="24">24</option>
-                  <option value="36">36</option>
-                  <option value="48">48</option>
-                </select>
-              </div>
-            </div>
-
-            {/* Page buttons */}
-            <div className="flex justify-center space-x-2">
-              <button
-                className="px-5 py-1 border border-orange-500 rounded-md hover:bg-orange-500 hover:text-white transition duration-400 cursor-pointer"
-                disabled={currentPage === 1}
-                onClick={() => handlePageChange(currentPage - 1)}
-              >
-                Prev
-              </button>
-
-              {Array.from({ length: totalPages }, (_, i) => (
-                <button
-                  key={i}
-                  className={`px-5 py-1 border rounded-md transition duration-400 cursor-pointer ${
-                    currentPage === i + 1
-                      ? "bg-orange-500 text-white border-orange-500"
-                      : "border-orange-500 hover:bg-orange-500 hover:text-white"
-                  }`}
-                  onClick={() => handlePageChange(i + 1)}
-                >
-                  {i + 1}
-                </button>
+          {/* Loading Skeleton */}
+          {loading && (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+              {[...Array(itemsPerPage)].map((_, index) => (
+                <ServiceCardSkeleton key={index} />
               ))}
-
-              <button
-                className="px-5 py-1 border border-orange-500 rounded-md hover:bg-orange-500 hover:text-white transition duration-400 cursor-pointer"
-                disabled={currentPage === totalPages}
-                onClick={() => handlePageChange(currentPage + 1)}
-              >
-                Next
-              </button>
             </div>
-          </div>
+          )}
+
+          {/* No Results */}
+          {!loading && services.length === 0 && (
+            <div className="text-center py-16 rounded-2xl shadow-lg border border-base-300 bg-base-100">
+              <div className="w-24 h-24 bg-accent rounded-full flex items-center justify-center mx-auto mb-4">
+                <MapPin className="w-12 h-12 text-primary" />
+              </div>
+              <p className="text-2xl text-primary font-bold mb-2">
+                No Shops Found
+              </p>
+              <p className="text-base-content/70 max-w-md mx-auto">
+                We couldn't find any service shops matching your criteria. Try
+                adjusting your search filters.
+              </p>
+            </div>
+          )}
+
+          {/* Services Grid & Pagination */}
+          {!loading && services.length > 0 && (
+            <>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 transition-opacity duration-300">
+                {services.map((service) => (
+                  <ServiceCard key={service._id} service={service} />
+                ))}
+              </div>
+
+              {loading ? <PaginationSkeleton /> : <PaginationComponent />}
+            </>
+          )}
         </div>
       </section>
-    </>
+    </div>
   );
-}
+};
+
+export default Services;

@@ -1,150 +1,331 @@
 "use client";
 
-import { 
-    CheckCircle, 
-    ArrowRight, 
-    MapPin, 
-    User, 
-    CalendarCheck, 
-    MessageCircle, 
-    CreditCard, 
-    Star, 
-    BarChart 
+import {
+  ArrowRight,
+  BarChart,
+  CalendarCheck,
+  CreditCard,
+  MapPin,
+  MessageCircle,
+  Star,
+  User,
 } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
+import Image from "next/image";
 
 const HowToWork = () => {
-    const [activeStep, setActiveStep] = useState(null);
-    
-    const steps = [
-        {
-            title: "Discover Mechanics",
-            description:
-                "Search trusted mechanics by category, location, rating, and experience.",
-            icon: <MapPin className="w-8 h-8" />,
-        },
-        {
-            title: "View Profiles & Portfolios",
-            description:
-                "Check mechanic profiles, skills, shop details, and past work before requesting service.",
-            icon: <User className="w-8 h-8" />,
-        },
-        {
-            title: "Post Service Request",
-            description:
-                "Submit a detailed request describing your problem to selected mechanics.",
-            icon: <CalendarCheck className="w-8 h-8" />,
-        },
-        {
-            title: "Schedule & Book Service",
-            description:
-                "Choose a convenient time slot based on mechanic availability for your service.",
-            icon: <CheckCircle className="w-8 h-8" />,
-        },
-        {
-            title: "Track Request Status",
-            description:
-                "Receive real-time updates as your request moves from Pending → Accepted → Completed.",
-            icon: <CheckCircle className="w-8 h-8" />,
-        },
-        {
-            title: "Real-Time Chat",
-            description:
-                "Communicate directly with mechanics to clarify details or share updates.",
-            icon: <MessageCircle className="w-8 h-8" />,
-        },
-        {
-            title: "Make Secure Payment",
-            description:
-                "Pay safely online using supported gateways and apply coupons or discounts.",
-            icon: <CreditCard className="w-8 h-8" />,
-        },
-        {
-            title: "Rate & Review Mechanics",
-            description:
-                "Provide feedback after service completion and help others choose trusted mechanics.",
-            icon: <Star className="w-8 h-8" />,
-        },
-        {
-            title: "View Outcomes & Analytics",
-            description:
-                "Track results and performance insights for continuous improvement.",
-            icon: <BarChart className="w-8 h-8" />,
-        },
-    ];
+  const [activeStep, setActiveStep] = useState(0);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setLoading(false);
+    }, 2000);
+    return () => clearTimeout(timer);
+  }, []);
+
+  const steps = [
+    {
+      title: "Find Mechanics",
+      description:
+        "Search trusted mechanics by category, location, and rating. Utilize smart filters to pinpoint the perfect match for your specific vehicle repair needs.",
+      icon: <MapPin className="w-6 h-6" />,
+      image: "/Step-1.png",
+    },
+    {
+      title: "Check Profiles",
+      description:
+        "View comprehensive mechanic profiles, verify their skills, and review past work portfolios before making a service request. Transparency builds trust.",
+      icon: <User className="w-6 h-6" />,
+      image: "/Step-2.png",
+    },
+    {
+      title: "Book Service",
+      description:
+        "Easily schedule a convenient time slot that fits your busy calendar, based on the mechanic's real-time availability. Confirm your booking instantly.",
+      icon: <CalendarCheck className="w-6 h-6" />,
+      image: "/Step-3.png",
+    },
+    {
+      title: "Chat with Mechanics",
+      description:
+        "Communicate directly and securely with the mechanic to clarify job details, get estimated quotes, or share necessary updates throughout the service process.",
+      icon: <MessageCircle className="w-6 h-6" />,
+      image: "/Step-4.png",
+    },
+    {
+      title: "Secure Payment",
+      description:
+        "Pay safely online using our supported secure gateways. Benefit from exclusive discounts and receive a transparent, itemized invoice for the services rendered.",
+      icon: <CreditCard className="w-6 h-6" />,
+      image: "/Step-5.png",
+    },
+    {
+      title: "Rate & Review",
+      description:
+        "Once the service is complete, provide valuable feedback by rating and reviewing the mechanic. Your input helps maintain quality and guides other users.",
+      icon: <Star className="w-6 h-6" />,
+      image: "/Step-6.png",
+    },
+  ];
+
+  const ActiveStepContent = ({ step, index, totalSteps, isActive }) => {
+    const contentRef = useRef(null);
+    const [height, setHeight] = useState('0px');
+
+    useEffect(() => {
+      if (contentRef.current) {
+        setHeight(isActive ? `${contentRef.current.scrollHeight}px` : '0px');
+      }
+    }, [isActive, step]);
 
     return (
-        <section className="py-16 font-roboto relative overflow-hidden">
-            {/* Decorative elements */}
-            {/* <div className="absolute top-0 left-0 w-72 h-72 bg-orange-100 rounded-full -translate-x-1/2 -translate-y-1/2 opacity-50"></div>
-            <div className="absolute bottom-0 right-0 w-96 h-96 bg-blue-100 rounded-full translate-x-1/3 translate-y-1/3 opacity-40"></div> */}
-            
-            <div className="container mx-auto px-4 relative z-10">
-                {/* Section Header */}
-                <div className="text-center mb-16">
-                    <h2 className="text-4xl md:text-5xl font-bold mb-4 font-roboto-con">
-                        How <span className="text-orange-500 font-caveat inline-block">MechaLink Works</span>
-                    </h2>
-                    <p className="text-xl text-gray-600 max-w-2xl mx-auto font-nunito-sans">
-                        Follow these steps to understand the complete workflow and get connected with trusted mechanics efficiently.
-                    </p>
+      <div
+        ref={contentRef}
+        style={{ maxHeight: height }}
+        className="overflow-hidden transition-[max-height] duration-500 ease-in-out lg:hidden"
+      >
+        <div className="mt-4 p-4 border-t border-gray-200">
+          <div className="mb-4">
+            <p className="text-sm leading-relaxed mb-4 text-gray-700">
+              {step.description}
+            </p>
+          </div>
+
+          <div className="relative rounded-xl overflow-hidden shadow-lg border border-gray-100">
+            <div className="aspect-video flex items-center justify-center bg-gray-50 p-4">
+              <Image
+                src={step.image}
+                alt={step.title}
+                width={600}
+                height={400}
+                className="w-full h-auto rounded-md object-cover max-w-[300px] sm:max-w-[400px]"
+              />
+            </div>
+          </div>
+
+          <div className="flex justify-between items-center mt-4">
+            <span className="text-primary text-xs font-semibold">
+              Step {index + 1} of {totalSteps}
+            </span>
+            <div className="w-3/4 bg-orange-300/30 rounded-full h-1.5">
+              <div
+                className="bg-primary h-1.5 rounded-full transition-all duration-500 ease-out"
+                style={{
+                  width: `${((index + 1) / totalSteps) * 100}%`,
+                }}
+              ></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  const StepSkeleton = () => (
+    <div className=" rounded-2xl p-6 shadow-lg border border-gray-100 animate-pulse">
+      <div className="flex items-center gap-4 mb-4">
+        <div className="bg-gray-300 w-12 h-12 rounded-full"></div>
+        <div className="bg-gray-300 h-6 w-32 rounded"></div>
+      </div>
+      <div className="bg-gray-200 h-4 w-full rounded mb-2"></div>
+      <div className="bg-gray-200 h-4 w-5/6 rounded"></div>
+    </div>
+  );
+
+  const SectionHeaderSkeleton = () => (
+    <div className="text-center mb-16 animate-pulse">
+      <div className="bg-gray-300 h-12 w-80 mx-auto rounded-lg mb-4"></div>
+      <div className="bg-gray-300 h-5 w-96 mx-auto rounded"></div>
+    </div>
+  );
+
+  if (loading) {
+    return (
+      <section className="py-16 font-roboto bg-gradient-to-br from-orange-50 to-white relative overflow-hidden">
+        <div className="lg:container mx-auto px-4 relative z-10">
+          <SectionHeaderSkeleton />
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {[...Array(6)].map((_, index) => (
+              <StepSkeleton key={index} />
+            ))}
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  return (
+    <section className="py-16 font-roboto relative overflow-hidden">
+      <div className="lg:container mx-auto px-6 relative z-10">
+        <div className="text-center mb-16">
+          <div className="inline-flex items-center gap-2 bg-primary/10 px-4 py-2 rounded-full mb-6">
+            <BarChart className="w-5 h-5 text-primary" />
+            <span className="text-primary font-semibold text-sm uppercase tracking-wide">
+              Simple Process
+            </span>
+          </div>
+          <h2 className="text-4xl md:text-5xl font-bold mb-4 font-roboto-con">
+            How <span className="text-primary font-caveat inline-block transform rotate-2">MechaLink</span> Works
+          </h2>
+          <p className="text-lg md:text-xl max-w-2xl mx-auto font-nunito-sans leading-relaxed">
+            Get your vehicle serviced in 6 simple steps. From finding the right mechanic to leaving reviews.
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
+          <div className="space-y-4">
+            {steps.map((step, index) => {
+              const isActive = activeStep === index;
+              return (
+                <div
+                  key={index}
+                  className={`rounded-2xl transition-all bg-base-200 duration-300 ${isActive
+                      ? "shadow-xl border-l-4 border-primary transform lg:-translate-y-1"
+                      : "shadow-md border border-neutral hover:shadow-lg hover:lg:-translate-y-0.5"
+                    }`}
+                >
+                  <button
+                    onClick={() => setActiveStep(isActive ? -1 : index)}
+                    className={`w-full text-left p-6 transition-all duration-300 ${isActive && 'pb-4 lg:pb-6'}`}
+                  >
+                    <div className="flex items-center gap-4">
+                      <div
+                        className={`flex-shrink-0 w-12 h-12 rounded-full flex items-center justify-center transition-all duration-300 ${isActive
+                            ? "bg-primary text-white shadow-lg scale-110"
+                            : "bg-orange-100 text-primary group-hover:bg-orange-200"
+                          }`}
+                      >
+                        {step.icon}
+                      </div>
+                      <div className="flex-1">
+                        <div className="flex items-center justify-between mb-2">
+                          <h3
+                            className={`text-xl font-bold transition-colors duration-300 ${isActive ? "text-primary" : ""
+                              }`}
+                          >
+                            {step.title}
+                          </h3>
+                          <div
+                            className={`flex items-center gap-2 transition-all duration-300 ${isActive
+                                ? "opacity-100 translate-x-0"
+                                : "opacity-0 -translate-x-2"
+                              }`}
+                          >
+                            <span className="text-sm font-semibold text-primary bg-orange-100 px-2 py-1 rounded-full">
+                              Step {index + 1}
+                            </span>
+                            <ArrowRight className="w-4 h-4 text-primary" />
+                          </div>
+                        </div>
+                        <p
+                          className={`text-sm leading-relaxed transition-colors duration-300 text-base-content/60 hidden lg:block`}
+                        >
+                          {step.description}
+                        </p>
+                      </div>
+                    </div>
+                  </button>
+
+                  <ActiveStepContent
+                    step={step}
+                    index={index}
+                    totalSteps={steps.length}
+                    isActive={isActive}
+                  />
+                </div>
+              );
+            })}
+          </div>
+
+          <div className="hidden lg:block lg:sticky lg:top-8 flex-1">
+            <div className=" rounded-3xl shadow-2xl overflow-hidden border border-neutral">
+              <div className="bg-primary p-6 text-white">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <span className="text-orange-100 text-sm font-semibold uppercase tracking-wide">
+                      Current Step
+                    </span>
+                    <h3 className="text-2xl font-bold mt-1">
+                      {steps[activeStep].title}
+                    </h3>
+                  </div>
+                  <div className="text-right">
+                    <div className="text-3xl font-bold text-orange-100">
+                      {activeStep + 1}
+                    </div>
+                    <div className="text-orange-200 text-sm">of {steps.length}</div>
+                  </div>
                 </div>
 
-                {/* Interactive Timeline Steps */}
-                <div className="relative">
-                    {/* Connecting line */}
-                    <div className="absolute left-4 top-10 bottom-10 w-1 bg-gradient-to-b from-orange-400 to-blue-400 hidden md:block"></div>
-                    
-                    <div className="grid grid-cols-1 gap-10">
-                        {steps.map((step, index) => (
-                            <div 
-                                key={index}
-                                className="flex group"
-                                onMouseEnter={() => setActiveStep(index)}
-                                onMouseLeave={() => setActiveStep(null)}
-                            >
-                                {/* Step indicator */}
-                                <div className="flex flex-col items-center mr-6">
-                                    <div className={`w-10 h-10 rounded-full flex items-center justify-center z-10 relative ${
-                                        activeStep === index 
-                                            ? "bg-orange-500 scale-110 ring-4 ring-orange-200" 
-                                            : "bg-white border-2 border-orange-400"
-                                    } transition-all duration-300`}>
-                                        <div className={`${activeStep === index ? "text-white" : "text-orange-500"}`}>
-                                            {step.icon}
-                                        </div>
-                                    </div>
-                                    {index < steps.length - 1 && (
-                                        <div className="flex-1 w-0.5 bg-orange-300 my-2 md:hidden"></div>
-                                    )}
-                                </div>
-                                
-                                {/* Content card with dynamic animation */}
-                                <div className={`flex-1 bg-white rounded-2xl p-6 transform transition-all duration-300 ${
-                                    activeStep === index 
-                                        ? "shadow-xl -translate-y-1 border-l-4 border-orange-500" 
-                                        : "shadow-md"
-                                }`}>
-                                    <div className="flex items-start justify-between">
-                                        <div>
-                                            <span className="text-sm font-semibold text-orange-500 mb-1 block">
-                                                Step {index + 1}
-                                            </span>
-                                            <h3 className="text-xl font-semibold mb-2">{step.title}</h3>
-                                            <p className="text-gray-600 text-sm">{step.description}</p>
-                                        </div>
-                                        <ArrowRight className={`w-5 h-5 text-orange-500 transition-transform duration-300 ${
-                                            activeStep === index ? "translate-x-1" : ""
-                                        }`} />
-                                    </div>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
+                <div className="mt-4 w-full bg-orange-300/30 rounded-full h-2">
+                  <div
+                    className="bg-white h-2 rounded-full transition-all duration-500 ease-out"
+                    style={{
+                      width: `${((activeStep + 1) / steps.length) * 100}%`,
+                    }}
+                  ></div>
                 </div>
+              </div>
+
+              <div className="p-8">
+                <div className="mb-6">
+                  <div className="w-16 h-16 bg-orange-100 rounded-2xl flex items-center justify-center mb-4 mx-auto">
+                    <div className="text-primary">
+                      {steps[activeStep].icon}
+                    </div>
+                  </div>
+                  <h4 className="text-2xl font-bold text-center mb-3">
+                    {steps[activeStep].title}
+                  </h4>
+                  <p className=" text-center leading-relaxed text-base-content/60">
+                    {steps[activeStep].description}
+                  </p>
+                </div>
+
+                <div className="relative rounded-2xl overflow-hidden">
+                  <div className="aspect-video flex items-center justify-center">
+                    <div className="text-center">
+                      <Image
+                        src={steps[activeStep].image}
+                        alt={steps[activeStep].title}
+                        width={600}
+                        height={400}
+                        className="w-600 h-100 rounded-md object-cover"
+                      />
+                      <p className="text-primary font-semibold mt-3">
+                        Step {activeStep + 1} Preview
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex justify-center gap-2 mt-8">
+                  {steps.map((_, index) => (
+                    <button
+                      key={index}
+                      onClick={() => setActiveStep(index)}
+                      className={`w-3 h-3 rounded-full transition-all duration-300 ${activeStep === index
+                          ? "bg-primary scale-125"
+                          : "bg-base-200 hover:bg-base-300"
+                        }`}
+                    />
+                  ))}
+                </div>
+              </div>
             </div>
-        </section>
-    );
+
+            <div className="mt-6 text-center">
+              <button className="bg-primary text-white px-8 py-4 rounded-2xl font-semibold shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-300 inline-flex items-center gap-2">
+                Get Started Today
+                <ArrowRight className="w-5 h-5" />
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
 };
 
 export default HowToWork;

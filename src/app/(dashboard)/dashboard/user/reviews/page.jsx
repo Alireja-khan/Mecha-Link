@@ -1,8 +1,24 @@
 "use client";
 import React, { useState } from 'react';
+import { Star, ThumbsUp, X, CheckCircle } from 'lucide-react';
+
+// Reusable Star Renderer Component for consistency (unchanged)
+const StarRating = ({ rating, size = 'w-5 h-5', color = 'text-warning' }) => {
+  return (
+    <div className="flex items-center">
+      {[1, 2, 3, 4, 5].map(star => (
+        <Star
+          key={star}
+          // Use text-warning for color and fill-warning for fill (DaisyUI equivalent of yellow)
+          className={`${size} ${star <= rating ? `${color} fill-warning` : 'text-base-300'} transition-colors duration-200`}
+        />
+      ))}
+    </div>
+  );
+};
 
 const ReviewsComponent = () => {
-  // Sample reviews data
+  // Sample reviews data (unchanged)
   const [reviews, setReviews] = useState([
     {
       id: 1,
@@ -60,7 +76,7 @@ const ReviewsComponent = () => {
     }
   ]);
 
-  // Sample mechanics for review form
+  // Sample data for review form (unchanged)
   const mechanics = [
     { id: 101, name: "Arif Hossain", specialty: "Engine Repair" },
     { id: 102, name: "Sajid Alam", specialty: "Electrical Systems" },
@@ -68,20 +84,18 @@ const ReviewsComponent = () => {
     { id: 104, name: "Nadia Ahmed", specialty: "AC Repair" }
   ];
 
-  // Sample services for review form
   const services = [
-    "Oil Change", "Brake Service", "Engine Diagnostic", 
+    "Oil Change", "Brake Service", "Engine Diagnostic",
     "Electrical System Check", "AC Service", "Tire Rotation",
     "Dent Removal", "Paint Job", "Battery Replacement"
   ];
 
-  // User's vehicles
   const vehicles = [
     { id: 1, make: "Toyota", model: "Corolla", year: "2018", plate: "DHA-1234" },
     { id: 2, make: "Honda", model: "Civic", year: "2020", plate: "DHA-5678" }
   ];
 
-  // Review form state
+  // Review form state (unchanged)
   const [isWritingReview, setIsWritingReview] = useState(false);
   const [newReview, setNewReview] = useState({
     mechanicId: "",
@@ -91,32 +105,32 @@ const ReviewsComponent = () => {
     comment: ""
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [filter, setFilter] = useState("all"); // all, 5-star, 4-star, etc.
-  const [sortBy, setSortBy] = useState("newest"); // newest, oldest, highest, lowest
+  const [filter, setFilter] = useState("all");
+  const [sortBy, setSortBy] = useState("newest");
 
-  // Handle input changes in review form
+  // Handlers (unchanged)
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setNewReview(prev => ({ ...prev, [name]: value }));
   };
 
-  // Handle rating selection
   const handleRatingSelect = (rating) => {
     setNewReview(prev => ({ ...prev, rating }));
   };
 
-  // Submit a new review
   const handleSubmitReview = async (e) => {
     e.preventDefault();
+    if (newReview.rating === 0) return;
+
     setIsSubmitting(true);
-    
+
     // Simulate API call
     await new Promise(resolve => setTimeout(resolve, 1000));
-    
+
     // Find selected mechanic and vehicle
     const selectedMechanic = mechanics.find(m => m.id === parseInt(newReview.mechanicId));
     const selectedVehicle = vehicles.find(v => v.id === parseInt(newReview.vehicleId));
-    
+
     // Create new review object
     const review = {
       id: reviews.length + 1,
@@ -136,34 +150,25 @@ const ReviewsComponent = () => {
       helpful: 0,
       verified: true
     };
-    
-    // Add to reviews list
+
+    // Add to reviews list and reset
     setReviews(prev => [review, ...prev]);
-    
-    // Reset form
-    setNewReview({
-      mechanicId: "",
-      service: "",
-      vehicleId: "",
-      rating: 0,
-      comment: ""
-    });
+    setNewReview({ mechanicId: "", service: "", vehicleId: "", rating: 0, comment: "" });
     setIsWritingReview(false);
     setIsSubmitting(false);
   };
 
-  // Mark a review as helpful
   const handleHelpful = (id) => {
-    setReviews(prev => 
-      prev.map(review => 
-        review.id === id 
-          ? { ...review, helpful: review.helpful + 1 } 
+    setReviews(prev =>
+      prev.map(review =>
+        review.id === id
+          ? { ...review, helpful: review.helpful + 1 }
           : review
       )
     );
   };
 
-  // Filter and sort reviews
+  // Filter and sort reviews (unchanged)
   const filteredAndSortedReviews = reviews
     .filter(review => {
       if (filter === "all") return true;
@@ -184,73 +189,64 @@ const ReviewsComponent = () => {
       }
     });
 
-  // Calculate average rating
-  const averageRating = reviews.length > 0 
-    ? (reviews.reduce((sum, review) => sum + review.rating, 0) / reviews.length).toFixed(1)
+  // Calculate average rating (unchanged)
+  const totalReviews = reviews.length;
+  const averageRating = totalReviews > 0
+    ? (reviews.reduce((sum, review) => sum + review.rating, 0) / totalReviews).toFixed(1)
     : 0;
 
-  // Count ratings
+  // Count ratings (unchanged)
   const ratingCounts = { 5: 0, 4: 0, 3: 0, 2: 0, 1: 0 };
   reviews.forEach(review => {
     ratingCounts[review.rating]++;
   });
 
-  // Render star rating
-  const renderStars = (rating) => {
-    return (
-      <div className="flex">
-        {[1, 2, 3, 4, 5].map(star => (
-          <svg
-            key={star}
-            className={`w-5 h-5 ${star <= rating ? 'text-yellow-400' : 'text-gray-300'}`}
-            fill="currentColor"
-            viewBox="0 0 20 20"
-          >
-            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-          </svg>
-        ))}
-      </div>
-    );
-  };
-
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
-      <div className="max-w-6xl mx-auto">
+    // Updated background to base-200 for page
+    <div className="min-h-screen bg-base-200 p-4 sm:p-6 md:p-10 text-base-content"> {/* Adjusted padding for small screens */}
+      <div className="container mx-auto">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-2xl font-bold text-gray-900">My Reviews</h1>
-          <p className="text-gray-600">View and manage your service reviews</p>
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-base-content">My Service Reviews</h1> {/* Adjusted text size */}
+          <p className="text-neutral-content text-sm sm:text-base">View and manage your service reviews for all completed bookings.</p>
         </div>
 
         {/* Stats and Action Card */}
-        <div className="bg-white rounded-2xl shadow-sm p-6 mb-8">
+        <div className="bg-base-100 rounded-3xl shadow-xl p-6 sm:p-8 mb-8 border border-neutral"> {/* Adjusted padding */}
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center">
-            <div className="flex items-center mb-4 md:mb-0">
-              <div className="mr-6">
-                <div className="text-4xl font-bold text-gray-900">{averageRating}</div>
-                <div className="flex mt-1">{renderStars(Number(averageRating))}</div>
-                <div className="text-sm text-gray-600 mt-1">{reviews.length} reviews</div>
+
+            {/* Rating Breakdown */}
+            {/* On small screens, the breakdown will stack vertically with the button below it */}
+            <div className="flex flex-col sm:flex-row items-start sm:items-center mb-6 md:mb-0 w-full md:w-auto">
+              {/* Average Rating Block */}
+              <div className="mr-0 sm:mr-8 mb-4 sm:mb-0 flex flex-col items-center flex-shrink-0">
+                <div className="text-5xl sm:text-6xl font-extrabold text-primary">{averageRating}</div> {/* Adjusted text size */}
+                <div className="mt-2"><StarRating rating={Number(averageRating)} size="w-6 h-6" color="text-warning" /></div>
+                <div className="text-sm text-neutral-content mt-2 font-medium">{totalReviews} total reviews</div>
               </div>
-              
-              <div className="space-y-1">
+
+              {/* Individual Star Count Bars */}
+              <div className="space-y-1 w-full max-w-sm sm:max-w-xs"> {/* Ensuring max width on small screen doesn't get too large */}
                 {[5, 4, 3, 2, 1].map(rating => (
                   <div key={rating} className="flex items-center">
-                    <div className="w-8 text-sm text-gray-600">{rating} star</div>
-                    <div className="w-32 h-2 bg-gray-200 rounded-full mx-2">
-                      <div 
-                        className="h-2 bg-yellow-400 rounded-full" 
-                        style={{ width: `${(ratingCounts[rating] / reviews.length) * 100}%` }}
+                    <div className="text-sm font-medium text-base-content w-10 flex-shrink-0">{rating} star</div> {/* Fixed width for 'star' text */}
+                    <div className="w-full h-2 bg-base-300 rounded-full mx-3"> {/* w-full ensures it takes available space */}
+                      <div
+                        className="h-2 bg-warning rounded-full transition-all duration-500"
+                        style={{ width: `${(ratingCounts[rating] / totalReviews) * 100 || 0}%` }}
+                        aria-label={`${ratingCounts[rating]} reviews for ${rating} stars`}
                       ></div>
                     </div>
-                    <div className="w-8 text-sm text-gray-600">{ratingCounts[rating]}</div>
+                    <div className="w-8 text-sm text-neutral-content font-medium flex-shrink-0">{ratingCounts[rating]}</div> {/* Fixed width for count */}
                   </div>
                 ))}
               </div>
             </div>
-            
+
+            {/* Write Review Button - takes full width on small screen, and auto on md+ */}
             <button
               onClick={() => setIsWritingReview(true)}
-              className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition"
+              className="w-full md:w-auto px-6 py-3 bg-primary text-primary-content font-semibold rounded-xl hover:bg-primary/90 transition duration-200 shadow-md hover:shadow-lg"
             >
               Write a Review
             </button>
@@ -258,34 +254,40 @@ const ReviewsComponent = () => {
         </div>
 
         {/* Filters and Sort */}
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6">
-          <div className="flex space-x-2 mb-4 sm:mb-0">
+        <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-6 p-4 bg-base-100 rounded-2xl shadow-sm border border-neutral">
+          {/* Filter Buttons: Use flex-wrap and gap for good flow on small screens. Use a grid on larger mobile screens for better density. */}
+          <div className="flex flex-wrap gap-2 mb-4 lg:mb-0 w-full sm:w-auto">
+            {/* All Reviews Button */}
             <button
               onClick={() => setFilter("all")}
-              className={`px-3 py-1 rounded-full text-sm ${filter === "all" ? "bg-indigo-100 text-indigo-700" : "bg-gray-100 text-gray-700"}`}
+              className={`px-3 py-2 sm:px-4 sm:py-2 rounded-xl text-xs sm:text-sm font-medium transition-colors ${filter === "all" ? "bg-primary text-primary-content shadow-md" : "bg-base-300 text-base-content hover:bg-base-300/80"}`}
             >
               All Reviews
             </button>
+            {/* Star Filter Buttons */}
             {[5, 4, 3, 2, 1].map(rating => (
               <button
                 key={rating}
                 onClick={() => setFilter(rating.toString())}
-                className={`px-3 py-1 rounded-full text-sm flex items-center ${filter === rating.toString() ? "bg-indigo-100 text-indigo-700" : "bg-gray-100 text-gray-700"}`}
+                className={`px-3 py-2 sm:px-4 sm:py-2 rounded-xl text-xs sm:text-sm font-medium flex items-center transition-colors 
+                ${filter === rating.toString()
+                    ? "bg-primary/20 text-primary ring-2 ring-primary/50"
+                    : "bg-base-300 text-base-content hover:bg-base-300/80"
+                  }`}
               >
                 <span className="mr-1">{rating}</span>
-                <svg className="w-4 h-4 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
-                  <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                </svg>
+                <Star className="w-3 h-3 sm:w-4 sm:h-4 text-warning fill-warning" /> {/* Adjusted star size */}
               </button>
             ))}
           </div>
-          
-          <div className="flex items-center">
-            <label className="text-sm text-gray-600 mr-2">Sort by:</label>
+
+          <div className="flex items-center w-full lg:w-auto"> {/* Ensure sort takes full width if needed */}
+            <label htmlFor="sort-by" className="text-sm text-neutral-content mr-2 font-medium flex-shrink-0">Sort by:</label>
             <select
+              id="sort-by"
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value)}
-              className="text-sm border rounded-lg px-3 py-1 focus:ring-indigo-500 focus:border-indigo-500"
+              className="w-full lg:w-auto text-sm border border-neutral rounded-xl px-4 py-2 focus:ring-primary focus:border-primary transition-colors cursor-pointer bg-base-100 text-base-content"
             >
               <option value="newest">Newest</option>
               <option value="oldest">Oldest</option>
@@ -299,73 +301,77 @@ const ReviewsComponent = () => {
         <div className="space-y-6">
           {filteredAndSortedReviews.length > 0 ? (
             filteredAndSortedReviews.map(review => (
-              <div key={review.id} className="bg-white rounded-2xl shadow-sm p-6">
-                <div className="flex flex-col md:flex-row">
-                  <div className="flex-shrink-0 mb-4 md:mb-0 md:mr-6">
+              <div key={review.id} className="bg-base-100 rounded-3xl shadow-lg p-6 border border-neutral transition-all duration-300 hover:shadow-xl">
+                <div className="flex flex-col sm:flex-row"> {/* Changed md to sm for better stacking on small phones */}
+
+                  {/* Mechanic Info (Left Column) */}
+                  {/* On small screens, this is full-width (flex-shrink-0 mb-4) */}
+                  <div className="flex-shrink-0 mb-4 sm:mb-0 sm:mr-6 sm:w-44 md:w-56"> {/* Reduced width for medium screens for better content fit */}
                     <div className="flex items-center">
                       <img
                         src={review.mechanic.avatar}
                         alt={review.mechanic.name}
-                        className="w-12 h-12 rounded-full object-cover"
+                        className="w-10 h-10 sm:w-12 sm:h-12 rounded-full object-cover ring-2 ring-primary/50"
                       />
                       <div className="ml-3">
-                        <h3 className="font-medium">{review.mechanic.name}</h3>
-                        <p className="text-sm text-gray-600">{review.mechanic.specialty}</p>
+                        <h3 className="font-semibold text-base-content text-sm sm:text-base">{review.mechanic.name}</h3>
+                        <p className="text-xs sm:text-sm text-neutral-content">{review.mechanic.specialty}</p>
                       </div>
                     </div>
                   </div>
-                  
-                  <div className="flex-1">
-                    <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start">
-                      <div>
+
+                  {/* Review Content (Right Column) */}
+                  <div className="flex-1 min-w-0"> {/* min-w-0 is crucial for flex items to shrink in tight spaces */}
+                    <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start border-b border-neutral pb-3">
+                      <div className="mb-3 sm:mb-0">
                         <div className="flex items-center">
-                          {renderStars(review.rating)}
-                          <span className="ml-2 text-sm text-gray-600">{review.date}</span>
+                          <StarRating rating={review.rating} size="w-4 h-4 sm:w-5 sm:h-5" /> {/* Adjusted star size */}
+                          <span className="ml-3 text-xs sm:text-sm text-neutral-content">{review.date}</span>
                         </div>
-                        <h4 className="font-medium mt-2">{review.service}</h4>
-                        <p className="text-sm text-gray-600">{review.vehicle}</p>
+                        <h4 className="font-bold text-base-content mt-2 text-base sm:text-lg">{review.service}</h4> {/* Adjusted text size */}
+                        <p className="text-xs sm:text-sm text-neutral-content">{review.vehicle}</p>
                       </div>
-                      
-                      <div className="flex items-center mt-3 sm:mt-0">
+
+                      <div className="flex flex-col items-start sm:items-end mt-2 sm:mt-0"> {/* Stack badge/button vertically on small screen */}
                         {review.verified && (
-                          <span className="inline-flex items-center px-2 py-1 bg-green-100 text-green-800 text-xs font-medium rounded-full mr-2">
-                            Verified
+                          <span className="inline-flex items-center px-2 py-0.5 sm:px-3 sm:py-1 bg-success/20 text-success text-xs font-medium rounded-full mb-2 sm:mb-0 sm:mr-3 shadow-inner">
+                            <CheckCircle className="w-3 h-3 mr-1" /> Verified
                           </span>
                         )}
                         <button
                           onClick={() => handleHelpful(review.id)}
-                          className="text-sm text-gray-500 hover:text-indigo-600 flex items-center"
+                          className="text-neutral-content hover:text-primary flex items-center transition-colors text-sm mt-1 sm:mt-0"
+                          aria-label={`Mark review as helpful. Currently ${review.helpful} helpful votes.`}
                         >
-                          <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905a3.61 3.61 0 01-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.5"></path>
-                          </svg>
+                          <ThumbsUp className="w-4 h-4 mr-1" />
                           Helpful ({review.helpful})
                         </button>
                       </div>
                     </div>
-                    
-                    <p className="mt-4 text-gray-700">{review.comment}</p>
-                    
-                    <div className="flex items-center mt-4">
+
+                    <p className="mt-4 text-base-content italic border-l-2 border-primary/50 pl-3 py-1 text-sm">{review.comment}</p> {/* Adjusted text size */}
+
+                    <div className="flex items-center mt-4 pt-3 border-t border-neutral">
                       <img
                         src={review.userAvatar}
                         alt={review.user}
-                        className="w-6 h-6 rounded-full object-cover"
+                        className="w-6 h-6 sm:w-7 sm:h-7 rounded-full object-cover ring-1 ring-neutral"
                       />
-                      <span className="ml-2 text-sm text-gray-600">{review.user}</span>
+                      <span className="ml-2 text-xs sm:text-sm font-medium text-base-content">{review.user}</span>
                     </div>
                   </div>
                 </div>
               </div>
             ))
           ) : (
-            <div className="bg-white rounded-2xl shadow-sm p-8 text-center">
-              <div className="text-gray-400 mb-4">🌟</div>
-              <h3 className="font-medium text-gray-900 mb-2">No reviews yet</h3>
-              <p className="text-gray-600 mb-4">You haven't written any reviews for your services.</p>
+            // No Reviews Card
+            <div className="bg-base-100 rounded-3xl shadow-lg p-6 sm:p-10 text-center border border-neutral">
+              <Star className="w-8 h-8 text-warning mx-auto mb-4" />
+              <h3 className="font-medium text-xl mb-2 text-base-content">No Reviews to Show</h3>
+              <p className="text-neutral-content mb-6">Looks like you haven't written any reviews matching this filter yet.</p>
               <button
                 onClick={() => setIsWritingReview(true)}
-                className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition"
+                className="px-6 py-3 bg-primary text-primary-content font-semibold rounded-xl hover:bg-primary/90 transition shadow-md"
               >
                 Write Your First Review
               </button>
@@ -375,31 +381,33 @@ const ReviewsComponent = () => {
 
         {/* Write Review Modal */}
         {isWritingReview && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-            <div className="bg-white rounded-2xl shadow-lg max-w-md w-full max-h-[90vh] overflow-y-auto">
-              <div className="p-6">
-                <div className="flex justify-between items-center mb-6">
-                  <h2 className="text-xl font-semibold">Write a Review</h2>
+          <div className="fixed inset-0 bg-black bg-opacity-60 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+            <div className="bg-base-100 rounded-3xl shadow-2xl max-w-lg w-full max-h-[95vh] sm:max-h-[90vh] overflow-y-auto transform transition-all duration-300"> {/* Increased max-h on small screens */}
+              <div className="p-5 sm:p-8"> {/* Adjusted padding */}
+                <div className="flex justify-between items-center pb-4 mb-6 border-b border-neutral">
+                  <h2 className="text-xl sm:text-2xl font-bold text-base-content">Share Your Experience</h2> {/* Adjusted text size */}
                   <button
                     onClick={() => setIsWritingReview(false)}
-                    className="text-gray-400 hover:text-gray-600"
+                    className="text-neutral-content hover:text-base-content transition-colors p-1 rounded-full hover:bg-base-200"
+                    aria-label="Close review form"
                   >
-                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path>
-                    </svg>
+                    <X className="w-6 h-6" />
                   </button>
                 </div>
-                
+
                 <form onSubmit={handleSubmitReview}>
-                  <div className="space-y-4">
+                  <div className="space-y-5">
+
+                    {/* Mechanic Selection (unchanged, good) */}
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Mechanic</label>
+                      <label htmlFor="mechanicId" className="block text-sm font-medium text-base-content mb-1">Mechanic</label>
                       <select
+                        id="mechanicId"
                         name="mechanicId"
                         value={newReview.mechanicId}
                         onChange={handleInputChange}
                         required
-                        className="w-full p-3 border rounded-lg focus:ring-indigo-500 focus:border-indigo-500"
+                        className="w-full p-3 border border-neutral rounded-xl focus:ring-primary focus:border-primary transition-colors bg-base-100 text-base-content"
                       >
                         <option value="">Select a mechanic</option>
                         {mechanics.map(mechanic => (
@@ -409,89 +417,94 @@ const ReviewsComponent = () => {
                         ))}
                       </select>
                     </div>
-                    
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Service</label>
-                      <select
-                        name="service"
-                        value={newReview.service}
-                        onChange={handleInputChange}
-                        required
-                        className="w-full p-3 border rounded-lg focus:ring-indigo-500 focus:border-indigo-500"
-                      >
-                        <option value="">Select a service</option>
-                        {services.map(service => (
-                          <option key={service} value={service}>{service}</option>
-                        ))}
-                      </select>
+
+                    {/* Service & Vehicle Selection - Stack vertically on extra small screens */}
+                    <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
+                      <div className="flex-1">
+                        <label htmlFor="service" className="block text-sm font-medium text-base-content mb-1">Service</label>
+                        <select
+                          id="service"
+                          name="service"
+                          value={newReview.service}
+                          onChange={handleInputChange}
+                          required
+                          className="w-full p-3 border border-neutral rounded-xl focus:ring-primary focus:border-primary transition-colors bg-base-100 text-base-content"
+                        >
+                          <option value="">Select service</option>
+                          {services.map(service => (
+                            <option key={service} value={service}>{service}</option>
+                          ))}
+                        </select>
+                      </div>
+                      <div className="flex-1">
+                        <label htmlFor="vehicleId" className="block text-sm font-medium text-base-content mb-1">Vehicle</label>
+                        <select
+                          id="vehicleId"
+                          name="vehicleId"
+                          value={newReview.vehicleId}
+                          onChange={handleInputChange}
+                          required
+                          className="w-full p-3 border border-neutral rounded-xl focus:ring-primary focus:border-primary transition-colors bg-base-100 text-base-content"
+                        >
+                          <option value="">Select vehicle</option>
+                          {vehicles.map(vehicle => (
+                            <option key={vehicle.id} value={vehicle.id}>
+                              {vehicle.make} {vehicle.model}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
                     </div>
-                    
+
+                    {/* Rating */}
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Vehicle</label>
-                      <select
-                        name="vehicleId"
-                        value={newReview.vehicleId}
-                        onChange={handleInputChange}
-                        required
-                        className="w-full p-3 border rounded-lg focus:ring-indigo-500 focus:border-indigo-500"
-                      >
-                        <option value="">Select a vehicle</option>
-                        {vehicles.map(vehicle => (
-                          <option key={vehicle.id} value={vehicle.id}>
-                            {vehicle.make} {vehicle.model} ({vehicle.year})
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-                    
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Rating</label>
-                      <div className="flex space-x-1">
+                      <label className="block text-sm font-medium text-base-content mb-2">Your Rating</label>
+                      {/* Ensure buttons don't wrap oddly */}
+                      <div className="flex space-x-2">
                         {[1, 2, 3, 4, 5].map(star => (
                           <button
                             key={star}
                             type="button"
                             onClick={() => handleRatingSelect(star)}
-                            className="focus:outline-none"
+                            className="focus:outline-none transition-transform transform hover:scale-110"
+                            aria-label={`${star} stars`}
                           >
-                            <svg
-                              className={`w-8 h-8 ${star <= newReview.rating ? 'text-yellow-400' : 'text-gray-300'}`}
-                              fill="currentColor"
-                              viewBox="0 0 20 20"
-                            >
-                              <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                            </svg>
+                            <Star
+                              className={`w-8 h-8 sm:w-9 sm:h-9 ${star <= newReview.rating ? 'text-warning fill-warning' : 'text-base-300 fill-current'}`}
+                            /> {/* Adjusted star size */}
                           </button>
                         ))}
                       </div>
                     </div>
-                    
+
+                    {/* Comment (unchanged, good) */}
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Your Review</label>
+                      <label htmlFor="comment" className="block text-sm font-medium text-base-content mb-1">Your Review</label>
                       <textarea
+                        id="comment"
                         name="comment"
                         value={newReview.comment}
                         onChange={handleInputChange}
                         required
                         rows="4"
                         placeholder="Share your experience with this mechanic..."
-                        className="w-full p-3 border rounded-lg focus:ring-indigo-500 focus:border-indigo-500"
+                        className="w-full p-3 border border-neutral rounded-xl focus:ring-primary focus:border-primary transition-colors bg-base-100 text-base-content"
                       ></textarea>
                     </div>
                   </div>
-                  
-                  <div className="mt-6 flex justify-end space-x-3">
+
+                  <div className="mt-8 flex justify-end space-x-3">
                     <button
                       type="button"
                       onClick={() => setIsWritingReview(false)}
-                      className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50"
+                      className="px-4 py-3 sm:px-6 sm:py-3 border border-neutral rounded-xl text-base-content hover:bg-base-200 transition-colors shadow-sm text-sm sm:text-base"
                     >
                       Cancel
                     </button>
                     <button
                       type="submit"
                       disabled={isSubmitting || newReview.rating === 0}
-                      className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 disabled:opacity-50"
+                      className="px-4 py-3 sm:px-6 sm:py-3 bg-primary text-primary-content font-semibold rounded-xl hover:bg-primary/90 transition-colors shadow-lg disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base"
                     >
                       {isSubmitting ? 'Submitting...' : 'Submit Review'}
                     </button>

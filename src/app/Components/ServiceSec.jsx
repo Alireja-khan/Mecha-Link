@@ -1,95 +1,102 @@
-import React from "react";
+"use client";
+import React, { useEffect, useState } from "react";
 import ServiceCard from "./ServiceCard";
 import Link from "next/link";
+import SpecificServices from "./SpecificServices";
 
 export default function ServiceSec() {
-  const services = [
-    {
-      id: 1,
-      name: "AutoFix Garage",
-      category: "Automobile",
-      location: "Dhaka, Bangladesh",
-      workingHour: "9:00 AM - 8:00 PM",
-      weekend: "Friday",
-      rating: 4,
-      image: "https://i.ibb.co.com/twWwK13q/pexels-olly-3817756.jpg",
-    },
-    {
-      id: 2,
-      name: "Home Essentials",
-      category: "Household",
-      location: "Chittagong, Bangladesh",
-      workingHour: "10:00 AM - 9:00 PM",
-      weekend: "Sunday",
-      rating: 3,
-      image: "https://i.ibb.co.com/j96BjHkM/pexels-olly-3846508.jpg",
-    },
-    {
-      id: 3,
-      name: "Speedy Motors",
-      category: "Automobile",
-      location: "Khulna, Bangladesh",
-      workingHour: "8:00 AM - 7:00 PM",
-      weekend: "Friday",
-      rating: 5,
-      image: "https://i.ibb.co.com/d0xkrYqh/pexels-gustavo-fring-6870320.jpg",
-    },
-    {
-      id: 4,
-      name: "Daily Needs Store",
-      category: "Household",
-      location: "Rajshahi, Bangladesh",
-      workingHour: "9:30 AM - 8:30 PM",
-      weekend: "Saturday",
-      rating: 2,
-      image: "https://i.ibb.co.com/ds3m107k/pexels-centre-for-ageing-better-55954677-7849743.jpg",
-    },
-    {
-      id: 5,
-      name: "Elite Auto Care",
-      category: "Automobile",
-      location: "Sylhet, Bangladesh",
-      workingHour: "9:00 AM - 6:00 PM",
-      weekend: "Friday",
-      rating: 4,
-      image: "https://i.ibb.co.com/1G6K3BDg/pexels-gustavo-fring-4173282.jpg",
-    },
-    {
-      id: 6,
-      name: "City Home Mart",
-      category: "Household",
-      location: "Barisal, Bangladesh",
-      workingHour: "10:00 AM - 9:00 PM",
-      weekend: "Sunday",
-      rating: 3,
-      image: "https://i.ibb.co.com/279cNcqV/pexels-cottonbro-4489732.jpg",
-    },
-  ];
+  const [services, setServices] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    setLoading(true);
+    fetch(`/api/shops?home=true`)
+      .then((res) => res.json())
+      .then((data) => {
+        setServices(data || []);
+        setLoading(false);
+      })
+      .catch((error) => {
+        console.error("Failed to fetch services:", error);
+        setLoading(false);
+      });
+  }, []);
+
+  const ServiceCardSkeleton = () => (
+    <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-4 sm:p-6 animate-pulse">
+      <div className="skeleton bg-gray-200 h-40 sm:h-48 w-full rounded-2xl mb-4"></div>
+      <div className="skeleton bg-gray-200 h-6 w-3/4 rounded mb-3"></div>
+      <div className="flex items-center gap-2 mb-3">
+        <div className="skeleton bg-gray-200 h-5 w-5 rounded-full"></div>
+        <div className="skeleton bg-gray-200 h-4 w-16 rounded"></div>
+      </div>
+      <div className="flex items-center gap-2 mb-4">
+        <div className="skeleton bg-gray-200 h-4 w-4 rounded"></div>
+        <div className="skeleton bg-gray-200 h-4 w-32 rounded"></div>
+      </div>
+      <div className="space-y-2 mb-4">
+        <div className="skeleton bg-gray-200 h-3 w-full rounded"></div>
+        <div className="skeleton bg-gray-200 h-3 w-5/6 rounded"></div>
+        <div className="skeleton bg-gray-200 h-3 w-4/6 rounded"></div>
+      </div>
+      <div className="skeleton bg-gray-200 h-10 w-full rounded-xl"></div>
+    </div>
+  );
+
+  const SectionHeaderSkeleton = () => (
+    <div className="text-center mb-10 max-w-2xl mx-auto px-4 animate-pulse">
+      <div className="skeleton bg-gray-300 h-8 sm:h-12 w-3/4 sm:w-80 mx-auto rounded-lg mb-4"></div>
+      <div className="skeleton bg-gray-300 h-4 sm:h-5 w-full rounded mb-2"></div>
+      <div className="skeleton bg-gray-300 h-4 sm:h-5 w-5/6 mx-auto rounded"></div>
+    </div>
+  );
+
   return (
     <>
       <section className="py-20">
-        <div className="container">
-          <div className="text-center mb-10 max-w-2xl mx-auto">
-            <h2 className="text-5xl font-bold text-center">
-              Trusted <span className="text-orange-500">Mechanics</span> Near You
-            </h2>
-            <p className="text-lg text-gray-600 mt-4">
-              MechaLink connects you with verified mechanics nearby – making vehicle
-              repairs and services faster, easier, and more reliable.
-            </p>
+        <div>
+          <SpecificServices loading={loading}></SpecificServices>
+        </div>
+        <div className="lg:container px-6 mx-auto">
+          {loading ? (
+            <SectionHeaderSkeleton />
+          ) : (
+            <div className="text-center mb-10 max-w-2xl mx-auto">
+              <h2 className="md:text-5xl text-4xl font-bold text-center">
+                Trusted <span className="text-primary">Mechanics</span> Near You
+              </h2>
+              <p className="md:text-lg text-medium mt-4">
+                MechaLink connects you with verified mechanics nearby – making
+                vehicle repairs and services faster, easier, and more reliable.
+              </p>
+            </div>
+          )}
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-10">
+            {loading
+              ? [...Array(6)].map((_, index) => (
+                <ServiceCardSkeleton key={index} />
+              ))
+              : services?.map((service) => (
+                <ServiceCard key={service._id} service={service} />
+              ))}
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-10">
-            {services.map((service) => (
-              <ServiceCard key={service.id} service={service}></ServiceCard>
-            ))}
-          </div>
           <div className="text-center mt-10">
-            <Link href='/services'>
-              <button className="px-16  py-3 bg-white border border-orange-500 hover:bg-orange-500  text-orange-500 hover:text-white font-bold text-xl capitalize leading-none font-urbanist rounded-md transition duration-400 cursor-pointer">
-                See All Mechanics
-              </button>
-            </Link>
+            {loading ? (
+              <div className="skeleton bg-gray-300 h-12 w-40 sm:w-48 mx-auto rounded-md"></div>
+            ) : (
+              <Link href="/services">
+                <button
+                  className="w-full sm:w-auto px-8 sm:px-12 lg:px-16 py-3 border-2 border-primary 
+                             hover:bg-primary text-primary hover:text-white font-bold text-lg sm:text-xl 
+                             capitalize leading-none font-urbanist rounded-md transition duration-400 cursor-pointer 
+                             shadow-md hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
+                >
+                  See All Mechanics
+                </button>
+              </Link>
+            )}
           </div>
         </div>
       </section>
